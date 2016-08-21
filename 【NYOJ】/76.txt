@@ -1,0 +1,26 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 41
+int dp[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	dp[2] = 1;
+	dp[3] = 2;
+	for (int i = 4; i <= 40; i++)
+		dp[i] = dp[i-1]+dp[i-2];
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		printf("%d\n", dp[n]);
+	}
+	return 0;
+}

@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+
+int get_phi(int n)
+{
+	int ans = n, m = sqrt(n+0.5);
+	for(int i = 2; i <= m; i++)
+	{
+		if(0 == n%i)
+		{
+			ans -= ans/i;
+			while(0 == n%i) n /= i;
+		}
+	}
+	if(n > 1) ans -= ans/n;
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		printf("%d\n", get_phi(n));
+	}
+	return 0;
+}

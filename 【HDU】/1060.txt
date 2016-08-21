@@ -1,0 +1,20 @@
+#include <cstdio>
+#include <cmath>
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		double n;
+		scanf("%lf%*c", &n);
+		double buf = n*log10(n);
+		putchar((int)pow(10.0,buf-floor(buf))+'0');
+		putchar('\n');
+	}
+	return 0;
+}

@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 100010
+char buf[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(NULL != gets(buf))
+	{
+        int num[26] = {0}, len = strlen(buf);
+        for (int i = 0; i < len; i++)
+        {
+        	if ('a' <= buf[i] && 'z' >= buf[i])
+				num[buf[i]-'a']++;
+        }
+        for (int i = 0; i < 26; i++)
+		{
+            printf ("%c:%d\n", i+'a', num[i]);
+		}
+		printf ("\n");
+	}
+    return 0;
+}

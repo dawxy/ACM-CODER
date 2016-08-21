@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 100010
+int n, a[MAXN][12], d[MAXN][12];
+
+int dp()
+{
+	for (int i = 1; i <= 11; i++)
+		d[n][i] = a[n][i];
+	for (int i = n-1; i >= 0; i--)
+	{
+		for (int j = 0; j <= 10; j++)
+		{
+			if (0 == j)
+				d[i][j] = a[i][j]+max(d[i+1][j], d[i+1][j+1]);
+			else
+				d[i][j] = a[i][j]+max(d[i+1][j-1], max(d[i+1][j],d[i+1][j+1]));
+		}
+	}
+	return d[0][5];
+}
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int m;
+	while(~scanf ("%d%*c", &m) && m)
+	{
+		n = 0;
+		int x,t;
+		memset(a,0,sizeof(a));
+		for (int i = 0; i < m; i++)
+		{
+			scanf ("%d %d%*c", &x, &t);
+			a[t][x]++;
+			if (t > n)
+				n = t;
+		}
+		printf ("%d\n", dp());
+	}
+	return 0;
+}

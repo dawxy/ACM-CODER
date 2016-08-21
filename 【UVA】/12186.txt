@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <vector>
+using namespace std;
+#define MAXN 100010
+vector<int> g[MAXN];
+int t;
+
+int dfs(int r)
+{
+	if (g[r].empty()) return 1;
+	int len = g[r].size(), c = (len*t - 1) / 100 + 1, ans = 0;
+	vector<int> buf;
+	for (int i = 0; i < len; i++)
+		buf.push_back(dfs(g[r][i]));
+	sort(buf.begin(),buf.end());
+	for (int i = 0; i < c; i++)
+		ans += buf[i];
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while (~scanf("%d %d%*c", &n, &t) && n + t)
+	{
+		int f;
+		for (int i = 0; i <= n; i++)
+			g[i].clear();
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%d%*c", &f);
+			g[f].push_back(i);
+		}
+		printf("%d\n", dfs(0));
+	}
+	return 0;
+}

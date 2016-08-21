@@ -1,0 +1,84 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int st[MAXN],ed[MAXN],a[MAXN],q[MAXN],sot[MAXN];
+
+int mx[MAXN<<1];
+inline int id(int x, int y){return x+y|x!=y;}
+void update(int x, int y, int p, int v)
+{
+	if(x == y)
+	{
+		mx[id(x,y)] = v;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(x,m,p,v);
+	else update(m+1,y,p,v);
+	mx[id(x,y)] = max(mx[id(x,m)],mx[id(m+1,y)]);
+}
+int query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr) return mx[id(x,y)];
+	int m = (x+y)>>1, ans = -INF;
+	if(ql <= m) ans = max(ans,query(x,m,ql,qr));
+	if(qr > m) ans = max(ans,query(m+1,y,ql,qr));
+	return ans;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n,len;
+		scanf("%d%d",&n, &len);
+		rep(i,0,n) scanf("%d", &a[i]),sot[i] = a[i];
+		printf("Case #%d: ",++count);
+		if(n == len)
+		{
+			puts("0");
+			continue;
+		}
+		sort(sot,sot+n);
+		int cnt = unique(sot,sot+n)-sot;
+		rep(i,0,n) a[i] = lower_bound(sot,sot+cnt,a[i])-sot;
+		clc(q,0x3f);
+		rep(i,0,n)
+		{
+			int k = lower_bound(q,q+n,a[i])-q;
+			q[k] = a[i];
+			ed[i] = k+1;
+		}
+		clc(q,0x3f);
+		per(i,n-1,0)
+		{
+			int k = lower_bound(q,q+n,-a[i])-q;
+			q[k] = -a[i];
+			st[i] = k+1;
+		}
+		int ans = ed[n-len-1];
+		clc(mx,0);
+		update(0,cnt-1,a[n-1],st[n-1]);
+		per(i,n-len-2,0)
+		{
+			if(a[i]+1 < cnt-1)
+				ans = max(ans,ed[i]+query(0,cnt-1,a[i]+1,cnt-1));
+			else
+				ans = max(ans,ed[i]);
+			ans = max(ans,st[i+len]);
+			update(0,cnt-1,a[i+len],st[i+len]);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

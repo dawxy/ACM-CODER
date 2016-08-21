@@ -1,0 +1,112 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+struct NODE{
+	int var;//保存num%N后的值
+	string num;//大数num
+	NODE(int v, string b){
+		var = v, num = b;
+	}
+};
+queue<NODE> q;
+char w[20];
+int n,c, m;
+bool vis[5010];
+
+int get_num(char ch)
+{
+	if('A' == ch) return 10;
+	else if('B' == ch) return 11;
+	else if('C' == ch) return 12;
+	else if('D' == ch) return 13;
+	else if('E' == ch) return 14;
+	else if('F' == ch) return 15;
+	else return ch-'0';
+}
+bool is_biger(const string &num)
+{
+	int sum = 0, sz = num.size();
+	rep(i,0,sz)
+	{
+		sum = sum+get_num(num[i]);
+		if(sum >= n) return true;
+		sum *= c;
+	}
+	return false;
+}
+bool bfs(string &ans)
+{
+	clc(vis,0);
+	while(!q.empty()) q.pop();
+	sort(w,w+m);
+	if(!n)
+	{
+		if('0' != w[0]) return false;
+		ans = string("")+w[0];
+		return true;
+	}
+	rep(i,0,m)
+	{
+		if('0' == w[i]) continue;
+		q.push(NODE(get_num(w[i])%n,string("")+w[i])), vis[get_num(w[i])%n] = true;
+	}
+	while(!q.empty())
+	{
+		NODE u = q.front();q.pop();
+		//int d = strcmp(u.num.c_str(),"11");
+		if(u.num.size() > 500) return false;
+		if(is_biger(u.num) && 0 == u.var%n)
+		{
+			ans = u.num;
+			return true;
+		}
+		rep(i,0,m)
+		{
+			NODE now = NODE((u.var*c+get_num(w[i]))%n,u.num+w[i]);
+			if(!vis[now.var])
+			{
+				q.push(now);
+				vis[now.var] = true;
+			}
+		}
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d %d%*c", &n, &c);
+		scanf("%d%*c", &m);
+		rep(i,0,m)
+		{
+			w[i] = getchar();
+			getchar();
+		}
+		string ans;
+		if(bfs(ans))
+			puts(ans.c_str());
+		else puts("give me the bomb please");
+	}
+	return 0;
+}

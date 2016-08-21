@@ -1,0 +1,126 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <vector>
+#include <map>
+using namespace std;
+#define MAXN 10
+#define MAXM 110
+#define MAXS 500001
+#define INF 0x3f3f3f3f
+vector<vector<int> > s;
+map<vector<int>, int> id;
+double c, p[MAXN][MAXM], dp[MAXM][MAXS];
+int m, n, kk, len, k[MAXN], buy[MAXS][MAXN], sell[MAXS][MAXN], pre[MAXM][MAXS], r[MAXM][MAXS];
+char name[MAXN][10];
+
+void dfs(int st, vector<int>& buf, int sum)
+{
+	if (n == st)
+	{
+		id[buf] = s.size();
+		s.push_back(buf);
+		return;
+	}
+	for (int i = 0; i <= k[st] && sum + i <= kk; i++)
+	{
+		buf[st] = i;
+		dfs(st+1,buf,sum+i);
+	}
+}
+void init()
+{
+	vector<int> buf(n);
+	s.clear();
+	id.clear();
+	dfs(0,buf,0);
+	len = s.size();
+	for (int i = 0; i < len; i++)
+	{
+		int sum = 0;
+		for (int j = 0; j < n; j++) sum += s[i][j];
+		for (int j = 0; j < n; j++)
+		{
+			buy[i][j] = sell[i][j] = -1;
+			if (s[i][j] < k[j] && sum < kk)
+			{
+				vector<int> val = s[i];
+				val[j]++;
+				buy[i][j] = id[val];
+			}
+			if (s[i][j] > 0)
+			{
+				vector<int> val = s[i];
+				val[j]--;
+				sell[i][j] = id[val];
+			}
+		}
+	}
+}
+void update(int d, int st, int st2, double v, int o)
+{
+	if (v > dp[d + 1][st2])
+	{
+		dp[d + 1][st2] = v;
+		r[d + 1][st2] = o;
+		pre[d + 1][st2] = st;
+	}
+}
+double sloved()
+{
+	for (int d = 0; d <= m; d++)
+	{
+		for (int i = 0; i < len; i++)
+			dp[d][i] = -INF;
+	}
+	dp[0][0] = c;
+	for (int d = 0; d < m; d++)
+	{
+		for (int i = 0; i < len; i++)
+		{
+			double v = dp[d][i];
+			if (v < -1) continue;
+			update(d,i,i,v,0);
+			for (int j = 0; j < n; j++)
+			{
+				if (-1 != buy[i][j] && v >= p[j][d] - 1e-3)
+					update(d,i,buy[i][j],v-p[j][d],j+1);
+				if (-1 != sell[i][j])
+					update(d,i,sell[i][j],v+p[j][d],-j-1);
+			}
+		}
+	}
+	return dp[m][0];
+}
+void pt(int d, int st)
+{
+	if (!d) return;
+	pt(d-1,pre[d][st]);
+	if (!r[d][st]) puts("HOLD");
+	else if (0 < r[d][st]) printf("BUY %s\n", name[r[d][st]-1]);
+	else printf("SELL %s\n", name[-r[d][st]-1]);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while (~scanf("%lf %d %d %d%*c", &c, &m, &n, &kk))
+	{
+		int g;
+		double val;
+		for (int i = 0; i < n; i++)
+		{
+			scanf("%s %d %d%*c", &name[i], &g, &k[i]);
+			for (int j = 0; j < m; j++)
+			{
+				scanf("%lf%*c", &val);
+				p[i][j] = g*val;
+			}
+		}
+		init();
+		printf("%.2lf\n", sloved());
+		pt(m,0);
+	}
+	return 0;
+}

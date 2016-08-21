@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 250*250+10;
+unordered_map<int,int> id;
+int b[MAXN], d[MAXN], cnt;
+
+int lis()
+{
+	int len = 0;
+	repe(i,1,cnt)
+	{
+		if(b[i] > d[len]) d[++len] = b[i];
+		else d[lower_bound(d,d+len,b[i])-d] = b[i];
+	}
+	return len;
+}
+int a[MAXN];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,p,q;
+		scanf("%d %d %d%*c", &n, &p, &q);
+		id.clear();
+		scanf("%*d%*c");
+		repe(i,1,p)
+		{
+			scanf("%d%*c", &a[i]);
+			id[a[i]] = i;
+		}
+		cnt = 0;
+		scanf("%*d%*c");
+		repe(i,1,q)
+		{
+			int v;
+			scanf("%d%*c", &v);
+			if(id.find(v) != id.end())
+				b[++cnt] = id[v];
+		}
+		printf("Case %d: %d\n", ++count,lis()+1);
+	}
+	return 0;
+}

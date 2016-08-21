@@ -1,0 +1,132 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10, MAXM = 100000+10,MOD = 1000007;
+char buf[MAXN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+    if(++ps == pe)
+        pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+    int ans = 0;
+    if(ps == pe) return -1;
+    do{
+        rnext();
+    }while(!isdigit(*ps) && ps != pe);
+    if(ps == pe) return -1;
+    do
+    {
+        ans = (ans<<1)+(ans<<3)+*ps-48;
+        rnext();
+    }while(isdigit(*ps) && ps != pe);
+    return ans;
+}
+struct HASH{
+	int head[MOD], next[MAXN], sum[MAXN], cnt, node[MAXN], num[MAXN];
+	void clear(){
+		cnt = 0;
+		clc(head,-1);
+		clc(sum,0);
+	}
+	int hash(int s){
+		if(s < 0) s = -s;
+		return s%MOD;
+	}
+	void insert(int s, int v){
+		int id = hash(s);
+		int u = head[id];
+		while(~u){
+			if(s == node[u])
+			{
+				sum[u]++;
+				return;
+			}
+			u = next[u];
+		}
+		sum[cnt] = 1;
+		node[cnt] = s;
+		num[cnt] = v;
+		next[cnt] = head[id];
+		head[id] = cnt++;
+	}
+	int find(int s){
+		int id = hash(s);
+		int u = head[id];
+		while(~u){
+			if(node[u] == s) return num[u];
+			u = next[u];
+		}
+		return -1;
+	}
+}vis;
+int head[MAXN], tol,nxt[MAXM],to[MAXM];
+int cnt;
+
+int get_id(int a)
+{
+	int tmp = vis.find(a);
+    if(-1 == tmp)
+    {
+        vis.insert(a,cnt++);
+        return cnt-1;
+    }
+    return tmp;
+}
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int a[MAXN];
+void pt(int u){
+	for(int i = head[u]; ~i; i = nxt[i])
+		printf("%d ", to[i]);
+	putchar('\n');
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int n,m;
+    while(~(n = in()))
+    {
+        m = in();
+        vis.clear();
+        clc(head,-1);
+		tol = 0;
+        cnt = 0;
+        repe(i,1,n) a[i] = in();
+		per(i,n,1)
+        {
+            int id = get_id(a[i]);
+            add_edge(id,i);
+        }
+        while(m--)
+        {
+            int a = in();
+            int id = get_id(a);
+            if(-1 == head[id]) puts("-1");
+            else
+			{
+				printf("%d\n", to[head[id]]);
+				head[id] = nxt[head[id]];
+			}
+        }
+    }
+    return 0;
+}

@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 1000
+struct NODE{
+    char data[105], a[105];
+}p[MAXN];
+char buf[105];
+
+bool cmp(const NODE a, const NODE b)
+{
+    if (strcmp(a.data, b.data) >= 0)
+		return false;
+	return true;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n = 0;
+    while(1)
+	{
+        gets(p[n].a);
+        if (!strcmp(p[n].a,"XXXXXX"))
+            break;
+        strcpy(p[n].data,p[n].a);
+        sort(p[n].a,p[n].a+strlen(p[n].a));
+        n++;
+	}
+	sort(p,p+n,cmp);
+    while(1)
+	{
+        gets(buf);
+        if (!strcmp(buf,"XXXXXX"))
+			break;
+		sort(buf,buf+strlen(buf));
+        bool finded = false;
+        for (int i = 0; i < n; i++)
+		{
+            if (!strcmp(buf,p[i].a))
+			{
+                puts(p[i].data);
+                finded = true;
+			}
+		}
+        if (!finded)
+			puts("NOT A VALID WORD");
+		puts("******");
+	}
+    return 0;
+}

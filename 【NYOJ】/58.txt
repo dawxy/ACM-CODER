@@ -1,0 +1,45 @@
+#include <stdio.h>
+int d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+struct queue{
+	int i, j;
+}que[1000], st,ed;
+
+int bfs();
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		scanf ("%d %d %d %d%*c", &st.i, &st.j, &ed.i, &ed.j);
+		printf ("%d\n", bfs()-1);
+	}
+
+	return 0;
+}
+
+int bfs()
+{
+	int g[9][9] = {{1,1,1,1,1,1,1,1,1}, {1,0,0,1,0,0,1,0,1},{1,0,0,1,1,0,0,0,1},{1,0,1,0,1,1,0,1,1},{1,0,0,0,0,1,0,0,1},{1,1,0,1,0,1,0,0,1},{1,1,0,1,0,1,0,0,1},{1,1,0,1,0,0,0,0,1},{1,1,1,1,1,1,1,1,1}};
+	int ni, nj, front = -1, rear = 0;
+	queue buf;
+	g[st.i][st.j] = 1;
+	que[rear++] = st;
+	while(1)
+	{
+		buf = que[++front];
+		if (buf.i == ed.i && buf.j == ed.j)
+			return g[ed.i][ed.j];
+		for (int i = 0;  i < 4; i++)
+		{
+			ni = d[i][0]+buf.i;
+			nj = d[i][1]+buf.j;
+			if (0 <= ni && 9 > ni && 0 <= nj && 9 > nj && 0 == g[ni][nj])
+			{
+				g[ni][nj] = g[buf.i][buf.j]+1;
+				que[rear].i = ni;
+				que[rear++].j = nj;
+			}
+		}
+	}
+}

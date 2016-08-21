@@ -1,0 +1,37 @@
+#include <stdio.h>
+
+bool is_number(char);
+
+int main ()
+{
+	char a;
+	int i, sum = 0;
+	while (EOF != (a = getchar()))
+	{
+		if (is_number(a))
+			sum += a-'0';
+		else
+		{
+			if (0 == sum)
+				sum = 1;
+			if ('!' == a)
+				a = '\n';
+			else
+				if ('b' == a)
+					a = ' ';
+			for (i = 0; i < sum; i++)
+				printf ("%c", a);
+			sum = 0;
+		}
+	}
+
+	return 0;
+}
+
+bool is_number(char a)
+{
+	if ('0' <= a && '9' >= a)
+		return true;
+	else
+		return false;
+}

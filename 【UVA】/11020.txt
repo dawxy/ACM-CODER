@@ -1,0 +1,258 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+typedef pair<int,int> P;
+multiset<P> s;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		P a;
+		s.clear();
+		printf("Case #%d:\n", ++count);
+		rep(i,0,n)
+		{
+			scanf("%d %d%*c", &a.first, &a.second);
+			auto p = s.lower_bound(a);
+			if(p == s.begin() || (--p)->second > a.second)
+			{
+				s.insert(a);
+				p = s.upper_bound(a);
+				while(p != s.end() && p->second >= a.second) s.erase(p++);
+			}
+			printf("%d\n", s.size());
+		}
+		if(t) putchar('\n');
+	}
+	return 0;
+}
+======================================================================================================
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+typedef pair<int,int> P;
+struct Treap{
+	/*
+	Treap同时有二叉搜索树(BST,键值:左儿子<根<右儿子)和堆的性质(根节点的优先级大于儿子节点)
+	这样能保证在优先级唯一且不相等的情况下树是唯一的
+	这里的r(优先级)是用rand()生成的，能证明查找，插入，删除的时间复杂度都是log(n)
+	注意:rand()最大值是RAND_MAX(系统不同值不同，可以输出看看),所以不够的话不能直接用
+	rand()是在0~RAND_MAX中的书按照某个顺序输出的，在输出前RAND_MAX+1中是不会重复的
+	*/
+	const int MAX_RAND = 100000;//设置最大的rand()
+	int size;
+	struct NODE{
+		NODE *ch[2];//0左1右儿子
+		NODE *next, *pre;//横向链接，根据v从小到大排序好之后
+		int r,cnt;//优先级，值越大越高
+		P v;//键值
+		int cmp(P x){
+			if(x == v) return -1;
+			return x<v?0:1;
+		}
+	}*rt, *begin, *end;
+	void newnode(NODE* &u, P v){
+		u = new NODE();
+		u->ch[0] = u->ch[1] = u->next = u->pre = NULL, u->v = v, u->r = rand();
+		u->cnt = 1;
+		size++;
+	}
+	void clear(){
+		P buf=make_pair(-1,-1);
+		newnode(end,buf);
+		buf = make_pair(-2,-2);
+		newnode(begin,buf);
+		begin->next = end,end->pre = begin;
+		rt = NULL;
+		size = 0;
+	}
+	void rotate(NODE* &u, int d)//旋转,d = 0左旋，d = 1右旋
+	{
+		NODE *k = u->ch[d^1];
+		u->ch[d^1] = k->ch[d], k->ch[d] = u, u = k;
+	}
+	bool find(NODE *u, P v, NODE* &ans)//查找键值v,查找到的话就是ans，否则ans是v应该插入的位置
+	{
+		if(!u)
+		{
+			ans = begin;
+			return false;
+		}
+		int d;
+		while(u)
+		{
+			ans = u;
+			d = u->cmp(v);
+			if(-1 == d)
+			{
+				//if(ans) ans = ans->next;
+				return true;
+			}
+			else u = u->ch[d];
+		}
+		if(d && ans) ans = ans->next;
+		return false;
+	}
+	NODE* add(NODE* &u, P v)//插入键值v,修改u(需要保证v不存在),返回新增的位置
+	{
+		if(!u)//新建节点
+		{
+			newnode(u,v);
+			return u;
+		}
+		int d = u->cmp(v);
+		NODE *ans = add(u->ch[d], v);
+		if(u->ch[d]->r > u->r)//如果儿子比根优先级大了就需要旋转
+			rotate(u,d^1);
+		return ans;
+	}
+	void insert(P v)//插入键值p
+	{
+		NODE *k;
+		if(find(rt,v,k)) k->cnt++,size++;
+		else
+		{
+			NODE *ans = add(rt,v);
+			if(-2 == k->v.first)
+			{
+				ans->next = end;
+				end->pre = ans;
+				begin = ans;
+				return;
+			}
+			ans->next = k;
+			if(k->pre) k->pre->next = ans, ans->pre = k->pre;
+			k->pre = ans;
+			if(end->pre->v < v) 
+				end->pre = ans;//插入值为最大需要更新end->pre
+			if(v < begin->v)//插入值为最小时需要更新begin
+			{
+				//if(v.first == begin->v.first) size -= begin->cnt, del(rt,begin->v);//如果插入值覆盖了begin则需要删除原来的begin
+				begin = ans;
+				ans->pre = NULL;
+			}
+		}
+	}
+	void del(NODE* &u, P v)//删除键值v(需要保证v存在)
+	{
+		int d = u->cmp(v);//寻找是左还是右儿子
+		if(~d)//没找到v,继续往下找
+		{
+			del(u->ch[d],v);
+			return;
+		}
+		//找到了节点v
+		if(!u->ch[0]) //没有左儿子直接把右儿子付到根节点吧
+		{
+			if(u->pre) u->pre->next = u->next;
+			if(u->next) u->next->pre = u->pre;
+			u = u->ch[1];
+		}
+		else if(!u->ch[1])
+		{
+			if(u->pre) u->pre->next = u->next;
+			if(u->next) u->next->pre = u->pre;
+			u = u->ch[0];
+		}
+		else
+		{
+			int d2 = u->ch[0]->r > u->ch[1]->r?1:0;
+			rotate(u,d2);
+			del(u->ch[d2],v);
+		}
+	}
+	NODE* erase(P v)//删除键值v,返回v下一个位置
+	{
+		NODE *ans = end, *k;//k为要删除的值
+		if(find(rt,v,k))//找到键值直接删除，相同值有多个就全部删除
+		{
+			size -= k->cnt;
+			ans = k->next;
+			if(begin == k)
+				begin = k->next;
+			del(rt,v);
+		}
+		return ans;
+	}
+	NODE* lower_bound(P v)
+	{
+		NODE *k;
+		find(rt,v,k);
+		return k;
+	}
+	NODE* upper_bound(P v)
+	{
+		NODE *k;
+		if(find(rt,v,k) && k)
+			k = k->next;
+		return k;
+	}
+}s;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		P a;
+		s.clear();
+		printf("Case #%d:\n", ++count);
+		rep(i,0,n)
+		{
+			scanf("%d %d%*c", &a.first, &a.second);
+			auto p = s.lower_bound(a);
+			if(p == s.begin || p->pre->v.second > a.second)
+			{
+				s.insert(a);
+				p = s.upper_bound(a);
+				while(p != s.end && p->v.second >= a.second)
+					p = s.erase(p->v);
+			}
+			printf("%d\n", s.size);
+		}
+		if(t) putchar('\n');
+	}
+	return 0;
+}

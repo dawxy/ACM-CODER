@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 105
+struct NODE{
+	char data[MAXN];
+}a[MAXN];
+
+bool cmp(NODE a, NODE b)
+{
+    if (strcmp(a.data, b.data) >= 0)
+		return false;
+	return true;
+}
+int main ()
+{
+    #ifdef SHY
+		freopen("e:\\1.txt","r",stdin);
+	#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+        int n;
+        scanf ("%d%*c", &n);
+        for (int i = 0; i < n; i++)
+		{
+			gets(a[i].data);
+		}
+		sort(a, a+n, cmp);
+        int ans = strlen(a[0].data);
+        for (int i = 1; i < n; i++)
+		{
+            int len;
+            for (len = 0; len < strlen(a[i].data); len++)
+			{
+				if (a[i].data[len] != a[i-1].data[len])
+					break;
+			}
+            ans += strlen(a[i].data) - len;
+		}
+        printf ("%d\n", ans);
+        for (int i = 0; i < n; i++)
+			puts(a[i].data);
+	}
+	return 0;
+}

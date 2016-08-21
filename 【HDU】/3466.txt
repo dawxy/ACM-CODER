@@ -1,0 +1,56 @@
+/*
+A,B两个物品,要使得先后顺序让所需空间最小，才能让后面的价值可能越大
+假如A先放，则需要空间 q1+w2;
+B先放，则所需空间为   q2+w1;
+假如要让A排在前面,则排序方式为 q1+w2<q2+w1
+*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 510, MAXM = 5010;
+struct NODE{
+	int w,q,v;
+	bool operator<(const NODE& t) const{
+		return q+t.w < t.q+w;
+	}
+}p[MAXN];
+int dp[MAXM];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		rep(i,0,n) scanf("%d %d %d%*c", &p[i].w, &p[i].q, &p[i].v);
+		clc(dp,0);
+		int ans = 0;
+		sort(p,p+n);
+		rep(i,0,n)
+		{
+			per(j,m,p[i].q)
+			{
+				dp[j] = max(dp[j], dp[j-p[i].w]+p[i].v);
+			}
+		}
+		repe(i,1,m) ans = max(ans,dp[i]);
+		printf("%d\n", ans);
+	}
+	return 0;
+}

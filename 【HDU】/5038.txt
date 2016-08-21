@@ -1,0 +1,69 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <cstdlib>
+#include <cmath>
+#include <algorithm>
+#include <queue>
+#include <map>
+using namespace std;
+#define MAXN 1000010
+map<int,int> vis;
+vector<int> ans;
+struct NODE{
+	int a, time;
+}p[MAXN];
+
+bool inline cmp(const NODE a, const NODE b)
+{
+	return a.time < b.time;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n, w;
+		vis.clear();
+		ans.clear();
+		scanf("%d%*c", &n);
+		for(int i = 0; i < n; i++)
+		{
+			scanf("%d%*c", &w);
+			vis[10000-(100-w)*(100-w)]++;
+		}
+		printf("Case #%d:\n", ++count);
+		map<int, int>::iterator it = vis.begin();
+		int m = 0;
+		for(;it != vis.end(); it++)
+			p[m].time = it->second, p[m++].a = it->first;
+		sort(p,p+m,cmp);
+		int cnt = p[m-1].time;
+		if(m == 1)
+			printf("%d\n", p[0].a);
+		else
+		{
+			int sum = 0;
+			for(int i = m-1; i >= 0; i--)
+			{
+				if(cnt == p[i].time)
+					sum += p[i].time, ans.push_back(p[i].a);
+			}
+			if(sum < n)
+			{
+				sort(ans.begin(),ans.end());
+				printf("%d", ans[0]);
+				for(int i = 1; i < ans.size(); i++)
+					printf(" %d", ans[i]);
+				printf("\n");
+			}
+			else
+				puts("Bad Mushroom");
+		}
+	}
+	return 0;
+}

@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <map>
+#include <algorithm>
+using namespace std;
+#define MAXN 2010
+struct NODE{
+    long long name;
+    int y,m,d,s;
+}p[MAXN],out[MAXN];
+int v[7], n;
+map <long long, int> lv;
+
+bool cmp(const NODE a, const NODE b)
+{
+    if (a.s != b.s)
+		return a.s > b.s;
+    if (a.y != b.y)
+		return a.y < b.y;
+	if (a.m != b.m)
+		return a.m < b.m;
+	if (a.d != b.d)
+		return a.d < b.d;
+	return a.name < b.name;
+}
+void output()
+{
+	int s = 0;
+	lv.clear();
+	for (int i = 6; i >= 3 && s < n; i--)
+	{
+		for (int j = 0; j < v[i]; j++)
+		{
+            lv[p[s++].name] = i;
+		}
+	}
+    for (; s < n; s++)
+	{
+        if (p[s].s)
+            lv[p[s].name] = 2;
+        else
+			lv[p[s].name] = 1;
+	}
+	for (int i = 0; i < n; i++)
+	{
+        printf ("LV%d\n",lv[out[i].name]);
+	}
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        scanf ("%d%*c", &n);
+        int pp = 0;
+        for (int i = 0; i < n; i++)
+		{
+			scanf ("%lld %d/%d/%d %d%*c",&p[i].name,&p[i].y, &p[i].m, & p[i].d, &p[i].s);
+			if (p[i].s)
+				pp++;
+			out[i] = p[i];
+		}
+		sort(p,p+n,cmp);
+        v[6] = pp*0.03;
+        v[5] = pp*0.07;
+        v[4] = pp*0.2;
+        v[3] = pp*0.3;
+        output();
+	}
+    return 0;
+}
+

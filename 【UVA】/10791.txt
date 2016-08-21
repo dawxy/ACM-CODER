@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n, count = 0;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		printf("Case %d: ", ++count);
+		if(1 == n)
+		{
+			puts("2");
+			continue;
+		}
+		int len = sqrt(n+0.5), kind = 0;
+		long long ans = 0;
+		for(int i = 2; i <= len && 1 != n; i++)
+		{
+			if(0 == n%i)
+			{
+				int buf = 1;
+				while(0 == n%i)
+				{
+					n /= i;
+					buf *= i;
+				}
+				ans += buf;
+				kind++;
+			}
+		}
+		if(1 != n) ans += n, kind++;
+		if(1 == kind) ans++;
+		printf("%lld\n", ans);
+	}
+	return 0;
+}

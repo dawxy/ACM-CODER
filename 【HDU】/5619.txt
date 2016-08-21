@@ -1,0 +1,149 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 400+20+10, MAXM = 20*20*20+20+20*20+10;
+struct ZKW_MinCostMaxFlow
+{
+private:
+	int st, ed, ecnt, n;
+	int head[MAXN],cap[MAXM<<1],cost[MAXM<<1],to[MAXM<<1],nxt[MAXM<<1];//有反向边，记得两倍
+	int dis[MAXN];
+	void SPFA()
+	{
+		repe(i,0,n) dis[i] = INF;
+		priority_queue<pair<int, int> > q;
+		dis[st] = 0;
+		q.push(make_pair(0, st));
+		while(!q.empty()){
+			int u = q.top().second, d = -q.top().first;
+			q.pop();
+			if(dis[u] != d) continue;
+			for(int p = head[u]; p!=-1; p = nxt[p]){
+				int &v = to[p];
+				if(cap[p] && dis[v] > d + cost[p]){
+					dis[v] = d + cost[p];
+					q.push(make_pair(-dis[v], v));
+				}
+			}
+		}
+		repe(i,0,n) dis[i] = dis[ed] - dis[i];
+	}
+	int minCost, maxFlow;
+	bool use[MAXN];
+	int add_flow(int u, int flow)
+	{
+		if(u == ed)
+		{
+			maxFlow += flow;
+			minCost += dis[st] * flow;
+			return flow;
+		}
+		use[u] = true;
+		int now = flow;
+		for(int p = head[u]; p!=-1; p = nxt[p])
+		{
+			int &v = to[p];
+			if(cap[p] && !use[v] && dis[u] == dis[v] + cost[p])
+			{
+				int tmp = add_flow(v, min(now, cap[p]));
+				cap[p] -= tmp;
+				cap[p^1] += tmp;
+				now -= tmp;
+				if(!now) break;
+			}
+		}
+		return flow - now;
+	}
+	bool modify_label()
+	{
+		int d = INF;
+		repe(u,0,n) if(use[u])
+			for(int p = head[u]; p!=-1; p = nxt[p])
+			{
+				int &v = to[p];
+				if(cap[p] && !use[v]) d = min(d, dis[v] + cost[p] - dis[u]);
+			}
+		if(d == INF) return false;
+		repe(i,0,n) if(use[i]) dis[i] += d;
+		return true;
+	}
+public:
+	void init()
+	{
+		clc(head,-1);
+		ecnt = 2;
+	}
+	void add_edge(int u, int v, int cc, int ww)//点u-v,cc-容量,ww-单位流量费用
+	{
+		cap[ecnt] = cc; cost[ecnt] = ww; to[ecnt] = v;
+		nxt[ecnt] = head[u]; head[u] = ecnt++;
+		cap[ecnt] = 0; cost[ecnt] = -ww; to[ecnt] = u;
+		nxt[ecnt] = head[v]; head[v] = ecnt++;
+	}
+	int zkw(int ss, int tt, int nn, int &flow)//ss-源点，tt-汇点,nn-点的总数(编号0~n)
+	{
+		st = ss, ed = tt, n = nn;
+		minCost = maxFlow = 0;
+		SPFA();
+		while(true)
+		{
+			while(true)
+			{
+				repe(i,0,n) use[i] = 0;
+				if(!add_flow(st, INF)) break;
+			}
+			if(!modify_label()) break;
+		}
+		flow = maxFlow;
+		return minCost;
+	}
+}zkwflow;
+int cost[30][30];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d%d", &m,&n);
+		repe(i,1,n)
+		{
+			repe(j,1,m)
+			{
+				scanf("%d", &cost[i][j]);
+			}
+		}
+		zkwflow.init();
+		repe(i,1,n)
+		{
+			zkwflow.add_edge(0,i,1,0);
+			repe(j,1,m)
+			{
+				repe(k,1,n)
+				{
+					zkwflow.add_edge(i,(j-1)*n+k+n,1,k*cost[i][j]);
+				}
+			}
+		}
+		int ed = (m-1)*n+n+n+1;
+		repe(j,1,m)
+		{
+			repe(k,1,n)
+			{
+				zkwflow.add_edge((j-1)*n+k+n,ed,1,0);
+			}
+		}
+		int flow;
+		printf("%d\n", zkwflow.zkw(0,ed,2+n+m*n,flow));
+	}
+	return 0;
+}

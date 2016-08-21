@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 105
+bool vis[MAXN];
+int time[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    char c;
+    int a, h,s;
+    while(EOF != scanf ("%d%*c", &a) && -1 != a)
+	{
+        memset(vis, false,sizeof(vis));
+        int sum = 0, t = 0;
+        scanf ("%c%*c%d%*c%d%*c", &c,&h,&s);
+        if ('S' == c)
+			time[a] = h*60+s,vis[a] = true;
+        if (!a)
+        {
+            printf ("0 0\n");
+            continue;
+        }
+        while(1)
+		{
+            scanf ("%d%*c%c%*c%d%*c%d%*c", &a, &c, &h,&s);
+            if (!a)
+				break;
+            if ('S' == c)
+                vis[a] = true, time[a] = 60*h+s;
+            else if (vis[a])
+                    sum += 60*h+s-time[a], t++, vis[a] = false;
+		}
+        if (!t)
+		{
+             printf ("0 0\n");
+            continue;
+		}
+        if (sum%t)
+            sum++;
+		printf ("%d %d\n", t,sum/t);
+	}
+    return 0;
+}

@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <queue>
+using namespace std;
+
+int main()
+{
+	int num, buf, ans[102] = {0}, n[102] = {0};
+	queue<int> que;
+	while(1)
+	{
+		scanf ("%d %d%*c", &num, &buf);
+		if (0 == num && 0 == buf)
+			break;
+		if (0 == n[num])
+			que.push(num);
+		n[num] = 1;
+		ans[num] += buf;
+	}
+	while (que.size())
+	{
+		num = que.front();
+		que.pop();
+		printf ("%d %d\n", num, ans[num]);
+	}
+	return 0;
+}

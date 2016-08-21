@@ -1,0 +1,51 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 10002
+#define INF 0x3f3f3f3f
+#define min(a,b) (a<b?a:b)
+const int cost[5][5]={{INF,2,2,2,2},{INF,1,3,4,3},{INF,3,1,3,4},{INF,4,3,1,3},{INF,3,4,3,1}};
+int dp[MAXN][5][5], a[MAXN], ch, ans;
+//dp[i][j][k]表示当前到第i个字符，左脚在j右脚在k的最小消耗能量值
+
+int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	return ch-'0';
+}
+void update(int now, int left, int right, int to)
+{
+	if (to != right)
+		dp[now+1][to][right] = min(dp[now+1][to][right],dp[now][left][right]+cost[left][to]);
+	if (to != left)
+		dp[now+1][left][to] = min(dp[now+1][left][to], dp[now][left][right]+cost[right][to]);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(a[1] = in())
+	{
+		int len = 2;
+		while(a[len++] = in());
+		len-=2;
+		memset(dp,0x3f,sizeof(dp));
+		dp[0][0][0] = 0;
+		for (int i = 0; i < len; i++)
+		{
+			for (int j = 0; j <= 4; j++)
+			{
+				for (int k = 0; k <= 4; k++)
+				{
+					if (INF <= dp[i][j][k]) continue;
+					update(i,j,k,a[i+1]);
+				}
+			}
+		}
+		ans = INF;
+		for (int i = 0; i <= 4; i++)
+			ans = min(ans,min(dp[len][a[len]][i],dp[len][i][a[len]]));
+		printf("%d\n", ans);
+	}
+	return 0;
+}

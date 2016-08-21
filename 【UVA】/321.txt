@@ -1,0 +1,136 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXS 20490
+#define MAXR 11
+struct G{
+	int lenr, lenk, link[MAXR], k[MAXR];
+}g[MAXR*10];
+struct QUE{
+	bool is_move;//false为开灯操作,true为前进
+	bool on;//true为开灯，false为关灯
+	int fa;//父亲状态,用于倒序输出
+	int s[MAXR], dis, ati, num;//当前状态s：0为暗着的，1为亮着
+}que[MAXS];
+int n, ed[MAXR];
+bool vis[MAXS][MAXR];
+
+int bfs();
+void output(int a);
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t = 0, d, s;
+	while(1)
+	{
+		scanf ("%d %d %d%*c", &n, &d, &s);
+		if (!n && !d && !s)
+			break;
+		int a, b, i;
+		for (i = 0;  i < MAXR;i++)
+			g[i].lenr = g[i].lenk = 0;
+		while(d--)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			g[a].link[g[a].lenr++] = b;
+			g[b].link[g[b].lenr++] = a;
+		}
+		while(s--)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			g[a].k[g[a].lenk++] = b;
+		}
+		getchar();
+		int ans = bfs();
+		printf ("Villa #%d\n", ++t);
+		if (-1 == ans)
+			printf ("The problem cannot be solved.\n");
+		else
+		{
+			printf ("The problem can be solved in %d steps:\n",que[ans].dis);
+			output(ans);
+		}
+		printf ("\n");
+	}
+	return 0;
+}
+int get_hash(int *a)
+{
+	int v = 0;
+	for (int i = 1; i <= n; i++)
+		v = (v<<1)+a[i]+1;
+	return v;
+}
+int bfs()
+{
+	int front = -1, rear = 0, anss;
+	memset(que[rear].s,0,sizeof(que[rear].s));
+	memset(ed,0,sizeof(ed));
+	memset(vis,false,sizeof(vis));
+	que[rear].ati = que[rear].s[1] = ed[n] = que[rear].num = 1;
+	que[rear].dis = 0;
+	que[rear++].fa = -1;
+	anss = get_hash(ed);
+	while(1 != rear-front)
+	{
+		int u = que[++front].ati;
+		if (n == que[front].ati && anss == get_hash(que[front].s))
+			return front;
+		for (int i = 0; i < g[u].lenr; i++)
+		{
+			int to = g[u].link[i];
+			if (que[front].s[to])//灯开着才能走
+			{
+				que[rear] = que[front];
+				que[rear].ati = to;
+				int t = get_hash(que[rear].s);
+				if (!vis[t][to])
+				{
+					vis[t][to] = true;
+					que[rear].dis = que[front].dis+1;
+					que[rear].fa = front;
+					que[rear].is_move = true;
+					que[rear].num = to;
+					rear++;
+				}
+			}
+		}
+		for (int i = 0; i < g[u].lenk; i++)
+		{
+			int to = g[u].k[i];
+			if (to == que[front].ati)//如果要开关的灯是自己所在房间直接不可能
+				continue;
+			que[rear] = que[front];
+			que[rear].s[to] = !que[rear].s[to];
+			int t = get_hash(que[rear].s);
+			if (!vis[t][que[rear].ati])
+			{
+				vis[t][que[rear].ati] = true;
+				que[rear].dis = que[front].dis+1;
+				que[rear].fa = front;
+				que[rear].is_move = false;
+				que[rear].on = que[rear].s[to];
+				que[rear].num = to;
+				rear++;
+			}
+		}
+	}
+	return -1;
+}
+
+void output(int a)
+{
+	if (-1 == que[a].fa)
+		return;
+	output(que[a].fa);
+	if (que[a].is_move)
+		printf ("- Move to room %d.\n", que[a].num);
+	else
+	{
+		if (que[a].on)
+			printf ("- Switch on light in room %d.\n", que[a].num);
+		else
+			printf ("- Switch off light in room %d.\n", que[a].num);
+	}
+}

@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 100
+char a[MAXN], b[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int  t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		gets(a);
+		gets(b);
+        int len = strlen(a);
+        int i;
+        for (i = 0; i < len/2; i ++)
+            printf ("%c", a[i]);
+        printf ("%s", b);
+        for (;i < len; i++)
+            printf ("%c", a[i]);
+		printf ("\n");
+	}
+    return 0;
+}

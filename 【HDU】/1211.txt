@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+typedef long long LL;
+
+void e_gcd(LL a, LL b, LL& d, LL& x, LL& y)
+{
+	if(!b) d = a, x = 1, y = 0;
+	else e_gcd(b,a%b, d, y, x), y -= a/b*x;
+}
+LL pow_mod(LL a, LL n, LL mod)
+{
+	LL ans = 1;
+	while(n)
+	{
+		if(n&1) ans = ans*a%mod;
+		a = a*a%mod;
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+	int p,q,e,l;
+	while(~scanf("%d %d %d %d%*c", &p, &q, &e, &l))
+	{
+		LL n = p*q, fn = (p-1)*(q-1), d, x, y;
+		e_gcd(e,-fn,d,x,y);
+		x *= 1/d;
+		LL gx = abs(-fn/d);
+		x = (x%gx+gx)%gx;
+		int a;
+		for(int i = 0; i < l; i++)
+		{
+			scanf("%d%*c", &a);
+			putchar((int)pow_mod(a,x,n));
+		}
+		putchar('\n');
+	}
+	return 0;
+}

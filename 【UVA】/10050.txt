@@ -1,0 +1,28 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n, a[3651] = {0},s, ans = 0, d;
+		scanf ("%d%*c", &d);
+		scanf("%d%*c", &n);
+		for (int j = 0; j < n; j++)
+		{
+			scanf ("%d%*c", &s);
+			for (int i = 0, k = 0; i <= d; i += s, k = (k+s)%7)
+			{
+				if (0 == a[i] && 0 != k && 6 != k)
+				{
+					ans++;
+					a[i] = 1;
+				}
+			}
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

@@ -1,0 +1,142 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10;
+queue<int> q;
+struct NODE{
+    NODE *ch[2];
+    int r;//随机优先级
+    int v;//键值
+    int sum;//以当前节点为根的总结点数
+    NODE(int a){
+        v = a,ch[0] = ch[1] = NULL, r = rand(), sum = 1;
+    }
+    int cmp(int x){
+        if(x == v) return -1;
+        return x<v?0:1;
+    }
+    void push_up(){
+        sum = 1;
+        if(ch[0]) sum += ch[0]->sum;
+        if(ch[1]) sum += ch[1]->sum;
+    }
+};
+void clear(NODE* &u)//清空树
+{
+    if(!u) return;
+    if(u->ch[0]) clear(u->ch[0]);
+    if(u->ch[1]) clear(u->ch[1]);
+    delete u;
+    u = NULL;
+}
+void rotate(NODE* &u, int d)//旋转，d = 0左旋,d = 1右旋
+{
+    NODE *k = u->ch[d^1];
+    u->ch[d^1] = k->ch[d], k->ch[d] = u;
+    u->push_up(), k->push_up();  //更新sum,先更新u
+    u = k;
+}
+void insert(NODE* &u, int v)//插入键值v(不需要保证v是否存在)
+{
+    if(!u) u = new NODE(v);
+    else
+    {
+        int d = v < u->v?0:1;//不要使用cmp(),可能已经存在相同的v
+        insert(u->ch[d], v);
+        if(u->r < u->ch[d]->r) //如果儿子的r比当前大则需要旋转
+            rotate(u,d^1);//左儿子则右旋，右儿子左旋
+    }
+    u->push_up();//更新sum
+}
+void del(NODE* &u, int v)//删除键值v
+{
+    int d = u->cmp(v);
+    if(~d)//没找到继续往下找
+        del(u->ch[d],v);
+    else
+    {
+        NODE *o = u;
+        if(u->ch[0] && u->ch[1])//左右儿子都存在
+        {
+            int d2 = u->ch[0]->r > u->ch[1]->r?1:0;//优先级大的儿子旋转为根
+            rotate(u,d2);
+            del(u->ch[d2],v);
+        }
+        else
+        {
+            if(!u->ch[0]) u = u->ch[1];//只有右儿子
+            else u = u->ch[0];//只有左儿子
+            delete o;
+            //u = NULL;
+        }
+    }
+    if(u) u->push_up();
+}
+int kth(NODE* u, int k)//寻找第k大键值
+{
+    if(!u || k <= 0 || k > u->sum) return 0;//不存在
+    int d = k-(u->ch[0]?u->ch[0]->sum:0);
+    if(d == 1) return u->v;//找到第k大值
+    if(d <= 0) return kth(u->ch[0],k);
+    return kth(u->ch[1],k-(u->ch[0]?u->ch[0]->sum:0)-1);
+}
+void pt(NODE *u)
+{
+    if(NULL == u) return;
+    pt(u->ch[0]);
+    printf("%d\n", u->v);
+    pt(u->ch[1]);
+}
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int n,count = 0;
+    while(~scanf("%d%*c", &n))
+    {
+        while(!q.empty()) q.pop();
+        NODE *rt = NULL;
+        printf("Case #%d:\n",++count);
+        while(n--)
+        {
+            char op[21];
+            scanf("%s", op);
+            if('i' == op[0])
+            {
+                int v;
+                scanf("%d%*c", &v);
+                q.push(v);
+                insert(rt,v);
+            }
+            else if('o' == op[0])
+            {
+                del(rt,q.front());
+                q.pop();
+            }
+            else
+            {
+                int m = q.size();
+                int pos = floor(m/2)+1;
+                printf("%d\n",kth(rt,pos));
+            }
+        }
+        clear(rt);
+    }
+    return 0;
+}

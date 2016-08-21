@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <queue>
+#include <map>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,a,n) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+map<int,int> vis;
+map<int,int> b;
+int n, a[22000];
+
+bool sloved()
+{
+    int c;
+    bool ok = true;
+    rep(i,0,n)
+    {
+        scanf("%d%*c", &c);
+        b[c] = 1;
+        if(vis.find(c) == vis.end())
+            ok = false;
+    }
+    rep(i,0,n)
+    {
+        if(b.find(a[i]) == b.end())
+            return false;
+    }
+    return ok;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    while(~scanf("%d%*c", &n))
+    {
+        int c;
+        vis.clear();
+        b.clear();
+        rep(i,0,n)
+        {
+            scanf("%d%*c", &c);
+            vis[c] = 1;
+            a[i] = c;
+        }
+        if(sloved()) puts("YES");
+        else puts("NO");
+    }
+    return 0;
+}

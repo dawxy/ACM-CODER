@@ -1,0 +1,45 @@
+#include <stdio.h>
+int n, ans[21], prime[14] = {2,3,5,7,11,13,17,19,23,29,31,37,41,43};
+bool isprime[45] = {0}, vis[21] = {0};
+
+void dfs(int p)
+{
+	if (p == n)
+	{
+		if (isprime[1+ans[n-1]])
+		{
+			printf("1");
+			for (int i = 1; i < n; i++)
+				printf (" %d", ans[i]);
+			printf ("\n");
+		}
+		return;
+	}
+	for (int i = 2;  i <= n; i++)
+	{
+		if (!vis[i] && isprime[i+ans[p-1]])
+		{
+			vis[i] = true;
+			ans[p] = i;
+			dfs(p+1);
+			vis[i] = false;
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	ans[0] = 1;
+	for (int i = 0; i < 14; i++)
+		isprime[prime[i]] = true;
+	int t = 0;
+	while(EOF != scanf ("%d%*c", &n))
+	{
+		printf ("Case %d:\n", ++t);
+		dfs(1);
+		printf ("\n");
+	}
+	return 0;
+}

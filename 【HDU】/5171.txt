@@ -1,0 +1,76 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MOD = 10000007;
+struct MATRIX{//矩阵
+	LL num[3][3];
+	MATRIX(LL a1,LL a2,LL a3, LL b1, LL b2, LL b3, LL c1, LL c2, LL c3)
+	{
+		num[0][0] = a1, num[0][1] = a2, num[0][2] = a3;
+		num[1][0] = b1, num[1][1] = b2, num[1][2] = b3;
+		num[2][0] = c1, num[2][1] = c2, num[2][2] = c3;
+	}
+};
+
+MATRIX mul(const MATRIX& a, const MATRIX& b)//矩阵a*b
+{
+	MATRIX ans=MATRIX(0,0,0,0,0,0,0,0,0);
+	rep(i,0,3)
+	{
+		rep(j,0,3)
+		{
+			rep(k,0,3)
+				ans.num[i][j] = (ans.num[i][j]+(a.num[i][k]*b.num[k][j]%MOD+MOD)%MOD)%MOD;
+		}
+	}
+	return ans;
+}
+MATRIX pow_mod(MATRIX x, int n)//快速幂
+{
+	MATRIX ans = MATRIX(1,0,0,0,1,0,0,0,1);//任何3*3矩阵乘以这个单位矩阵不会改变值
+	while(n)
+	{
+		if(n&1) ans = mul(ans,x);
+		x = mul(x,x);
+		n >>= 1;
+	}
+	return ans;
+}
+
+int a[100000+10];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,k;
+	MATRIX x = MATRIX(0,1,1,1,1,1,0,0,1);
+	while(~scanf("%d %d%*c", &n, &k))
+	{
+		rep(i,0,n) scanf("%d%*c", &a[i]);
+		sort(a,a+n);
+		int aa = a[n-2], bb = a[n-1];
+		int sum = 0;
+		rep(i,0,n)
+			sum = (sum+a[i])%MOD;
+		MATRIX ans = pow_mod(x,k);
+		LL sn = aa+bb;
+		LL ret = (aa*ans.num[0][2])%MOD+(bb*ans.num[1][2])%MOD+sum;
+		printf("%I64d\n", ret%MOD);
+	}
+	return 0;
+}

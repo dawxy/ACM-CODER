@@ -1,0 +1,120 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000*4+10, MAXM = 100000*2+10, MAXQ = 100000+10;
+map<string, int> id;
+string name[MAXN];
+int n;
+int get_id(char *x)
+{
+	if(id.find(x) == id.end())
+	{
+		name[n] = x;
+		id[x] = n++;
+		return n-1;
+	}
+	return id[x];
+}
+struct Edge{//邻接表
+	int head[MAXN], tol, next[MAXM], to[MAXM], num[MAXM];//num询问的编号(用于离线)
+	void init(){
+		clc(head,-1);
+		tol = 0;
+	}
+	void add_edge(int u, int v){
+		next[tol] = head[u], to[tol] = v;
+		head[u] = tol++;
+	}
+	void add_edge(int u, int v, int id){
+		next[tol] = head[u], to[tol] = v, num[tol] = id;
+		head[u] = tol++;
+	}
+}g, q;//g-存树, q-所有询问
+int f[MAXN];
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+void bing(int a, int b)//把b所在集合并到a所在集合
+{
+	int x = find(a), y = find(b);
+	if(x != y) f[y] = x;
+}
+bool root[MAXN], vis[MAXN];
+int ans[MAXQ];//最后答案
+
+void lca(int u)//这里是有根树,不需要fa
+{
+	vis[u] = true;
+	for(int i = g.head[u]; ~i; i = g.next[i])
+	{
+		int v = g.to[i];
+		if(vis[v]) continue;
+		lca(v);
+		bing(u,v);//u,v不能换,否则要加一个数组记录每个结点当前所在根
+	}
+	/*找出当前结点有关的询问*/
+	for(int i = q.head[u]; ~i; i = q.next[i])
+	{
+		int v = q.to[i];
+		if(vis[v])//访问过了说明v在u子树中,或者v是u的祖先，则这时候v所在的集合编号(也是最近的祖先)就是LCA
+			ans[q.num[i]] = find(v);
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int m;
+	scanf("%d%*c", &m);
+	g.init();
+	id.clear();
+	n = 0;
+	char a[1000], b[1000];
+	clc(root,1);
+	while(m--)
+	{
+		scanf("%s %s%*c", a,b);
+		int u = get_id(a), v = get_id(b);
+		g.add_edge(u,v);
+		root[v] = false;
+	}
+	scanf("%d%*c", &m);
+	q.init();
+	rep(i,0,m)
+	{
+		scanf("%s %s%*c", a, b);
+		int u = get_id(a), v = get_id(b);
+		q.add_edge(u,v,i);
+		q.add_edge(v,u,i);
+	}
+	clc(ans,-1);
+	rep(i,0,n) f[i] = i;
+	rep(i,0,n)
+	{
+		if(root[i])
+		{
+			clc(vis,0);
+			lca(i);
+		}
+	}
+	rep(i,0,m)
+	{
+		if(~ans[i])
+			puts(name[ans[i]].c_str());
+		else puts("-1");
+	}
+	return 0;
+}

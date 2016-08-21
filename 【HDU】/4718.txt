@@ -1,0 +1,164 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define ls ch[u][0]
+#define rs ch[u][1]
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int par[MAXN],fa[MAXN],ch[MAXN][2],val[MAXN];
+int mx[MAXN][2],lsum[MAXN][2],lv[MAXN],rsum[MAXN][2],rv[MAXN],sz[MAXN];
+
+void init()
+{
+	clc(par,0);clc(fa,0);clc(ch,0);
+}
+inline int chd(int u){return ch[fa[u]][1] == u;}
+inline void setch(int f, int u, int d){ch[f][d] = u, fa[u] = f;}
+inline void push_up(int u)
+{
+	//l->r
+	mx[u][0] = max(mx[ls][0],mx[rs][0]);
+	if(!ls || rv[ls] < val[u])
+	{
+		mx[u][0] = max(mx[u][0],rsum[ls][0]+1);
+		if(val[u] < lv[rs]) mx[u][0] = max(mx[u][0],rsum[ls][0]+1+lsum[rs][0]);
+	}
+	if(val[u] < lv[rs]) mx[u][0] = max(mx[u][0],1+lsum[rs][0]);
+	lsum[u][0] = lsum[ls][0];
+	if(lsum[ls][0] == sz[ls])
+	{
+		if(!ls || rv[ls] < val[u])
+		{
+			lsum[u][0]++;
+			if(val[u] < lv[rs]) lsum[u][0] += lsum[rs][0];
+		}
+	}
+	rsum[u][0] = rsum[rs][0];
+	if(rsum[rs][0] == sz[rs])
+	{
+		if(!rs || val[u] < lv[rs])
+		{
+			rsum[u][0]++;
+			if(rv[ls] < val[u]) rsum[u][0] += rsum[ls][0];
+		}
+	}
+	//r->l
+	mx[u][1] = max(mx[ls][1],mx[rs][1]);
+	if(!rs || lv[rs] < val[u])
+	{
+		mx[u][1] = max(mx[u][1],lsum[rs][1]+1);
+		if(val[u] < rv[ls]) mx[u][1] = max(mx[u][1],lsum[rs][1]+1+rsum[ls][1]);
+	}
+	if(val[u] < rv[ls]) mx[u][1] = max(mx[u][1],1+rsum[ls][1]);
+	lsum[u][1] = lsum[ls][1];
+	if(lsum[u][1] == sz[ls])
+	{
+		if(!ls || val[u] < rv[ls])
+		{
+			lsum[u][1]++;
+			if(lv[rs] < val[u]) lsum[u][1] += lsum[rs][1];
+		}
+	}
+	rsum[u][1] = rsum[rs][1];
+	if(rsum[u][1] == sz[rs])
+	{
+		if(!rs || lv[rs] < val[u])
+		{
+			rsum[u][1]++;
+			if(val[u] < rv[ls]) rsum[u][1] += rsum[ls][1];
+		}
+	}
+
+	lv[u] = ls?lv[ls]:val[u],rv[u] = rs?rv[rs]:val[u];
+	sz[u] = sz[ls]+sz[rs]+1;
+}
+inline void rot(int u)
+{
+	int d = chd(u),y = fa[u];
+	setch(fa[y],u,chd(y));
+	setch(y,ch[u][d^1],d);
+	setch(u,y,d^1);
+	push_up(y);push_up(u);
+}
+void splay(int u)
+{
+	int rt = u;
+	while(fa[rt]) rt = fa[rt];
+	if(rt == u) return;
+	par[u] = par[rt],par[rt] = 0;
+	while(fa[u])
+	{
+		if(fa[fa[u]] && chd(u) == chd(fa[u])) rot(fa[u]);
+		rot(u);
+	}
+}
+void expose(int u)
+{
+	for(int now = u,la = 0;now;la = now,now = par[now])
+	{
+		splay(now);
+		par[ch[now][1]] = now;fa[ch[now][1]] = par[la] = 0;
+		setch(now,la,1);
+		push_up(now);
+	}
+	splay(u);
+}
+int query(int u, int v)
+{
+	expose(u);
+	for(int now = v,la = 0;now;la = now,now = par[now])
+	{
+		splay(now);
+		if(!par[now])
+		{
+			int l = ch[now][1],r = la;
+			int ans = max(max(mx[l][1],mx[r][0]),1);
+			if(lv[l] < val[now])
+			{
+				ans = max(ans,lsum[l][1]+1);
+				if(val[now] < lv[r]) ans = max(ans,lsum[l][1]+1+lsum[r][0]);
+			}
+			if(val[now] < lv[r]) ans = max(ans,1+lsum[r][0]);
+			return ans;
+		}
+		par[ch[now][1]] = now;fa[ch[now][1]] = par[la] = 0;
+		setch(now,la,1);
+		push_up(now);
+	}
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		init();
+		int n;
+		scanf("%d", &n);
+		repe(i,1,n)
+		{
+			scanf("%d", &val[i]);
+			lv[i] = rv[i] = val[i];
+			mx[i][0] = mx[i][1] = lsum[i][0] = lsum[i][1] = rsum[i][0] = rsum[i][1] = sz[i] = 1;
+		}
+		repe(i,2,n) scanf("%d", &par[i]);
+		int q;
+		if(count++) putchar('\n');
+		printf("Case #%d:\n",count);
+		scanf("%d", &q);
+		while(q--)
+		{
+			int u,v;
+			scanf("%d %d", &u, &v);
+			printf("%d\n", query(u,v));
+		}
+	}
+	return 0;
+}

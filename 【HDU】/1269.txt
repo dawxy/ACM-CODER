@@ -1,0 +1,68 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <stack>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define min(a,b) (a>b?b:a)
+#define MAXN 10010
+int n, pre[MAXN], sccno[MAXN], dfs_clock, scc_cnt;
+//sccno[1~n]标记每个点在第几个SCC中,scc_cnt是SCC的计数,dfs_clock递归时间戳
+vector<int> g[MAXN];
+stack<int> s;
+
+int dfs(int u)
+{
+	int lowu = pre[u] = ++dfs_clock, sz = g[u].size();
+	s.push(u);
+	rep(i,0,sz)
+	{
+		int v = g[u][i];
+		if(!pre[v])
+		{
+			int lowv = dfs(v);
+			lowu = min(lowu, lowv);
+		}
+		else if(!sccno[v]) lowu = min(lowu, pre[v]);
+	}
+	if(lowu == pre[u])
+	{
+		int x;
+		scc_cnt++;
+		do{
+			x = s.top();s.pop();
+			sccno[x] = scc_cnt;
+		}while(x != u);
+	}
+	return lowu;
+}
+void find_scc()
+{
+	dfs_clock = scc_cnt = 0;
+	clc(pre,0);
+	clc(sccno,0);
+	repe(i,1,n) if(!pre[i]) dfs(i);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int m;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		int a,b;
+		repe(i,1,n) g[i].clear();
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a, &b);
+			g[a].push_back(b);
+		}
+		find_scc();
+		if(1 == scc_cnt) puts("Yes");
+		else puts("No");
+	}
+	return 0;
+}

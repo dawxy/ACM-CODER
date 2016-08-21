@@ -1,0 +1,60 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 21;
+LL dp[MAXN][2];
+int bit[MAXN];
+
+LL dfs(int len, bool is4, bool ismax)
+{
+	if(!len) return 1;
+	if(!ismax && ~dp[len][is4]) return dp[len][is4];
+	int mxnum = ismax?bit[len]:9;
+	LL cnt = 0;
+	repe(i,0,mxnum)
+	{
+		if(is4 && 9 == i) continue;
+		cnt += dfs(len-1,4 == i,ismax && i == mxnum);
+	}
+	return ismax?cnt:dp[len][is4] = cnt;
+}
+LL sloved(LL n)
+{
+	int len = 0;
+	while(n)
+	{
+		bit[++len] = n%10;
+		n /= 10;
+	}
+	return dfs(len,false,true);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	clc(dp,-1);
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		LL n;
+		scanf("%I64d", &n);
+		printf("%I64d\n", n-(sloved(n)-1));
+	}
+	return 0;
+}

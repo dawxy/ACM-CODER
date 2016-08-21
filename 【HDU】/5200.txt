@@ -1,0 +1,109 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50000+10;
+struct NODE{
+	int h,pos;
+	bool operator<(const NODE&t) const{
+		return h < t.h;
+	}
+}p[MAXN];
+struct Q{
+	int qh, id;
+	bool operator<(const Q&t) const{
+		return qh < t.qh;
+	}
+}q[MAXN];
+bool cov[MAXN];
+int ans[MAXN];
+int sum[MAXN<<1];
+
+inline int id(int x, int y){
+	return x+y|x!=y;
+}
+void push_up(int x, int y, int m)
+{
+	int u = id(x,y), l = id(x,m), r = id(m+1,y);
+	sum[u] = sum[l]+sum[r];
+	if(cov[m] && cov[m+1]) sum[u]--;
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		sum[id(x,y)] = 1;
+		cov[x] = 1;
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+void del(int x, int y, int p)
+{
+	if(x == y)
+	{
+		cov[x] = 0;
+		sum[id(x,y)] = 0;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) del(x,m,p);
+	else del(m+1,y,p);
+	push_up(x,y,m);
+}
+int n,m;
+void sloved()
+{
+	int pn = 0;
+	bulid(0,n-1);
+	rep(i,0,m)
+	{
+		while(p[pn].h <= q[i].qh)
+		{
+			del(0,n-1,p[pn].pos);
+			pn++;
+		}
+		ans[q[i].id] = sum[id(0,n-1)];
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		rep(i,0,n)
+		{
+			scanf("%d%*c", &p[i].h);
+			p[i].pos = i;
+		}
+		sort(p,p+n);
+		rep(i,0,m)
+		{
+			scanf("%d%*c", &q[i].qh);
+			q[i].id = i;
+		}
+		sort(q,q+m);
+		sloved();
+		rep(i,0,m)
+			printf("%d\n", ans[i]);
+	}
+	return 0;
+}

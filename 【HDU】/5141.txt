@@ -1,0 +1,46 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int d[MAXN], p[MAXN];//p[i]表示以i结尾时最k靠右的左下标(下面简称左下标),也就是数量
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int a, len = 0;
+		LL ans = 0;
+		d[0] = -1;
+		repe(i,1,n)
+		{
+			scanf("%d%*c", &a);
+			int k = lower_bound(d,d+len,a)-d;
+			d[k++] = a;//k++变成1开始的下标
+			if(1 == k) p[k] = i;//k==1时长度为1,左下标则为i(新起点)
+			else p[k] = p[k-1];//否则p[k] = p[k-1]的值，因为是连续的，所以修改和增加长度都不会改变左下标
+			if(k > len)//长度增加时ans要重置为新长度的数量
+				ans = p[++len];
+			else ans += p[len];//长度不变时说明有新方案长度也能等于len，累加
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

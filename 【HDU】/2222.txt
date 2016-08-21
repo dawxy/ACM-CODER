@@ -1,0 +1,119 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+/*O(n)时间求多模版字符串匹配，这里是计算出现的模版数目(有重复模版)*/
+const int INF = 0x3f3f3f3f, MAXN = 10000*50+10, MAXM = 1000000+10;
+struct Trie{
+	int cnt;//当前节点总数
+	int ch[MAXN][26], fail[MAXN], end[MAXN];//儿子节点，失配指针,单词结束计数
+	int newnode()
+	{
+		clc(ch[cnt],-1);
+		end[cnt++] = 0;
+		return cnt-1;
+	}
+	void bulid()//0为根节点
+	{
+		cnt = 0;
+		newnode();
+	}
+	void insert(char *s)//trie的插入
+	{
+		int u = 0,len = strlen(s);
+		rep(i,0,len)
+		{
+			int& c = ch[u][s[i]-'a'];//u的儿子
+			if(-1 == c)//新建
+				c = newnode();
+			u = c;
+		}
+		end[u]++;
+	}
+	void get_fail()//得到失配指针(前缀后缀相同)
+	{
+		queue<int> q;
+		//特殊处理第一层的儿子节点
+		fail[0] = 0;
+		rep(i,0,26)
+		{
+			int& c = ch[0][i];
+			if(~c)//存在的节点加入队列
+			{
+				fail[c] = 0;
+				q.push(c);
+			}
+			else c = 0;//不存在的全部变成root节点，方便操作
+		}
+		while(!q.empty())
+		{
+			int u = q.front();q.pop();
+			rep(i,0,26)
+			{
+				int& c = ch[u][i];//u的儿子结点c
+				int p = ch[fail[u]][i];//u的失配节点和c相同的儿子节点
+				if(~c)//存在c儿子，则把c失配指针指向p(增加前后缀相同的长度,
+				{	 //或者没有不会增加还是0,因为第一层失配节点都指向了0)
+					fail[c] = p;
+					q.push(c);
+				}
+				else c = p;//不存在的话直接指向p
+			}
+		}
+	}
+	int query(char *s)
+	{
+		int len = strlen(s);
+		int u = 0, ans = 0;
+		rep(i,0,len)
+		{
+			u = ch[u][s[i]-'a'];
+			int temp = u;
+			while(temp)//沿着失配指针往上走，0为根结束
+			{
+				ans += end[temp];//加上当前出现的单词数
+				end[temp] = 0;//防止重复计算
+				temp = fail[temp];
+			}
+		}
+		return ans;
+	}
+}ac;
+char str[MAXM];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		char a[100];
+		scanf("%d%*c", &n);
+		ac.bulid();
+		rep(i,0,n)
+		{
+			scanf("%s", a);
+			ac.insert(a);
+		}
+		ac.get_fail();
+		scanf("%s", str);
+		printf("%d\n", ac.query(str));
+	}
+	return 0;
+}

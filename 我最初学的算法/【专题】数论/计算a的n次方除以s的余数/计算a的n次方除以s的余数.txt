@@ -1,0 +1,47 @@
+//计算a的n次方除以s的余数
+//公式：(a*b^n)%s = ((a%s)*(b%s))%s
+//把n看成2进制转成10进制的方法做,
+//例如：a^29 = a^(1*2^0)*a^(0*2^1)*a^(1*2^2)*a^(1*2^3)*a^(1*2^4)=a^1*a^0*a^4*a^8*a^16; 
+//29的2进制是11101;11101转成29的方法：1*2^0+0*2^1+1*2^3+1*2^4 = 1+0+4+8+16 = 29;
+#include <stdio.h>
+
+void mod(int, int, int, int*);//递归方法
+int mod2(int, int, int);//非递归
+
+int main ()
+{
+	int a, n, s, r;
+	while (1)
+	{
+		r = 1;
+		printf ("输入格式:a n(a的n次方) s(对于他取余) \n");
+		scanf_s ("%d %d %d%*c", &a, &n, &s);
+		mod(a, n, s, &r);
+		printf ("递归法:%d\n", r);
+		printf ("非递归法:%d\n", mod2(a, n, s));
+	}
+
+	return 0;
+}
+
+int mod2 (int a, int n, int s)
+{
+	int r = 1, x = a%s;
+	while (n>0)
+	{
+		if (1 == n%2)
+			r = (r*x)%s;
+		x = (x*x)%s;
+		n /= 2;
+	}
+	return r;
+}
+
+void mod (int a, int n, int s, int* r)
+{
+	if (0 == n)
+		return;
+	if (1 == n%2)
+		*r = (*r * a)%s;
+	mod ((a*a)%s, n/2, s, r);
+}

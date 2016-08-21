@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 65536
+int prime[MAXN+1], sum[6600];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n, count = 0;
+	for(int i = 2; i <= MAXN; i++)
+	{
+		if(!prime[i]) prime[++prime[0]] = i;
+		for(int j = 1; j <= prime[0] && prime[j] <= MAXN/i; j++)
+		{
+			prime[prime[j]*i] = 1;
+			if(i%prime[j] == 0) break;
+		}
+	}
+	prime[6543] = 0x3f3f3f3f;
+	while(~scanf("%d%*c", &n) && n > 0)
+	{
+		int m = n;
+		memset(sum,0,sizeof(sum));
+		for(int i = 1; prime[i] <= n; i++)
+		{
+			while(0 == n%prime[i])
+			{
+				sum[i]++;
+				n /= prime[i];
+			}
+		}
+		if(count) putchar('\n');
+		printf("Case %d.\n", ++count);
+		int i;
+		for(i = 1; prime[i] <= m; i++)
+		{
+			if(sum[i]) printf("%d %d ",prime[i],sum[i]);
+		}
+		putchar('\n');
+	}
+	return 0;
+}

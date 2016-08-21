@@ -1,0 +1,22 @@
+#include <stdio.h>
+#define scanf scanf_s
+
+int main ()
+{
+	int n;
+	while (EOF != scanf ("%d%*c", &n))
+	{
+		int k = 1, s = 0;
+		while(n > s)
+		{
+			s += k;
+			k++;
+		}
+		if (0 != k%2)//此时的K是n所在列+1
+			printf ("%d/%d\n", k-(s+1-n), s+1-n);
+		else
+			printf ("%d/%d\n", s+1-n, k-(s+1-n));
+	}
+
+	return 0;
+}

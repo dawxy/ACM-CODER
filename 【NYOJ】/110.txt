@@ -1,0 +1,51 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 510
+bool c[MAXN][MAXN], dp[MAXN][MAXN];
+//dp[i][j]表示i和j(i在左，j在右)能相遇，当dp[k][k] = 1时说明k能战胜其他所有人，k可以获胜
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+				scanf("%d%*c", &c[i][j]);
+		}
+		memset(dp,false,sizeof(dp));
+		for (int i = 0; i < n; i++)
+			dp[i][(i+1)%n] = true;
+		for (int len = 2; len <= n; len++)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				int j = i+len;
+				for (int k = i+1; k < j; k++)
+				{
+					if (dp[i][k%n] && dp[k%n][j%n] && (c[i][k%n] || c[j%n][k%n]))
+					{
+						dp[i][j%n] = true;
+						break;
+					}
+				}
+			}
+		}
+		int ans = 0;
+		for (int i = 0; i < n; i++)
+		{
+			if (dp[i][i]) ans++;
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

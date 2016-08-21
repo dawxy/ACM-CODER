@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <string.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		char s[6];
+		int n, d = 1, i, time, ans = 0;
+		scanf ("%d%*c", &n);
+		for (i = 0; i < n; i++)
+		{
+			scanf ("%s%*c", s);
+			if (!strcmp(s, "IN"))
+				d *= 20;
+			else
+				if (!strcmp(s, "OUT") && d/20 > 0)
+					d /= 20;
+			if (!strcmp(s, "STAY"))
+			{
+				scanf ("%d%*c", &time);
+				ans += time*60/d;
+			}
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

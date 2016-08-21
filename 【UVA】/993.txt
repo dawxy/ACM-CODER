@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <string.h>
+int num[10];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf ("%d%*c", &n);
+		memset(num,0,sizeof(num));
+		if (n < 10)
+		{
+			printf ("%d\n",n);
+			continue;
+		}
+        for (int i = 9; i > 1; )
+		{
+            if (n%i)
+				i--;
+			else
+			{
+                n /= i;
+                num[i]++;
+			}
+		}
+		if (1 != n)
+		{
+            printf ("-1\n");
+            continue;
+		}
+        for (int i = 2;  i < 10; )
+        {
+        	if (num[i])
+			{
+				printf ("%d", i);
+				num[i]--;
+			}
+			else
+				i++;
+        }
+		printf ("\n");
+	}
+	return 0;
+}

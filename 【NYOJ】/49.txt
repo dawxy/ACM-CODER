@@ -1,0 +1,31 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 26
+#define MAXM 30010
+int dp[MAXM];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n, m, w, v;
+		scanf("%d %d%*c", &m, &n);
+		memset(dp,0,sizeof(dp));
+		for (int i = 0; i < n; i++)
+		{
+			scanf("%d %d%*c", &w, &v);
+			v *= w;
+			for (int j = m; j >= w; j--)
+				dp[j] = max(dp[j], dp[j-w]+v);
+		}
+		printf("%d\n", dp[m]);
+	}
+	return 0;
+}

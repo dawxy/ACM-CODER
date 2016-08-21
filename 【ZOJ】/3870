@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <cstring>
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int a[MAXN], cnt[40];
+
+int main()
+{
+	#ifdef SHY
+		freopen("e:\\1.txt","r",stdin);
+	#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		clc(cnt,0);
+		rep(i,0,n)
+		{
+			scanf("%d%*c", &a[i]);
+			int tmp = a[i];
+			if(!tmp) continue;
+			per(j,31,0)
+			{
+				if(tmp&(1<<j))
+				{
+					cnt[j]++;
+					break;
+				}
+			}
+		}
+		int ans = 0;
+		rep(i,0,n)
+		{
+			if(!a[i]) continue;
+			int p = 31;
+			while(!(a[i]&(1<<p))) p--;
+			per(j,p,0)
+			{
+				if(!(a[i]&(1<<j))) 
+					ans += cnt[j];
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}
+

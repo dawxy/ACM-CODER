@@ -1,0 +1,166 @@
+/*划分树*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int a[MAXN], sot[MAXN];
+int tree[20][MAXN], tolleft[20][MAXN];
+
+void bulid(int x, int y, int dep)
+{
+	if(x == y) return;
+	int m = (x+y)>>1;
+	int same = m-x+1;
+	repe(i,x,y) if(tree[dep][i] < sot[m]) same--;
+	int lpos = x, rpos = m+1;
+	repe(i,x,y)
+	{
+		if(tree[dep][i] < sot[m])
+			tree[dep+1][lpos++] = tree[dep][i];
+		else if(tree[dep][i] == sot[m] && same > 0)
+			tree[dep+1][lpos++] = tree[dep][i],same--;
+		else tree[dep+1][rpos++] = tree[dep][i];
+		tolleft[dep][i] = tolleft[dep][x-1]+lpos-x;
+	}
+	bulid(x,m,dep+1);
+	bulid(m+1,y,dep+1);
+}
+void init(int n)
+{
+	clc(tree,0);
+	repe(i,1,n) tree[0][i] = a[i];
+	sort(sot+1,sot+1+n);
+	bulid(1,n,0);
+}
+int query(int x, int y, int ql, int qr, int dep, int k)
+{
+	if(ql == qr) return tree[dep][ql];
+	int m = (x+y)>>1, cnt = tolleft[dep][qr]-tolleft[dep][ql-1];//cnt- [ql,qr]有几个分在左子树数
+	if(cnt >= k)//左边比k小的数>=k个,往左子树走
+	{
+		int nx = x+tolleft[dep][ql-1]-tolleft[dep][x-1];//nx是去掉[x,qr-1]中分在左边个数的新左区间
+		int ny = nx+cnt-1;//
+		return query(x,m,nx,ny,dep+1,k);
+	}
+	int ny = qr+tolleft[dep][y]-tolleft[dep][qr];
+	int nx = ny-(qr-ql-cnt);
+	return query(m+1,y,nx,ny,dep+1,k-cnt);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,q;
+		scanf("%d %d", &n, &q);
+		repe(i,1,n) scanf("%d%*c", &a[i]), sot[i] = a[i];
+		init(n);
+		while(q--)
+		{
+			int x,y,k;
+			scanf("%d %d %d%*c", &x, &y, &k);
+			printf("%d\n", query(1,n,x,y,0,k));
+		}
+	}
+	return 0;
+}
+=====================================================================================================================
+/*主席树*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+/*主席树-求区间第k大*/
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, M = MAXN*30;//M = 2*N*log(N)
+int l[M],r[M],sum[M], cnt;
+
+void bulid(int &u, int x, int y)//建空树0
+{
+    sum[cnt] = 0;u = cnt++;
+    if(x == y) return;
+    int m = (x+y)>>1;
+    bulid(l[u],x,m);
+    bulid(r[u],m+1,y);
+}
+void insert(int &u, int x, int y, int p)
+{
+    l[cnt] = l[u],r[cnt] = r[u],sum[cnt] = sum[u];//复制老版本信息
+    sum[u=cnt++]++;//新版本计数+1
+    if(x == y) return;
+    int m = (x+y)>>1;
+    if(p <= m) insert(l[u],x,m,p);
+    else insert(r[u],m+1,y,p);
+}
+int a[MAXN],sot[MAXN],n, root[MAXN];//a[]原序列,sot[]排序后离散化,root[i]表示[1,i]每个数出现的次数的线段树
+void init()
+{
+    cnt = 1;
+    //bulid(root[0],1,n);//第0颗空树
+    sort(sot+1,sot+1+n);
+    repe(i,1,n)
+    {
+        root[i] = root[i-1];//借用第i-1颗树
+        insert(root[i],1,n,lower_bound(sot+1,sot+1+n,a[i])-sot);
+    }
+}
+int query(int a, int b, int x, int y, int k)//查询区间[a+1,b]的第k大数
+{
+    if(x == y) return x;
+    int d = sum[l[b]]-sum[l[a]];
+    int m = (x+y)>>1;
+    if(d >= k) return query(l[a],l[b],x,m,k);
+    return query(r[a],r[b],m+1,y,k-d);
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        int q;
+        scanf("%d %d", &n, &q);
+        repe(i,1,n) scanf("%d",&a[i]), sot[i] = a[i];
+        init();
+        while(q--)
+        {
+            int x,y,k;
+            scanf("%d%d%d",&x,&y,&k);
+            printf("%d\n", sot[query(root[x-1],root[y],1,n,k)]);
+        }
+    }
+    return 0;
+}

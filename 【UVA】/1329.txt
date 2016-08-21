@@ -1,0 +1,58 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 20010
+int f[MAXN], d[MAXN];
+
+int find(int x)
+{
+	if(f[x] == x) return x;
+	int tmp = find(f[x]);
+	d[x] += d[f[x]];
+	return f[x] = tmp;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		repe(i,0,n) f[i] = i;
+		clc(d,0);
+		int ch,a,b;
+		while((ch = getchar()) != 'O')
+		{
+			if('I' == ch)
+			{
+				scanf("%d %d%*c", &a, &b);
+				f[a] = b;
+				d[a] = abs(a-b)%1000;
+			}
+			else
+			{
+				scanf("%d%*c", &a);
+				find(a);
+				printf("%d\n", d[a]);
+			}
+		}
+	}
+	return 0;
+}

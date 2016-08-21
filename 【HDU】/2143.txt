@@ -1,0 +1,51 @@
+#include <stdio.h>
+__int64 a[3];
+
+bool can(__int64 a, __int64 b, __int64 c)
+{
+    if (a+b == c)
+		return true;
+    if (a-b == c)
+		return true;
+	if (a*b == c)
+        return true;
+    if (b && 0 == a%b && a/b == c)
+		return true;
+	if (b && a%b == c)
+        return true;
+	return false;
+}
+bool sloved()
+{
+    for (int i = 0; i < 3; i++)
+	{
+        for (int j = 0; j < 3; j++)
+		{
+            if (i == j)
+				continue;
+			int k;
+			for (k = 0; k < 3; k++)
+			{
+				if (k != i && k != j)
+                    break;
+			}
+			if (can(a[i],a[j], a[k]))
+                return true;
+		}
+	}
+	return false;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(~scanf ("%I64d %I64d %I64d%*c", &a[0], &a[1], &a[2]))
+	{
+		if (sloved())
+			puts("oh,lucky!");
+		else
+			puts("what a pity!");
+	}
+    return 0;
+}

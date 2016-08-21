@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 99999999
+struct p{
+    char name[35];
+}pl[155];
+int cost[155][155], m;
+
+int find_name (char *);
+int dijkstra (int, int);
+
+int main ()
+{
+    while (1)
+    {
+        int n, i, j, time, ia, ib, min, buf, from, to;
+        char a[35], b[35], st[35],ed[35];
+        scanf ("%d%*c", &n);
+        if (-1 == n)
+            break;
+        for (i = 1; i <= 154; i++)
+            for (j = 1; j <= 154; j++)
+                cost[i][j] = MAX;
+        scanf ("%s%s", st,ed);
+        for (i = 1,m = 0; i <= n; i++)
+        {
+            scanf ("%s%s%d", a,b, &time);
+            ia = find_name(a);
+            ib = find_name(b);
+            if (time < cost[ia][ib])
+                cost[ia][ib] = cost[ib][ia] = time;
+        }
+        if (0 == strcmp(st, ed))
+            printf ("0\n");
+        else{
+        	from = find_name(st);
+        	to = find_name(ed);
+            buf = dijkstra (from,to);
+            if (MAX == buf)
+                printf ("-1\n");
+            else
+                printf ("%d\n", buf);
+            }
+    
+    }
+    return 0;
+}
+
+int find_name (char * a)
+{
+    int i;
+    for (i = 1; i <= m; i++)
+        if (0 == strcmp (a, pl[i].name))
+            return i;
+    m++;
+    strcpy (pl[m].name, a);
+    return m;
+}
+
+int dijkstra (int from, int to)
+{
+    int i, min, si, in[155], d[155];
+    for (i = 1; i <= m; i++)
+    {
+        if (MAX != cost[from][i])
+            d[i] = cost[from][i];
+        else
+            d[i] = MAX;
+        in[i] = 1;
+    }
+    in[from] = d[from] = 0;
+    while (in[to])
+    {
+        for (i = 1, min = MAX; i <= m; i++)
+        {
+            if (1 == in[i] && min > d[i])
+            {
+                min = d[i];
+                si = i;
+            }
+        }
+        in[si] = 0;
+        if (MAX == min)
+            break;
+        for (i = 1; i <= m; i++)
+        {
+            if (1 == in[i] && d[i] > d[si]+cost[si][i])
+            {
+                d[i] = d[si]+cost[si][i];
+            }
+        }
+    }
+    return d[to];
+}

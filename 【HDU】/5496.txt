@@ -1,0 +1,43 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MOD = 1e9+7, MAXN = 1e5+10;
+int a[MAXN],sot[MAXN],vis[MAXN],b[MAXN],cnt[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	b[0] = 1;
+	repe(i,1,100000) b[i] = (b[i-1]<<1)%MOD;
+	while(t--)
+	{
+		int n;
+		scanf("%d", &n);
+		rep(i,0,n) scanf("%d", &a[i]),sot[i] = a[i];
+		sort(sot,sot+n);
+		int len = unique(sot,sot+n)-sot;
+		clc(vis,-1);
+		clc(cnt,0);
+		LL ans = 0;
+		rep(i,0,n)
+		{
+			int v = lower_bound(sot,sot+len,a[i])-sot;
+			LL tmp = 0;
+			if(~vis[v]) tmp = (LL)(cnt[v])*a[i];
+			vis[v] = i;
+			cnt[v] = (cnt[v]+b[i])%MOD;
+			ans = (ans*2+(LL)a[i]*b[i]-tmp)%MOD;
+		}
+		if(ans < 0)ans += MOD;
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,43 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 10000010
+#define max(a,b) (a>b?a:b)
+int f[MAXN];
+int vis[MAXN];
+
+int find(int x){ return ~f[x]?f[x] = find(f[x]):x;}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		if(!n)
+		{
+			puts("1");
+			continue;
+		}
+		int a,b, ans = -1, maxn = -1;
+		memset(f,-1,sizeof(f));
+		memset(vis,0,sizeof(vis));
+		for(int i = 0; i < n; i++)
+		{
+			scanf("%d %d%*c", &a,&b);
+			vis[a] = vis[b] = 1;
+			maxn = max(max(a,b), maxn);
+			int x = find(a), y = find(b);
+			if(x != y) f[x] = y;
+		}
+		for(int i = 1; i <= maxn; i++)
+		{
+			if(!vis[i]) continue;
+			int x = find(i);
+			vis[x]++;
+			ans = max(ans,vis[x]);
+		}
+		printf("%d\n", ans-1);
+	}
+	return 0;
+}

@@ -1,0 +1,24 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 105
+int dp[MAXN][MAXN],n, m, ed;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int st;
+	while(~scanf("%d %d %d %d%*c", &n, &st, &m, &ed))
+	{
+		memset(dp,0,sizeof(dp));
+		dp[0][st] = 1;
+		for(int i = 1; i <= m; i++)
+		{
+			for(int j = 1; j <= n; j++)
+				dp[i][j] = dp[i-1][j-1]+dp[i-1][j+1];
+		}
+		printf("%d\n", dp[m][ed]);
+	}
+	return 0;
+}

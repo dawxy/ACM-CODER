@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 205
+#define MAXM 42
+#define max(a,b) (a>b?a:b)
+char a[MAXN], ch[7][MAXN];
+int dp[MAXN][MAXM], sum[MAXN][MAXN];
+
+int dfs(int r, int m)
+{
+	int& ans = dp[r][m];
+	if (~ans) return ans;
+	if (1 == m) return ans = sum[0][r];
+	ans = -0x3f3f3f3f;
+	for (int i = 0;i < r;i++)
+		ans = max(ans,dfs(i,m-1)+sum[i+1][r]);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n, m, len, p;
+		char buf[30], c;
+		memset(sum,0,sizeof(sum));
+		memset(dp,-1,sizeof(dp));
+		scanf("%d %d%*c", &n, &m);
+		a[0] = 0;
+		for (int i = 0; i < n; i++)
+		{
+			scanf("%s%*c", buf);
+			strcat(a,buf);
+		}
+		len = strlen(a);
+		scanf("%d%*c", &p);
+		for (int i = 0; i < p; i++)
+			scanf("%s%*c",ch[i]);
+		for (int i = len-1; i >= 0; i--)
+		{
+			for (int j = len-1; j >= i; j--)
+			{
+				c = a[j+1];
+				a[j+1] = 0;
+				bool have = false;
+				for (int k = 0; k < p; k++)
+				{
+					if (!(a+i-strstr(a+i,ch[k])))
+					{
+						have = true;
+						break;
+					}
+				}
+				a[j+1] = c;
+				if (have) sum[i][j] = sum[i+1][j]+1;
+				else sum[i][j] = sum[i+1][j];
+			}
+		}
+		printf("%d\n", dfs(len-1,m));
+	}
+	return 0;
+}

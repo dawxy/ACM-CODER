@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 5005
+#define max(a,b) (a>b?a:b)
+char a[MAXN], b[MAXN];
+int dp[2][MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		scanf("%s%*c",a+1);
+		for(int i = 1; i <= n; i++)
+			b[n-i+1] = a[i];
+		int s = 1;
+		memset(dp,0,sizeof(dp));
+		for(int i = 1; i <= n; i++)
+		{
+			s ^= 1;
+			for(int j = 1; j <= n; j++)
+			{
+				if(a[i] == b[j]) dp[s][j] = dp[s^1][j-1]+1;
+				else dp[s][j] = max(dp[s^1][j],dp[s][j-1]);
+			}
+		}
+		printf("%d\n", n-dp[s][n]);
+	}
+	return 0;
+}

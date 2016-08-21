@@ -1,0 +1,24 @@
+#include <cstdio>
+#include <cmath>
+#define min(a,b) (a<b?a:b)
+unsigned long long ans[65];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    ans[1] = 1;
+    for(int i = 2; i <= 64; i++)
+    {
+        ans[i] = 2+pow(2.0,i-1)-1;
+        for(int j = 2; j < i; j++)
+            ans[i] = min(ans[i], 2*ans[j]+pow(2.0,i-j)-1);
+    }
+    int n;
+    while(~scanf("%d%*c", &n))
+    {
+        printf("%I64u\n", ans[n]);
+    }
+    return 0;
+}

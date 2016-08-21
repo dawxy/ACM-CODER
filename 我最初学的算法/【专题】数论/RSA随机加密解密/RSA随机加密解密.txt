@@ -1,0 +1,98 @@
+//RSA加密解密【注意：需要加密的数值必须小于p*q】
+/*【工作原理】
+1)选择一对素数p q；
+2)z = p*q;
+3)f = (p-1)(q-1);
+4)选择满足gcd(n, f) = 1的一个n（一般为素数）;
+5)计算满足(n*s)%f = 1的唯一的s（0<s<f）;
+*/
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <stdlib.h>
+
+int gcd (int, int);//求最大公约数
+int getn(int, int*);//生成所有可能的n(这里的n可以在多个中选一个),返回n的个数;
+int getthes(int, int);//获得唯一的s
+void mod (int, int, int, int*);//加密公式：c = a^n%z;解密公式:c^s%z;
+
+int main ()
+{
+	char a[100];
+	int p, q, f, s, c[100], shuchu[100], ns[1000], lenn;
+	int z, n;
+	printf ("请输入p和q(都是素数)：");
+	scanf_s ("%d %d%*c", &p, &q);
+	z = p*q;
+	f = (p-1)*(q-1);
+	lenn = getn(f, ns);
+	while(1)
+	{
+		srand(time(0));
+		n = ns[rand()%lenn];//随机选择一个n，使得每次的密文不同
+		s = getthes(n, f);
+		int i, lena, y = 0;
+		printf ("请输入需要加密的内容:");
+		gets_s(a);
+		lena = strlen(a);
+		printf ("密文:");
+		for (i = 0; i < lena; i++)
+		{
+			c[i] = 1;
+			mod (a[i], n, z, &c[i]);
+			printf ("%d", c[i]);
+		}
+		printf ("\n");
+		printf ("输入1解密:");
+		scanf_s ("%d%*c", &y);
+		if (1 == y)
+		{
+			printf ("解密后还原:");
+			for (i = 0; i < lena; i++)
+			{
+				shuchu[i] = 1;
+				mod (c[i], s, z, &shuchu[i]);
+				printf ("%c", shuchu[i]);
+			}
+			printf ("\n");
+		}
+	}
+}
+
+int gcd (int a, int b)//a<b
+{
+	if (0 == b%a)
+		return a;
+	gcd(b%a, a);
+}
+
+int getn(int f, int* n)
+{
+	int i, j;
+	for (i = 1, j = 0; i < 1000;i++)
+	{
+		if (1 == gcd(i, f))
+		{
+			n[j] = i;
+			j ++;
+		}
+	}
+	return j;
+}
+
+int getthes(int n, int f)
+{
+	int i;
+	for (i = 1; i < f; i++)
+		if (1 == ((n%f)*(i%f))%f)
+			return i;
+}
+
+void mod (int a, int n, int z, int *c)
+{
+	if (0 == n)
+		return;
+	if (1 == n%2)
+		*c = (*c*a)%z;
+	mod((a*a)%z, n/2, z, c);
+}

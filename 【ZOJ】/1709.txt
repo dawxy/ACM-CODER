@@ -1,0 +1,50 @@
+#include <stdio.h>
+#define MAX 102
+int m,h;
+char g[MAX][MAX];
+
+void dfs(int si, int sj)
+{
+	g[si][sj] = '*';
+	int d[8][2] = {{-1,0},{1,0},{0,-1},{0,1},{-1,-1},{-1,1},{1,-1},{1,1}}, ni, nj;
+	for (int i = 0; i < 8; i++)
+	{
+		ni = d[i][0]+si;
+		nj = d[i][1]+sj;
+		if (0 <= ni && h > ni && 0 <= nj && m > nj && '@' == g[ni][nj])
+			dfs(ni, nj);
+	}
+}
+
+int main ()
+{
+	while(1)
+	{
+		scanf("%d %d%*c", &h, &m);
+		if (0 == m && 0 == h)
+			break;
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				g[i][j] = getchar();
+			}
+			getchar();
+		}
+		int ans = 0;
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				if ('@' == g[i][j])
+				{
+					dfs(i, j);
+					ans++;
+				}
+			}
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

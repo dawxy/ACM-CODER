@@ -1,0 +1,183 @@
+/*根据in文件顺序输出AC和TOL*/
+#include <cstdio>
+#include <io.h>
+#include <cstring>
+#include <string>
+#include <vector>
+using namespace std;
+#define sprintf sprintf_s
+#define access _access
+#define fopen fopen_s
+#define fscanf fscanf_s
+#define sscanf sscanf_s
+const string TOL = ">Total Submission(s):", AC = ";Accepted Submission(s):",NOT = ">Invalid Parameter.<";
+struct NODE{
+	int ac, tol;
+	NODE(int a, int b){ac = a, tol = b;}
+};
+vector<int> in;//in.txt中的问题
+vector<int> unfind;//存放还没有获取的问题
+vector<int> get_error;//存放获取错误需要重新获取的数据
+vector<int> not_p;//没有这个问题
+vector<NODE> ans;
+string text;
+
+bool isnum(char ch)
+{
+	if('0' <= ch && '9' >= ch)
+		return true;
+	return false;
+}
+bool isfind(int p_id)
+{
+	char problem[10];
+	sprintf(problem,"%d",p_id);
+	if(~access(("problem\\"+(string)problem+".htm").c_str(),0))
+		return true;
+	return false;
+}
+bool check()
+{
+	char buf[100];
+	FILE *f;
+	fopen(&f,"in.txt","r");
+	if(!f)
+	{
+		puts("请把in.txt放在此程序同一目录下");
+		system("pause");
+		exit(-1);
+	}
+	int same = 0;
+	while(~fscanf(f,"%s%*c", buf,100))
+	{
+		if(isnum(buf[0]))
+		{
+			int a;
+			sscanf(buf,"%d",&a);
+			in.push_back(a);
+			if(!isfind(a))
+				unfind.push_back(a);
+		}
+	}
+	fclose(f);
+	return !unfind.size();
+}
+void input()
+{
+	if(!check())
+	{
+		printf("输入数据中有%d个还没有获取过呢...已经输出到unfind.txt\n",unfind.size());
+		FILE *f = NULL;
+		fopen(&f,"unfind.txt","w");
+		for(int i = 0; i < unfind.size(); i++)
+			fprintf(f,"%d\n",unfind[i]);
+		fclose(f);
+		system("pause");
+		exit(-1);
+	}
+	printf("成功读取%d个数据!按任意键开始按顺序导出数据...\n", in.size());
+	getchar();
+	puts("正在分析,请稍候...");
+}
+void get_text(const string& url)
+{
+	FILE* f = NULL;
+	fopen(&f,url.c_str(),"r");
+	text.clear();
+	char buf[1010];
+	while(!feof(f))
+		fgets(buf,1000,f),text += buf;
+	fclose(f);
+}
+bool search(const string& it, int &num)
+{
+	const char *p = strstr(text.c_str(),it.c_str());
+	if(p)
+	{
+		sscanf(p+it.size(),"%d%*c", &num);
+		return true;
+	}
+	return false;
+}
+void output()
+{
+	for(int i = 0; i < in.size(); i++)
+	{
+		char pro[20];
+		sprintf(pro,"%d", in[i]);
+		int ac, tol;
+		string url = "problem\\"+(string)pro+".htm";
+		get_text(url);
+		if(search(AC,ac) && search(TOL,tol))
+			ans.push_back(NODE(ac,tol));
+		else if(search(NOT, tol))
+			ans.push_back(NODE(-1,-1)),not_p.push_back(in[i]);
+		else
+			get_error.push_back(in[i]),ans.push_back(NODE(-2,-2));
+	}
+	if(get_error.size())
+	{
+		printf("有%d个数据没有抓取完全,已经输出到get_error.txt\n正在删除这些无效数据...\n",get_error.size());
+		FILE *f = NULL;
+		fopen(&f,"get_error.txt","w");
+		for(int i = 0; i < get_error.size(); i++)
+		{
+			char pro[20];
+			sprintf(pro,"%d", get_error[i]);
+			fprintf(f,"%d\n",get_error[i]);
+			remove(("problem\\"+(string)pro+".htm").c_str());
+		}
+		fclose(f);
+		puts("成功删除不完整数据.\n请重新用抓取工具抓取");
+		puts("这些题目可能已经被HDU删除，请去HDU查看，如果没被删除请重新获取");
+		system("pause");
+		exit(-2);
+	}
+	FILE* f = NULL;
+	fopen(&f,"AC.txt","w");
+	for(int i = 0; i < in.size(); i++)
+	{
+		if(~ans[i].ac)
+			fprintf(f,"%d\n",ans[i].ac);
+		else
+			fprintf(f,"not_this_problem\n");
+	}
+	fclose(f);
+	fopen(&f,"TOL.txt","w");
+	for(int i = 0; i < in.size(); i++)
+	{
+		if(~ans[i].tol)
+			fprintf(f,"%d\n",ans[i].tol);
+		else
+			fprintf(f,"not_this_problem\n");
+	}
+	fclose(f);
+	puts("恭喜，全部数据已经完整导出到AC.txt和TOL.txt中!");
+	if(not_p.size())
+	{
+		printf("但是还有%d个问题是不存在的\n(可能是HDU已经下架这些问题)\n",not_p.size());
+		FILE *f = NULL;
+		fopen(&f,"not_problem.txt","w");
+		for(int i = 0; i < not_p.size(); i++)
+			fprintf(f,"%d\n",not_p[i]);
+		fclose(f);
+		puts("已经把这些问题输出到not_problem.txt,并且在上面输出中数据为not_this_problem");
+	}
+	system("pause");
+}
+int main()
+{
+	if(!access("unfind.txt",0))
+		system("del unfind.txt");
+	if(!access("AC.txt",0))
+		system("del AC.txt");
+	if(!access("TOL.txt",0))
+		system("del TOL.txt");
+	if(!access("not_problem.txt",0))
+		system("del not_problem.txt");
+	if(!access("get_error.txt",0))
+		system("del get_error.txt");
+	input();
+	output();
+	return 0;
+}

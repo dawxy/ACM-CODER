@@ -1,0 +1,28 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int d[192] = {0}, n, i, j, a, b, c, maxb = -1, ans = -1;
+		scanf ("%d%*c", &n);
+		for (i = 0; i < n; i++)
+		{
+			scanf ("%d %d %d%*c", &a, &b, &c);
+			if (maxb < b+c)
+				maxb = b+c;
+			for (j = b; j < b+c; j++)
+				d[j] += a;
+		}
+		for (i = 1; i < maxb; i++)
+		{
+			if (ans < d[i])
+				ans = d[i];
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

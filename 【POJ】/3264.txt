@@ -1,0 +1,59 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 50010
+int mx[MAXN][20], mi[MAXN][20], n;
+
+int in()
+{
+	int ans,ch;
+	while((ch = getchar()) < '0' || ch > '9');
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && ch <= '9') ans = (ans<<3)+(ans<<1)+ch-'0';
+	return ans;
+}
+void st_init()
+{
+	repe(i,1,n) mx[i][0] = mi[i][0] = in();
+	for(int j = 1; (1<<j) <= n; j++)
+	{
+		for(int i = 1; i+(1<<j)-1 <= n; i++)
+		{
+			mx[i][j] = max(mx[i][j-1], mx[i+(1<<(j-1))][j-1]);
+			mi[i][j] = min(mi[i][j-1], mi[i+(1<<(j-1))][j-1]);
+		}
+	}
+}
+int st()
+{
+	int x = in(), y = in(), k = 0;
+	while((1<<(k+1)) <= y-x+1) k++;
+	return max(mx[x][k], mx[y-(1<<k)+1][k])-min(mi[x][k], mi[y-(1<<k)+1][k]);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int q;
+	while(~scanf("%d %d%*c", &n, &q))
+	{
+		int x,y;
+		st_init();
+		rep(i,0,q) printf("%d\n", st());
+	}
+	return 0;
+}

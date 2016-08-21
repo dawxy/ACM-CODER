@@ -1,0 +1,45 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 2010
+int f[MAXN], p[MAXN], ans, ch;
+
+int in()
+{
+    while((ch = getchar()) < '0' || '9' < ch);
+    ans = ch-'0';
+    while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+    return ans;
+}
+int find(int x) {return f[x] == x ? x: f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int t, count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n = in(),m = in();
+        bool have = false;
+        for(int i = 0; i <= n; i++) f[i] = i;
+        memset(p,0,sizeof(p));
+        for(int i = 0; i < m; i++)
+        {
+            int x = find(in()), y = find(in());
+            if(x == y)
+            {
+                have = true;
+                continue;
+            }
+            if(p[x]) f[p[x]] = y;
+            if(p[y]) f[p[y]] = x;
+            p[x] = y, p[y] = x;
+        }
+        printf("Scenario #%d:\n", ++count);
+        if(have) puts("Suspicious bugs found!");
+        else puts("No suspicious bugs found!");
+        putchar('\n');
+    }
+    return 0;
+}

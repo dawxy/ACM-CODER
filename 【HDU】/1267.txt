@@ -1,0 +1,26 @@
+#include <cstdio>
+#include <cstring>
+typedef long long LL;
+#define MAXN 25
+LL dp[MAXN][MAXN];//dp[i][j] 前i+j个字符中有i个h和j个d的可能数
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int h,d;
+	for(int i = 0; i <= 20; i++) dp[i][0] = 1;
+	for(int i = 1; i <= 20; i++)
+	{
+		for(int j = 1; j <= i; j++)
+		{
+			dp[i][j] = dp[i-1][j]+dp[i][j-1];
+		}
+	}
+	while(~scanf("%d %d%*c", &h, &d))
+	{
+		printf("%I64d\n", dp[h][d]);
+	}
+	return 0;
+}

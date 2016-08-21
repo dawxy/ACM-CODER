@@ -1,0 +1,94 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10;
+struct IN{
+	int x,y,h;
+}in[100000+10];
+int sum[MAXN*20],lc[MAXN*20], rc[MAXN*20], cnt, n,q,a[MAXN/2],rt[MAXN/2],num[MAXN],sot[MAXN];
+int tol;
+
+void bulid(int &u, int x, int y)
+{
+	sum[cnt] = 0;u = cnt++;
+	if(x == y) return;
+	int m = (x+y)>>1;
+	bulid(lc[u],x,m);
+	bulid(rc[u],m+1,y);
+}
+void insert(int &u, int x, int y, int p)
+{
+	sum[cnt] = sum[u], lc[cnt] = lc[u], rc[cnt] = rc[u];
+	u = cnt++;sum[u]++;
+	if(x == y) return;
+	int m = (x+y)>>1;
+	if(p <= m) insert(lc[u],x,m,p);
+	else insert(rc[u],m+1,y,p);
+}
+int mhash(int v){return lower_bound(sot+1,sot+1+tol,v)-sot;}
+void init()
+{
+	cnt = 0;
+	bulid(rt[0],0,n+q-1);
+	sort(num,num+n+q);
+	tol = 0;
+	sot[++tol] = num[0];
+	rep(i,1,n+q)
+	{
+		if(num[i] != num[i-1]) sot[++tol] = num[i];
+	}
+	repe(i,1,n)
+	{
+		int p = mhash(a[i]);
+		rt[i] = rt[i-1];
+		insert(rt[i],1,tol,p);
+	}
+}
+int query(int ta, int tb, int x, int y,int p)
+{
+	if(x == y) return sum[tb]-sum[ta];
+	int m = (x+y)>>1;
+	if(p <= m) return query(lc[ta],lc[tb],x,m,p);
+	return query(rc[ta], rc[tb],m+1,y,p)+sum[lc[tb]]-sum[lc[ta]];
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d %d", &n, &q);
+		repe(i,1,n) scanf("%d", &a[i]),num[i-1] = a[i];
+		rep(i,0,q)
+		{
+			int x,y,h;
+			scanf("%d%d%d", &x, &y, &h);
+			in[i] = {x+1,y+1,h};
+			num[n+i] = h;
+		}
+		init();
+		printf("Case %d:\n",++count);
+		rep(i,0,q)
+		{
+			printf("%d\n", query(rt[in[i].x-1], rt[in[i].y],1,tol,mhash(in[i].h)));
+		}
+	}
+	return 0;
+}

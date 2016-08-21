@@ -1,0 +1,22 @@
+#include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        int n,p = 0;
+        scanf ("%d%*c", &n);
+        while(!(n&1))
+        {
+            p++;
+            n >>= 1;
+        }
+        printf ("%d %d\n", n,p);
+    }
+    return 0;
+}

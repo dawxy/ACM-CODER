@@ -1,0 +1,43 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 110
+#define MOD 10000
+int a[MAXN][MAXN], dp[MAXN][MAXN];
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        int h, w;
+        scanf ("%d %d%*c", &h, &w);
+        for (int i = 1; i <= h; i++)
+        {
+            for (int j = 1; j <= w; j++)
+                scanf ("%d%*c", &a[i][j]);
+        }
+        memset(dp, 0, sizeof(dp));
+        dp[1][1] = 1;
+        for (int i = 1; i <= h; i++)
+        {
+            for (int j = 1; j <= w; j++)
+            {
+                for (int k = i; k <= i+a[i][j] && k <= h; k++)
+                {
+                    for (int l = j; l <= j+a[i][j]-k+i && l <= w; l++)
+                    {
+                        if (i == k && j == l)
+                            continue;
+                        dp[k][l] = (dp[k][l]+dp[i][j])%MOD;
+                    }
+                }
+            }
+        }
+        printf ("%d\n", dp[h][w]);
+    }
+    return 0;
+}

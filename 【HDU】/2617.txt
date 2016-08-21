@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 10005
+char c[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(NULL !=gets(c))
+	{
+		int len = strlen(c), h = 0, a = 0, p = 0, ans = 0;
+        for (int i = 0; i < len; i++)
+		{
+            if ('h' == c[i])
+                h++;
+            else if ('a' == c[i] && h)
+                h--,a++;
+            else if ('p' == c[i] && a)
+			{
+                p++;
+                if (!(p&1))
+                    a--;
+			}
+            else if ('y' == c[i] && p >= 2)
+				ans++, p -= 2;
+		}
+		printf ("%d\n", ans);
+	}
+    return 0;
+}

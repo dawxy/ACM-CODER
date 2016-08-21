@@ -1,0 +1,281 @@
+#pragma comment(linker, "/STACK:1024000000,1024000000") 
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000 + 10;
+char buf[MAXN], *ps = buf, *pe = buf + 1;//ps当前读取到的开头指针，pe当前缓存结尾指针
+inline void rnext(){
+	if (++ps == pe)
+		pe = (ps = buf) + fread(buf, 1, sizeof(buf), stdin);
+}
+inline int in()
+{
+	if (ps == pe) return -INF;
+	int f = 1;
+	do{
+		rnext();
+		if ('-' == *ps) f = -1;
+	} while (!isdigit(*ps) && ps != pe);
+	if (ps == pe) return -INF;
+	int ans = 0;
+	do
+	{
+		ans = (ans << 1) + (ans << 3) + *ps - 48;
+		rnext();
+	} while (isdigit(*ps) && ps != pe);
+	return ans*f;
+}
+inline void in_str(char *ans)
+{
+	int cnt = 0;
+	do{
+		rnext();
+	} while (!('A' == *ps || 'D' == *ps || '1' == *ps || '2' == *ps) && ps != pe);
+	do{
+		ans[cnt++] = *ps;
+		rnext();
+	} while (('A' == *ps || 'D' == *ps || '1' == *ps || '2' == *ps) && ps != pe);
+	ans[cnt] = 0;
+}
+inline void out(LL x) {
+	if (x > 9) out(x / 10);
+	putchar(x % 10 + '0');
+}
+int head[MAXN], nxt[MAXN << 1], to[MAXN << 1], tol;
+
+void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+struct TCP1{
+private:
+	int fa[MAXN];//fa[u]表示u的父亲
+	int dep[MAXN];//dep[u]表示u的深度
+	int sz[MAXN];//sz[u]表示以u为根的子树有几个结点
+	int son[MAXN];//son[u]表示u的所有儿子结点中sz[]最大的那个点(重儿子)
+	int top[MAXN];//top[u]表示u所在的链的顶端节点
+	int tree[MAXN];//tree[u]表示节点u在线段树中的编号
+	int pre[MAXN];//pre[x]表示线段树中编号为x的点在树中的点(和tree相反)
+	int cnt;//线段树中点的数量(其实就是n)
+	void dfs1(int u)//预处理fa[],dep[],sz[],son[]
+	{
+		int num = 0;
+		sz[u] = 1;
+		for (int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if (v == fa[u]) continue;
+			fa[v] = u; dep[v] = dep[u] + 1;
+			dfs1(v);
+			if (sz[v] > num) num = sz[v], son[u] = v;
+			sz[u] += sz[v];
+		}
+	}
+	void dfs2(int u, int num)//预处理top[],tree[],pre[]
+	{
+		tree[u] = ++cnt, pre[cnt] = u, top[u] = num;
+		if (-1 == son[u]) return;
+		dfs2(son[u], num);//必须点递归重儿子，否则重链在线段树的编号会不连续
+		for (int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if (v != fa[u] && son[u] != v) dfs2(v, v);
+		}
+	}
+	LL add[MAXN];
+	inline int lowbit(int x){ return x&-x; }
+	LL sum(int x)
+	{
+		LL ans = 0;
+		while (x > 0)
+		{
+			ans += add[x];
+			x -= lowbit(x);
+		}
+		return ans;
+	}
+	void update(int x, int num)
+	{
+		while (x <= cnt)
+		{
+			add[x] += num;
+			x += lowbit(x);
+		}
+	}
+public:
+	void init(int rt)
+	{
+		clc(son, -1);
+		dep[rt] = 0, fa[rt] = -1;
+		dfs1(rt);
+		cnt = 0;
+		dfs2(rt, rt);
+		clc(add, 0);
+	}
+	void tcp_update(int x, int y, int v)//树上点x~y之间的权值都加v
+	{
+		int f1 = top[x], f2 = top[y];
+		while (f1 != f2)
+		{
+			if (dep[f1] < dep[f2]) swap(f1, f2), swap(x, y);
+			update(tree[f1], v); update(tree[x] + 1, -v);
+			x = fa[f1], f1 = top[x];
+		}
+		x = tree[x], y = tree[y];
+		if (x > y) swap(x, y);
+		update(x, v); update(y + 1, -v);
+	}
+	LL tcp_query(int x)//查询点x的权值
+	{
+		return sum(tree[x]);
+	}
+}tcp1;
+int e[MAXN][2];
+struct TCP2{
+private:
+	int fa[MAXN];//fa[u]表示u的父亲
+	int dep[MAXN];//dep[u]表示u的深度
+	int sz[MAXN];//sz[u]表示以u为根的子树有几个结点
+	int son[MAXN];//son[u]表示u的所有儿子结点中sz[]最大的那个点(重儿子)
+	int top[MAXN];//top[u]表示u所在的链的顶端节点
+	int tree[MAXN];//tree[u]表示节点u和他父亲的连边在线段树中的编号
+	int pre[MAXN];//pre[x]和tree相反
+	int bnum[MAXN];//每个边转化为深度较深的点之后对应的边号
+	int cnt;//线段树中点的数量(其实就是n)
+	void dfs1(int u)//预处理fa[],dep[],sz[],son[]
+	{
+		int num = 0;
+		sz[u] = 1;
+		for (int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if (v == fa[u]) continue;
+			fa[v] = u; dep[v] = dep[u] + 1;
+			dfs1(v);
+			if (sz[v] > num) num = sz[v], son[u] = v;
+			sz[u] += sz[v];
+		}
+	}
+	void dfs2(int u, int num)//预处理top[],tree[],pre[]
+	{
+		tree[u] = ++cnt, pre[cnt] = u, top[u] = num;
+		if (-1 == son[u]) return;
+		dfs2(son[u], num);//必须点递归重儿子，否则重链在线段树的编号会不连续
+		for (int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if (v != fa[u] && son[u] != v) dfs2(v, v);
+		}
+	}
+	LL add[MAXN];
+	inline int lowbit(int x){ return x&-x; }
+	LL sum(int x)
+	{
+		LL ans = 0;
+		while (x > 0)
+		{
+			ans += add[x];
+			x -= lowbit(x);
+		}
+		return ans;
+	}
+	void update(int x, int num)
+	{
+		while (x <= cnt)
+		{
+			add[x] += num;
+			x += lowbit(x);
+		}
+	}
+public:
+	void init(int rt)
+	{
+		clc(son, -1);
+		dep[rt] = 0, fa[rt] = -1;
+		dfs1(rt);
+		cnt = 0;
+		dfs2(rt, rt);
+		clc(add, 0);
+		rep(i, 1, cnt)//所有边
+		{
+			if (dep[e[i][0]] > dep[e[i][1]]) swap(e[i][0], e[i][1]);//每条边在树中下面的点作为标识(边转点)
+			bnum[e[i][1]] = i;
+		}
+	}
+	void tcp_update(int x, int y, int v)
+	{
+		int f1 = top[x], f2 = top[y];
+		while (f1 != f2)
+		{
+			if (dep[f1] < dep[f2]) swap(f1, f2), swap(x, y);
+			update(tree[f1], v); update(tree[x] + 1, -v);
+			x = fa[f1], f1 = top[x];
+		}
+		if (x == y) return;
+		if (dep[x] > dep[y]) swap(x, y);
+		update(tree[son[x]], v); update(tree[y] + 1, -v);
+	}
+	LL tcp_query(int x)
+	{
+		return sum(tree[e[x][1]]);//直接用e[c][1](每条边深度较深的点)作为该边的标识
+	}
+}tcp2;
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t = in(), count = 0;
+	while (t--)
+	{
+		int n = in(), q = in();
+		clc(head, -1);
+		tol = 0;
+		rep(i, 1, n)
+		{
+			int u = in(), v = in();
+			e[i][0] = u, e[i][1] = v;
+			add_edge(u, v);
+			add_edge(v, u);
+		}
+		tcp1.init(1);
+		tcp2.init(1);
+		char op[10];
+		while (q--)
+		{
+			in_str(op);
+			int x = in(), y = in(), v = in();
+			if ('1' == op[3]) tcp1.tcp_update(x, y, v);
+			else tcp2.tcp_update(x, y, v);
+		}
+		printf("Case #%d:\n", ++count);
+		repe(i, 1, n)
+		{
+			out(tcp1.tcp_query(i));
+			putchar(i == n ? '\n' : ' ');
+		}
+		rep(i, 1, n)
+		{
+			out(tcp2.tcp_query(i));
+			if (i != n - 1) putchar(' ');
+		}
+		putchar('\n');
+	}
+	return 0;
+}

@@ -1,0 +1,81 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+#define MAXN 210
+#define INF 0x3f3f3f3f
+struct E{
+	int from, to, cap, flow;
+	E(int a, int b, int c, int d){
+		from = a, to = b, cap = c, flow = d;
+	}
+};
+int a[MAXN], p[MAXN];
+vector<int> g[MAXN];
+vector<E> edge;
+
+void add_edge(int from, int to, int cap)
+{
+	edge.push_back(E(from,to,cap,0));
+	edge.push_back(E(to,from,0,0));//反向限制为0
+	int num = edge.size();
+	g[from].push_back(num-2);
+	g[to].push_back(num-1);
+}
+int ek(int st, int ed)
+{
+	int ans = 0;
+	while(1)
+	{
+		memset(a,0,sizeof(a));
+		queue<int> q;
+		q.push(st);
+		a[st] = INF;
+		while(!q.empty())
+		{
+			int x = q.front();q.pop();
+			int len = g[x].size();
+			for(int i = 0; i < len; i++)
+			{
+				E& e = edge[g[x][i]];
+				if(!a[e.to] && e.cap > e.flow)
+				{
+					p[e.to] = g[x][i];
+					a[e.to] = min(a[x], e.cap-e.flow);
+					q.push(e.to);
+				}
+			}
+			if(a[ed]) break;
+		}
+		if(!a[ed]) break;
+		for(int u = ed; u != st; u = edge[p[u]].from)
+		{
+			edge[p[u]].flow += a[ed];
+			edge[p[u]^1].flow -= a[ed];
+		}
+		ans += a[ed];
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n, m;
+	while(~scanf("%d %d%*c", &m, &n))
+	{
+		int a,b,c;
+		edge.clear();
+		for(int i = 1; i <= n; i++) g[i].clear();
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b , &c);
+			add_edge(a,b,c);
+		}
+		printf("%d\n", ek(1,n));
+	}
+	return 0;
+}

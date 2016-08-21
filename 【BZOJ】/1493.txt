@@ -1,0 +1,223 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500000+10;
+int py, fz;//py-位置偏移量,fz-是否翻转
+int blc[MAXN<<1], lc[MAXN<<1],rc[MAXN<<1], cov[MAXN<<1];
+int a[MAXN],n;
+ 
+inline int id(int x, int y){
+    return x+y|x!=y;
+}
+void push_up(int x, int y, int m)
+{
+    int u = id(x,y), l = id(x,m), r = id(m+1,y);
+    blc[u] = blc[l]+blc[r];
+    if(rc[l] == lc[r])
+        blc[u]--;
+    lc[u] = lc[l];
+    rc[u] = rc[r];
+}
+void bulid(int x, int y)
+{
+    cov[id(x,y)] = -1;
+    if(x == y)
+    {
+        int u = id(x,y);
+        lc[u] = rc[u] = cov[u] = a[x];
+        blc[u] = 1;
+        return;
+    }
+    int m = (x+y)>>1;
+    bulid(x,m);
+    bulid(m+1,y);
+    push_up(x,y,m);
+}
+void push_down(int x, int y, int m)
+{
+    int u = id(x,y);
+    if(~cov[u])
+    {
+        int l = id(x,m), r =id(m+1,y);
+        lc[l] = rc[l] = cov[u];
+        lc[r] = rc[r] = cov[u];
+        blc[l] = blc[r] = 1;
+        cov[l] = cov[r] = cov[u];
+        cov[u] = -1;
+    }
+}
+void pt(int x, int y)
+{
+    //printf("[%d,%d] lc = %d, rc = %d\n", x,y,lc[id(x,y)], rc[id(x,y)]);
+    if(x == y)
+    {
+        printf("%d ", cov[id(x,y)]);
+        return;
+    }
+    int m = (x+y)>>1;
+    push_down(x,y,m);
+    pt(x,m);
+    pt(m+1,y);
+    if(0 == x && n-1 == y) putchar('\n');
+    push_up(x,y,m);
+}
+ 
+int find_col(int x, int y, int p)
+{
+    if(x == y) return cov[id(x,y)];
+    int m = (x+y)>>1,ans;
+    push_down(x,y,m);
+    if(p <= m) ans = find_col(x,m,p);
+    else ans = find_col(m+1,y,p);
+    push_up(x,y,m);
+    return ans;
+}
+void update(int x, int y, int p, int v)
+{
+    if(x == y)
+    {
+        int u = id(x,y);
+        lc[u] = rc[u] = cov[u] = v;
+        blc[u] = 1;
+        return;
+    }
+    int m = (x+y)>>1;
+    push_down(x,y,m);
+    if(p <= m) update(x,m,p,v);
+    else update(m+1,y,p,v);
+    push_up(x,y,m);
+}
+void paint(int x, int y, int ql, int qr, int v)
+{
+    if(ql <= x && y <= qr)
+    {
+        int u = id(x,y);
+        cov[u] = v;
+        lc[u] = rc[u] = v;
+        blc[u] = 1;
+        return;
+    }
+    int m = (x+y)>>1;
+    push_down(x,y,m);
+    if(ql <= m) paint(x,m,ql,qr,v);
+    if(qr > m) paint(m+1,y,ql,qr,v);
+    push_up(x,y,m);
+}
+int query(int x, int y, int ql, int qr)
+{
+    if(ql <= x && y <= qr) return blc[id(x,y)];
+    int m = (x+y)>>1, ans = 0;
+    push_down(x,y,m);
+    if(ql <= m) ans += query(x,m,ql,qr);
+    if(qr > m) ans += query(m+1,y,ql,qr);
+    int l = id(x,m), r = id(m+1,y);
+    if(ql <= m && qr > m && rc[l] == lc[r]) ans--;
+    push_up(x,y,m);
+    return ans;
+}
+inline void get_w(int &x, int &y)//找到当前位置所在线段树的下标
+{
+    if(fz)
+    {
+        x = (2*n-py-x)%n;
+        y = (2*n-py-y)%n;
+        swap(x,y);
+    }
+    else
+    {
+        x = (x-py+n)%n, y = (y-py+n)%n;
+    }
+}
+ 
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int c;
+    scanf("%d %d", &n, &c);
+    rep(i,0,n)
+    {
+        scanf("%d%*c", &a[i]);
+    }
+    bulid(0,n-1);
+    int q;
+    scanf("%d%*c", &q);
+    fz = py = 0;
+    char op[10];
+    while(q--)
+    {
+        scanf("%s", op);
+        if('R' == op[0])
+        {
+            int k;
+            scanf("%d%*c", &k);
+            if(fz) py = (py-k+n)%n;
+            else py = (py+k)%n;
+        }
+        else if('F' == op[0])
+            fz ^= 1;
+        else if('S' == op[0])
+        {
+            int x,y;
+            scanf("%d %d%*c", &x, &y);
+            x--,y--;
+            get_w(x,y);
+            int cx = find_col(0,n-1,x);
+            int cy = find_col(0,n-1,y);
+            update(0,n-1,x,cy);
+            update(0,n-1,y,cx);
+        }
+        else if('P' == op[0])
+        {
+            int x,y,v;
+            scanf("%d %d %d%*c", &x, &y, &v);
+            x--,y--;
+            get_w(x,y);
+            if(x <= y)
+                paint(0,n-1,x,y,v);
+            else
+            {
+                paint(0,n-1,x,n-1,v);
+                paint(0,n-1,0,y,v);
+            }
+        }
+        else if('C' == op[0] && !op[1])
+        {
+            int ans = blc[id(0,n-1)];
+            if(1 < ans && find_col(0,n-1,0) == find_col(0,n-1,n-1)) ans--;
+            printf("%d\n", ans);
+        }
+        else
+        {
+            int x,y;
+            scanf("%d %d%*c", &x, &y);
+            x--,y--;
+            get_w(x,y);
+            if(x <= y)
+                printf("%d\n", query(0,n-1,x,y));
+            else
+            {
+                int ans = query(0,n-1,0,y)+query(0,n-1,x,n-1);
+                if(1 < ans && find_col(0,n-1,0) == find_col(0,n-1,n-1)) ans--;
+                printf("%d\n", ans);
+            }
+        }
+         
+    }
+    return 0;
+}

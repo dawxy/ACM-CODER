@@ -1,0 +1,14 @@
+#include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    __int64 n, ans;
+    while(~scanf ("%I64d%*c", &n))
+    {
+        printf ("%I64d\n", n*(n+1)*(n+2)/6);
+    }
+    return 0;
+}

@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 500010
+int len, d[MAXN], a[MAXN];
+//d[]是一个单调递增队列，用来贪心的记录当前下标的长度下，可以得到的一个末尾数字最小的子序列
+//d[]中的每一个数在更新过程中是单调不上升的
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int n, count = 0;
+    while(~scanf ("%d%*c", &n))
+    {
+        int s,v;
+        len = 0;//当前可以得到的最长的上升子序列的长度
+        for(int i = 0; i < n; i++)
+        {
+            scanf ("%d %d%*c", &s, &v);
+            a[s] = v;
+        }
+        for (int i = 1; i <= n; i++)
+        {
+            if (a[i] > d[len])//如果当前值大于队列中的最大值的话把它放在最后，并且最大长度加一
+                d[++len] = a[i];
+            else
+            {
+                int l = 1, r = len, mid;
+                while(l <= r)//二分查找d[j]<a[i]的最大的j,并d[j+1] = a[i]
+                {
+                    mid = (l+r) >> 1;
+                    if (a[i] <= d[mid])
+                        r = mid-1;
+                    else
+                        l = mid+1;
+                }
+                d[l] = a[i];
+            }
+        }
+        printf ("Case %d:\n", ++count);
+        if (1 == len)
+            printf ("My king, at most %d road can be built.\n\n", len);
+        else
+            printf ("My king, at most %d roads can be built.\n\n", len);
+    }
+    return 0;
+}

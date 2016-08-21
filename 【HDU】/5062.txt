@@ -1,0 +1,48 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <map>
+#include <queue>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define min(a,b) (a>b?b:a)
+#define max(a,b) (a>b?a:b)
+#define MAXN 1000010
+const int ans[7] = {1,9,18,54,90,174,258};
+bool is[MAXN];
+
+bool ok(int num)
+{
+    char a[30];
+    sprintf(a,"%d",num);
+    int len = strlen(a);
+    //rep(i,0,len) if('0' == a[i]) return false;
+    int m = 0;
+    for(int i = 0, j = len-1; i <= j; i++, j--)
+    {
+        if(a[i] != a[j] || m >= a[i])
+            return false;
+        m = a[i];
+    }
+    return true;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n;
+        scanf("%d%*c", &n);
+        printf("%d\n", ans[n]);
+    }
+    return 0;
+}

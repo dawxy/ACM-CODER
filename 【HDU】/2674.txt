@@ -1,0 +1,20 @@
+#include<cstdio>
+#include<cstring>
+int ans[40];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	ans[0] = ans[1] = 1;
+	for(int i = 2; i <= 40; i++)
+		ans[i] = ans[i-1]*i%2009;
+	while(~scanf("%d%*c", &n))
+	{
+		if(n <= 40) printf("%d\n", ans[n]);
+		else puts("0");
+	}
+	return 0;
+}

@@ -1,0 +1,313 @@
+/*最小割(最大流)*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000*1000+10, MAXM = 1000*1000*3+10, MAXBUF = 100000;
+char buf[MAXBUF], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;//EOF
+	do{
+		rnext();
+		if('-' == *ps) f = -1;
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;//EOF
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+typedef LL type;
+struct Dinic{
+	struct Edge{
+		int next,u,v;
+		type cap;//cap是剩余流量
+	}edge[MAXM<<1];
+	int head[MAXN], tol, s,t,d[MAXN];
+	void init()
+	{
+		clc(head,-1);
+		tol = 0;
+	}
+	void add_edge(int u, int v, type cap, type cap2 = 0)//有向图传前3个，无向图传4个
+	{
+		Edge e1 = {head[u],u,v,cap};
+		edge[tol] = e1;
+		head[u] = tol++;
+		Edge e2 = {head[v],v,u,cap2};//无向图把这里的cap2=cap可以只建一条边(add_edge一次)
+		edge[tol] = e2;
+		head[v] = tol++;
+	}
+	bool bfs()
+	{
+		clc(d,-1);
+		queue<int> q;
+		q.push(s);
+		d[s] = 0;
+		while(!q.empty())
+		{
+			int u = q.front();q.pop();
+			for(int i = head[u]; ~i; i = edge[i].next)
+			{
+				int v = edge[i].v;
+				if(-1 == d[v] && edge[i].cap)
+				{
+					d[v] = d[u]+1;
+					q.push(v);
+					if(~d[t]) return true;
+				}
+			}
+		}
+		return false;
+	}
+	int stack[MAXN],cur[MAXN],top;
+	type maxflow(int s, int t)
+	{
+		this->s = s, this->t = t;
+		type ans = 0;
+		while(bfs())
+		{
+			memcpy(cur,head,sizeof(head));
+			int u = s;
+			top = 0;
+			while(1)
+			{
+				if(u == t)
+				{
+					type flow = INF;
+					int loc;//loc 表示 stack 中 cap 最小的边
+					rep(i,0,top)
+					{
+						if(flow > edge[stack[i]].cap)
+						{
+							flow = edge[stack[i]].cap;
+							loc = i;
+						}
+					}
+					rep(i,0,top)
+					{
+						edge[stack[i]].cap -= flow;
+						edge[stack[i]^1].cap += flow;
+					}
+					ans += flow;
+					top = loc;
+					u = edge[stack[top]].u;
+				}
+				for(int i = cur[u]; ~i; cur[u] = i = edge[i].next) //cur[u] 表示u所在能增广的边的下标
+					if(edge[i].cap && (d[u]+1 == d[edge[i].v])) break;
+				if(~cur[u])
+				{
+					stack[top++] = cur[u];
+					u = edge[cur[u]].v;
+				}
+				else
+				{
+					if(!top) break;
+					d[u] = -1;
+					u = edge[stack[--top]].u;
+				}
+			}
+		}
+		return ans;
+	}
+}dinic;
+int m;
+
+int get_id(int x, int y){
+	return x*m+y;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	in(n),in(m);
+	dinic.init();
+	rep(i,0,n)
+	{
+		rep(j,1,m)
+		{
+			int v;
+			in(v);
+			dinic.add_edge(get_id(i,j-1),get_id(i,j),v,v);
+		}
+	}
+	rep(i,1,n)
+	{
+		rep(j,0,m)
+		{
+			int v;
+			in(v);
+			dinic.add_edge(get_id(i-1,j),get_id(i,j),v,v);
+		}
+	}
+	rep(i,1,n)
+	{
+		rep(j,1,m)
+		{
+			int v;
+			in(v);
+			dinic.add_edge(get_id(i-1,j-1),get_id(i,j),v,v);
+		}
+	}
+	printf("%d\n", dinic.maxflow(0,get_id(n-1,m-1)));
+	return 0;
+}
+==============================================================================
+/*最短路*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000*1000*3+10, MAXM = 1000*1000*3*2+10, MAXBUF = 100000;
+char buf[MAXBUF], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;//EOF
+	do{
+		rnext();
+		if('-' == *ps) f = -1;
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;//EOF
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+int head[MAXN], tol,nxt[MAXM<<1],to[MAXM<<1];
+void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int m, cost[MAXN];
+
+void add_all(int a, int b, int c)
+{
+	add_edge(a,b);add_edge(b,a);
+	add_edge(a,c);add_edge(c,a);
+	add_edge(b,c);add_edge(c,b);
+}
+struct NODE{
+	int dis;//这里的dis不一定是dis[u]
+	int u;
+	NODE(int a, int b){ dis = a, u = b;}
+	bool operator <(const NODE& a) const {return dis > a.dis;}
+};
+priority_queue<NODE> q;
+int dis[MAXN];
+bool vis[MAXN];
+int dijkstra(int st, int ed)
+{
+	while(!q.empty()) q.pop();
+	clc(dis, 0x3f);
+	clc(vis, 0);
+	dis[st] = 0;
+	q.push(NODE(dis[st], st));
+	while(!q.empty())
+	{
+		NODE now = q.top(); q.pop();
+		int u = now.u;
+		if(dis[u] > now.dis) dis[u] = now.dis;
+		if(ed == u) return dis[u];
+		if(vis[u]) continue;
+		vis[u] = true;
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(dis[v] > now.dis+cost[v]) q.push(NODE(now.dis+cost[v], v));
+		}
+	}
+	return dis[ed];
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	in(n),in(m);
+	clc(head,-1);
+	tol = 0;
+	int cnt = 0;
+	rep(i,0,n) rep(j,1,m) in(cost[cnt++]);
+	int cnt1 = cnt;
+	rep(i,1,n) rep(j,0,m) in(cost[cnt++]);
+	int cnt2 = cnt;
+	rep(i,1,n) rep(j,1,m) in(cost[cnt++]);
+	rep(i,1,n)
+	{
+		rep(j,1,m-1)
+		{
+			int a = cnt1+(i-1)*m+j, b = cnt2+(i-1)*(m-1)+j, c = i*(m-1)+j;
+			add_all(a,b,c);
+			b = cnt2+(i-1)*(m-1)+j-1, c = (i-1)*(m-1)+j-1;
+			add_all(a,b,c);
+		}
+		int a = cnt1+(i-1)*m, b = cnt2+(i-1)*(m-1), c = i*(m-1);
+		add_all(a,b,c);
+		a = cnt1+i*m-1, b = cnt2+(i-1)*(m-1)+m-2, c = (i-1)*(m-1)+m-2;
+		add_all(a,b,c);
+	}
+	int st = cnt, ed = cnt+1;
+	cost[st] = cost[ed] = 0;
+	rep(i,1,n)
+	{
+		add_edge(st,cnt1+(i-1)*m);
+		add_edge(cnt1+(i-1)*m+m-1,ed);
+	}
+	rep(j,1,m)
+		add_edge(st,(n-1)*(m-1)+j-1), add_edge(j-1,ed);
+	printf("%d\n",dijkstra(st,ed));
+	return 0;
+}

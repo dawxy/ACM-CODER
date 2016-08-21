@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+
+int the_next (int);
+
+int main ()
+{
+	int n;
+	scanf ("%d%*c", &n);
+	while (n--)
+	{
+		int i, j, s[2000], count = 1;
+		bool find = false;
+		scanf ("%d%*c", &s[0]);
+		for (i = 0; ;i++)
+		{
+			s[count++] = the_next(s[i]);
+			for (j = 0; j < count-1; j++)
+			{
+				if (s[count-1] == s[j])
+				{
+					find = true;
+					break;
+				}
+			}
+			if (find)
+				break;
+		}
+		printf ("%d\n", i+1);
+	}
+
+	return 0;
+}
+
+bool cmp(int a, int b)
+{
+	return a>b;
+}
+
+int the_next (int a)
+{
+	char c[5];
+	int b;
+	sprintf(c, "%d", a);
+	sort(c, c+4);
+	sscanf (c, "%d", &a);
+	sort(c, c+4, cmp);
+	sscanf (c, "%d", &b);
+	return b-a;
+}

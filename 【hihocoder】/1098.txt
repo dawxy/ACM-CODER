@@ -1,0 +1,55 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXM = 1000000*2+10;
+struct NODE{
+	int u,v,cost;
+	bool operator<(const NODE &t)const{
+		return cost < t.cost;
+	}
+}edge[MAXM];
+int n,m, f[MAXN];
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int kruscal()
+{
+	sort(edge,edge+m);
+	repe(i,1,n) f[i] = i;
+	int block = n, ans = 0;
+	rep(i,0,m)
+	{
+		int x = find(edge[i].u), y = find(edge[i].v);
+		if(x != y)
+		{
+			f[x] = y;
+			ans += edge[i].cost;
+			if(--block == 1) return ans;
+		}
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	scanf("%d %d%*c", &n, &m);
+	rep(i,0,m)
+		scanf("%d %d %d%*c", &edge[i].u, &edge[i].v, &edge[i].cost);
+	printf("%d\n", kruscal());
+	return 0;
+}

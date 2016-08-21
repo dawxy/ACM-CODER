@@ -1,0 +1,219 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+struct NODE{
+    NODE *ch[2], *fa;
+    int sz,v,add;
+    bool f;
+    int chd(){
+        return this == fa->ch[1];
+    }
+    void push_up(){
+        sz = ch[0]->sz+ch[1]->sz+1;
+    }
+    void push_down(){
+        if(f)
+        {
+            f = false;
+            swap(ch[0],ch[1]);
+            ch[0]->f ^= 1;
+            ch[1]->f ^= 1;
+        }
+        if(add)
+        {
+            ch[0]->add += add;
+            ch[0]->v += add;
+            ch[1]->add += add;
+            ch[1]->v += add;
+            add = 0;
+        }
+    }
+};
+NODE *null = new NODE;
+inline void setch(NODE *fa, NODE *u, int p)
+{
+    fa->ch[p] = u, u->fa = fa;
+}
+void rot(NODE *u)
+{
+    NODE *y = u->fa;
+    int d = u->chd();
+    setch(y->fa,u,y->chd());
+    setch(y,u->ch[d^1],d);
+    setch(u,y,d^1);
+    y->push_up(), u->push_up();
+}
+NODE *find_kth(NODE *u, int k)
+{
+    u->push_down();
+    int d = k-u->ch[0]->sz;
+    if(1 == d) return u;
+    if(d <= 0) return find_kth(u->ch[0],k);
+    return find_kth(u->ch[1], d-1);
+}
+void splay(NODE* &rt, int k, NODE *p)
+{
+    NODE *x = find_kth(rt,k);
+    if(x == p) return;
+    while(x->fa != p)
+    {
+        NODE *y = x->fa;
+        if(y->fa != p && x->chd() != y->chd()) rot(y);
+        rot(x);
+    }
+    x->push_up();
+    if(null == p) rt = x;
+}
+int a[MAXN];
+NODE node[MAXN], node2[MAXN];
+NODE *rt;
+void bulid(NODE* &u, int x, int y, NODE *fa)
+{
+    if(x>y)
+    {
+        u = null;
+        return;
+    }
+    int m = (x+y)>>1;
+    u = &node[m];
+    u->add = u->f = 0,u->fa = fa,u->v = a[m];
+    bulid(u->ch[0],x,m-1,u);
+    bulid(u->ch[1],m+1,y,u);
+    u->push_up();
+}
+int k1,k2;
+void init(int sz)
+{
+    null->sz = 0;
+    bulid(rt,0,sz+1,null);
+}
+void add(int x)
+{
+    splay(rt,1,null);
+    splay(rt,k2+2,rt);
+    rt->ch[1]->ch[0]->add += x;
+    rt->ch[1]->ch[0]->v += x;
+}
+void reverse()
+{
+    splay(rt,1,null);
+    splay(rt,k1+2,rt);
+    rt->ch[1]->ch[0]->f ^= 1;
+}
+void insert(int k, NODE* x)//把x结点插入第k个后面
+{
+    splay(rt,k,null);
+    if(rt->ch[1] == null) setch(rt,x,1);
+    else
+    {
+        NODE *u = rt->ch[1];
+        u->push_down();
+        while(u->ch[0] != null) u = u->ch[0],u->push_down();
+        setch(u,x,0);
+        while(x->fa != null) x->push_up(), x = x->fa;//向上更新sz
+    }
+    rt->push_up();
+}
+NODE* del(int k)//删除第k个结点,需要左右都加一个虚拟结点,返回删除结点
+{
+    splay(rt,k,null);
+    NODE *u = rt->ch[0], *v = rt->ch[1], *ans = rt;
+    if(null == u) v->fa = null, rt = v;
+    else if(null == v) u->fa = null, rt = u;
+    else
+    {
+        splay(rt,rt->ch[0]->sz+2,rt);//把rt右儿子子树最小的伸展到rt->ch[1],这样rt->ch[1]没有左儿子
+        setch(rt->ch[1],rt->ch[0],0);
+        rt = rt->ch[1], rt->fa = null;
+        rt->push_up();
+    }
+    ans->ch[0] = ans->ch[1] = ans->fa = null;
+    ans->sz = 1;
+    return ans;
+}
+void mov(int x)
+{
+    if(2 == x)
+    {
+        NODE *v = del(2);
+        insert(rt->sz-1,v);
+    }
+    else
+    {
+        NODE *v = del(rt->sz-1);
+        insert(1,v);
+    }
+}
+int query()
+{
+    splay(rt,2,null);
+    return rt->v;
+}
+void pt(NODE *u)
+{
+    if(u == null) return;
+    u->push_down();
+    pt(u->ch[0]);
+    printf("%d\n", u->v);
+    pt(u->ch[1]);
+}
+
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int n,m, count = 0;
+    while(~scanf("%d %d %d %d%*c", &n, &m, &k1, &k2) && k1)
+    {
+        char op[10];
+        int x, cnt = 0;
+        repe(i,1,n) scanf("%d%*c", &a[i]);
+        printf("Case #%d:\n", ++count);
+        init(n);
+        rep(i,0,m)
+        {
+            scanf("%s",op);
+            if('a' == op[0]) 
+            {
+                scanf("%d%*c", &x);
+                add(x);
+            }
+            else if('r' == op[0]) reverse();
+            else if('i' == op[0])
+            {
+                scanf("%d%*c", &x);
+                NODE *v = &node2[cnt++];
+                v->add = v->f = 0;
+                v->ch[0] = v->ch[1] = v->fa = null;
+                v->sz = 1;
+                v->v = x;
+                insert(2,v);
+            }
+            else if('d' == op[0]) del(2);
+            else if('m' == op[0])
+            {
+                scanf("%d%*c", &x);
+                mov(x);
+            }
+            else printf("%d\n", query());
+        }
+    }
+    return 0;
+}

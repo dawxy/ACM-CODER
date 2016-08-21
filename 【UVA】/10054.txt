@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <string.h>
+//#define scanf scanf_s
+#define MAX 51
+bool vis[MAX];
+int d[MAX], g[MAX][MAX],len, first;
+
+void pri(int);
+bool is_oula();
+int main ()
+{
+	//FILE *f;
+	//freopen_s (&f,"e:\\1.txt","r",stdin);
+	int t, count = 0;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n, a, b;
+		scanf ("%d%*c", &n);
+		memset(g,0,sizeof(g));
+		memset(vis,false,sizeof(vis));
+		memset(d,0,sizeof(d));
+		while(n--)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			g[a][b]++, g[b][a]++;
+			d[a]++;
+			d[b]++;
+		}
+		printf ("Case #%d\n", ++count);
+		if (is_oula())
+			pri(first);
+		else
+			puts("some beads may be lost");
+		if (t)
+			printf ("\n");
+	}
+
+	return 0;
+}
+
+bool is_oula()
+{
+	int sum = 0;
+	for (int i = 1; i < MAX; i++)
+	{
+		if (d[i])
+		{
+			first = i;
+			sum++;
+			if (d[i]%2)
+				return false;
+		}
+	}		
+	return true;
+}
+
+void pri(int u)
+{
+	for (int i = 1; i < MAX; i++)
+	{
+		if (g[u][i])
+		{
+			g[u][i]--;
+			g[i][u]--;	
+			pri(i);		
+			printf ("%d %d\n", i, u);//必须在pri返回后输出不然为顺序输出
+		}
+	}
+}

@@ -1,0 +1,107 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20, MAXM = 15*15+10;
+struct Edge{
+	int u,v, cost;
+	Edge(int a = 0, int b = 0, int c = 0){
+		u = a, v = b, cost = c;
+	}
+	bool operator<(const Edge t)const{
+		return cost < t.cost;
+	}
+}edge[MAXM];
+int tol, f[MAXN], a[MAXN], ans[MAXN],n, m;
+double mi,w[MAXN];
+bool vis[MAXN];
+int intime;
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+double kruskal()
+{
+	double sum = 0;
+	rep(i,0,m) f[a[i]] = a[i];
+	int cnt = m;
+	rep(i,0,tol)
+	{
+		if(vis[edge[i].u] && vis[edge[i].v])
+		{
+			int x = find(edge[i].u), y = find(edge[i].v);
+			if(x != y)
+			{
+				cnt--;
+				f[x] = y;
+				sum += edge[i].cost;
+				if(1 == cnt) return sum;
+			}
+		}
+	}
+	return sum;
+}
+void dfs(int p, int st, double nsum)
+{
+	intime++;
+	if(p == m)
+	{
+		double tmp = kruskal()/nsum;
+		if(fabs(tmp-mi) > 1e-3 && tmp < mi)
+		{
+			mi = tmp;
+			rep(i,0,m) ans[i] = a[i];
+		}
+		return;
+	}
+	if(p+n-st+1 < m) return;
+	repe(i,st,n)
+	{
+		if(vis[i]) continue;
+		a[p] = i;
+		vis[i] = true;
+		dfs(p+1,i+1,nsum+w[i]);
+		vis[i] = false;
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		repe(i,1,n) scanf("%lf%*c", &w[i]);
+		tol = 0;
+		int c;
+		repe(i,1,n)
+		{
+			repe(j,1,n)
+			{
+				scanf("%d%*c", &c);
+				if(i != j)
+					edge[tol++] = Edge(i,j,c);
+			}
+		}
+		mi = INF;
+		sort(edge,edge+tol);
+		intime = 0;
+		dfs(0,1,0);
+		printf("%d", ans[0]);
+		rep(i,1,m) printf(" %d", ans[i]);
+		putchar('\n');
+		//printf("intime=%d\n", intime);
+	}
+	return 0;
+}

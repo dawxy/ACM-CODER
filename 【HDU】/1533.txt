@@ -1,0 +1,122 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <string>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+#define MAXN 10010
+#define INF 0x3f3f3f3f
+typedef long long LL;
+int n,m, st, ed;
+struct NODE{
+	int x,y;
+	NODE(int a, int b){
+		x = a, y = b;
+	}
+};
+struct MCMF{
+	int n,m;
+	struct Edge{
+		int from, to, cap, flow, cost;
+		Edge(int a, int b, int c, int d, int e){
+			from = a, to = b, cap = c, flow = d, cost = e;
+		}
+	};
+	vector<Edge> edge;
+	vector<int> g[MAXN];
+	bool inq[MAXN];
+	int d[MAXN]/*spfa*/, p[MAXN]/*上一条弧*/, a[MAXN]/*可改进量*/;
+	void init(int n){
+		this->n = n;
+		for(int i = 0; i < n; i++) g[i].clear();
+		edge.clear();
+	}
+	void add_edge(int from, int to, int cap, int cost)
+	{
+		edge.push_back(Edge(from,to,cap,0,cost));
+		edge.push_back(Edge(to,from,0,0,-cost));
+		m = edge.size();
+		g[from].push_back(m-2);
+		g[to].push_back(m-1);
+	}
+	bool spfa(int s, int t, int& flow, LL& cost)
+	{
+		memset(d,0x3f,sizeof(d));
+		memset(inq,0,sizeof(inq));
+		d[s] = 0, inq[s] = true, p[s] = 0, a[s] = INF;
+		queue<int> q;
+		q.push(s);
+		while(!q.empty())
+		{
+			int u = q.front();q.pop();
+			inq[u] = false;
+			for(int i = 0; i < g[u].size(); i++)
+			{
+				Edge& e = edge[g[u][i]];
+				if(e.cap > e.flow && d[e.to] > d[u]+e.cost)
+				{
+					d[e.to] = d[u]+e.cost;
+					p[e.to] = g[u][i];
+					a[e.to] = min(a[u], e.cap-e.flow);
+					if(!inq[e.to]) q.push(e.to), inq[e.to] = true;
+				}
+			}
+		}
+		if(INF == d[t]) return false;
+		flow += a[t];
+		cost += (LL)d[t]*(LL)a[t];
+		for(int u = t; u != s; u = edge[p[u]].from)
+		{
+			edge[p[u]].flow += a[t];
+			edge[p[u]^1].flow -= a[t];
+		}
+		return true;
+	}
+	//需要保证初始网络没有负圈，返回最大流量，cost才是最小花费
+	int mincostmaxflow(int s, int t, LL & cost)
+	{
+		int flow = 0;
+		cost = 0;
+		while(spfa(s,t,flow,cost));
+		return flow;
+	}
+}mcmf;
+vector<NODE> pm, ph;
+
+inline int hh(int a, int b){return a*m+b;}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		pm.clear(), ph.clear();
+		char ch;
+		mcmf.init(n*m+2);
+		st = n*m, ed = n*m+1;
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = 0; j < m; j++)
+			{
+				ch = getchar();
+				if('m' == ch)
+					mcmf.add_edge(st,hh(i,j),1,0),pm.push_back(NODE(i,j));
+				else if('H' == ch)
+					mcmf.add_edge(hh(i,j),ed,1,0),ph.push_back(NODE(i,j));
+			}
+			getchar();
+		}
+		for(int i = 0; i < pm.size(); i++)
+		{
+			for(int j = 0; j < ph.size(); j++)
+				mcmf.add_edge(hh(pm[i].x, pm[i].y),hh(ph[j].x,ph[j].y),1,abs(pm[i].x-ph[j].x)+abs(pm[i].y-ph[j].y));
+		}
+		LL ans;
+		mcmf.mincostmaxflow(st,ed,ans);
+		printf("%I64d\n", ans);
+	}
+    return 0;
+}

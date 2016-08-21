@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <string.h>
+char a[300];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n;
+    while(~scanf ("%d%*c", &n))
+	{
+		int ans = 0;
+		for (int i = 0; i < n; i++)
+		{
+            scanf ("%s%*c", a);
+            if (!strcmp("bowl",a) || !strcmp("knife",a) || !strcmp("fork",a) || !strcmp("chopsticks",a))
+			{
+                if (ans++)
+					printf (" ");
+                printf("%s",a);
+			}
+		}
+		printf ("\n");
+	}
+    return 0;
+}

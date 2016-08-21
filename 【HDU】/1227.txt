@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#define MAXN 202
+#define INF 0x3f3f3f3f
+#define min(a,b) (a<b?a:b)
+int a[MAXN], sum[MAXN][MAXN], dp[MAXN][32];
+
+int dfs(int y, int m)
+{
+	int& ans = dp[y][m];
+	if(~ans) return ans;
+	if(1 == m) return ans = sum[1][y];
+	ans = INF;
+	for(int k = 1; k < y; k++)
+		ans = min(ans,dfs(k,m-1)+sum[k+1][y]);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,m,count = 0;
+	while(~scanf("%d %d%*c",&n, &m) && n+m)
+	{
+		for(int i = 1; i <= n; i++)
+			scanf("%d%*c", &a[i]);
+		memset(sum,0,sizeof(sum));
+		for(int i = 1; i <= n; i++)
+		{
+			for(int j = i; j <= n; j++)
+			{
+				for(int k = i; k <= j; k++)
+					sum[i][j] += abs(a[k] - a[(i + j)/2]);
+			}
+		}
+		memset(dp,-1,sizeof(dp));
+		printf("Chain %d\nTotal distance sum = %d\n\n", ++count,dfs(n,m));
+	}
+	return 0;
+}

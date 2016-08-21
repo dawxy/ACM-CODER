@@ -1,0 +1,109 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 40*40+10, MAXM = 40*40*4+10;
+const int f[4][2]={{-1,0},{1,0},{0,-1},{0,1}};
+char mp[45][45];
+int n,m,num[45][45],cnt;
+int head[MAXN], tol, nxt[MAXM], to[MAXM];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+void dfs(int x, int y, char c)
+{
+	num[x][y] = cnt;
+	rep(i,0,4)
+	{
+		int ni = x+f[i][0], nj = y+f[i][1];
+		if(0 <= ni && n > ni && 0 <= nj && m > nj && -1 == num[ni][nj] && c == mp[ni][nj])
+			dfs(ni,nj,c);
+	}
+}
+int dis[MAXN];
+int bfs(int s)
+{
+	queue<int> q;
+	clc(dis,-1);
+	q.push(s);
+	dis[s] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(-1 == dis[v])
+			{
+				q.push(v);
+				dis[v] = dis[u]+1;
+			}
+		}
+	}
+	int mx = 0;
+	rep(i,0,cnt) mx = max(mx,dis[i]);
+	return mx;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d %d%*c", &n, &m);
+		rep(i,0,n)
+		{
+			scanf("%s%*c", mp[i]);
+		}
+		clc(num,-1);
+		cnt = 0;
+		rep(i,0,n)
+		{
+			rep(j,0,m)
+			{
+				if(-1 == num[i][j])
+				{
+					dfs(i,j,mp[i][j]);
+					cnt++;
+				}
+			}
+		}
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,n)
+		{
+			rep(j,0,m)
+			{
+				rep(k,0,4)
+				{
+					int ni = i+f[k][0], nj = j+f[k][1];
+					if(0 <= ni && n > ni && 0 <= nj && m > nj && num[i][j] != num[ni][nj])
+						add_edge(num[i][j], num[ni][nj]);
+				}
+			}
+		}
+		int ans = INF;
+		rep(i,0,cnt) ans = min(ans,bfs(i));
+		printf("%d\n", ans);
+	}
+	return 0;
+}

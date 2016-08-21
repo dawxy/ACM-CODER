@@ -1,0 +1,45 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 10010
+int x[MAXN], n;
+
+int gcd(int a, int b)
+{
+	if (a > b) a ^= b, b ^= a, a ^= b;
+	while (a)
+	{
+		b %= a;
+		if (a > b) a ^= b, b ^= a, a ^= b;
+	}
+	return b;
+}
+bool sloved()
+{
+	x[1] /= gcd(x[1],x[0]);
+	for(int i = 2; i < n; i++) x[1] /= gcd(x[i],x[1]);
+	return x[1] == 1;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int ch;
+		n = 0;
+		while(1)
+		{
+			scanf("%d", &x[n++]);
+			ch = getchar();
+			if('\n' == ch || -1 == ch) break;
+		}
+		if(sloved())
+			puts("YES");
+		else
+			puts("NO");
+	}
+	return 0;
+}

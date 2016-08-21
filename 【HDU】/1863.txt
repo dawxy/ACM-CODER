@@ -1,0 +1,68 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+vector<int> g[MAXN];
+struct NODE{
+	int a,b,v;
+	bool operator <(const NODE& t) const{ return v < t.v; }
+}p[MAXN];
+int f[MAXN], sum;
+bool vis[MAXN];
+
+void dfs(int u)
+{
+	vis[u] = true;
+	sum++;
+	int len = g[u].size();
+	for(int i = 0; i < len; i++)
+	{
+		if(vis[g[u][i]]) continue;
+		dfs(g[u][i]);
+	}
+}
+int find(int x)
+{
+	return f[x] == x ? x: f[x] = find(f[x]);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int m,n;
+	while(~scanf("%d %d%*c", &m, &n) && m)
+	{
+		memset(vis,0,sizeof(vis));
+		for(int i = 1; i <= n; i++)
+			g[i].clear(), f[i] = i;
+		sum = 0;
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d%*c", &p[i].a, &p[i].b, &p[i].v);
+			g[p[i].a].push_back(p[i].b);
+			g[p[i].b].push_back(p[i].a);
+		}
+		dfs(1);
+		if(sum != n)
+		{
+			puts("?");
+			continue;
+		}
+		int ans = 0;
+		sort(p,p+m);
+		for(int i = 0; i < m; i++)
+		{
+			int x = find(p[i].a), y = find(p[i].b);
+			if(x != y)
+			{
+				ans += p[i].v;
+				f[x] = y;
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

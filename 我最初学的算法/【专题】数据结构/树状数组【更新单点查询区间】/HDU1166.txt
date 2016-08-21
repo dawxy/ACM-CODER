@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 50010
+int ans[MAXN], n;
+
+void updata(int, int);
+int get_sum(int);
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    char c[10];
+    int t, count = 0;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        scanf ("%d%*c",&n);
+        memset(ans,0,sizeof(ans));
+        int buf;
+        for (int i = 1; i <= n; i++)
+        {
+            scanf ("%d%*c", &buf);
+            updata(i,buf);
+        }
+        int a, b;
+        printf ("Case %d:\n", ++count);
+        while(1)
+        {
+            scanf ("%s%*c", c);
+            if ('E' == c[0])
+                break;
+            scanf ("%d %d%*c", &a, &b);
+            if ('Q' == c[0])
+                printf("%d\n", get_sum(b)-get_sum(a-1));
+            else if ('A' == c[0])
+                updata(a,b);
+            else if ('S' == c[0])
+                updata(a,-b);
+        }
+    }
+    return 0;
+}
+
+void updata(int num, int val)
+{
+    while(num <= n)
+    {
+        ans[num] += val;
+        num += num&(-num);
+    }
+}
+
+int get_sum(int num)
+{
+    int sum = 0;
+    while(num > 0)
+    {
+        sum += ans[num];
+        num -= num&(-num);
+    }
+    return sum;
+}

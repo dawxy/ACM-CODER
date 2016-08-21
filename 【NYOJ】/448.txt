@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <string.h>
+char a[200];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t, len;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		int n, ans;
+		scanf ("%s %d%*c", a,&n);
+		len = strlen(a);
+		n  = len-n;
+		int s = 0;
+		while(n--)
+		{
+            for (int i = s+1; i < len-n; i++)
+			{
+                if (a[s] < a[i])
+                    s = i;
+			}
+            printf ("%c",a[s++]);
+		}
+		printf ("\n");
+	}
+    return 0;
+}

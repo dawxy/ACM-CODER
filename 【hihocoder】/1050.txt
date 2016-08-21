@@ -1,0 +1,158 @@
+/*1点dfs最远点为端点，再从该端点dfs最远点即为另一个端点*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXM = 100000*2+10;
+int head[MAXN], tol, to[MAXM], nxt[MAXM], dis[MAXN];
+bool vis[MAXN];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+void dfs(int u)
+{
+	vis[u] = true;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(!vis[v])
+		{
+			dis[v] = dis[u]+1;
+			dfs(v);
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	scanf("%d%*c", &n);
+	clc(head,-1);
+	tol = 0;
+	rep(i,1,n)
+	{
+		int u,v;
+		scanf("%d %d%*c", &u, &v);
+		add_edge(u,v);
+		add_edge(v,u);
+	}
+	dfs(1);
+	int u, mx = -1;
+	repe(i,1,n)
+	{
+		if(mx < dis[i])
+		{
+			u = i;
+			mx = dis[i];
+		}
+	}
+	clc(vis,0);
+	dis[u] = 0;
+	dfs(u);
+	int ans = 0;
+	repe(i,1,n)
+	{
+		ans = max(ans, dis[i]);
+	}
+	printf("%d\n", ans);
+	return 0;
+}
+=====================================================================================================
+/*类似树形DP*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXM = 100000*2+10;
+int head[MAXN], tol, to[MAXM], nxt[MAXM], mx[MAXN],ans;
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+void dfs(int u, int fa)
+{
+	mx[u] = 0;
+	bool noson = true;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v != fa)
+			dfs(v,u), noson = false;
+	}
+	int second = 0;
+	if(!noson)
+	{
+		int id;
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(v != fa && mx[u] <= mx[v]) 
+			{
+				mx[u] = mx[v];
+				id = v;
+			}
+		}
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(v != fa && id != v && second < mx[v]) 
+				second = mx[v];
+		}
+		mx[u]++;
+	}
+	ans = max(ans,mx[u]+second+1);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	scanf("%d%*c", &n);
+	clc(head,-1);
+	tol = 0;
+	rep(i,1,n)
+	{
+		int u,v;
+		scanf("%d %d%*c", &u, &v);
+		add_edge(u,v);
+		add_edge(v,u);
+	}
+	ans = -1;
+	dfs(1,-1);
+	printf("%d\n", ans);
+	return 0;
+}

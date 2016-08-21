@@ -1,0 +1,22 @@
+#include <cstdio>
+#include <cstring>
+int ans[31];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	ans[1] = 1, ans[2] = 3;
+	for(int i = 3; i <= 30; i++)
+		ans[i] = ans[i-1]+ans[i-2]*2;
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		printf("%d\n", ans[n]);
+	}
+	return 0;
+}

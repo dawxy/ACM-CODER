@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+int d[MAXN][MAXN], x[15], y[15], val[15];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+        int t;
+        scanf ("%d%*c", &t);
+        while(t--)
+	{
+		int n, cx, cy;
+                scanf ("%d %d %d%*c", &n, &cx, &cy);
+                memset(d,0,sizeof(d));
+                for (int i = 0; i < n; i++)
+			scanf ("%d %d %d%*c", &x[i], &y[i], &val[i]);
+		for (int j = 0; j <= cx; j++)
+		{
+			for (int k = 0; k <= cy; k++)
+			{
+				for (int i = 0; i < n; i++)
+				{
+					if (j >= x[i] && k >= y[i])
+						d[j][k] = max(d[j][k], max(d[j-x[i]][k]+d[x[i]][k-y[i]],d[j][k-y[i]]+d[j-x[i]][y[i]]) + val[i]);
+					swap(x[i],y[i]);
+					if (j >= x[i] && k >= y[i])
+						d[j][k] = max(d[j][k], max(d[j-x[i]][k]+d[x[i]][k-y[i]],d[j][k-y[i]]+d[j-x[i]][y[i]]) + val[i]);
+				}
+			}
+		}
+                printf ("%d\n", d[cx][cy]);
+	}
+        return 0;
+}

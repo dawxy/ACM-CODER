@@ -1,0 +1,47 @@
+#include <stdio.h>
+int g[8][8], h[8], ans;
+bool vis[3][20] = {0};
+
+void dfs(int p)
+{
+	if (8 == p)
+	{
+		int sum = 0;
+		for (int i = 0; i < 8; i++)
+			sum += g[i][h[i]];
+		if (sum > ans)
+			ans = sum;
+		return;
+	}
+	for(int i = 0; i < 8; i++)
+	{
+		if (!vis[0][i] && !vis[1][p+i] && !vis[2][p-i+8])
+		{
+			h[p] = i;
+			vis[0][i] = vis[1][p+i] = vis[2][p-i+8] = true;
+			dfs(p+1);
+			vis[0][i] = vis[1][p+i] = vis[2][p-i+8] = false;
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			for (int j = 0; j < 8; j++)
+				scanf ("%2d%*c", &g[i][j]);
+		}
+		ans = -1;
+		dfs(0);
+		printf ("%5d\n", ans);
+	}
+
+	return 0;
+}

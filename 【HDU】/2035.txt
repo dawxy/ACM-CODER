@@ -1,0 +1,28 @@
+#include <stdio.h>
+
+void main ()
+{
+	int a, b;
+
+	while (1)
+	{
+		int i, san;
+		scanf ("%d %d", &a, &b);
+		getchar();
+
+		if (0 == a, 0 == b)
+		{
+			return;
+		}
+
+		for (i = 1, san = a; i < b; i++)
+		{
+			san *= a;
+			if (1000 <= san)
+				san %= 1000;
+		}
+
+		printf ("%d\n", san);
+	}
+
+}

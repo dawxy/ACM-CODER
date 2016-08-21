@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 105
+#define max(a,b) (a>b?a:b)
+const int f[4][2] = {{1,0},{-1,0},{0,-1},{0,1}};
+int a[MAXN][MAXN], dp[MAXN][MAXN], n, k;
+
+int dfs(int si, int sj)
+{
+	int& ans = dp[si][sj];
+	if(~ans) return ans;
+	ans = a[si][sj];
+	for(int i = 0; i < 4; i++)
+	{
+		for(int j = 1; j <= k; j++)
+		{
+			int ni = si+f[i][0]*j, nj = sj + f[i][1]*j;
+			if (0 <= ni && n > ni && 0 <= nj && n > nj && a[ni][nj] > a[si][sj])
+				ans = max(ans,dfs(ni,nj)+a[si][sj]);
+		}
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &k) && ~n)
+	{
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = 0; j < n; j++)
+				scanf("%d%*c", &a[i][j]);
+		}
+		memset(dp,-1,sizeof(dp));
+		printf("%d\n", dfs(0,0));
+	}
+	return 0;
+}

@@ -1,0 +1,187 @@
+#include <stdio.h>
+#include <malloc.h>
+typedef struct NODE{
+	char num, h;
+	NODE *next;
+	NODE *last;
+	NODE *up;
+}node, *pnode;
+pnode ph;
+
+pnode init_list();
+void add_list(char*);
+void move();
+void traverse (pnode);
+
+int main ()
+{
+	while (1)
+	{
+		int i;
+		char a[5];
+		ph = init_list();
+		scanf ("%s%*c", a);
+		if ('#' == a[0])
+			break;
+		add_list(a);
+		for (i = 0; i < 51; i++)
+		{
+			scanf ("%s%*c", a);
+			if ('#' == a[0])
+				return 0;
+			add_list(a);
+		}
+		move ();
+		traverse (ph);
+
+		free(ph);
+	}
+
+	return 0;
+}
+
+pnode init_list()
+{
+	pnode phead;
+	phead = (pnode)malloc(sizeof(node));
+	phead->up = NULL;
+	phead->last = phead->next = phead;
+	phead->num = 0;
+	return phead;
+}
+
+void add_list(char *a)
+{
+	pnode p = (pnode)malloc(sizeof(node));
+	p->num = a[0];
+	p->h = a[1];
+	p->up = NULL;
+	
+	p->next = ph;
+	p->last = ph->last;
+	ph->last->next = p;
+	ph->last = p;
+	ph->num += 1;
+}
+
+void hebing(pnode p, pnode q)//把p节点放到q节点上面
+{
+	pnode buf;
+	if (NULL != p->up)//如取出的p下面还有牌就把下面的排放到最上面
+	{
+		buf = p->last;
+		while(NULL != buf)
+		{
+			buf->next = p->up;
+			buf = buf->up;
+		}
+		buf = p->next;
+		while(NULL != buf)
+		{
+			buf->last = p->up;
+			buf = buf->up;
+		}
+	}
+	else
+	{
+		ph->num--;
+		//删除p节点
+		buf = p->last;
+		while(NULL != buf)
+		{
+			buf->next = p->next;
+			buf = buf->up;
+		}
+		buf = p->next;
+		while(NULL != buf)
+		{
+			buf->last = p->last;
+			buf = buf->up;
+		}
+
+	}
+	//把节点p加入到q的位置
+	p->last = q->last;
+	p->next = q->next;
+	//更新所有p牌下面的牌的前后指向
+	buf = q->up;
+	while(NULL != buf)
+	{
+		buf->last = q->last;
+		buf->next = q->next;
+		buf = buf->up;
+	}
+	//把新加入的p节点放到上方,原来q指向的前后节点不变
+	p->up = q;
+	buf = p->last;
+	while(NULL != buf)
+	{
+		buf->next = p;
+		buf = buf->up;
+	}
+	buf = p->next;
+	while(NULL != buf)
+	{
+		buf->last = p;
+		buf = buf->up;
+	}
+}
+
+void traverse (pnode ph)
+{
+	pnode p = ph->next, q, buf;
+	int i;
+	if (1 == ph->num)
+	{
+		printf ("1 pile remaining: 52\n");
+		p = ph->next;
+		while(NULL != p)
+		{
+			buf = p;
+			p = p->up;
+			free(buf);
+		}
+		return;
+	}
+	printf ("%d piles remaining:", ph->num);
+	while (ph != p)
+	{
+		q = p->up;
+		for (i = 1; NULL != q; i++)
+		{
+			buf = q;
+			q = q->up;
+			free(buf);
+		}
+		printf (" %d", i);
+		buf = p;
+		p = p->next;
+		free(buf);
+	}
+	printf ("\n");
+}
+
+void move()
+{
+	pnode p = ph->next->next;
+	while (ph != p)
+	{
+ 		if (p->last != ph)
+		{
+			if (p->last->last != ph && p->last->last->last != ph && (p->last->last->last->h == p->h || p->last->last->last->num == p->num))
+			{
+				hebing(p, p->last->last->last);
+				continue;
+			}
+			else if(p->last->h == p->h || p->last->num == p->num)
+			{
+				hebing(p, p->last);
+				continue;
+			}
+			else
+				p = p->next;
+		}
+		else
+			p = p->next;
+	}
+}

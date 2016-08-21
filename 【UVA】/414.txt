@@ -1,0 +1,34 @@
+#include <stdio.h>
+
+int main ()
+{
+	while (1)
+	{
+		char a;
+		int i, j, minb = 26, p[14] = {0}, ans = 0, h;
+		scanf ("%d%*c", &h);
+		if (0 == h)
+			break;
+		for (i = 0; i < h; i++)
+		{
+			for (j = 0; j < 25; j++)
+			{
+				a = getchar ();
+				if (' ' == a)
+					p[i]++;
+			}
+			getchar ();
+			if(p[i] < minb)
+				minb = p[i];
+		}
+
+		for (i = 0; i < h; i++)
+		{
+			p[i] -= minb;
+			ans += p[i];
+		}
+		printf ("%d\n",ans);
+	}
+
+	return 0;
+}

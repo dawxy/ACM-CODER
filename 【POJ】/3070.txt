@@ -1,0 +1,69 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MOD = 10000;
+struct MATRIX{
+	int num[2][2];
+}x;
+
+MATRIX mul(const MATRIX& a, const MATRIX &b)
+{
+	MATRIX ans;
+	clc(ans.num,0);
+	rep(i,0,2)
+	{
+		rep(j,0,2)
+		{
+			rep(k,0,2) ans.num[i][j] += a.num[i][k]*b.num[k][j];
+			ans.num[i][j] %= MOD;
+		}
+	}
+	return ans;
+}
+MATRIX pow_mod(MATRIX x, int n)
+{
+	MATRIX ans;
+	clc(ans.num,0);
+	rep(i,0,2) ans.num[i][i] = 1;
+	while(n)
+	{
+		if(n&1) ans = mul(ans,x);
+		x = mul(x,x);
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	x.num[0][0] = x.num[0][1] = x.num[1][0] = 1;
+	x.num[1][1] = 0;
+	while(~scanf("%d%*c", &n) && ~n)
+	{
+		if(!n)
+		{
+			puts("0");
+			continue;
+		}
+		MATRIX ans = pow_mod(x,n);
+		printf("%d\n", ans.num[0][1]);
+	}
+	return 0;
+}

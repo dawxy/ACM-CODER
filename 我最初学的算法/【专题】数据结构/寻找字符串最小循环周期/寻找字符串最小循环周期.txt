@@ -1,0 +1,33 @@
+//寻找字符串最小循环周期
+#include <stdio.h>
+#include <string.h>
+
+int main ()
+{
+	int len;
+	char a[100];
+	gets_s (a);
+	len = strlen(a);
+	for (int i = 1; i < len; i++)
+	{
+		if (!(len%i))//如果len除以i有余数说明这个i的值肯定不可能是重复周期
+		{
+			bool ok = true;
+			for (int j = 0; j < len; j++)
+			{
+				if (a[j] != a[j%i])//判断以i为周期时后面的所有字符串是不是都是循环的
+				{
+					ok = false;
+					break;
+				}
+			}
+			if (ok)//ok为true时说明找到了
+			{
+				printf ("%d\n", i);
+				break;
+			}
+		}
+	}
+	
+	return 0;
+}

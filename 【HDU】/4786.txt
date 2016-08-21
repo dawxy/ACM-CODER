@@ -1,0 +1,100 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int fb[100];
+bool is_fb[MAXN];
+struct Edge{
+	int u,v, c;
+	bool operator<(const Edge& t)const{
+		return c < t.c;
+	}
+}edge[MAXN];
+int f[MAXN],n,m,mi,mx;
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+bool ok(int st, int ed)
+{
+	for(int i = st; i <= ed; i++)
+	{
+		if(is_fb[i]) return true;
+	}
+	return false;
+}
+bool sloved()
+{
+	int cnt = n;
+	mi = mx = 0;
+	repe(i,1,n) f[i] = i;
+	rep(i,0,m)
+	{
+		int x = find(edge[i].u), y = find(edge[i].v);
+		if(x != y)
+		{
+			f[x] = y;
+			cnt--;
+			mi += edge[i].c;
+			if(1 == cnt) break;
+		}
+	}
+	if(1 != cnt) return false;
+	cnt = n;
+	repe(i,1,n) f[i] = i;
+	per(i,m-1,0)
+	{
+		int x = find(edge[i].u), y = find(edge[i].v);
+		if(x != y)
+		{
+			f[x] = y;
+			cnt--;
+			mx += edge[i].c;
+			if(1 == cnt) break;
+		}
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	int i = 2;
+	fb[0] = 1, fb[1] = 2;
+	while(1){
+		fb[i] = fb[i-1]+fb[i-2];
+		if(fb[i] < MAXN) is_fb[fb[i]] = true;
+		else break;
+		i++;
+	}
+	while(t--)
+	{
+		scanf("%d %d%*c", &n, &m);
+		rep(i,0,m) scanf("%d %d %d%*c", &edge[i].u, &edge[i].v, &edge[i].c);
+		sort(edge,edge+m);
+		printf("Case #%d: ", ++count);
+		if(!sloved())
+		{
+			puts("No");
+			continue;
+		}
+		if(ok(mi,mx)) puts("Yes");
+		else puts("No");
+	}
+	return 0;
+}

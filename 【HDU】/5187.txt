@@ -1,0 +1,60 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+LL n,MOD;
+
+LL mul_mod(LL a, LL b)//a*b¶ÔMODÈ¡Óà
+{
+	a %= MOD;
+	LL ans = 0;
+	while(b)
+	{
+		if(b&1)
+		{
+			ans += a;
+			if(ans >= MOD) ans -= MOD;
+		}
+		a <<= 1;
+		if(a >= MOD) a -= MOD;
+		b >>= 1;
+	}
+	return ans;
+}
+LL pow_mod(LL x, LL n)
+{
+    LL ans = 1;
+    while(n)
+    {
+        if(n&1) ans = mul_mod(ans,x);
+        x = mul_mod(x,x);
+        n >>= 1;
+    }
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    while(~scanf("%I64d %I64d%*c", &n, &MOD))
+    {
+        if(1 == n) printf("%I64d\n", n%MOD);
+        else printf("%I64d\n", (pow_mod(2,n)-2+MOD)%MOD);
+    }
+    return 0;
+}

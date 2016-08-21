@@ -1,0 +1,161 @@
+/*在线分块*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef unsigned int LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50000+10,SIZE = 200,BLOCK = MAXN/SIZE+10;
+int a[MAXN],n,sn,all;
+LL sum[BLOCK][MAXN],cnt[BLOCK][MAXN],tmp[MAXN],tnum[MAXN];
+
+LL g(LL x) {return x*(x-1)/2;}
+LL gcd(LL a, LL b)
+{
+	while(b)
+	{
+		a %= b;
+		if(a < b) swap(a,b);
+	}
+	return a;
+}
+LL ans;
+void cal(int x, int y, int st, int ed)
+{
+	repe(i,x,y)
+	{
+		if(!tmp[a[i]])
+			tnum[all++] = a[i],tmp[a[i]] = cnt[ed][a[i]]-cnt[st+1][a[i]];
+		ans += (tmp[a[i]]++);
+	}
+}
+LL query(int x, int y)
+{
+	int st = x/SIZE,ed = y/SIZE;
+	if(st == ed)
+	{
+		ans = all = 0;
+		cal(x,y,0,1);
+		rep(i,0,all) tmp[tnum[i]] = 0;
+		return ans;
+	}
+	if(st+1 == ed)
+	{
+		ans = all = 0;
+		cal(x,(st+1)*SIZE-1,0,1);
+		cal(ed*SIZE,y,0,1);
+		rep(i,0,all) tmp[tnum[i]] = 0;
+		return ans;
+	}
+	ans = sum[st+1][ed*SIZE-1];
+	all = 0;
+	cal(x,(st+1)*SIZE-1,st,ed);
+	cal(ed*SIZE,y,st,ed);
+	rep(i,0,all) tmp[tnum[i]] = 0;
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int q;
+	scanf("%d %d", &n, &q);
+	rep(i,0,n) scanf("%d", &a[i]);
+	sn = n/SIZE+(bool)(n%SIZE);
+	rep(i,0,sn)
+	{
+		tmp[a[i*SIZE]]++;
+		rep(j,i*SIZE+1,n) sum[i][j] = sum[i][j-1]+(tmp[a[j]]++);
+		clc(tmp,0);
+	}
+	rep(i,0,sn)
+	{
+		int st = i*SIZE,ed = min(n,(i+1)*SIZE);
+		memcpy(cnt[i+1],cnt[i],sizeof(cnt[i]));
+		rep(j,st,ed) cnt[i+1][a[j]]++;
+	}
+	while(q--)
+	{
+		int x,y;
+		scanf("%d %d", &x, &y);
+		LL m = query(x-1,y-1),d = g(y-x+1);
+		LL g = gcd(m,d);
+		printf("%u/%u\n",m/g,d/g);
+	}
+	return 0;
+}
+=====================================================================
+/*离线莫队*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef unsigned int LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50000+10,SIZE = 300;
+struct NODE{
+	LL x,y;
+	int id,block;
+	bool operator<(const NODE&t)const{
+		if(block != t.block) return block < t.block;
+		return y < t.y;
+	}
+}in[MAXN];
+int a[MAXN];
+LL ans1[MAXN],ans2[MAXN],cnt[MAXN];
+
+LL gcd(LL a, LL b)
+{
+	while(b)
+	{
+		a %= b;
+		if(a < b) swap(a,b);
+	}
+	return a;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,q;
+	scanf("%d %d", &n, &q);
+	rep(i,0,n) scanf("%d", &a[i]);
+	rep(i,0,q)
+	{
+		scanf("%d %d", &in[i].x, &in[i].y);
+		in[i].x--;in[i].y--;
+		in[i].id = i,in[i].block = in[i].x/SIZE;
+	}
+	sort(in,in+q);
+	LL sum = 0,x = 0,y = 0;cnt[a[0]]++;
+	rep(i,0,q)
+	{
+		while(x < in[i].x)
+		{
+			sum -= (--cnt[a[x]]);
+			x++;
+		}
+		while(x > in[i].x)
+		{
+			sum += (cnt[a[--x]]++);
+		}
+		while(y < in[i].y)
+		{
+			sum += (cnt[a[++y]]++);
+		}
+		while(y > in[i].y)
+		{
+			sum -= (--cnt[a[y]]);
+			y--;
+		}
+		LL d = (y-x+1)*(y-x)/2;
+		LL g = gcd(sum,d);
+		ans1[in[i].id] = sum/g;ans2[in[i].id] = d/g;
+	}
+	rep(i,0,q) printf("%u/%u\n", ans1[i],ans2[i]);
+	return 0;
+}

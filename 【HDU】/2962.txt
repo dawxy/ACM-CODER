@@ -1,0 +1,102 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 1010
+#define MAXM 2010000
+struct Edge{
+	int next, v, h, cost;
+	Edge(int a = 0, int b = 0, int c = 0, int d = 0){next = a, v = b, h = c, cost = d;}
+}edge[MAXM];
+int head[MAXN], tol, dis[MAXN];
+bool inq[MAXN];
+
+void add_edge(int u, int v, int h, int cost)
+{
+	edge[tol] = Edge(head[u],v,h,cost);
+	head[u] = tol++;
+}
+bool spfa(int s, int ed, int nowh)
+{
+	queue<int> q;
+	clc(dis,0x3f);
+	clc(inq,0);
+	inq[s] = true;
+	dis[s] = 0;
+	q.push(s);
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		inq[u] = false;
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v, cost = edge[i].cost;
+			if(edge[i].h < nowh) continue;
+			if(INF != dis[u] && dis[v] >= dis[u]+cost)
+			{
+				dis[v] = dis[u]+cost;
+				if(!inq[v])
+				{
+					inq[v] = true;
+					q.push(v);
+				}
+			}
+		}
+	}
+	return INF != dis[ed];
+}
+int sloved(int st, int ed, int limh, int &ansd)
+{
+	if(!spfa(st,ed,0)) return -1;
+	int x = 0, y = limh, mid, ansh = 0;
+	while(x <= y)
+	{
+		mid = (x+y)>>1;
+		if(spfa(st,ed,mid))
+			x = mid+1, ansh = mid,ansd = dis[ed];
+		else
+			y = mid-1;
+	}
+	return ansh;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m, count = 0;
+	while(~scanf("%d %d%*c", &n, &m) &&n+m)
+	{
+		int a,b,h,c;
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,m)
+		{
+			scanf("%d %d %d %d%*c", &a, &b, &h, &c);
+			if(-1 == h) h = INF;
+			add_edge(a,b,h,c);
+			add_edge(b,a,h,c);
+		}
+		int st,ed,limh, ansd;
+		scanf("%d %d %d%*c", &st, &ed, &limh);
+		int ans = sloved(st,ed,limh,ansd);
+		if(count) putchar('\n');
+		printf("Case %d:\n", ++count);
+		if(~ans)
+			printf("maximum height = %d\nlength of shortest route = %d\n", ans, ansd);
+		else puts("cannot reach destination");
+	}
+	return 0;
+}

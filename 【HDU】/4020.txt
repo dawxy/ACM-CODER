@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <string.h>
+#include <map>
+#include <algorithm>
+using namespace std;
+#define MAXN 100010
+#define MAXM 500010
+map <int, int> v[MAXN];
+__int64 ans[MAXM];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t, count = 0;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int n ,m, q, id, c, len, max = -1;
+        scanf ("%d %d %d%*c", &n, &m, &q);
+        for (int i = 0; i < m; i++)
+		{
+            scanf ("%d %d %d%*c", &id, &c, &len);
+            v[id-1].insert(map<int, int> :: value_type(c,len));
+		}
+		memset(ans,0,sizeof(ans));
+        for (int i = 0; i < n; i++)
+		{
+			int lenv = v[i].size();
+			map <int, int>::iterator it = v[i].end();
+            for (int j = 0; j < lenv; j++)
+			{
+				it--;
+                ans[j] += (*it).second;
+			}
+			v[i].clear();
+		}
+		for (int i = 1; i < m; i++)
+            ans[i] += ans[i-1];
+        printf ("Case #%d:\n", ++count);
+        for (int i = 0; i < q; i++)
+		{
+			scanf ("%d%*c", &id);
+			if (id > m)
+				id = m;
+            printf ("%I64d\n", ans[id-1]);
+		}
+	}
+    return 0;
+}

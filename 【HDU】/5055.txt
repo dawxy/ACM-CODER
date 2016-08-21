@@ -1,0 +1,49 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <string>
+#include <map>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+int a[MAXN];
+
+inline bool cmp(int a, int b){return a >b;}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int n;
+    while(~scanf("%d%*c", &n))
+    {
+        int minn = 0x3f3f3f3f, s = -1;
+        bool have = false;
+        for(int i = 0; i < n; i++)
+        {
+            scanf("%d%*c", &a[i]);
+            if(a[i]&1)
+            {
+                have = true;
+                if(minn > a[i])
+                    minn = a[i], s = i;
+            }
+        }
+		for (int i = s; i < n - 1; i++)
+			a[i] = a[i + 1];
+        sort(a,a+n-1,cmp);
+        if(!have || !a[0])
+        {
+            puts("-1");
+            continue;
+        }
+        if(a[0])
+        {
+            for(int i = 0; i < n-1; i++)
+                printf("%d", a[i]);
+        }
+        printf("%d\n",minn);
+    }
+    return 0;
+}

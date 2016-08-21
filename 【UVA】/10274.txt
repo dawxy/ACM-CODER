@@ -1,0 +1,182 @@
+#include <stdio.h>
+#include <string.h>
+#include <string>
+#include <map>
+#define MAXN 22
+#define MAXS 50000
+using namespace std;
+struct QUE{
+	char g[MAXN*MAXN+1], data;
+	int dis, fa;
+}que[MAXS];
+char sss[MAXN],fx[5] = "DLRU";
+const int d[4][2] = {{1,0},{0,-1},{0,1},{-1,0}};
+int h, w, front, rear;
+map <string,bool> vis;
+
+int bfs();
+void output(int);
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		scanf ("%d %d%*c", &h, &w);
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
+				que[0].g[i*w+j] = getchar();
+			getchar();
+		}
+		gets(sss);
+		que[0].g[h*w] = 0;
+		int ans = bfs();
+		if (-1 == ans)
+			printf ("-1\n");
+		else
+		{
+			output(ans);
+			printf ("\n");
+		}
+	}
+	return 0;
+}
+
+void a_move(int si, int sj, int f)
+{
+	int ni = si, nj = sj;
+	int old = si*w+sj, nw;
+	while(1)
+	{
+		ni += d[f][0];
+		nj += d[f][1];
+		if (' ' != que[rear].g[ni*w+nj])
+		{
+			ni -= d[f][0];
+			nj -= d[f][1];
+			nw = ni*w+nj;
+			if (old != nw)
+			{
+				que[rear].g[nw] = que[rear].g[old];
+				que[rear].g[old] = ' ';
+			}
+			return;
+		}
+	}
+}
+void dfs(int si, int sj, char c)
+{
+	que[rear].g[si*w+sj] = ' ';
+	for (int i = 0; i < 4; i++)
+	{
+		int ni = si+d[i][0], nj = sj+d[i][1];
+		if (c == que[rear].g[ni*w+nj])
+			dfs(ni, nj, c);
+	}
+}
+bool move(int f)
+{
+	switch (f)
+	{
+	case 0:
+		{
+			for (int i = h-1; i >= 0; i--)
+				for (int j = 0; j < w; j++)
+					if ('#' != que[rear].g[i*w+j] && ' ' != que[rear].g[i*w+j])
+						a_move(i,j,f);
+			break;
+		}
+	case 1:
+		{
+			for (int j = 0; j < w; j++)
+				for (int i = 0; i < h; i++)
+					if ('#' != que[rear].g[i*w+j] && ' ' != que[rear].g[i*w+j])
+						a_move(i,j,f);
+			break;
+		}
+	case 2:
+		{
+			for (int j = w-1; j >= 0; j--)
+				for (int i = 0; i < h; i++)
+					if ('#' != que[rear].g[i*w+j] && ' ' != que[rear].g[i*w+j])
+						a_move(i,j,f);
+			break;
+		}
+	case 3:
+		{
+			for (int i = 0; i < h; i++)
+				for (int j = 0; j < w; j++)
+					if ('#' != que[rear].g[i*w+j] && ' ' != que[rear].g[i*w+j])
+						a_move(i,j,f);
+			break;
+		}
+	}
+	bool again = false;
+	for (int i = 1; i < h-1; i++)
+	{
+		for (int j = 1; j < w-1; j++)
+		{
+			char c = que[rear].g[i*w+j];
+			if ('1' <= c && '3' >= c)
+			{
+				for (int k = 0; k < 4; k++)
+				{
+					int ni = i+d[k][0], nj = j+d[k][1];
+					if (c == que[rear].g[ni*w+nj])
+					{
+						dfs(i,j,c);
+						again = true;
+					}
+				}
+			}
+		}
+	}
+	return again;
+}
+bool is_ans()
+{
+	for (int i = 0; i < h*w; i++)
+		if ('1' <= que[front].g[i] && '3' >= que[front].g[i])
+			return false;
+	return true;
+}
+int bfs()
+{
+	front = -1, rear = 0;
+	que[0].fa = -1;
+	que[rear++].dis = 0;
+	vis.clear();
+	vis[que[0].g] = true;
+	while(1 != rear-front)
+	{
+		if (18 < que[++front].dis)
+			return -1;
+		if (is_ans())
+			return front;
+		for (int i = 0; i < 4; i++)
+		{
+			strcpy(que[rear].g,que[front].g);
+			while(move(i));
+			if (!vis.count(que[rear].g))
+			{
+				vis[que[rear].g] = true;
+				que[rear].dis = que[front].dis+1;
+				que[rear].fa = front;
+				que[rear].data = fx[i];
+				rear++;
+			}
+		}
+	}
+	return -1;
+}
+void output(int a)
+{
+	if (-1 == que[a].fa)
+		return;
+	output(que[a].fa);
+	printf ("%c",que[a].data);
+}

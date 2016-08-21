@@ -1,0 +1,70 @@
+#include <stdio.h>
+#define MAXN 31
+#define MAXQUE 30000
+int d[6][3] = {{1,0,0},{-1,0,0},{0,-1,0},{0,1,0},{0,0,-1},{0,0,1}} ,mi, mj, mk;
+char g[MAXN][MAXN][MAXN];
+struct queue{
+	int i, j, k;
+}que[MAXQUE], st, ed;
+
+int bfs();
+int main ()
+{
+	while(1)
+	{
+		scanf ("%d %d %d%*c", &mk, &mi, &mj);
+		if (0 == mk && 0 == mi && 0 == mj)
+			break;
+		for (int k = 0; k < mk; k++)
+		{
+			for (int i = 0; i < mi; i++)
+			{
+				for (int j = 0; j < mj; j++)
+				{
+					g[k][i][j] = getchar();
+					if ('S' == g[k][i][j])
+						st.i = i, st.j = j,st.k = k;
+					else if ('E' == g[k][i][j])
+						ed.i = i, ed.j = j, ed.k = k, g[k][i][j] = '.';
+				}
+				getchar();
+			}
+			getchar();
+		}
+		int ans = bfs();
+		if (-1 != ans)
+			printf ("Escaped in %d minute(s).\n", ans-1);
+		else
+			printf ("Trapped!\n");
+
+	}
+
+	return 0;
+}
+
+int bfs()
+{
+	int front = -1, rear = 0,time[MAXN][MAXN][MAXN] = {0}, ni, nj, nk;
+	queue buf;
+	que[rear++] = st;
+	time[st.k][st.i][st.j] = 1;
+	while(1 != rear-front)
+	{
+		buf = que[++front];
+		if (ed.i == buf.i && ed.j == buf.j && ed.k == buf.k)
+			return time[ed.k][ed.i][ed.j];
+		for (int i = 0; i < 6; i++)
+		{
+			nk = d[i][0]+buf.k;
+			ni = d[i][1]+buf.i;
+			nj = d[i][2]+buf.j;
+			if (0 <= ni && mi > ni && 0 <= nj && mj > nj && 0 <= nk && mk > nk && 0 == time[nk][ni][nj] && '.' == g[nk][ni][nj])
+			{
+				time[nk][ni][nj] = time[buf.k][buf.i][buf.j]+1;
+				que[rear].i = ni, que[rear].j = nj, que[rear++].k = nk;
+			}
+		}
+	}
+
+	return -1;
+}

@@ -1,0 +1,182 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10, MAXM = 10000*2+10;
+char buf[MAXN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+	int ans = 0;
+	do{
+		rnext();
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return -1;
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	return ans;
+}
+inline bool in_str(char *s)
+{
+	int cnt = 0;
+	do{
+		rnext();
+	}while(!isalpha(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{
+		s[cnt++] = *ps;
+		rnext();
+	}while(isalpha(*ps) && ps != pe);
+	s[cnt] = 0;
+	return true;
+}
+int head[MAXN], tol, nxt[MAXM], to[MAXM], e[MAXN][2], cost[MAXN];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int fa[MAXN],sz[MAXN],dep[MAXN],son[MAXN];
+void dfs1(int u)
+{
+	int num = 0;
+	sz[u] = 1;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v == fa[u]) continue;
+		dep[v] = dep[u]+1, fa[v] = u;
+		dfs1(v);
+		sz[u] += sz[v];
+		if(num < sz[v]) num = sz[v], son[u] = v;
+	}
+}
+int cnt, top[MAXN], tree[MAXN], pre[MAXN];
+void dfs2(int u, int num)
+{
+	top[u] = num;tree[u] = cnt, pre[cnt++] = u;
+	if(-1 == son[u]) return;
+	dfs2(son[u],num);
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v != fa[u] && v != son[u]) dfs2(v,v);
+	}
+}
+int mx[MAXN<<1], p[MAXN];
+inline int id(int x, int y){return x+y|x!=y;}
+void push_up(int x, int y, int m){
+	mx[id(x,y)] = max(mx[id(x,m)], mx[id(m+1,y)]);
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		mx[id(x,y)] = cost[p[pre[x]]];
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+void update(int x, int y, int p, int v)
+{
+	if(x == y)
+	{
+		mx[id(x,y)] = v;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(x,m,p,v);
+	else update(m+1,y,p,v);
+	push_up(x,y,m);
+}
+int query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr) return mx[id(x,y)];
+	int m = (x+y)>>1,ans = -INF;
+	if(ql <= m) ans = max(ans, query(x,m,ql,qr));
+	if(qr > m) ans = max(ans, query(m+1,y,ql,qr));
+	return ans;
+}
+void tcp_update(int x, int v)
+{
+	update(0,cnt-1,tree[e[x][1]],v);
+}
+int tcp_query(int x, int y)
+{
+	int f1 = top[x], f2 = top[y], ans = -INF;
+	while(f1 != f2)
+	{
+		if(dep[f1] < dep[f2]) swap(f1,f2), swap(x,y);
+		ans = max(ans, query(0,cnt-1,tree[f1],tree[x]));
+		x = fa[f1], f1 = top[x];
+	}
+	if(x == y) return ans;
+	if(dep[x] > dep[y]) swap(x,y);
+	ans = max(ans, query(0,cnt-1,tree[son[x]],tree[y]));
+	return ans;
+}
+void init(int rt)
+{
+	clc(son,-1);
+	fa[rt] = -1;dep[rt] = 0;
+	dfs1(rt);
+	cnt = 0;
+	dfs2(rt,rt);
+	rep(i,1,cnt)
+	{
+		if(dep[e[i][0]] > dep[e[i][1]]) swap(e[i][0],e[i][1]);
+		p[e[i][1]] = i;
+	}
+	bulid(0,cnt-1);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t = in();
+	while(t--)
+	{
+		int n = in();
+		clc(head,-1);
+		tol = 0;
+		rep(i,1,n)
+		{
+			e[i][0] = in(),e[i][1] = in(),cost[i] = in();
+			add_edge(e[i][0],e[i][1]);
+			add_edge(e[i][1],e[i][0]);
+		}
+		init(1);
+		char op[10];
+		while(in_str(op) && strcmp(op,"DONE"))
+		{
+			int x = in(),y = in();
+			if('Q' == op[0]) printf("%d\n", tcp_query(x,y));
+			else tcp_update(x,y);
+		}
+	}
+	return 0;
+}

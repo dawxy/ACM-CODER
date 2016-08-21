@@ -1,0 +1,112 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000*2*2+10;
+struct IN{
+	int a,b;
+}in[MAXN];
+unordered_map<int,int> num;
+int cnt,p[MAXN], s[MAXN], tb[MAXN],tol;
+LL sum[MAXN<<1];
+
+inline void insert(int v)
+{
+	if(num.find(v) == num.end())
+	{
+		num[v] = cnt;
+		p[cnt++] = v;
+	}
+}
+inline int get_id(int v){
+	return lower_bound(tb,tb+tol,v)-tb;
+}
+inline int id(int x, int y){return x+y|x!=y;}
+inline void push_up(int x, int y, int m){
+	sum[id(x,y)] = sum[id(x,m)]+sum[id(m+1,y)];
+}
+void add(int x, int y, int p, int v)
+{
+	if(x == y)
+	{
+		sum[id(x,y)] += v;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) add(x,m,p,v);
+	else add(m+1,y,p,v);
+	push_up(x,y,m);
+}
+LL query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr) return sum[id(x,y)];
+	int m = (x+y)>>1;
+	LL ans = 0;
+	if(ql <= m) ans += query(x,m,ql,qr);
+	if(qr > m) ans += query(m+1,y,ql,qr);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		cnt = 0;
+		num.clear();
+		insert(1);
+		rep(i,0,n)
+		{
+			int a,b;
+			scanf("%d %d%*c", &a, &b);
+			in[i] = {a,b};
+			insert(a), insert(b);
+		}
+		sort(p,p+cnt);
+		p[cnt] = p[cnt-1]+1;
+		memcpy(s,p,sizeof(int)*(cnt+1));
+		rep(i,0,n)
+		{
+			int a = lower_bound(p,p+cnt,in[i].a)-p, b = lower_bound(p,p+cnt,in[i].b)-p;
+			swap(s[a],s[b]);
+		}
+		tol = 0;
+		rep(i,0,cnt)
+		{
+			tb[tol++] = p[i];
+			if(p[i+1]-p[i] > 1)
+				tb[tol++] = p[i]+1;
+		}
+		LL ans = 0;
+		clc(sum,0);
+		rep(i,0,cnt)
+		{
+			int v = get_id(s[i]);
+			ans += query(0,tol-1,v,tol-1);
+			add(0,tol-1,v,1);
+			if(p[i+1]-p[i] > 1)
+			{
+				v = get_id(p[i]+1);
+				ans += query(0,tol-1,v,tol-1)*(p[i+1]-p[i]-1);
+				add(0,tol-1,v,p[i+1]-p[i]-1);
+			}
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,60 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, MOD = 1000000007;
+int last[32*32], now[32*32], cnt;
+int dp[MAXN][1<<5], m;
+
+void dfs(int j, int lt, int nw)
+{
+	if(j == m)
+	{
+		last[cnt] = lt, now[cnt++] = nw;
+		return;
+	}
+	if(j+1 <= m)
+	{
+		dfs(j+1, lt<<1, nw<<1|1);
+		dfs(j+1, lt<<1|1, nw<<1);
+	}
+	if(j+2 <= m)
+		dfs(j+2, lt<<2|3, nw<<2|3);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	scanf("%d %d%*c", &n, &m);
+	cnt = 0;
+	dfs(0,0,0);
+	if((n&1) && (m&1))
+	{
+		puts("0");
+		return 0;
+	}
+	int ALL = (1<<m)-1;
+	dp[0][ALL] = 1;
+	repe(i,1,n)
+	{
+		rep(j,0,cnt)
+			dp[i][now[j]] = (dp[i][now[j]]+dp[i-1][last[j]])%MOD;
+	}
+	printf("%d\n", dp[n][ALL]);
+	return 0;
+}

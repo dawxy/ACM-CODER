@@ -1,0 +1,56 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 800
+struct NODE{
+	int s, bi;
+	NODE(int a, int b){s = a, bi = b;}
+	bool operator<(const NODE& t)const{return s > t.s;}
+};
+int a[MAXN][MAXN], n;
+
+void merge(int *a, int *b, int *c)
+{
+	priority_queue<NODE> q;
+	rep(i,0,n) q.push(NODE(a[i]+b[0],0));
+	rep(i,0,n)
+	{
+		NODE now = q.top();q.pop();
+		c[i] = now.s;
+		if(now.bi+1 < n) q.push(NODE(now.s-b[now.bi]+b[now.bi+1],now.bi+1));
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+				scanf("%d%*c", &a[i][j]);
+			sort(a[i],a[i]+n);
+		}
+		rep(i,1,n)
+			merge(a[0],a[i],a[0]);
+		printf("%d", a[0][0]);
+		rep(i,1,n) printf(" %d", a[0][i]);
+		putchar('\n');
+	}
+	return 0;
+}

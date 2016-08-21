@@ -1,0 +1,125 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10, MAXIN = 10000, MAXOUT = 10000;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+char bufout[MAXOUT], outtmp[50],*pout = bufout, *pend = bufout+MAXOUT;
+inline void write(){ fwrite(bufout,sizeof(char),pout-bufout,stdout);pout = bufout;}
+inline void out_char(char c){ *(pout++) = c;if(pout == pend) write();}
+inline void out_str(char *s)
+{
+	while(*s){ *(pout++) = *(s++); if(pout == pend) write(); }
+}
+template <class T>
+inline void out_int(T x) {
+	if(!x){ out_char('0');return;}
+	if(x < 0) x = -x,out_char('-');
+	int len = 0;
+	while(x){ outtmp[len++] = x%10+48; x /= 10;}
+	outtmp[len] = 0;
+	for(int i = 0, j = len-1; i < j; i++,j--) swap(outtmp[i],outtmp[j]);
+	out_str(outtmp);
+}
+int a[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(in(n))
+	{
+		int sum = 0;
+		in(m);
+		rep(i,0,n)
+		{
+			rep(j,0,m) in(a[i][j]),sum += a[i][j];
+		}
+		if(n&1)
+		{
+			out_int(sum);out_char('\n');
+			rep(i,0,n)
+			{
+				rep(j,1,m) out_char((i&1)?'L':'R');
+				if(i != n-1) out_char('D');
+			}
+		}
+		else if(m&1)
+		{
+			out_int(sum);out_char('\n');
+			rep(j,0,m)
+			{
+				rep(i,1,n) out_char((j&1)?'U':'D');
+				if(j != m-1) out_char('R');
+			}
+		}
+		else
+		{
+			int x = 0,y = 1;
+			rep(i,0,n)
+			{
+				rep(j,0,m)
+				{
+					if(((i+j)&1) && a[x][y] > a[i][j])
+					{
+						x = i;y = j;
+					}
+				}
+			}
+			out_int(sum-a[x][y]);out_char('\n');
+			int ff = 0;
+			rep(i,0,n)
+			{
+				if(i == x || i == (x^1))
+				{
+					int st = min(x,x^1),f = 0;
+					rep(j,0,m)
+					{
+						if(j == y)
+						{
+							if(j != m-1)
+								out_char('R');
+						}
+						else
+						{
+							out_char(f?'U':'D');
+							f ^= 1;
+							if(j != m-1) out_char('R');
+						}
+					}
+					if(++i < n-1) out_char('D');
+					ff ^= 1;
+				}
+				else
+				{
+					rep(j,1,m) out_char(ff?'L':'R');
+					if(i != n-1) out_char('D');
+					ff ^= 1;
+				}
+			}
+		}
+		out_char('\n');
+	}
+	write();
+	return 0;
+}

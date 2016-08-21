@@ -1,0 +1,124 @@
+#include <cstdio>
+#include <string.h>
+#define MAXS 800000
+struct QUE{
+	int num[8];
+	int dis;
+}que[MAXS],st;
+const int ans[8] = {1,2,3,4,5,6,7,8};
+bool man[9], prime[20] = {0}, vis[MAXS];
+int front, rear, f[8] = {1};
+
+int bfs();
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int count = 0;
+	prime[2]=prime[3]=prime[5]=prime[7]=prime[11]=prime[13]=prime[17]=prime[19] = true;
+	for (int i = 1; i < 8;i++)
+		f[i] = f[i-1]*i;
+	while(1)
+	{
+		scanf ("%d%*c", &st.num[0]);
+		if (!st.num[0])
+			break;
+		if (0 > st.num[0])
+		{
+			st.num[0] *= -1;
+			man[st.num[0]] = true;
+		}
+		else
+			man[st.num[0]] = false;
+		for (int i = 1; i < 8; i++)
+		{
+			scanf ("%d%*c", &st.num[i]);
+			if (0 > st.num[i])
+			{
+				st.num[i] *= -1;
+				man[st.num[i]] = true;
+			}
+			else
+				man[st.num[i]] = false;
+		}
+		printf ("Case %d: %d\n", ++count, bfs());
+	}
+	return 0;
+}
+
+bool can_din(int a, int b)
+{
+	if (man[que[front].num[a]] == man[que[front].num[b]] || !prime[que[front].num[a]+que[front].num[b]])
+		return false;
+	return true;
+}
+void insert(int from, int to, int r)
+{
+	memcpy(que[rear].num,que[front].num,sizeof(que[rear].num));
+	if (r)
+		to++;
+	if (from == to)
+		return;
+	if (from > to)
+	{
+		que[rear].num[to] = que[front].num[from];
+		for (int i = to+1; i <= from; i++)
+			que[rear].num[i] = que[front].num[i-1];
+	}
+	else
+	{
+		que[rear].num[to-1] = que[front].num[from];
+		for (int i = from; i < to-1; i++)
+			que[rear].num[i] = que[front].num[i+1];
+	}
+}
+bool try_insert(int s)
+{
+	int code = 0;
+	for (int i = 0; i < 8; i++)
+	{
+		int cnt = 0;
+		for (int j = i+1; j < 8; j++)
+		{
+			if (que[s].num[j] < que[s].num[i])
+				cnt++;
+		}
+		code += f[7-i]*cnt;
+	}
+	if (vis[code])
+		return false;
+	return vis[code] = true;
+}
+int bfs()
+{
+	front = -1, rear = 0;
+	memset(vis,false, sizeof(vis));
+	st.dis = 0;
+	que[rear++] = st;
+	try_insert(0);
+	while(1 != rear-front)
+	{
+		if (!memcmp(ans,que[++front].num,sizeof(ans)))
+			return que[front].dis;
+		for (int i = 0; i < 8; i++)
+		{
+			for (int j = 0; j < 8; j++)
+			{
+				if (i != j && can_din(i, j))
+				{
+					for (int k = 0; k < 2; k++)
+					{
+						insert(i,j,k);
+						if (try_insert(rear))
+						{
+							que[rear].dis = que[front].dis+1;
+							rear++;
+						}
+					}
+				}
+			}
+		}
+	}
+	return -1;
+}

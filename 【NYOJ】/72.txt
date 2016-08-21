@@ -1,0 +1,18 @@
+#include <stdio.h>
+
+int main ()
+{
+	double a;
+	while (EOF != scanf ("%lf%*c", &a))
+	{
+		double sum = 0;
+		sum += a;
+		for (int i = 1; i < 12; i++)
+		{
+			scanf ("%lf%*c", &a);
+			sum += a;
+		}
+		printf ("%.2lf\n", sum/12);
+	}
+	return 0;
+}

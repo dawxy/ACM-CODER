@@ -1,0 +1,56 @@
+#include <stdio.h>
+#define MAX 90
+char g[MAX][MAX];
+int h;
+
+void dfs(int si, int sj);
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int j, si, sj;
+		char c;
+		for(h = 1; ;h++)
+		{
+			g[h][0] = 0;
+			for (j = 1; '\n' != (c = getchar());j++)
+			{
+				g[h][j] = c;
+				g[h][0] ++;
+				if ('*' == c)
+				{
+					si = h;
+					sj = j;
+				}
+			}
+			if ('_' == g[h][1])
+				break;
+		}
+		dfs(si, sj);
+		for (int i = 1; i <= h; i++)
+		{
+			for (j = 1; j <= g[i][0]; j++)
+				printf ("%c", g[i][j]);
+			printf ("\n");
+		}
+
+	}
+
+	return 0;
+}
+
+void dfs(int si, int sj)
+{
+	g[si][sj] = '#';
+	int d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}}, ni, nj;
+	for (int i = 0; i < 4; i++)
+	{
+		ni = d[i][0]+si;
+		nj = d[i][1]+sj;
+		if (' ' == g[ni][nj] && 0 < ni && 0 < nj && h > ni && g[ni][0] >= nj)
+			dfs(ni, nj);
+	}
+}

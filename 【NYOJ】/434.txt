@@ -1,0 +1,64 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <string>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 50
+struct Edge{
+	int from ,to, cost;
+	Edge(int a, int b, int c){from = a, to = b, cost = c;}
+	bool operator<(const Edge& t) const{return cost<t.cost;}
+};
+vector<Edge> edge;
+int f[MAXN], n;
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int kruskal()
+{
+	int sz = edge.size(), cnt = 1, ans = 0;
+	rep(i,0,27) f[i] = i;
+	sort(edge.begin(), edge.end());
+	rep(i,0,sz)
+	{
+		int a = find(edge[i].from), b = find(edge[i].to);
+		if(a != b) cnt++, ans += edge[i].cost, f[b] = a;
+		if(cnt == n) break;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d%*c", &n) && n)
+	{
+		char ch[100];
+		int a, b, c, len;
+		edge.clear();
+		rep(i,1,n)
+		{
+			scanf("%s %d%*c", ch, &len);
+			a = ch[0]-'A';
+			rep(i,0,len)
+			{
+				scanf("%s %d%*c", &ch, &c);
+				b = ch[0]-'A';
+				edge.push_back(Edge(a,b,c));
+			}
+		}
+		printf("%d\n", kruskal());
+	}
+	return 0;
+}

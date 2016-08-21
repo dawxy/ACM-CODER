@@ -1,0 +1,136 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1010;
+int tree[MAXN<<5][30], val[MAXN<<5], cnt;
+
+void init()
+{
+	clc(tree[0],-1);
+	cnt = 1;
+}
+void insert(const char *s, int v)
+{
+	int u = 0, n = strlen(s);
+	rep(i,0,n)
+	{
+		int c = s[i]-'a';
+		if(-1 == tree[u][c])
+		{
+			clc(tree[cnt],-1);
+			val[cnt] = 0;
+			tree[u][c] = cnt++;
+		}
+		u = tree[u][c];
+		val[u] += v;
+	}
+}
+void get_num(int &si, int &len, int num)
+{
+	if(num <= 6)
+	{
+		si = (num-2)*3;
+		len = 3;
+		return;
+	}
+	if(7 == num)
+	{
+		si = 15;
+		len = 4;
+		return;
+	}
+	if(8 == num)
+	{
+		si = 19;
+		len = 3;
+		return;
+	}
+	si = 22, len = 4;
+}
+char pt[110], ans[110];
+int mx;
+void query(char *s, int u, int cnt, int len)
+{
+	if(cnt == len)
+	{
+		if(mx < val[u])
+		{
+			strcpy(ans,pt);
+			mx = val[u];
+		}
+		return;
+	}
+	//得到按键对应的字母
+	int si, n;
+	get_num(si,n,s[cnt]-'0');
+	rep(i,0,n)
+	{
+		int c = si+i;
+		pt[cnt] = c+'a', pt[cnt+1] = 0;
+		if(-1 == tree[u][c]) continue;
+		query(s,tree[u][c], cnt+1, len);
+	}
+	return;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+	//freopen("e:\\out.txt","w",stdout);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n, v;
+		char s[110];
+		scanf("%d%*c", &n);
+		init();
+		rep(i,0,n)
+		{
+			scanf("%s %d%*c",s, &v);
+			insert(s,v);
+		}
+		int m;
+		scanf("%d%*c", &m);
+		printf("Scenario #%d:\n", ++count);
+		rep(i,0,m)
+		{
+			scanf("%s", s);
+			int len = strlen(s);
+			s[len-1] = 0;
+			bool end = false;
+			rep(i,1,len)
+			{
+				if(!end)
+				{
+					mx = 0;
+					query(s,0,0,i);
+					if(mx)
+						puts(ans);
+					else
+						puts("MANUALLY"), end = true;
+				}
+				else
+					puts("MANUALLY");
+			}
+			putchar('\n');
+		}
+		putchar('\n');
+	}
+	return 0;
+}

@@ -1,0 +1,34 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 100
+const int f[8][2] = {{2,1},{1,2},{-1,2},{-2,1},{-2,-1},{-1,-2},{1,-2},{2,-1}};
+int h, w, x, y, dp[MAXN][MAXN];
+bool vis[MAXN][MAXN];
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    scanf ("%d %d %d %d%*c", &h, &w, &x, &y);
+    x++, y++;
+    for (int i = 0;  i < 8; i++)
+    {
+        int ni = x+f[i][0], nj = y+f[i][1];
+        vis[ni][nj] = true;
+    }
+    vis[x][y] = true;
+    dp[0][1] = 1;
+    for (int i = 1; i <= h+1; i++)
+    {
+        for (int j = 1; j <= w+1; j++)
+        {
+            if (!vis[i][j])
+                dp[i][j] = dp[i-1][j]+dp[i][j-1];
+        }
+    }
+    printf ("%d\n", dp[h+1][w+1]);
+    return 0;
+}

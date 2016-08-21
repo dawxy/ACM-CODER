@@ -1,0 +1,96 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 510
+struct P{
+	int st, ed, a, b, c, d;
+}p[MAXN];
+struct Edge{
+	int next, v;
+	Edge(int a = 0, int b = 0){next = a, v = b;}
+}edge[MAXN*MAXN];
+int head[MAXN], tol,lin[MAXN],n;
+bool vis[MAXN];
+
+void add_edge(int u, int v)
+{
+	edge[tol] = Edge(head[u],v);
+	head[u] = tol++;
+}
+bool dfs(int u)
+{
+	for(int i = head[u]; ~i; i = edge[i].next)
+	{
+		int v = edge[i].v;
+		if(!vis[v])
+		{
+			vis[v] = true;
+			if(-1 == lin[v] || dfs(lin[v]))
+			{
+				lin[v] = u;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int hungary()
+{
+	int ans = 0;
+	clc(lin,-1);
+	rep(i,0,n)
+	{
+		clc(vis,0);
+		if(dfs(i)) ans++;
+	}
+	return ans;
+}
+int cost(int a, int b, int c, int d)
+{
+	return abs(a-c)+abs(b-d);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int h,s;
+		scanf("%d%*c", &n);
+		rep(i,0,n)
+		{
+			scanf("%d:%d %d %d %d %d%*c", &h, &s, &p[i].a, &p[i].b, &p[i].c, &p[i].d);
+			p[i].st = h*60+s;
+			p[i].ed = cost(p[i].a, p[i].b, p[i].c, p[i].d)+p[i].st;
+		}
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+			{
+				if(i == j) continue;
+				if(p[i].ed+cost(p[i].c, p[i].d, p[j].a, p[j].b) < p[j].st)
+					add_edge(i,j);
+			}
+		}
+		printf("%d\n", n-hungary());
+	}
+	return 0;
+}

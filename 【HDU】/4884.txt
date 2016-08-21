@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1010
+#define max(a,b) (a>b?a:b)
+int  cnt[MAXN], last[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while (t--)
+	{
+		int n, c, v, m, h, s, kind, num, time, now = 0;
+		scanf("%d %d %d %d%*c", &n, &c, &v, &m);
+		memset(cnt, 0, sizeof(cnt));
+		for (int i = 0; i < m; i++)
+		{
+			scanf("%d:%d %d %d%*c", &h, &s, &kind, &num);
+			time = h * 60 + s;
+			if (cnt[kind] >= num && last[kind] >= time)
+			{
+				cnt[kind] -= num;
+				printf("%02d:%02d\n", (last[kind] + c) % 1440 / 60, (last[kind] + c) % 60);
+				continue;
+			}
+			if (cnt[kind] && last[kind] >= time)
+				num -= cnt[kind];
+			int x = 1 + (num - 1) / v;
+			now = max(now, time) + c*x;
+			printf("%02d:%02d\n", now % 1440 / 60, now % 60);
+			cnt[kind] = x*v - num;
+			last[kind] = now - c;
+		}
+		if (t) putchar('\n');
+	}
+	return 0;
+}

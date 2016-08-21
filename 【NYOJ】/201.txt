@@ -1,0 +1,58 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+struct NODE{
+	int x, y;
+}p[MAXN];
+char ch;
+int dp[MAXN];
+
+inline int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	int ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+inline bool cmp(const NODE &a, const NODE& b)
+{
+	return a.x < b.x;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t = in();
+	while(t--)
+	{
+		int n = in(), ans = 0;
+		for (int i = 0; i < n; i++)
+			p[i].x = in(), p[i].y = in();
+		sort(p,p+n,cmp);
+		for (int i = 0; i < n; i++)
+		{
+			dp[i] = 1;
+			for (int j = 0; j < i; j++)
+			{
+				if (p[i].y > p[j].y)
+					dp[i] = max(dp[i], dp[j]+1);
+			}
+			ans = max(ans,dp[i]);
+		}
+		for (int i = 0; i < n; i++)
+		{
+			dp[i] = 1;
+			for (int j = 0; j < i; j++)
+			{
+				if (p[i].y < p[j].y)
+					dp[i] = max(dp[i], dp[j]+1);
+			}
+			ans = max(ans,dp[i]);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

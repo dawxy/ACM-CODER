@@ -1,0 +1,59 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f,p[10][2]={{1,2},{3,10},{11,18},{19,36},{37,54},{55,86}};
+
+bool same(int a, int b)
+{
+	if(a > b) swap(a,b);
+	rep(i,0,6) if(p[i][0] <= a && b <= p[i][1]) return true;
+	return false;
+}
+bool tp(int a, int b)
+{
+	if(a > b) swap(a,b);
+	if(4 == a && 5 == b) return true;
+	if(12 == a && 13 == b) return true;
+	if(20 == a && 31 == b) return true;
+	if(38 == a && 49 == b) return true;
+	if(56 == a && 81 == b) return true;
+	if(7 == a && 8 == b) return true;
+	if(15 == a && 16 == b) return true;
+	if(33 == a && 34 == b) return true;
+	if(51 == a && 52 == b) return true;
+	if(83 == a && 84 == b) return true;
+	return false;
+}
+bool sloved(int a, int b)
+{
+	if(!tp(a,b) && same(a,b)) return a>b;
+	return a < b;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int a,b;
+	while(~scanf("%d %d", &a, &b))
+	{
+		if(sloved(a,b)) puts("FIRST BIGGER");
+		else puts("SECOND BIGGER");
+	}
+	return 0;
+}

@@ -1,0 +1,43 @@
+#include <stdio.h>
+struct time{
+    int h, m, s;
+};
+struct NODE{
+    time ti[2];
+    char name[30];
+}st, ed, buf;
+
+bool is_later(NODE *a, NODE *b, int s)
+{
+    if (a->ti[s].h !=  b->ti[s].h)
+        return a->ti[s].h > b->ti[s].h;
+    if (a->ti[s].m != b->ti[s].m)
+		return a->ti[s].m > b->ti[s].m;
+    if (a->ti[s].s != b->ti[s].s)
+		return a->ti[s].s > b->ti[s].s;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int n;
+        scanf ("%d%*c", &n);
+        scanf ("%s %d:%d:%d %d:%d:%d%*c", &st.name, &st.ti[0].h,&st.ti[0].m,&st.ti[0].s, &st.ti[1].h,&st.ti[1].m,&st.ti[1].s);
+        ed = st;
+        for (int i = 1; i < n; i++)
+		{
+			scanf ("%s %d:%d:%d %d:%d:%d%*c", &buf.name, &buf.ti[0].h,&buf.ti[0].m,&buf.ti[0].s, &buf.ti[1].h,&buf.ti[1].m,&buf.ti[1].s);
+            if (is_later(&st,&buf,0))
+                st = buf;
+            if (is_later(&buf,&ed,1))
+                ed = buf;
+		}
+        printf ("%s %s\n", st.name, ed.name);
+	}
+    return 0;
+}

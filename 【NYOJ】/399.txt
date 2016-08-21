@@ -1,0 +1,12 @@
+#include <stdio.h>
+
+int main ()
+{
+	int n, b;
+	while (EOF != scanf ("%d %d%*c", &n, &b))
+	{
+		printf ("%d\n",n/b);
+	}
+
+	return 0;
+}

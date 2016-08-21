@@ -1,0 +1,57 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+int a,b,c;
+
+bool ok(int p, int q, int k, int m)
+{
+	return b == q*k+m*p;
+}
+int mx2;
+bool find(int p, int q)
+{
+	repe(k,1,mx2)
+	{
+		if(0 == c%k)
+		{
+			int m = c/k;
+			if(ok(p,q,k,m) || ok(p,q,m,k))
+				return true;
+		}
+	}
+	return false;
+}
+bool sloved()
+{
+	int mx = sqrt(a+0.5);
+	mx2 = sqrt(c+0.5);
+	repe(p,1,mx)
+	{
+		if(0 == a%p)
+		{
+			int q = a/p;
+			if(find(p,q) || find(q,p)) return true;
+		}
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d%d%d", &a,&b,&c);
+		if(sloved()) puts("YES");
+		else puts("NO");
+	}
+	return 0;
+}

@@ -1,0 +1,110 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, MAXM = 2000+10, M = 2001;
+int head[MAXN], tol, nxt[MAXM],to[MAXM];//边
+int dp[MAXN][2];//dp[i][y]表示点i的父亲结点选y或者不选!y时最小的x;x表示n*M+b，n是选择的n个点，b是照亮一次的边数
+int vis[MAXN];
+
+inline void add_edge(int u, int v){
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+void find(int u)
+{
+	vis[u] = true;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(!vis[v])
+			find(v);
+	}
+}
+/*int dfs(int u, int f, int fa)
+{
+	int &ans = dp[u][f];
+	if(~ans) return ans;
+	int yz = 1;
+	ans = 0;
+	int sum = 0;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(fa == v) continue;
+		ans += dfs(v,1,u)+M;//不选当前结点，儿子结点必须都选
+		if(f)//选择当前结点
+			sum += dfs(v,0,u)+1;
+		//else ans++;
+		yz = 0;
+	}
+	if(f) ans = min(sum,ans);
+	return ans;
+}*/
+int dfs(int u, int f, int fa)
+{
+	int &ans = dp[u][f];
+	if(~ans) return ans;
+	ans = M;
+	int sum = 0;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v == fa) continue;
+		ans += dfs(v,1,u);
+		if(f || -1 == fa) sum += dfs(v,0,u);
+	}
+	if(!f && ~fa) ans++;
+	if(f || -1 == fa)
+	{
+		if(~fa) sum++;
+		ans = min(ans, sum);
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d %d%*c", &n, &m);
+		tol = 0;
+		clc(head,-1);
+		rep(i,0,m)
+		{
+			int a,b;
+			scanf("%d %d%*c",&a, &b);
+			add_edge(a,b);
+			add_edge(b,a);
+		}
+		clc(vis,0);
+		int ans = 0;
+		rep(r,0,n)//枚举树
+		{
+			if(vis[r]) continue;
+			find(r);
+			clc(dp,-1);
+			ans += min(dfs(r,1,-1),dfs(r,0,-1));
+		}
+		printf("%d %d %d\n", ans/M, m-ans%M,ans%M);
+	}
+	return 0;
+}

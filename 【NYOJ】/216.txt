@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <math.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int i, n;
+		int ans = 0;
+		scanf ("%d%*c", &n);
+		if (1 == n)
+			ans = 0;
+		else
+		{
+			for (i = 1; i*i <= n+1; i++)
+			{
+				if (0 == (n+1)%(i+1))
+					ans++;
+			}
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

@@ -1,0 +1,43 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+int a[4],b[4];
+
+bool ok(int st)
+{
+	rep(i,0,4)
+	{
+		if(a[i] != b[(i+st)%4]) return false;
+	}
+	return true;
+}
+bool sloved()
+{
+	rep(i,0,4)
+		if(ok(i)) return true;
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		rep(i,0,4) scanf("%d", &a[i]);
+		rep(i,0,4) scanf("%d", &b[i]);
+		swap(a[2],a[3]);
+		swap(b[2],b[3]);
+		printf("Case #%d: ",++count);
+		if(sloved()) puts("POSSIBLE");
+		else puts("IMPOSSIBLE");
+	}
+	return 0;
+}

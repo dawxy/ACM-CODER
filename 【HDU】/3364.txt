@@ -1,0 +1,99 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50+10, MAXM = 50+10;
+const double eps = 1e-8;
+int n,m;//n-方程个数,m-未知数个数
+int a[MAXN][MAXM],x[MAXN];//a[][]方程左边的矩阵,x[]-方程右边的值以及最后的未知数答案
+
+int gauss()//返回-1无解,0有一个解并存在x[],否则返回自由变元个数
+{
+	int row,col;
+	for(row = 0,col = 0; row < n && col < m; row++,col++)
+	{
+		int mx = row;//找出绝对值最大的作为当前行
+		rep(i,row+1,n) if(abs(a[i][col]) > abs(a[mx][col])) mx = i;
+		if(mx != row)
+		{
+			rep(j,col,m) swap(a[mx][j],a[row][j]);
+			swap(x[mx],x[row]);
+		}
+		if(!a[row][col])
+		{
+			row--;
+			continue;//有多个解
+		}
+		rep(i,row+1,n)
+		{
+			if(!a[i][col]) continue;
+			a[i][col] = 0;
+			rep(j,col+1,m) a[i][j] ^= a[row][j];
+			x[i] ^= x[row];
+		}
+	}
+	rep(i,row,n) if(x[i]) return -1;
+	if(row < m) return m-row;//迭代次数小于未知数个数则有多解(每个自由元可能的状态^(m-row))
+	per(now,m-1,0)//从下往上推,利用已知求未知
+	{
+		rep(j,now+1,m) x[now] ^= (a[now][j]&x[j]);
+		x[now] &= a[now][now];//输出整数解可能需要(int)(x[i]+0.5)
+	}
+	return 0;
+}
+int tmp[MAXN][MAXM];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d %d", &n, &m);
+		clc(a,0);
+		rep(i,0,m)
+		{
+			int len;
+			scanf("%d", &len);
+			rep(j,0,len)
+			{
+				int v;
+				scanf("%d", &v);
+				a[v-1][i] = 1;
+			}
+		}
+		rep(i,0,m) memcpy(tmp[i],a[i],sizeof(a[i]));
+		int q;
+		scanf("%d", &q);
+		printf("Case %d:\n",++count);
+		while(q--)
+		{
+			rep(i,0,n)
+			{
+				scanf("%d", &x[i]);
+			}
+			rep(i,0,m) memcpy(a[i],tmp[i],sizeof(tmp[i]));
+			int ans = gauss();
+			if(-1 == ans) puts("0");
+			else printf("%I64d\n", ((LL)1)<<ans);
+		}
+	}
+	return 0;
+}

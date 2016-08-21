@@ -1,0 +1,180 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 300000+10;
+struct NODE *null;
+struct NODE{
+    NODE *ch[2], *fa;
+    bool fz;
+    int add, mx, val;
+private:
+    int chd(){
+        return this == fa->ch[1];
+    }
+    bool isroot(){
+        return fa == null || (fa->ch[0] != this && fa->ch[1] != this);
+    }
+    void setch(NODE *x, int p){
+        ch[p] = x, x->fa = this;
+    }
+    void rev(){//单个反转
+        swap(ch[0],ch[1]);
+        fz ^= 1;
+    }
+    void one_add(int v){//单个增加
+        if(null == this) return;
+        mx += v;
+        add += v;
+        val += v;
+    }
+    void push_down(){
+        if(add)
+        {
+            ch[0]->one_add(add);ch[1]->one_add(add);
+            add = 0;
+        }
+        if(fz)
+        {
+            ch[0]->rev();ch[1]->rev();
+            fz = 0;
+        }
+    }
+    void push_up(){
+        mx = max(val,max(ch[0]->mx,ch[1]->mx));
+    }
+    void rot(){
+        NODE*y = fa;
+        int d = chd();//决定是左旋还是右旋d=0左儿子对应右旋,d=1右儿子对应左旋
+        if(y->fa->ch[y->chd()] == y) y->fa->setch(this,y->chd());//把y的父亲(就是u父亲的父亲)的y儿子变为u =====把u放到当前根
+        else this->fa = y->fa;
+        y->setch(ch[d^1],d);//把u的对应儿子放到u所在位置(此时变成两颗树了 y成另外一颗树的根)
+        setch(y,d^1);//把y放到u的对应儿子
+        y->push_up(), push_up();//先更新y再更新u(y在u下面了)
+    }
+    void dfs_down(){//先把根到x所用到的所有的标记从上往下下放
+        if(!isroot()) fa->dfs_down();//飘逸的结构体内递归
+        push_down();
+    }
+    void splay(){//把rt树的x节点伸展到p下方(即p的儿子),从下往上伸展
+        dfs_down();
+        while(!isroot())
+        {
+            if(!fa->isroot() && chd() == fa->chd()) fa->rot();
+            rot();
+        }
+        push_up();
+    }
+    void access(){
+        for(NODE *p = this,*q = null; p != null; q = p, p = p->fa)
+        {
+            p->splay();
+            p->setch(q,1);
+            p->push_up();
+        }
+        splay();
+    }
+    void make_root(){//把当前结点变成所在子树的根(slpay中最左边的点,深度最小)
+        access();
+        rev();
+    }
+public:
+    NODE *find_root(){//查找当前点所在LCT的根(就是splay中最左边的点)
+        access();
+        NODE *x = this;
+        while(x->ch[0] != null) x = x->ch[0];
+        return x;
+    }
+    bool link(NODE *y){//如果x(以下x都是当前节点),y不在同一颗子树中，则通过在x,y之间连边的方式，连接这两颗子树
+        if(y->find_root() == find_root()) return false;
+        make_root();
+        fa = y;
+        return true;
+    }
+    bool cut(NODE *y){//如果x,y在同一颗子树中，且x!=y,则将x视为这颗子树的根以后，切断y与其父亲结点的连接
+        if(this == y || y->find_root() != find_root()) return false;
+        make_root();
+        y->access();
+        y->ch[0]->fa = null;
+        y->ch[0] = null;
+        return true;
+    }
+    bool update(NODE *y, int v){//如果x,y在同一颗子树中，则将x,y之间路径上所有点的点权增加w
+        if(y->find_root() != find_root()) return false;
+        make_root();
+        y->access();
+        y->one_add(v);
+        return true;
+    }
+    int query(NODE *y){//如果x,y在同一颗子树中，返回x,y之间路径上点权的最大值
+        if(y->find_root() != find_root()) return -1;
+        make_root();
+        y->access();
+        return y->mx;
+    }
+}node[MAXN];
+void init(int n)
+{
+    null = &node[0];
+    null->mx = -INF;
+    repe(i,1,n)
+    {
+        node[i].ch[0] = node[i].ch[1] = node[i].fa = null;
+        node[i].fz = node[i].mx = node[i].add = node[i].val = 0;
+    }
+}
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int n;
+    while(~scanf("%d", &n))
+    {
+        init(n);
+        rep(i,1,n)
+        {
+            int u,v;
+            scanf("%d %d", &u, &v);
+            node[u].link(&node[v]);
+        }
+        repe(i,1,n)
+        {
+            int w;
+            scanf("%d", &w);
+            node[i].update(&node[i],w);
+        }
+        int q;
+        scanf("%d", &q);
+        NODE* tmp = node[2].find_root();
+        while(q--)
+        {
+            int op,x,y;
+            scanf("%d %d %d", &op, &x, &y);
+            if(1 == op)
+            {
+                if(!node[x].link(&node[y])) puts("-1");
+            }
+            else if(2 == op)
+            {
+                if(!node[x].cut(&node[y])) puts("-1");
+            }
+            else if(3 == op)
+            {
+                int z;
+                scanf("%d", &z);
+                if(!node[y].update(&node[z],x)) puts("-1");
+            }
+            else
+            {
+                printf("%d\n", node[x].query(&node[y]));
+            }
+        }
+        putchar('\n');
+    }
+    return 0;
+}

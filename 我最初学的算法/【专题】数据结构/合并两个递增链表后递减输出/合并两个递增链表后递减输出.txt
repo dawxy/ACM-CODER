@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <malloc.h>
+#define scanf scnaf_s
+typedef struct node{
+	int data;
+	struct node* next;
+}NODE, *PNODE;
+
+PNODE list_init ();
+void list_insert(PNODE, int, int);//在第s-1个元素之后插入val
+void list_traverse (PNODE);
+void list_merge (PNODE, PNODE);
+PNODE witch_NULL (PNODE, PNODE);
+
+int main ()
+{
+	int i;
+	PNODE pa = list_init();
+	PNODE pb = list_init();
+	for (i = 1; i <= 20; i++)
+		list_insert (pa, i, i);
+	for (i = 1; i <= 30; i++)
+		list_insert (pb, i, 4*(i-2));
+
+	list_merge(pa, pb);
+	list_traverse(pa);
+	return 0;
+}
+
+PNODE list_init ()
+{
+	PNODE phead = (PNODE)malloc (sizeof(NODE));
+	phead->next = NULL;
+	phead->data = 0;
+	return phead;
+}
+
+void list_insert(PNODE ph, int s, int val)
+{
+	int i;
+	if (0 >= s || ph->data+1 < s)
+	{
+		printf ("插入范围超标！\n");
+		return;
+	}
+	PNODE p = (PNODE)malloc(sizeof(NODE)), q;
+	p->data = val;
+	for (i = 0, q = ph; i < s-1; i++)//q是要插入位置的前一个节点
+		q = q->next;
+	p->next = q->next;
+	q->next = p;
+	ph->data += 1;
+}
+
+void list_traverse (PNODE ph)
+{
+	PNODE p = ph->next;
+	while (NULL != p)
+	{
+		printf ("%d\n", p->data);
+		p = p->next;
+	}
+}
+
+void list_merge (PNODE pha, PNODE phb)
+{
+	PNODE pa, pb, buf, last;
+	pa = pha->next;
+	pb = phb->next;
+	if (pa->data < pb->data)
+		last = pa;
+	else
+		last = pb;
+	while (NULL != pa && NULL != pb)
+	{
+		if (pa->data < pb->data)
+		{
+			buf = pa;
+			pa = pa->next;
+		}
+		else
+		{
+			buf = pb;
+			pb = pb->next;
+		}
+		buf->next = pha->next;
+		pha->next = buf;
+	}
+	if (PNODE p = witch_NULL(pa,pb))
+	{
+		while (NULL != p)
+		{
+			buf = p;
+			p = p->next;
+			buf->next = pha->next;
+			pha->next = buf;
+		}
+	}
+	last->next = NULL;
+}
+
+PNODE witch_NULL (PNODE pa, PNODE pb)
+{
+	if (NULL == pa)
+		return pb;
+	if (NULL == pb)
+		return pa;
+	return NULL;
+}

@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <cstring>
+#define MOD 1000000007
+#define MAXN 10010
+typedef long long LL;
+int a[MAXN], ans[MAXN];
+
+LL pow_mod(LL a, int n)
+{
+	LL ans = 1;
+	while(n)
+	{
+		if(n&1) ans = ans*a%MOD;
+		a = a*a%MOD;
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,t,k;
+		scanf("%d %d %d%*c", &n, &t, &k);
+		for(int i = 0; i < n; i++)
+			scanf("%d%*c", &a[i]);
+		LL p = pow_mod(k,t);
+		for(int i = 0; i < n; i++)
+			ans[(i+t)%n] = a[i]*p%MOD;
+		printf("%d", ans[0]);
+		for(int i = 1; i < n; i++)
+			printf(" %d", ans[i]);
+		putchar('\n');
+	}
+	return 0;
+}

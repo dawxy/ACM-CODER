@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <math.h>
+
+double dis(int, int, int, int);
+
+int main ()
+{
+	int n, t, i, j,bufi, bufj;
+	double sum[201][201]={0,1};
+	for (i = 1,j = 0, bufi = 0, bufj = 1; i <= 200; )
+	{
+		if (0 == sum[i][j])
+			sum[i][j] = sum[bufi][bufj]+dis(i, j, bufi, bufj);
+		bufi = i;
+		bufj = j;
+		if (0 == j)
+		{
+			j = i+1;
+			i = 0;
+		}
+		else
+		{
+			j--;
+			i++;
+		}
+	}
+	scanf ("%d%*c", &n);
+	t = n;
+	while (n--)
+	{
+		int x1, y1, x2, y2;
+		double s;
+		scanf ("%d %d %d %d%*c", &x1, &y1, &x2, &y2);
+		s = sum[x2][y2]-sum[x1][y1];
+		if (s < 0)
+			s *= -1;
+		printf ("%.3lf\n", s);
+	}
+
+	return 0;
+}
+
+double dis(int x1, int y1, int x2, int y2)
+{
+	return (sqrt)(1.0*(x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+}

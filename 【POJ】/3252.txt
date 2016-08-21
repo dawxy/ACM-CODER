@@ -1,0 +1,58 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 32;
+int dp[MAXN][MAXN][MAXN],bit[MAXN];
+
+int dfs(int len, int num0, int num1, int ismax)
+{
+	if(!len) return num0 >= num1;
+	int &ans = dp[len][num0][num1];
+	if(!ismax && ~ans) return ans;
+	int sum = 0, mx = ismax?bit[len]:1;
+	repe(i,0,mx)
+	{
+		int nx0 = num0, nx1 = num1;
+		if(0 == i && num1) nx0++;
+		if(1 == i) nx1++;
+		sum += dfs(len-1,nx0,nx1,ismax&&i==mx);
+	}
+	return ismax?sum:ans = sum;
+}
+int sloved(int n)
+{
+	int len = 0;
+	while(n)
+	{
+		bit[++len] = n&1;
+		n >>= 1;
+	}
+	return dfs(len,0,0,1);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int x,y;
+	clc(dp,-1);
+	while(~scanf("%d %d", &x, &y))
+	{
+		printf("%d\n", sloved(y)-sloved(x-1));
+	}
+	return 0;
+}

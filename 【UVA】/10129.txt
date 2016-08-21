@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <string.h>
+//#define scanf scanf_s
+//#define gets gets_s
+#define MAX 26
+bool vis[MAX], g[MAX][MAX];//记录对应字母是否读入
+int in[MAX], out[MAX];
+int len;
+
+void dfs(int);//判断图是否连通
+bool is_oula();//判断是否为欧拉回路或者欧拉道路
+int main ()
+{
+	//FILE *f;
+	//freopen_s(&f,"e:\\1.txt","r",stdin);
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n, a, b;
+		char temp[1010];
+		memset(vis,false,sizeof(vis));
+		memset(g,false,sizeof(g));
+		memset(in,0,sizeof(in));
+		memset(out,0,sizeof(out));
+		scanf ("%d%*c", &n);
+		for (int i = 0; i < n; i++)
+		{
+			gets(temp);
+			a = temp[0]-'a';
+			b = temp[strlen(temp)-1]-'a';
+			g[a][b] = g[b][a] = true;//看作无向图才能用DFS判断连通性
+			in[b]++, out[a]++;
+		}	
+		if (is_oula())
+			puts("Ordering is possible.");
+		else
+			puts("The door cannot be opened.");
+	}
+	return 0;
+}
+
+void dfs(int u)
+{
+	vis[u] = true;
+	len--;
+	for (int i = 0; i < MAX; i++)
+	{
+		if (!vis[i] && g[u][i])
+			dfs(i);
+	}
+}
+
+bool is_oula()
+{
+	int st = 0, ed = 0, num = 0, sum = 0;
+	for (int i = 0; i < MAX; i++)
+	{
+		if (in[i] || out[i])
+		{
+			sum++;
+			if (1 == in[i]-out[i])
+				ed++;
+			else if (1 == out[i]-in[i])
+				st++;
+			else if (in[i] == out[i])
+				num++;
+		}
+	}
+	len = sum;
+	for (int i = 0; i < MAX;i++)
+	{
+		if (out[i])
+		{
+			dfs(i);
+			break;
+		}
+	}
+	if (len) 
+		return false;
+	if (1 == st && 1 == ed && 2 == sum-num || sum == num)
+		return true;
+	return false;
+}

@@ -1,0 +1,115 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 2000+10, MAXM = 2000+10;
+map<string,int> num;
+char name[MAXN][20];
+struct Edge{
+	int next, to;
+	Edge(int a = 0, int b = 0){
+		next = a, to = b;
+	}
+}edge[MAXM];
+int head[MAXN], tol, cnt, id[MAXN];
+queue<int> q;
+
+int get_id(char *s)
+{
+	if(num.find(s) == num.end())
+	{
+		strcpy(name[cnt],s);
+		num[s] = cnt++;
+	}
+	return num[s];
+}
+void add_edge(int u, int v)
+{
+	edge[tol] = Edge(head[u],v);
+	head[u] = tol++;
+}
+vector<int> ans;
+void find(int u)
+{
+	bool fd[MAXN]={0};
+	int sum[MAXN]={0}, mx = 0;
+	for(int i = head[u]; ~i; i = edge[i].next) q.push(edge[i].to), fd[edge[i].to] = true;
+	fd[u] = true;
+	while(!q.empty())
+	{
+		int now = q.front();q.pop();
+		for(int i = head[now]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].to;
+			if(!fd[v])
+			{
+				sum[v]++;
+				if(sum[v] > mx) mx = sum[v];
+			}
+		}
+	}
+	ans.clear();
+	if(!mx) return;
+	rep(i,0,cnt)
+	{
+		if(mx == sum[id[i]])
+			ans.push_back(id[i]);
+	}
+}
+inline bool cmp(const int a, const int b)
+{
+	return strcmp(name[a],name[b]) <= 0;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		num.clear();
+		clc(head,-1);
+		cnt = tol = 0;
+		int n,q;
+		scanf("%d %d%*c", &n, &q);
+		char u[20],v[20];
+		rep(i,0,n)
+		{
+			scanf("%s %s%*c", u, v);
+			int a = get_id(u), b = get_id(v);
+			add_edge(a,b), add_edge(b,a);
+		}
+		rep(i,0,cnt) id[i] = i;
+		sort(id,id+cnt,cmp);
+		printf("Case %d:\n", ++count);
+		rep(i,0,q)
+		{
+			scanf("%s", u);
+			find(get_id(u));
+			if(ans.size() == 0) puts("-");
+			else
+			{
+				int sz = ans.size();
+				printf("%s", name[ans[0]]);
+				rep(i,1,sz) printf(" %s", name[ans[i]]);
+				putchar('\n');
+			}
+		}
+	}
+	return 0;
+}

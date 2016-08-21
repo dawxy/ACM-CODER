@@ -1,0 +1,15 @@
+#include <stdio.h>
+
+void main (void)
+{
+	double a;
+
+	while (EOF != scanf ("%lf", &a))
+	{
+		if (a < 0.0)
+		{
+			a = -1.0*a;
+		}
+		printf ("%.2lf\n", a);
+	}
+}

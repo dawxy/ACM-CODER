@@ -1,0 +1,45 @@
+#include <stdio.h>
+
+int gcd (int, int);
+
+int main ()
+{
+	int n;
+	while (EOF != scanf ("%d%*c", &n))
+	{
+		int i, u = 0, g;
+		char c;
+		bool bin = false;
+		double cha;
+		for (i = 0; i < n; i++)
+		{
+			c = getchar();
+			if ('S' == c)
+				bin = true;
+			if ('U' == c)
+				u++;
+		}
+		if (bin)
+		{
+			printf ("Bingo\n");
+			continue;
+		}
+		cha = ((double)u)/((double)n)-0.5;
+		if ( cha > 0.003 || (-1)*cha > 0.003)
+		{
+			printf ("Fail\n");
+			continue;
+		}
+		g = gcd(u, n);
+		printf ("%d/%d\n", u/g, n/g);
+	}
+
+	return 0;
+}
+
+int gcd(int a, int b)
+{
+	if (0 == b%a)
+		return a;
+	return gcd(b%a, a);
+}

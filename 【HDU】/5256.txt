@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int a[MAXN],lis[MAXN], pos[MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t,count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n;
+        scanf("%d%*c", &n);
+        repe(i,1,n) scanf("%d",&a[i]);
+        int top=0;
+        lis[0]=-INF;
+        repe(i,1,n)
+        {
+            if(a[i]>lis[top]&&a[i]-lis[top]-1>=i-pos[top]-1)
+            {
+                lis[++top]=a[i];
+                pos[top]=i;
+            }
+            else
+            {
+                int l=0, r=top, tp=-1;
+                while(l<=r)
+                {
+                    int mid=(l+r)>>1;
+                    if(a[i]-lis[mid]-1>=i-pos[mid]-1)
+                    {
+                        tp=mid;
+                        l=mid+1;
+                    }
+                    else r=mid-1;
+                }
+                if(tp!=-1) lis[tp+1]=a[i], pos[tp+1]=i;
+            }
+        }
+        printf("Case #%d:\n%d\n", ++count,n-top);
+    }
+    return 0;
+}

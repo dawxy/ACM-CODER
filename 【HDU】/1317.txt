@@ -1,0 +1,195 @@
+/*DFS*/
+#include <stdio.h>
+#include <string.h>
+#define MAX 101
+int ed, vis[MAX], en[MAX];
+bool find;
+struct G{
+	int en, n, out[MAX];
+}g[MAX];
+
+void dfs(int, int);
+void dfs2(int);
+
+int main ()
+{
+	while(1)
+	{
+		scanf ("%d%*c", &ed);
+		if (-1 == ed)
+			break;
+		memset(g,0,sizeof(g));
+		memset(vis,0,sizeof(vis));
+		memset(en,0,sizeof(en));
+		for (int i = 1; i <= ed; i++)
+		{
+			scanf ("%d%*c%d%*c", &g[i].en, &g[i].n);
+			for (int j = 0; j < g[i].n; j++)
+				scanf ("%d%*c", &g[i].out[j]);
+		}
+		find = false;
+		dfs(1,100);
+		if (find)
+			puts("winnable");
+		else
+			puts("hopeless");
+	}
+
+	return 0;
+}
+
+void dfs(int room, int eng)
+{
+	if (find)
+		return;
+	if (ed == room)
+	{
+		find = true;
+		return;
+	}
+	for (int i = 0; i < g[room].n; i++)
+	{
+		int m = g[room].out[i];
+		if(en[m] && en[m] < eng+g[m].en)
+		{
+			dfs2(room);
+			if (find)
+				return;
+		}
+		else if (!en[m] && 0 < eng+g[m].en)
+		{
+			en[m] = eng+g[m].en;
+			dfs(m, en[m]);
+		}
+
+	}
+}
+
+void dfs2(int room)
+{
+	if (ed == room)
+	{
+		find = true;
+		return;
+	}
+	for (int i = 0; i < g[room].n; i++)
+	{
+		int m = g[room].out[i];
+		if (!vis[m])
+		{
+			vis[m] = 1;
+			dfs2(m);
+			vis[m] = 0;
+		}
+	}
+}
+==========================================================================
+/*dfs£¨»òÕßfloyd£©+spfa*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 1044266559, MAXN = 1000+10, MAXM = 20000+10;
+struct Edge{
+	int next,v;
+	Edge(int a = 0, int b = 0){
+		next = a, v = b;
+	}
+}edge[MAXM];
+int tol,head[MAXN],e[MAXN],dis[MAXN],cnt[MAXN],n;
+bool inq[MAXN],vis[MAXN];
+
+void add_edge(int u, int v)
+{
+	edge[tol] = Edge(head[u],v);
+	head[u] = tol++;
+}
+bool dfs(int u)
+{
+	vis[u] = true;
+	if(u == n) return true;
+	for(int i = head[u]; ~i; i = edge[i].next)
+	{
+		int v = edge[i].v;
+		if(!vis[v] && dfs(v)) return true;
+	}
+	return false;
+}
+bool spfa(int s, int ed)
+{
+	queue<int> q;
+	clc(dis,-0x3f);
+	clc(inq,0);
+	clc(cnt,0);
+	q.push(s);
+	inq[s] = true;
+	dis[s] = 100;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		inq[u] = false;
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v;
+			if(-INF != dis[u] && dis[v] < dis[u]+e[v] && dis[u]+e[v] > 0)
+			{
+				dis[v] = dis[u]+e[v];
+				if(!inq[v])
+				{
+					q.push(v);
+					inq[v] = true;
+					if(++cnt[v] > ed)
+					{
+						clc(vis,0);
+						return dfs(v);
+					}
+				}
+			}
+		}
+	}
+	return dis[ed] > 0;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &n) && ~n)
+	{
+		clc(head,-1);
+		tol = 0;
+		repe(i,1,n)
+		{
+			scanf("%d%*c", &e[i]);
+			int len,v;
+			scanf("%d%*c", &len);
+			while(len--)
+			{
+				scanf("%d%*c", &v);
+				add_edge(i,v);
+			}
+		}
+		clc(vis,0);
+		if(!dfs(1))
+		{
+			puts("hopeless");
+			continue;
+		}
+		if(spfa(1,n)) puts("winnable");
+		else puts("hopeless");
+	}
+	return 0;
+}

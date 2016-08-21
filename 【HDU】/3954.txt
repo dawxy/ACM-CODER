@@ -1,0 +1,144 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 10010
+#define lc u<<1
+#define rc u<<1|1
+struct NODE{//mxexp最大经验值,lv最大等级,add是lazy标记累加单位经验,mm最少差多少单位经验升级
+    int x,y,mxexp,lv,add, mm;
+    void dw(int v)
+    {
+        mxexp += lv*v;
+        add += v;
+        mm -= v;
+    }
+}node[MAXN<<2];
+int k, lvup[15];
+
+void bulid(int u, int x, int y)
+{
+    node[u].x = x, node[u].y = y, node[u].add = 0;
+    node[u].lv = 1;
+    node[u].mxexp = 0;
+    node[u].mm = lvup[2];
+    if(x == y) return;
+    int m = (x+y)>>1;
+    bulid(lc,x,m);
+    bulid(rc,m+1,y);
+}
+void push_up(int u)
+{
+    node[u].mm = min(node[lc].mm, node[rc].mm);
+    node[u].lv = max(node[lc].lv, node[rc].lv);
+    node[u].mxexp = max(node[lc].mxexp, node[rc].mxexp);
+}
+void push_down(int u)
+{
+    if(!node[u].add) return;
+    node[lc].dw(node[u].add);
+    node[rc].dw(node[u].add);
+    node[u].add = 0;
+}
+int get_lv(int exp)
+{
+    int x = 1, y = k, m;
+    while(x < y)
+    {
+        m = (x+y)>>1;
+        if(exp == lvup[m]) return m;
+        if(exp < lvup[m]) y = m-1;
+        else x = m+1;
+    }
+    if(exp < lvup[x]) x--;
+    return x;
+}
+int ql,qr,v;
+void update(int u)
+{
+    int x = node[u].x, y = node[u].y;
+    if(x == y)
+    {
+        int &lv = node[u].lv;
+        node[u].mxexp += lv*v;
+        lv = get_lv(node[u].mxexp); 
+        int tmp = lvup[lv+1]-node[u].mxexp;
+        node[u].mm = tmp/lv+(tmp%lv != 0);
+        node[u].add = 0;
+        return;
+    }
+    if(ql <= x && y <= qr && v < node[u].mm)
+    {
+        node[u].dw(v);
+        return;
+    }
+    push_down(u);
+    int m = (x+y)>>1;
+    if(ql <= m) update(lc);
+    if(qr > m) update(rc);
+    push_up(u);
+}
+int ans;
+void query(int u)
+{
+    int x = node[u].x, y = node[u].y;
+    if(ql <= x && y <= qr)
+	{
+		ans = max(ans,node[u].mxexp);
+        return;
+	}
+    push_down(u);
+    int m = (x+y)>>1, ans = 0;
+    if(ql <= m) query(lc);
+    if(qr > m) query(rc);
+    return;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t, count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n,q;
+        char ch[10];
+        scanf("%d %d %d%*c", &n, &k, &q);
+        repe(i,2,k) scanf("%d%*c", &lvup[i]);
+        lvup[k+1] = INF;
+        bulid(1,1,n);
+        printf("Case %d:\n", ++count);
+        rep(i,0,q)
+        {
+            scanf("%s %d %d%*c", ch, &ql, &qr);
+            if('W' == ch[0])
+            {
+                scanf("%d%*c", &v);
+                update(1);
+            }
+            else
+			{
+				ans = -INF;
+				query(1);
+                printf("%d\n", ans);
+			}
+        }
+        putchar('\n');
+    }
+    return 0;
+}
+

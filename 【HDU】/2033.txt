@@ -1,0 +1,44 @@
+#include <stdio.h>
+
+void main ()
+{
+	int n;
+	scanf ("%d", &n);
+	getchar ();
+
+	while (n--)
+	{
+		int ah,am,as,bh,bm,bs,ch = 0,cm = 0,cs = 0;
+		scanf ("%d %d %d %d %d %d", &ah, &am,&as,&bh, &bm,&bs);
+		getchar ();
+
+		cs = as + bs;
+		while (1)
+		{
+			if (cs < 60)
+				break;
+			else
+			{
+				cs -= 60;
+				cm += 1;
+			}
+		}
+
+		cm = cm + am + bm;
+		while (1)
+		{
+			if (cm < 60)
+				break;
+			else
+			{
+				cm -= 60;
+				ch += 1;
+			}
+		}
+		ch = ch + ah + bh;
+
+		printf ("%d %d %d\n", ch, cm, cs);
+
+	}
+
+}

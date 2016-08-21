@@ -1,0 +1,25 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int n, ans = 2, a, b;
+        scanf ("%d%*c", &n);
+        for (int i = 0; i < n; i++)
+		{
+			scanf ("%d %d%*c", &a, &b);
+            if (ans == a)
+                ans = b;
+			else if (ans == b)
+				ans = a;
+		}
+		printf ("%d\n", ans);
+	}
+    return 0;
+}

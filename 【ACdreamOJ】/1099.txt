@@ -1,0 +1,51 @@
+#include <cstdio>
+#include <ctime>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 5000010
+int a[MAXN];
+char c;
+
+inline int input()//快速读入，比scanf快3~5倍
+{
+	int ans = 0;
+	c = getchar();
+	while('0'> c || '9' < c) c = getchar();
+	while('0' <= c && '9' >= c)
+	{
+		ans = ans*10+c-'0';
+		c = getchar();
+	}
+	return ans;
+}
+inline int q_sort(int l, int r, int k)//快排找到后直接退出
+{
+	if (l < r)
+	{
+		int i = l, j = r, x = a[l];
+		while(i < j)
+		{
+			while(i < j && a[j] >= x) j--;
+			if (i < j) a[i++] = a[j];
+			while(i < j && a[i] <= x) i++;
+			if (i < j) a[j--] = a[i];
+		}
+		a[i] = x;
+		if (k == i) return a[i];
+		else if (i > k) return q_sort(l,i-1,k);
+		else return q_sort(i+1,r,k);
+	}
+	return a[l];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n = input(), k = input();
+	for (int i = 0; i < n; i++)
+		a[i] = input();
+    printf("%d\n", q_sort(0,n-1, n-k));
+	return 0;
+}

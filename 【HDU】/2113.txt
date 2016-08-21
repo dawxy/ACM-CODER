@@ -1,0 +1,24 @@
+#include <stdio.h>
+char c[35];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int a, t = 0;
+    while(~scanf ("%d%*c", &a))
+	{
+        sprintf (c,"%d", a);
+        int ans = 0;
+        for (int i = 0; c[i]; i++)
+		{
+            if (!((c[i]-'0')&1))
+                ans += c[i]-'0';
+		}
+        if (t++)
+			printf ("\n");
+        printf ("%d\n", ans);
+	}
+    return 0;
+}

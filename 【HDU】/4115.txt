@@ -1,0 +1,111 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10, MAXM = 10000*4*2+10;
+struct TWOSAT{
+	int head[MAXN<<1], tol, to[MAXM], next[MAXM];
+	void init(){
+		clc(head,-1);
+		tol = 0;
+	}
+	void add_edge(int u, int v)
+	{
+		next[tol] = head[u], to[tol] = v;
+		head[u] = tol++;
+	}
+	void add_clause(int x, int xv, int y, int yv)//冲突
+	{
+		x = (x<<1)+xv, y = (y<<1)+yv;
+		add_edge(x,y^1);
+		add_edge(y,x^1);
+	}
+	bool vis[MAXN<<1];
+	int s[MAXN<<1], c;
+	bool dfs(int u)
+	{
+		if(vis[u^1]) return false;
+		if(vis[u]) return true;
+		s[c++] = u;
+		vis[u] = true;
+		for(int i = head[u]; ~i; i = next[i])
+			if(!dfs(to[i])) return false;
+		return true;
+	}
+	bool sloved(int n)
+	{
+		clc(vis,0);
+		for(int i = 0; i < n<<1; i += 2)
+		{
+			c = 0;
+			if(!dfs(i))
+			{
+				while(c) vis[s[--c]] = false;
+				if(!dfs(i^1)) return false;
+			}
+		}
+		return true;
+	}
+}ts;
+const int b[4][2] = {{0,0}, {1,2},{2,3},{3,1}};
+int a[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d %d%*c", &n, &m);
+		repe(i,1,n) scanf("%d%*c", &a[i]);
+		ts.init();
+		rep(i,0,m)
+		{
+			int u,v,k;
+			scanf("%d %d %d%*c", &u,&v, &k);
+			if(k)//必须不同
+			{
+				rep(j,0,2)
+				{
+					rep(j2,0,2)
+					{
+						if(b[a[u]][j] == b[a[v]][j2])
+							ts.add_clause(u,j,v,j2);
+					}
+				}
+			}
+			else//必须相同
+			{
+				rep(j,0,2)
+				{
+					rep(j2,0,2)
+					{
+						if(b[a[u]][j] != b[a[v]][j2])
+							ts.add_clause(u,j,v,j2);
+					}
+				}
+			}
+		}
+		printf("Case #%d: ", ++count);
+		if(ts.sloved(n)) puts("yes");
+		else puts("no");
+	}
+	return 0;
+}

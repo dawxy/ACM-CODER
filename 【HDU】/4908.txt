@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 40000
+int a[MAXN+10], sum[2*MAXN+10][2];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int n,m;
+    while(~scanf("%d %d%*c", &n, &m))
+    {
+        int ans, mid, p = 0;
+        memset(sum,0,sizeof(sum));
+        for(int i = 1; i <= n; i++)
+        {
+            scanf("%d%*c", &a[i]);
+            if(m == a[i]) mid = i;
+        }
+        sum[MAXN][0] = 1;
+        for(int i = mid-1; i >= 1; i--)
+        {
+            if(a[i] > m) p++;
+            else p--;
+            sum[p+MAXN][(mid-i)&1]++;
+        }
+        p = 0;
+        ans = sum[MAXN][0];
+        for(int i = mid+1; i <= n; i++)
+        {
+            if(a[i] > m) p--;
+            else p++;
+            ans += sum[p+MAXN][(i-mid)&1];
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

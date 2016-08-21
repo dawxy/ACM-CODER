@@ -1,0 +1,83 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+char a[MAXN][MAXN];
+int up[MAXN][MAXN], lt[MAXN][MAXN],rt[MAXN][MAXN];
+//up[i][j]->(i,j)上面连续F的长度, lt[i][j]表示最长连续F段向左平移的最左边的列标,rt是向右
+//这样最后答案就是max{up[i][j]*(right[i][j]-lt[i][j])}
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d %d%*c", &n, &m);
+		repe(i,1,n)
+		{
+			repe(j,1,m)
+			{
+				int ch;
+				while((ch=getchar()) != 'F' && ch != 'R');
+				a[i][j] = ch;
+			}
+		}
+		repe(i,1,n)
+		{
+			int lp = 0;//当前行最左边R出现的位置
+			repe(j,1,m)
+			{
+				if('F' == a[i][j])
+				{
+					up[i][j] = up[i-1][j]+1;
+					lt[i][j] = max(lt[i-1][j], lp+1);
+				}
+				else
+				{
+					up[i][j] = lt[i][j] = 0;
+					lp = j;
+				}
+			}
+		}
+		repe(j,1,m) rt[0][j] = m+1;
+		int ans = 0;
+		repe(i,1,n)
+		{
+			int rp = m+1;
+			per(j,m,1)
+			{
+				if('F' == a[i][j])
+				{
+					rt[i][j] = min(rt[i-1][j], rp-1);
+					ans = max(ans, up[i][j]*(rt[i][j]-lt[i][j]+1));
+				}
+				else
+				{
+					rt[i][j] = m;
+					rp = j;
+				}
+			}
+		}
+		printf("%d\n", ans*3);
+	}
+	return 0;
+}

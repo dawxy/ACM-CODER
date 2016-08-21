@@ -1,0 +1,105 @@
+/* ***********************************************
+Author :Darkangelwings  
+Created Time :2014/10/25 ÐÇÆÚÁù 13:05:14
+File Name :use.cpp
+************************************************ */
+#pragma comment(linker, "/STACK:102400000,102400000")
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define eps 1e-8
+#define pi acos(-1.0)
+typedef long long LL;
+#define MAXN 110
+#define MAXM 11000
+struct Edge{
+	int next, v;
+	Edge(int a = 0, int b = 0){
+		next = a, v = b;
+	}
+}edge[MAXM];
+int a[MAXN][MAXN], head[MAXN], tol,n,lin[MAXN];
+bool have[60], vis[MAXN];
+
+void add_edge(int u, int v){
+	edge[tol] = Edge(head[u],v);
+	head[u] = tol++;
+}
+bool dfs(int u)
+{
+	for(int i = head[u]; ~i; i = edge[i].next){
+		int v = edge[i].v;
+		if(!vis[v]){
+			vis[v] = true;
+			if(-1 == lin[v] || dfs(lin[v])){
+				lin[v] = u;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int hungary(){
+	int ans = 0;
+	clc(lin,-1);
+	rep(i,0,n){
+		clc(vis,0);
+		if(dfs(i)) ans++;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int k;
+	while(~scanf("%d %d%*c", &n, &k) && n+k)
+	{
+		clc(have,0);
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+			{
+				scanf("%d%*c", &a[i][j]);
+				have[a[i][j]] = true;
+			}
+		}
+		vector<int> ans;
+		repe(i,1,50)
+		{
+			if(!have[i]) continue;
+			clc(head,-1);
+			tol = 0;
+			rep(j,0,n)
+			{
+				rep(k,0,n)
+				{
+					if(a[j][k] == i)
+					  add_edge(j,k);
+				}
+			}
+			int sum = hungary();
+			if(k < sum) ans.push_back(i);
+		}
+		if(ans.size() == 0) puts("-1");
+		else{
+			printf("%d",ans[0]);
+			rep(i,1,ans.size()) printf(" %d",ans[i]);
+			putchar('\n');
+		}
+	}
+    return 0;
+}

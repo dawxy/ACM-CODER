@@ -1,0 +1,16 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		char f;
+		int a,b;
+		scanf ("%x%c%x%*c", &a, &f, &b);
+		printf ("%o\n", '+' == f ? a+b : a-b);
+	}
+
+	return 0;
+}

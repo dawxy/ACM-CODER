@@ -1,0 +1,45 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 10000000
+#define MOD 7
+int ans[MAXN+1];
+
+int pow_mod(int a, int n)
+{
+	int ans = 1;
+	while(n)
+	{
+		if(n&1) ans = ans*a%MOD;
+		a = a*a%MOD;
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,t;
+	for(int i = 1; i <= MAXN; i++)
+	{
+		if(i%MOD) ans[i] = (ans[i-1]+pow_mod(i%MOD,i%(MOD-1)))%MOD;
+		else ans[i] = ans[i-1];
+	}
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int d;
+		scanf("%d%*c", &n);
+		if(n <= MAXN) d = ans[n];
+		else d = ans[n%294];
+		if(1 == d) puts("Sunday");
+		else if(2 == d) puts("Monday");
+		else if(3 == d) puts("Tuesday");
+		else if(4 == d) puts("Wednesday");
+		else if(5 == d) puts("Thursday");
+		else if(6 == d) puts("Friday");
+		else puts("Saturday");
+	}
+	return 0;
+}

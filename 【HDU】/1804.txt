@@ -1,0 +1,94 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 110;
+int tree[MAXN<<4][28], cnt;
+char val[MAXN<<4][110];
+
+void insert(const char *s, const char *v)
+{
+	int u = 0, n = strlen(s);
+	rep(i,0,n)
+	{
+		int c = s[i]-'a';
+		if(-1 == tree[u][c])
+		{
+			clc(tree[cnt],-1);
+			val[cnt][0] = 0;
+			tree[u][c] = cnt++;
+		}
+		u = tree[u][c];
+	}
+	strcpy(val[u], v);
+}
+bool query(const char *s, char *v)
+{
+	int u = 0, n = strlen(s);
+	rep(i,0,n)
+	{
+		int c = s[i]-'a';
+		if(-1 == tree[u][c]) return false;
+		u = tree[u][c];
+	}
+	strcpy(v,val[u]);
+	return true;
+}
+bool fuyin(char c)
+{
+	if('a' == c || 'e' == c || 'i' == c || 'o' == c || 'u' == c)
+		return false;
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int l,m;
+	while(~scanf("%d %d%*c", &l, &m))
+	{
+		char a[110], b[110];
+		clc(tree[0],-1);
+		cnt = 1;
+		rep(i,0,l)
+		{
+			scanf("%s %s", a, b);
+			insert(a,b);
+		}
+		rep(i,0,m)
+		{
+			scanf("%s", a);
+			if(query(a,b))
+				puts(b);
+			else
+			{
+				int n = strlen(a);
+				if(n >= 2 && fuyin(a[n-2]) && 'y' == a[n-1])
+				{
+					a[n-1] = 0;
+					printf("%sies\n", a);
+				}
+				else if('o' == a[n-1] || 's' == a[n-1] || 'x' == a[n-1])
+					printf("%ses\n", a);
+				else if(n >= 2 &&(('c' == a[n-2] && 'h' == a[n-1]) || ('s' == a[n-2] && 'h' == a[n-1])))
+					printf("%ses\n", a);
+				else printf("%ss\n", a);
+			}
+		}
+	}
+	return 0;
+}

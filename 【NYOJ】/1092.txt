@@ -1,0 +1,39 @@
+import java.util.*; 
+import java.math.BigDecimal;
+public class Main
+ {
+	 static String res;
+     public static void main(String args[])
+     {
+         Scanner in = new Scanner(System.in);
+    	 BigDecimal f = new BigDecimal(-1.0);
+         while(in.hasNext())
+         {
+        	 String a = in.next();
+        	 BigDecimal num = new BigDecimal(a);
+        	 res = num.setScale(2,BigDecimal.ROUND_HALF_EVEN).toString();
+        	 if(res.charAt(0) == '-')
+        	 {
+        		 num = num.multiply(f);
+        		 res = num.setScale(2,BigDecimal.ROUND_HALF_EVEN).toString();
+        		 System.out.print("(");
+        		 pt(res.length()-4,0);
+        		 for(int i = res.length()-3; i < res.length(); i++) System.out.print(res.charAt(i));
+        		 System.out.print(")");
+        	 }
+        	 else
+        	 {
+        		 pt(res.length()-4,0);
+        		 for(int i = res.length()-3; i < res.length(); i++) System.out.print(res.charAt(i));
+        	 }
+        	 System.out.println("");
+         }
+     }
+     public static void pt(int p, int cnt)
+     {
+     	if(p < 0) return;
+     	pt(p-1, (cnt+1)%3);
+     	if(2 == cnt && p > 0) System.out.print(",");
+     	System.out.print(res.charAt(p));
+     }
+ }

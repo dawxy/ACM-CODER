@@ -1,0 +1,19 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int count = 0, r;
+    while(~scanf ("%d%*c", &r) && r)
+	{
+        int w, l;
+        scanf ("%d %d%*c", &w, &l);
+        if (w*w+l*l > 4*r*r)
+            printf("Pizza %d does not fit on the table.\n", ++count);
+		else
+			printf ("Pizza %d fits on the table.\n", ++count);
+	}
+    return 0;
+}

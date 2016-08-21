@@ -1,0 +1,31 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 500
+char a[MAXN], b[MAXN];
+int dp[MAXN][MAXN];
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    while(~scanf ("%s %s%*c", a, b))
+    {
+        memset(dp,0,sizeof(dp));
+        int la = strlen(a), lb = strlen(b);
+        for (int i = 1; i <= la; i++)
+        {
+            for (int j = 1; j <= lb; j++)
+            {
+                int sum = 0;
+                if (a[i-1] == b[j-1])
+                    sum++;
+                dp[i][j] = max(max(dp[i-1][j], dp[i][j-1]), dp[i-1][j-1]+sum);
+            }
+        }
+        printf ("%d\n", dp[la][lb]);
+    }
+    return 0;
+}

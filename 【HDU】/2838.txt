@@ -1,0 +1,102 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define lc u<<1
+#define rc u<<1|1
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+struct NODE{
+	int x,y;
+	LL sum;
+}node[MAXN<<2];
+int a[MAXN];
+
+int p;
+inline void push_up(NODE &fa, NODE &l, NODE &r)
+{
+	fa.sum = l.sum+r.sum;
+}
+void bulid(int u, int x, int y)
+{
+	node[u].x = x, node[u].y = y;
+	node[u].sum = 0;
+	if(x == y) return;
+	int m = (x+y)>>1;
+	bulid(lc,x,m);
+	bulid(rc,m+1,y);
+}
+void update(int u)
+{
+	int x = node[u].x, y = node[u].y;
+	if(x == y)
+	{
+		node[u].sum++;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(lc);
+	else update(rc);
+	push_up(node[u],node[lc],node[rc]);
+}
+int ql, qr;
+NODE query(int u)
+{
+	int x = node[u].x, y = node[u].y;
+	if(ql <= x && y <= qr)
+		return node[u];
+	int m = (x+y)>>1;
+	if(ql <= m && qr > m)
+	{
+		NODE ans,l = query(lc),r = query(rc);
+		ans.x = l.x, ans.y = r.y;
+		push_up(ans,l,r);
+		return ans;
+	}
+	if(ql <= m) return query(lc);
+	if(qr > m) return query(rc);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int mx = 0;
+		rep(i,0,n) scanf("%d%*c", &a[i]), mx = max(mx,a[i]);
+		mx++;
+		bulid(1,0,mx);
+		LL ans = 0;
+		rep(i,0,n)
+		{
+			ql = a[i]+1,qr = mx;
+			ans += query(1).sum*a[i];
+			p = a[i];
+			update(1);
+		}
+		bulid(1,0,mx);
+		per(i,n-1,0)
+		{
+			ql = 0, qr = a[i]-1;
+			ans += query(1).sum*a[i];
+			p = a[i];
+			update(1);
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

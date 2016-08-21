@@ -1,0 +1,46 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 130
+#define MAXM 11
+#define INF 0x3f3f3f3f
+int dp[1<<MAXM][1<<MAXM], st[MAXN], n, m;
+//dp[s][a]表示已经询问过s集合中，已经确认了w所具备的特征集a时，还需要询问的最小次数
+
+int dfs(int s, int a)
+{
+	if (-1 != dp[s][a]) return dp[s][a];
+	int cnt = 0;
+	for (int i = 0; i < n; ++i)
+		if ((st[i] & s) == a)
+			cnt++;
+	if (cnt <= 1) return dp[s][a] = 0;
+	dp[s][a] = INF;
+	for (int k = 0; k < m; k++)
+	{
+		if (s&(1 << k)) continue;
+		dp[s][a] = min(max(dfs(s|(1<<k),a|(1<<k)),dfs(s|(1<<k), a))+1,dp[s][a]);
+	}
+	return dp[s][a];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while (~scanf("%d %d%*c", &m, &n) && n + m)
+	{
+		char a[MAXM*2];
+		memset(dp,-1,sizeof(dp));
+		for (int i = 0; i < n; i++)
+		{
+			st[i] = 0;
+			gets(a);
+			for (int j = 0; j < m; j++)
+				st[i] = (st[i] << 1) + a[j] - '0';
+		}
+		printf("%d\n", dfs(0,0));
+	}
+	return 0;
+}

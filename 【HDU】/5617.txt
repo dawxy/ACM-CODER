@@ -1,0 +1,52 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500+10, MOD = 5201314;
+char a[MAXN][MAXN];
+int dp[2][MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d", &n);
+		repe(i,1,n) scanf("%s", a[i]+1);
+		if(a[1][1] != a[n][n])
+		{
+			puts("0");
+			continue;
+		}
+		clc(dp,0);
+		dp[0][1][n] = 1;
+		int p = 0,ans = 0;
+		rep(i,1,n)
+		{
+			p ^= 1;
+			clc(dp[p],0);
+			repe(x1,1,n)
+			{
+				if(x1 > i+1) continue;
+				per(x2,n,x1)
+				{
+					int y1 = i-x1+2, y2 = (n<<1)-x2-i;
+					if(y1 < 0 || y2 < 0 || y1 > y2) continue;
+					if(a[x1][y1] == a[x2][y2])
+						dp[p][x1][x2] = (dp[p^1][x1-1][x2+1]+dp[p^1][x1-1][x2] + dp[p^1][x1][x2+1]+dp[p^1][x1][x2])%MOD;
+				}
+			}
+		}
+		repe(i,1,n) repe(j,1,n) ans = (ans+dp[p][i][j])%MOD;
+		printf("%d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,56 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100;
+int x[MAXN],y[MAXN];
+
+int p[5];
+inline bool cmp(int a, int b)
+{
+	if(x[a] != x[b]) return x[a]<x[b];
+	return y[a] < y[b];
+}
+int dis(int a, int b){return (x[a]-x[b])*(x[a]-x[b])+(y[a]-y[b])*(y[a]-y[b]);}
+bool ok()
+{
+	sort(p,p+4,cmp);
+	int d = dis(p[0],p[1]);
+	if(d != dis(p[3],p[1])) return false;
+	if(d != dis(p[3],p[2])) return false;
+	if(d != dis(p[2],p[0])) return false;
+	return dis(p[0],p[3]) == dis(p[1],p[2]);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d", &n))
+	{
+		rep(i,0,n) scanf("%d %d", &x[i], &y[i]);
+		int ans = 0;
+		rep(i,0,n) rep(i2,i+1,n) rep(i3,i2+1,n) rep(i4,i3+1,n)
+		{
+			p[0] = i;p[1] = i2;p[2] = i3;p[3] = i4;
+			if(ok()) ans++;
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

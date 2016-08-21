@@ -1,0 +1,156 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20000+10, MAXM = 200000*2+10, MAXIN = 10000;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+
+int head[MAXN], tol,nxt[MAXM],to[MAXM],sum[MAXN];
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int cnt, ft[MAXN], d[MAXN<<1],num[MAXN<<1];
+void dfs(int u, int deep, int fa)
+{
+	ft[u] = cnt;
+	d[cnt] = deep, num[cnt++] = u;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(fa == v) continue;
+		dfs(v,deep+1,u);
+		d[cnt] = deep, num[cnt++] = u;
+	}
+}
+int dp[MAXN<<1][21], dp_num[MAXN<<1][21];
+void st_init()
+{
+	rep(i,0,cnt) dp[i][0] = d[i], dp_num[i][0] = num[i];
+	for(int j = 1; (1<<j) <= cnt; j++)
+	{
+		for(int i = 0; i+(1<<j)-1 < cnt; i++)
+		{
+			if(dp[i][j-1] < dp[i+(1<<(j-1))][j-1])
+			{
+				dp[i][j] = dp[i][j-1];
+				dp_num[i][j] = dp_num[i][j-1];
+			}
+			else
+			{
+				dp[i][j] = dp[i+(1<<(j-1))][j-1];
+				dp_num[i][j] = dp_num[i+(1<<(j-1))][j-1];
+			}
+		}
+	}
+}
+int st_query(int x, int y)
+{
+	if(x > y) swap(x,y);
+	int k = 0;
+	while((1<<(k+1)) <= y-x+1) k++;
+	if(dp[x][k] <= dp[y-(1<<k)+1][k]) return dp_num[x][k];
+	return dp_num[y-(1<<k)+1][k];
+}
+void lca_init(int rt)
+{
+	cnt = 0;
+	dfs(rt,0,-1);
+	st_init();
+}
+int lca_query(int x, int y)
+{
+	return st_query(ft[x],ft[y]);
+}
+void dfs(int u, int fa)
+{
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v == fa) continue;
+		dfs(v,u);
+		sum[u] += sum[v];
+	}
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	in(t);
+	while(t--)
+	{
+		int n,m;
+		in(n),in(m);
+		clc(head,-1);
+		tol = 0;
+		clc(sum,0);
+		rep(i,1,n)
+		{
+			int u,v;
+			in(u),in(v);
+			add_edge(u,v);
+			add_edge(v,u);
+		}
+		lca_init(1);
+		rep(i,0,m-n+1)
+		{
+			int u,v;
+			in(u),in(v);
+			sum[u]++,sum[v]++;
+			sum[lca_query(u,v)] -= 2;
+		}
+		dfs(1,0);
+		int ans = INF;
+		repe(i,2,n) ans = min(ans,sum[i]+1);
+		printf("Case #%d: %d\n", ++count,ans);
+	}
+	return 0;
+}
+/*
+1 
+11 22
+1 2
+2 3
+2 4
+2 5
+2 6
+1 7
+7 8
+7 9
+7 10
+7 11
+3 4
+4 5
+5 6
+3 5
+3 6
+4 8
+6 11
+8 9
+8 10
+9 10
+9 11
+10 11
+*/

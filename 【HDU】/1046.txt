@@ -1,0 +1,22 @@
+#include <stdio.h>
+#include <math.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t, count = 0;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int a,b;
+        scanf ("%d %d%*c", &a, &b);
+        printf ("Scenario #%d:\n", ++count);
+        if (a&1 && b&1)
+            printf ("%.2lf\n\n", sqrt(2.0)-1+a*b);
+        else
+			printf ("%.2lf\n\n", 1.0*a*b);
+	}
+    return 0;
+}

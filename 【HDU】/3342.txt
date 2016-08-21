@@ -1,0 +1,70 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 110
+#define MAXM 110
+struct Edge{
+	int next,v;
+	Edge(int a = 0, int b = 0){next = a, v = b;}
+}edge[MAXM];
+int n,head[MAXN], in[MAXN], tol;
+
+void add_edge(int u, int v)
+{
+	edge[tol] = Edge(head[u],v);
+	head[u] = tol++;
+}
+bool topo()
+{
+	int p = 0;
+	queue<int> q;
+	rep(i,0,n) if(!in[i]) q.push(i);
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v;
+			if(!--in[v]) q.push(v);
+		}
+		p++;
+	}
+	if(p < n) return false;
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int m;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		int a,b;
+		clc(head,-1);
+		clc(in,0);
+		tol = 0;
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a, &b);
+			add_edge(a,b);
+			in[b]++;
+		}
+		if(topo()) puts("YES");
+		else puts("NO");
+	}
+	return 0;
+}

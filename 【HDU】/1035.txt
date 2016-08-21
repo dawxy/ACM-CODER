@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 11
+int h, w, loop, g[MAX][MAX], d[4][2] = {{-1,0},{1,0},{0,1},{0,-1}};//N,S,E,W
+int vis[MAX][MAX];
+
+int dfs(int si, int sj, int sum)
+{
+	vis[si][sj] = sum;
+	int ni, nj;
+	ni = d[g[si][sj]][0]+si;
+	nj = d[g[si][sj]][1]+sj;
+	if (0 > ni || h <= ni || 0 > nj || w <= nj)
+		return sum;
+	if (!vis[ni][nj])
+		return dfs(ni,nj,sum+1);
+	else
+	{
+		loop = vis[si][sj]-vis[ni][nj]+1;
+		return vis[ni][nj]-1;
+	}
+}		
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(EOF != scanf ("%d %d%*c", &h, &w) && h &&w)
+	{
+		int st, i, j;
+		char c;
+		scanf ("%d%*c", &st);
+		for (i = 0; i < h; i++)
+		{
+			for (j = 0; j < w; j++)
+			{
+				c = getchar();
+				switch(c)
+				{
+				case 'N':g[i][j] = 0;break;
+				case 'S':g[i][j] = 1;break;
+				case 'E':g[i][j] = 2;break;
+				case 'W':g[i][j] = 3;break;
+				}
+			}
+			getchar();
+		}
+		memset(vis, false, sizeof(vis));
+		loop = 0;
+		int ans = dfs(0, st-1, 1);
+		if (loop)
+			printf ("%d step(s) before a loop of %d step(s)\n", ans, loop);
+		else
+			printf ("%d step(s) to exit\n", ans);
+	}
+	return 0;
+}

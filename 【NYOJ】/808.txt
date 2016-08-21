@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 1002
+#define MAXM 10002
+#define min(a,b) (a<b?a:b)
+#define max(a,b) (a>b?a:b)
+struct NODE{
+	int w, x, s;
+}p[MAXN];
+int ans, ch;
+bool dp[MAXM];
+
+inline bool cmp(const NODE& a, const NODE& b){return a.s > b.s;}
+int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n, c;
+	while(~scanf("%d %d%*c",&n, &c))
+	{
+		int a,b,len = 0, sum = 0;
+		for (int i = 0; i < n; i++)
+		{
+			a = in(), b = in();
+			if (b <= c)
+				p[len].w = a, p[len].x = b, p[len++].s = b-a,sum += b;
+		}
+		sort(p,p+len,cmp);
+		c = min(c,sum);
+		memset(dp,0,sizeof(dp));
+		dp[0] = true;
+		ans = 0;
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = min(c,ans+p[i].x); j >= p[i].x; j--)
+			{
+				if (dp[j-p[i].x])
+					dp[j-p[i].x+p[i].w] = true, ans = max(ans,j-p[i].x+p[i].w);
+			}
+		}
+		printf("%d\n",ans);
+	}
+	return 0;
+}

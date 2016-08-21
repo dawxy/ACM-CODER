@@ -1,0 +1,31 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 45
+#define MAXK 10
+int dp[MAXK][MAXN];
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        int m, n, a, num;
+        scanf ("%d %d%*c", &m, &n);
+        memset(dp,0,sizeof(dp));
+        dp[0][0] = 1;
+        for (int i = 1; i <= n; i++)
+        {
+            scanf ("%d %d%*c", &a, &num);
+            memcpy(dp[i],dp[i-1],sizeof(dp[i]));
+            for (int j = a; j <= m; j++)
+                for (int k = 1; k <= num && k*a <= j; k++)
+                    dp[i][j] += dp[i-1][j-k*a];
+        }
+        printf ("%d\n", dp[n][m]);
+    }
+    return 0;
+}

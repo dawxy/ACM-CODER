@@ -1,0 +1,32 @@
+#include <stdio.h>
+
+void main (void)
+{
+	int a;
+
+	while (EOF != scanf ("%d", &a))
+	{
+		if (90 <= a && 100 >= a)
+		{
+			printf ("A\n");
+		}
+		else if (80 <= a && 89 >= a)
+		{
+			printf ("B\n");
+		}
+		else if (70 <= a && 79 >= a)
+		{
+			printf ("C\n");
+		}
+		else if (60 <= a && 69 >= a)
+		{
+			printf ("D\n");
+		}
+		else if (0 <= a && 59 >= a)
+		{
+			printf ("E\n");
+		}
+		else 
+			printf ("Score is error!\n");
+	}
+}

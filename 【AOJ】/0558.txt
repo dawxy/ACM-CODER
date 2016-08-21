@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <queue>
+#define MAX_HW 1001
+#define INF 99999999
+using namespace std;
+struct p{
+	int i, j;
+};
+int h, w, n, f[4][2] = {{-1,0},{1,0},{0,-1},{0,1}}, d[MAX_HW][MAX_HW];
+char map[MAX_HW][MAX_HW];
+p point[10];
+int bfs (int, int, int, int, int);
+
+int main ()
+{
+	while (EOF != scanf ("%d %d %d%*c", &h, &w, &n))
+	{
+		int i, j, len;
+		for (i = 0; i < h; i++)
+		{
+			for (j = 0; j < w; j++)
+			{
+				map[i][j] = getchar ();
+				if ('S' == map[i][j])
+				{
+					point[0].i = i;
+					point[0].j = j;
+				}
+				if ('0' < map[i][j] && '9' >= map[i][j])
+				{
+					point[map[i][j]-'0'].i = i;
+					point[map[i][j]-'0'].j = j;
+				}
+			}
+			getchar ();
+		}
+
+		for (i = 1,len = 0; i <= n; i++)
+		{
+			len = bfs (point[i-1].i, point[i-1].j, point[i].i, point[i].j, len);
+			i = i;
+		}
+
+		printf ("%d\n", len);
+	}
+
+	return 0;
+}
+
+int bfs (int si, int sj, int ei, int ej, int len)
+{
+	int i, j;
+	p buf, val;
+	queue<p> que;
+	for (i = 0; i < h; i++)
+	{
+		for (j = 0; j < w; j++)
+		{
+			d[i][j] = INF;
+		}
+	}
+	buf.i = si;
+	buf.j = sj;
+	que.push (buf);
+	d[si][sj] = len;
+
+	while (que.size())
+	{
+		buf = que.front();
+		que.pop();
+		int size = que.size();
+		if (ei == buf.i && ej == buf.j)
+			break;
+		for (i = 0; i < 4; i++)
+		{
+			val.i = buf.i + f[i][0];
+			val.j = buf.j + f[i][1];
+			if (0 <= val.i && h > val.i && 0 <= val.j && w > val.j && 'X' != map[val.i][val.j] && INF == d[val.i][val.j])
+			{
+				que.push(val);
+				d[val.i][val.j] = d[buf.i][buf.j]+1;
+			}
+		}
+	}
+	return d[ei][ej];
+}

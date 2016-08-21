@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <math.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		double x1, y1, x2, y2;
+		scanf ("%lf %lf %lf %lf%*c", &x1, &y1, &x2, &y2);
+		printf ("%.2lf\n", (sqrt)((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)));
+	}
+
+	return 0;
+}

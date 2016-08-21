@@ -1,0 +1,108 @@
+/*±©Á¦*/
+#include <stdio.h>
+#include <string.h>
+
+int xiangtong (char *, char*, int, int);
+
+int main ()
+{
+    char a[1000], b[1000];
+    while (1)
+    {
+        int i = 0, j, lena, lenb, sum = 0;
+        scanf("%s%*c", a);
+        if (0 == strcmp(a, "#"))
+            break;
+        scanf("%s%*c", b);
+        lena = strlen(a);
+        lenb = strlen(b);
+        while (i <= lena-lenb+1)
+        {
+            if (a[i] == b[0] && 0 == xiangtong(a, b, i, lenb))
+            {
+                sum += 1;
+                i += lenb;
+            }
+            else
+                i++;
+        }
+        printf ("%d\n", sum);
+
+    }
+
+    return 0;
+}
+
+int xiangtong (char *a, char *b, int i, int lenb)
+{
+    int j;
+    for (j = 0; j < lenb; j++)
+        if (a[i+j] != b[j])
+            break;
+    if (lenb == j)
+        return 0;
+    else
+        return 1;
+}
+============================================================================================
+/*KMP*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1010;
+char a[MAXN], b[MAXN];
+int nxt[MAXN];
+
+void getnext(char *x, int m)
+{
+	int i = 0,j;
+	j = nxt[0] = -1;
+	while(i < m)
+	{
+		while(~j && x[i] != x[j])j = nxt[j];
+		if(x[++i] == x[++j]) nxt[i] = nxt[j];
+		else nxt[i] = j;
+	}
+}
+int kmp(char *x, int m, char *y, int n)
+{
+	int i = 0, j = 0,ans = 0;
+	getnext(x,m);
+	while(i < n)
+	{
+		while(~j && y[i] != x[j]) j = nxt[j];
+		i++,j++;
+		if(j == m)
+		{
+			ans++;
+			j = 0;
+		}
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%s", a) && '#' != a[0])
+	{
+		scanf("%s", b);
+		printf("%d\n", kmp(b,strlen(b),a,strlen(a)));
+	}
+	return 0;
+}

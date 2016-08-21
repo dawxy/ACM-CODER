@@ -1,0 +1,106 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, f[4][2] = {{0,1},{1,0},{0,-1},{-1,0}}, MAXN = 1000+10;
+struct NODE{
+	int x,y,d;
+}a,b;
+int dis[2][MAXN][MAXN],n,lx[2],ly[2];
+
+bool ok(int p,int nx, int ny)
+{
+	if(!(0 <= nx && nx < n && 0 <= ny && ny < n)) return false;
+	if(~dis[p][nx][ny]) return false;
+	return true;
+}
+void bfs(int p,NODE &st, int to)
+{
+	clc(dis[p],-1);
+	dis[p][st.x][st.y] = 0;
+	int x = st.x,y = st.y,d = st.d;
+	while(1)
+	{
+		int nx = x+f[d][0],ny = y+f[d][1];
+		if(!ok(p,nx,ny))
+		{
+			d = (d+to+4)%4;
+			nx = x+f[d][0],ny = y+f[d][1];
+			if(!ok(p,nx,ny)) break;
+		}
+		dis[p][nx][ny] = dis[p][x][y]+1;
+		x = nx, y = ny;
+	}
+	lx[p] = x;ly[p] = y;
+}
+bool sloved(int &x, int &y)
+{
+	bfs(0,a,1);
+	bfs(1,b,-1);
+	int mi = INF;
+	rep(i,0,n)
+	{
+		rep(j,0,n)
+		{
+			if(dis[0][i][j] == dis[1][i][j] && ~dis[0][i][j])
+			{
+				if(mi > dis[0][i][j])
+				{
+					mi = dis[0][i][j];
+					x = i, y = j;
+				}
+			}
+			if(lx[0] == i && ly[0] == j && dis[0][i][j] < dis[1][i][j])
+			{
+				if(mi > dis[1][i][j])
+				{
+					mi = dis[1][i][j];
+					x = i, y = j;
+				}
+			}
+			if(lx[1] == i && ly[1] == j && dis[1][i][j] < dis[0][i][j])
+			{
+				if(mi > dis[0][i][j])
+				{
+					mi = dis[0][i][j];
+					x = i, y = j;
+				}
+			}
+		}
+	}
+	return INF != mi;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int tmp[3][3] = {0};
+	rep(i,0,4)
+	{
+		int nx = 1+(f[i][0]), ny = 1+f[i][1];
+		tmp[nx][ny] = 1;
+	}
+	while(~scanf("%d", &n) && n)
+	{
+		scanf("%d %d %d", &a.x, &a.y, &a.d);
+		scanf("%d %d %d", &b.x, &b.y, &b.d);
+		int x,y;
+		if(sloved(x,y)) printf("%d %d\n",x,y);
+		else puts("-1");
+	}
+	return 0;
+}

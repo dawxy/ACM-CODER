@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(EOF != scanf ("%d%*c", &n) && n)
+	{
+		int ans, a;
+		scanf ("%d%*c", &ans);
+		n--;
+		while(n--)
+		{
+			scanf ("%d%*c", &a);
+			ans ^= a;
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

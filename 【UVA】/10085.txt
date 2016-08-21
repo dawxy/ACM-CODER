@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 362890
+struct QUE{
+	int s[9], zi, zj, dis, fa;
+	char data;
+}que[MAX], st;
+const char fx[] = "ULDR";
+const int d[4][2] = {{-1,0},{0,-1},{1,0},{0,1}}, f[9] = {1,1,2,6,24,120,720,5040,40320};
+int maxd, ans;
+bool vis[MAX];
+
+void bfs();
+void output(int);
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+	freopen("e:\\out.txt","w",stdout);
+#endif
+	int t, count = 0;
+	scanf ("%d%*c%*c", &t);
+	while(t--)
+	{
+		int i,j;
+		for (i = 0; i < 9; i++)
+		{
+			scanf ("%d%*c", &st.s[i]);
+			if (0 == st.s[i])
+			{
+				st.zi = i/3;
+				st.zj = i%3;
+			}
+		}
+		maxd = -1;
+		memset(vis,false,sizeof(vis));
+		bfs();
+		printf ("Puzzle #%d\n",++count);
+		for (i = 0; i < 3; i++)
+		{
+			printf ("%d",que[ans].s[i*3]);
+			for (j = 1; j < 3; j++)
+				printf (" %d",que[ans].s[i*3+j]);
+			printf ("\n");
+		}
+		output(ans);
+		printf ("\n\n");
+	}
+	return 0;
+}
+
+bool hash_insert(int a)
+{
+	int v = 0, i, j;
+	for (i = 0;  i < 9; i++)
+	{
+		int buf = 0;
+		for (j = i+1; j < 9; j++)
+			if (que[a].s[j] < que[a].s[i])
+				buf++;
+		v += f[8-i]*buf;
+	}
+	if (vis[v])
+		return false;
+	return vis[v] = true;
+}
+void bfs ()
+{
+	int front = -1, rear = 0;
+	QUE buf;
+	st.dis = 0;
+	st.fa = -1;
+	que[rear++] = st;
+	while(1 != rear-front)
+	{
+		buf = que[++front];
+		if (buf.dis > maxd)
+			ans = front, maxd = buf.dis;
+		for (int i = 0; i < 4; i++)
+		{
+			que[rear].zi = buf.zi+d[i][0];
+			que[rear].zj = buf.zj+d[i][1];
+			if (0 <= que[rear].zi && 3 > que[rear].zi && 0 <= que[rear].zj && 3 > que[rear].zj)
+			{
+				int oz = buf.zi*3+buf.zj, nz = que[rear].zi*3+que[rear].zj;
+				memcpy(que[rear].s, buf.s,sizeof(que[rear].s));
+				que[rear].s[oz] = buf.s[nz];
+				que[rear].s[nz] = 0;
+				if (hash_insert(rear))
+				{
+					que[rear].dis = buf.dis+1;
+					que[rear].data = fx[i];
+					que[rear].fa = front;
+					rear++;
+				}
+			}
+		}
+	}
+	return;
+}
+
+void output(int a)
+{
+	if (-1 == que[a].fa)
+		return;
+	output(que[a].fa);
+	printf ("%c",que[a].data);
+}

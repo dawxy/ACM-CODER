@@ -1,0 +1,34 @@
+#include <cstdio>
+#include <cstring>
+#define MAXT 30000
+#define MAXN 10010
+int have[MAXT];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n, h, m, st, ed,num, ans = 0;
+        memset(have,0,sizeof(have));
+        scanf("%d%*c", &n);
+        for(int i = 0; i < n; i++)
+        {
+            scanf("%d %d:%d%*c", &num, &h,&m);
+            st = h*60+m;
+            scanf("%d:%d%*c", &h, &m);
+            ed = h*60+m;
+            for(int j = st+1; j <= ed; j++)
+            {
+                have[j] += num;
+                if(have[j] > ans) ans = have[j];
+            }
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

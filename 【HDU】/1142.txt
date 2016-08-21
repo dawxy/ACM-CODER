@@ -1,0 +1,78 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <queue>
+using namespace std;
+#define MAXN 1010
+struct NODE{
+	int dis,s;
+	NODE(int a, int b){dis = a, s = b;}
+	bool operator<(const NODE& a)const{return dis>a.dis;}
+};
+int cost[MAXN][MAXN], dis[MAXN], dp[MAXN];
+bool vis[MAXN];
+vector<int> g[MAXN];
+priority_queue<NODE> q;
+
+void dijkstra()
+{
+	memset(dis,0x3f,sizeof(dis));
+	memset(vis,0,sizeof(vis));
+	q.push(NODE(0,2));
+	dis[2] = 0;
+	while(!q.empty())
+	{
+		NODE now = q.top();q.pop();
+		int u = now.s;
+		if(vis[u]) continue;
+		vis[u] = true;
+		int len = g[u].size();
+		for(int i = 0; i < len; i++)
+		{
+			int to = g[u][i];
+			if(dis[to] > dis[u]+cost[u][to])
+			{
+				dis[to] = dis[u]+cost[u][to];
+				q.push(NODE(dis[to],to));
+			}
+		}
+	}
+}
+int dfs(int u)
+{
+	int& ans = dp[u];
+	if(~ans) return ans;
+	if(2 == u) return ans = 1;
+	ans = 0;
+	int len = g[u].size();
+	for(int i = 0; i < len; i++)
+	{
+		int to = g[u][i];
+		if(dis[u] > dis[to])
+			ans += dfs(to);
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,m;
+	while(~scanf("%d%*c",&n) && n)
+	{
+		int a,b,c;
+		scanf("%d%*c", &m);
+		for(int i = 0; i <= n; i++) g[i].clear();
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b, &c);
+			cost[a][b] = cost[b][a] = c;
+			g[a].push_back(b), g[b].push_back(a);
+		}
+		dijkstra();
+		memset(dp,-1,sizeof(dp));
+		printf("%d\n", dfs(1));
+	}
+	return 0;
+}

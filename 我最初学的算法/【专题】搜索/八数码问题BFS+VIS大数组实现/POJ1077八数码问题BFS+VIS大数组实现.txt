@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXS 362890
+struct QUE{
+	char data;
+	int zi, zj, fa, s[9];
+}que[MAXS], st;
+char fx[] = "udlr";//记录0移动方向对应下面的d数组
+int ed[9] = {1,2,3,4,5,6,7,8,0}, f[9]={1};
+bool vis[MAXS];
+
+int bfs();
+void output(int s);//倒着输出
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	char c[30];
+	for (int i = 1; i < 9; i++)
+		f[i] = f[i-1]*i;
+	while(NULL != gets(c))
+	{
+		int i, j = 0;
+		for (i = 0;  '\0' != c[i]; i++)
+		{
+			if (' ' == c[i])
+				continue;
+			if ('x' == c[i])
+			{
+				st.zi = j/3;
+				st.zj = j%3;
+				st.s[j++] = 0;
+			}
+			else
+				st.s[j++] = c[i]-'0';
+		}
+		memset(vis,false,sizeof(vis));
+		int d  = bfs();
+		if (-2 != d)
+		{
+			output(d);
+			printf ("\n");
+		}
+		else
+			printf ("unsolvable\n");
+	}
+	return 0;
+}
+
+bool try_insert(QUE *a)
+{
+	int v = 0;
+	for (int i = 0; i < 9; i++)
+	{
+		int cnt = 0;
+		for (int j = i+1; j < 9; j++)
+			if (a->s[j] < a->s[i])
+				cnt++;
+		v += f[8-i]*cnt;
+	}
+	if (vis[v])return false;
+	return vis[v] = true;
+}
+int bfs()
+{
+	int front = -1, rear = 0, i, d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};//u/d/l/r
+	QUE buf, val;
+	st.fa = -1;
+	try_insert(&st);
+	que[rear++] = st;
+	while(1 != rear-front)
+	{
+		buf = que[++front];
+		if (!memcmp(buf.s, ed, sizeof(int)*9))
+			return front;
+		for (i = 0; i < 4; i++)
+		{
+			val.zi = d[i][0]+buf.zi;
+			val.zj = d[i][1]+buf.zj;
+			if (0 <= val.zi && 3 > val.zi && 0 <= val.zj && 3 > val.zj)
+			{
+				int nz = val.zi*3+val.zj, oz = buf.zi*3+buf.zj;
+				memcpy(val.s, buf.s, sizeof(int)*9);
+				val.s[oz] = buf.s[nz];
+				val.s[nz] = 0;
+				if (try_insert(&val))
+				{
+					val.fa = front;
+					val.data = fx[i];
+					que[rear++] = val;
+				}
+			}
+		}
+	}
+	return -2;
+}
+
+void output(int s)
+{
+	if (-1 == que[s].fa)
+		return;
+	output(que[s].fa);
+	printf ("%c", que[s].data);
+}

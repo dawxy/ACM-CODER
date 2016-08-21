@@ -1,0 +1,22 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int a, b, c;
+        scanf ("%d %d %d%*c", &a, &b, &c);
+        if (a > b-c)
+			puts("do not advertise");
+		else if (a < b-c)
+			puts("advertise");
+		else
+			puts("does not matter");
+	}
+    return 0;
+}

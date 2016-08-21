@@ -1,0 +1,27 @@
+import java.util.*;
+import java.math.BigInteger;
+import java.io.*;
+
+public class Main {
+	static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+	static BufferedWriter out = new BufferedWriter(new OutputStreamWriter(System.out));
+	static BigInteger a[] = new BigInteger[100+10];
+	public static void main(String args[])throws Exception{
+		int t = Integer.parseInt(in.readLine());
+		while(t-- > 0)
+		{
+			StringTokenizer st = new StringTokenizer(in.readLine());
+			BigInteger m = new BigInteger(st.nextToken());
+			BigInteger n = new BigInteger(st.nextToken());
+			BigInteger d = m.pow(n.intValue()-1);
+			BigInteger g = n.gcd(d);
+			n = n.divide(g);
+			d = d.divide(g);
+			out.write(n.toString());
+			out.write("/");
+			out.write(d.toString());
+			out.newLine();
+		}
+		out.flush();//±ØÐë¼Ó
+	}
+}

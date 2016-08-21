@@ -1,0 +1,8 @@
+#include <stdio.h>
+const int ans[10] = {1,0,0,2,10,4,40,92,352,724};
+int main (){
+	int n;
+	while(EOF != scanf ("%d%*c", &n)&&n)
+		printf("%d\n", ans[n-1]);
+	return 0;
+}

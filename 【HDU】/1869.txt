@@ -1,0 +1,43 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 110
+#define INF 0x3f3f3f3f
+#define min(a,b) (a<b?a:b)
+#define max(a,b) (a>b?a:b)
+int dp[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		int a,b;
+		memset(dp,0x3f,sizeof(dp));
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d%*c", &a, &b);
+			dp[a][b] = dp[b][a] = 1;
+		}
+		for(int i = 0; i < n; i++) dp[i][i] = 0;
+		for(int k = 0; k < n; k++)
+		{
+			for(int i = 0; i < n; i++)
+			{
+				for(int j = 0; j < n; j++)
+					dp[i][j] = min(dp[i][j],dp[i][k]+dp[k][j]);
+			}
+		}
+		int ans = -1;
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = i+1; j < n; j++)
+				ans = max(ans,dp[i][j]);
+		}
+		if(ans <= 7) puts("Yes");
+		else puts("No");
+	}
+	return 0;
+}

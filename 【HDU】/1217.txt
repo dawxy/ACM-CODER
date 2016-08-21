@@ -1,0 +1,95 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <map>
+#include <queue>
+#include <vector>
+using namespace std;
+#define MAXN 35
+struct NODE{
+	double dis;
+	int s;
+	NODE(double a, int b){dis = a, s = b;}
+};
+map<string,int>name;
+vector<int> g[MAXN];
+vector<int> fg[MAXN];
+int n,cnt[MAXN];
+double cost[MAXN][MAXN], dp[MAXN];
+bool inq[MAXN];
+
+bool bellman_ford(int st)
+{
+	queue<int> q;
+	memset(inq,0,sizeof(inq));
+	memset(cnt,0,sizeof(cnt));
+	for(int i = 0; i < n; i++) dp[i] = 0;
+	q.push(st);
+	dp[st] = 1;
+	inq[st] = true;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		inq[u] = false;
+		int len = g[u].size();
+		for(int i = 0; i < len; i++)
+		{
+			int to = g[u][i];
+			if(dp[u] > 0 && dp[to] < dp[u]*cost[u][to])
+			{
+				dp[to] = dp[u]*cost[u][to];
+				if(!inq[to])
+				{
+					q.push(to);
+					inq[to] = true;
+					if(++cnt[to] > n)
+						return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+bool sloved()
+{
+	for(int i = 0; i < n; i++)
+	{
+		if(bellman_ford(i))
+			return true;
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int count = 0;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		char ca[100],cb[100];
+		name.clear();
+		for(int i = 0; i < n; i++)
+		{
+			scanf("%s%*c",ca);
+			name[ca] = i;
+			g[i].clear();
+			fg[i].clear();
+		}
+		int m, a, b;
+		double c;
+		scanf("%d%*c", &m);
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%s %lf %s%*c", ca,&c,cb);
+			a = name[ca], b = name[cb];
+			cost[a][b] = c;
+			g[a].push_back(b);
+			fg[b].push_back(a);
+		}
+		printf("Case %d: ",++count);
+		if(sloved()) puts("Yes");
+		else puts("No");
+	}
+	return 0;
+}

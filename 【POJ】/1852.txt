@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <malloc.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int len, n, *d, i, min = -1, max = -1, buf;
+		scanf ("%d %d%*c", &len, &n);
+		d = (int *)malloc(sizeof(int)*n);
+		for (i = 0; i < n; i++)
+			scanf ("%d%*c", d+i);
+
+		for (i = 0; i < n; i++)
+		{
+			buf = d[i] > (len-d[i])?len-d[i] : d[i];
+			if (buf > min)
+				min = buf;
+			buf = d[i] > (len-d[i])?d[i] : len-d[i];
+			if (buf > max)
+				max = buf;
+		}
+		printf ("%d %d\n", min, max);
+		free(d);
+	}
+
+	return 0;
+}

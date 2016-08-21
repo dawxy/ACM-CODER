@@ -1,0 +1,38 @@
+#include <stdio.h>
+
+int main ()
+{
+	int n;
+	scanf ("%d", &n);
+	getchar ();
+	while (n--)
+	{
+		int m, a, b, buf, max = 0;
+		scanf ("%d %d %d", &m, &a, &b);
+		getchar ();
+		buf = m-6;
+		if (0 <= buf)
+		{
+			max = buf*8 + 2 + 3 + 4 + 5 + 6 + 7;
+		}
+		else
+		{
+			switch(buf)
+			{
+			case -1: max += 3;
+			case -2: max += 4;
+			case -3: max += 5;
+			case -4: max += 6;
+			case -5: max += 7;
+			}
+		}
+
+		if (a+max >= b)
+			printf ("Yes\n");
+		else
+			printf ("No\n");
+
+	}
+
+	return 0;
+}

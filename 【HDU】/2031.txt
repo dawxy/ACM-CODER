@@ -1,0 +1,111 @@
+#include <stdio.h>
+#include <malloc.h>
+
+typedef struct node
+{
+	int a;
+	struct node *next;
+}Node, *PNode;
+
+void main ()
+{
+	int n, r, *s, i;
+
+	while (EOF != scanf ("%d %d", &n, &r))
+	{
+		int f = 0, m = 0;
+		getchar ();
+		PNode head = (PNode) malloc (sizeof(Node));
+		PNode pi = head;
+		pi->next = NULL;
+
+		if (n <= r && 0 <= n)
+		{
+			printf ("%d\n", n);
+			continue;
+		}
+		else
+		{
+			if (0 > n)
+			{
+				f = 1;
+				n *= -1;
+			}
+			while (0 != n)
+			{
+				PNode pnew = (PNode) malloc (sizeof(Node));
+				pnew->a = n%r;
+				n /= r;
+				pi->next = pnew;
+				pnew->next = NULL;
+				pi = pnew;
+				m += 1;
+			}
+
+		}
+
+		s = (int*) malloc (sizeof(int)*(m+1));
+		pi = head->next;
+		for (i = 0; i < m; i++)
+		{
+			s[i] = pi->a;
+			pi = pi->next;
+		}
+		
+		if (1 == f)
+		{
+			printf ("-");
+		}
+		if (10 > r)
+		{
+			for (i = m-1; i >=0; i--)
+			{
+				printf ("%d", s[i]);
+			}
+		}
+		else if (10 < r)
+		{
+			for (i = m-1; i >= 0; i--)
+			{
+				switch (s[i])
+				{
+				case 10:
+					{
+						printf ("A");
+					}
+					break;
+				case 11:
+					{
+						printf ("B");
+					}
+					break;
+				case 12:
+					{
+						printf ("C");
+					}
+					break;
+				case 13:
+					{
+						printf ("D");
+					}
+					break;
+				case 14:
+					{
+						printf ("E");
+					}
+					break;
+				case 15:
+					{
+						printf ("F");
+					}
+					break;
+				default:
+					printf ("%d", s[i]);
+					break;
+				}
+			}
+		}
+		printf ("\n");
+
+	}
+}

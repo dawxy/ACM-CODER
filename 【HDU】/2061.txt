@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <malloc.h>
+
+int main ()
+{
+    int n;
+    scanf ("%d", &n);
+    getchar ();
+
+    while (n--)
+    {
+        //获取数据
+        int k, i, q = 0;
+        double *c, *s, sum1, sum2;
+        char buf[31];
+        scanf ("%d", &k);
+        getchar ();
+        c = (double*) malloc (sizeof(double)*(k+1));
+        s = (double*) malloc (sizeof(double)*(k+1));
+        for (i = 0; i < k; i++)
+        {
+            scanf ("%s%lf%lf", buf, &c[i], &s[i]);
+        }
+        //判断是否有不及格的
+        for (i = 0; i < k; i++)
+        {
+            if (60 > s[i] && s[i] >= 0)
+                q = 1;
+        }
+        //算平均分
+        for (i = 0, sum1 = sum2 = 0; i < k; i++)
+        {
+            sum1 += c[i]*s[i];
+            sum2 += c[i];
+        }
+
+        if (1 == q)
+            printf ("Sorry!\n");
+        else
+            printf ("%.2lf\n", sum1/sum2);
+        if (0 != n)
+            printf ("\n");
+    }
+    return 0;
+}

@@ -1,0 +1,25 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#define MAXN 1000000
+int num[MAXN+1], len;
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int p = 0;
+	for(int i = 2; i <= MAXN; i++)
+	{
+		if(num[i]) continue;
+		num[i] = ++p;
+		for(int j = i<<1; j <= MAXN; j += i) num[j] = p;
+	}
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		printf("%d\n",num[n]);
+	}
+	return 0;
+}

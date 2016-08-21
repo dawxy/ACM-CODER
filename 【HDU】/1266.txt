@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <string.h>
+char a[100];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        gets(a);
+        int st = 0, ed, len = strlen(a);
+        ed = len-1;
+        if ('-' == a[0])
+			st = 1;
+        for (int i = len-1; i >= st; i--)
+		{
+            if ('0' != a[i])
+			{
+				ed = i;
+				break;
+			}
+		}
+        if (st)
+			printf ("-");
+        for (int i = ed; i >= st; i--)
+			printf ("%c", a[i]);
+        for (int i = ed+1; i < len; i++)
+			printf ("%c", a[i]);
+		printf ("\n");
+	}
+    return 0;
+}

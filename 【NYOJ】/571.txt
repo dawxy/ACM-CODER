@@ -1,0 +1,64 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 51
+int dp[MAXN], dp2[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		//1)dp[j]:用前i个数能构成j的方法数,完全背包
+		memset(dp,0,sizeof(dp));
+		dp[0] = 1;
+		for (int i = 1; i <= n; i++)//物品为1~n
+		{
+			for (int j = i; j <= n; j++)
+				dp[j] += dp[j-i];
+		}
+		printf("%d\n", dp[n]);
+		//2)dp2[j][k]：用k个前i的数构成j的方法数,二维费用完全背包
+		memset(dp2,0,sizeof(dp2));
+		dp2[0][0] = 1;
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = i; j <= n; j++)
+			{
+				for (int k = 1; k <= m; k++)
+					dp2[j][k] += dp2[j-i][k-1];
+			}
+		}
+		printf("%d\n", dp2[n][m]);
+		//3)和1基本一样，就是物品为1~m
+		memset(dp,0,sizeof(dp));
+		dp[0] = 1;
+		for (int i = 1; i <= m; i++)
+		{
+			for (int j = i; j <= n; j++)
+				dp[j] += dp[j-i];
+		}
+		printf("%d\n", dp[n]);
+		//4)物品变为1~n的奇数
+		memset(dp,0,sizeof(dp));
+		dp[0] = 1;
+		for (int i = 1; i <= n; i += 2)
+		{
+			for (int j = i; j <= n; j++)
+				dp[j] += dp[j-i];
+		}
+		printf("%d\n", dp[n]);
+		//物品数量只有一个了，01背包
+		memset(dp,0,sizeof(dp));
+		dp[0] = 1;
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = n; j >= i; j--)
+				dp[j] += dp[j-i];
+		}
+		printf("%d\n", dp[n]);
+	}
+	return 0;
+}

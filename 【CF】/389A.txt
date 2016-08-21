@@ -1,0 +1,28 @@
+#include <stdio.h>
+//#define scanf scanf_s
+
+int gcd (int a, int b)
+{
+	if (0 == b%a)
+		return a;
+	return gcd(b%a, a);
+}
+
+int main ()
+{
+	int n;
+	while(EOF != scanf ("%d%*c", &n))
+	{
+		int a, b, len = n;
+		scanf ("%d%*c", &a);
+		n--;
+		while(n--)
+		{
+			scanf ("%d%*c", &b);
+			a = gcd(a, b);
+		}
+		printf ("%d\n", len*a);
+	}
+
+	return 0;
+}

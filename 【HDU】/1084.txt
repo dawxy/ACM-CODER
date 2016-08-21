@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 105
+struct NODE{
+    int ac, time;
+}p[MAXN];
+int n, sum[6];
+
+bool is_add(int s)
+{
+    int c = 1;
+    for (int i = 0; i < n; i++)
+	{
+        if (p[s].ac == p[i].ac && p[s].time > p[i].time)
+            c++;
+        if (c > sum[p[s].ac]/2)
+            return false;
+	}
+    return true;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    freopen("e:\\out.txt","w",stdout);
+    #endif
+    while(1)
+	{
+		scanf ("%d%*c", &n);
+        if (n < 0)
+            break;
+		int h,m,s;
+		memset(sum,0,sizeof(sum));
+        for(int i = 0; i < n; i++)
+		{
+            scanf ("%d %d:%d:%d%*c", &p[i].ac, &h,&m,&s);
+            p[i].time = h*3600+m*60+s;
+            sum[p[i].ac]++;
+		}
+		int ans;
+        for (int i = 0; i < n; i++)
+		{
+            if (5 == p[i].ac)
+                printf ("100\n");
+            else if (0 == p[i].ac)
+                printf ("50\n");
+            else
+			{
+                if (4 == p[i].ac)
+                    ans = 90;
+
+				else if (3 == p[i].ac)
+                    ans = 80;
+				else if (2 == p[i].ac)
+                    ans = 70;
+				else
+					ans = 60;
+                if (is_add(i))
+					ans += 5;
+				printf ("%d\n", ans);
+			}
+		}
+		printf ("\n");
+	}
+    return 0;
+}

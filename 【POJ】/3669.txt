@@ -1,0 +1,138 @@
+#include <stdio.h>
+#include <malloc.h>
+#define MAX_N 305
+#define INF 99999999
+typedef struct node{//队列节点
+	int x;
+	int y;
+	struct node *next;
+	struct node *prev;
+}QUE, *PQUE;
+typedef struct ph{//记录队列信息
+	int len;
+	PQUE last;
+	PQUE first;
+}Head, *Phead;
+int map[MAX_N][MAX_N], maxd;
+
+Phead que_init ();//创建并初始化队列
+void que_push (Phead, int, int);//入队
+QUE que_pop (Phead);//出队
+void destroy (int ,int, int);
+int bfs (int);
+
+int main ()
+{
+	int m, x, y, time;
+	while (EOF != scanf ("%d%*c", &m))
+	{
+		int i, j;
+		maxd = -1;
+		for (i = 0; i < MAX_N; i++)
+			for (j = 0;j < MAX_N; j++)
+				map[i][j] = INF;
+		for (i = 0; i < m; i++)
+		{
+			scanf ("%d %d %d%*c", &x, &y, &time);
+			if (time > maxd)
+				maxd = time;
+			destroy (x, y, time);
+		}
+		
+		printf ("%d\n", bfs (m));
+		
+	}
+
+	return 0;
+}
+
+Phead que_init ()
+{
+	Phead phead = (Phead)malloc (sizeof(Head));
+	phead->first = phead->last = NULL;
+	phead->len = 0;
+	return phead;
+}
+
+void que_push (Phead phead, int x, int y)
+{
+	PQUE p = (PQUE)malloc (sizeof(QUE));
+	p->x = x;
+	p->y = y;
+	p->next = NULL;
+	p->prev = phead->last;
+	if (0 == phead->len)
+		phead->first = p;
+	else
+		phead->last->next = p;
+	phead->last= p;
+	phead->len ++;
+}
+
+QUE que_pop (Phead phead)
+{
+	PQUE buf = phead->first;
+	QUE fanhui;
+	fanhui.next = fanhui.prev = NULL;
+	fanhui.x = buf->x;
+	fanhui.y = buf->y;
+	phead->first = buf->next;
+	free(buf);
+	phead->len --;
+	if (0 == phead->len)
+		phead->first = phead->last = NULL;
+	return fanhui;
+}
+
+void destroy (int x, int y, int time)
+{
+	int d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}}, i, ni, nj;
+	if (time < map[y][x])
+		map[y][x] = time;
+	for (i = 0; i < 4; i++)
+	{
+		ni = y + d[i][0];
+		nj = x + d[i][1];
+		if (time < map[ni][nj] && 0 <= ni && MAX_N > ni && 0 <= nj && MAX_N > nj)
+			map[ni][nj] = time;
+	}
+}
+
+int bfs (int m)
+{
+	int i, j, d[MAX_N][MAX_N], ni, nj, f[4][2]={{-1,0},{1,0},{0,-1},{0,1}}, min;
+	QUE buf;
+	for (i = 0; i < MAX_N; i++)
+		for (j = 0; j < MAX_N; j++)
+			d[i][j] = INF;
+	Phead p = que_init();
+	que_push (p, 0, 0);
+	d[0][0] = 0;
+	while (p->len)
+	{
+		buf = que_pop(p);
+		if (d[buf.y][buf.x] > maxd)//当超过最后一颗流星下落的时间后退出循环
+			break;
+		for (i = 0; i < 4; i++)
+		{
+			ni = buf.y + f[i][0];
+			nj = buf.x + f[i][1];
+			if (0 <= ni && MAX_N > ni && 0 <= nj && MAX_N > nj && d[buf.y][buf.x]+1 < map[ni][nj] && INF == d[ni][nj])
+			{
+				que_push (p, nj, ni);
+				d[ni][nj] = d[buf.y][buf.x]+1;
+			}
+		}
+	}
+	for (i = 0, min = INF; i < MAX_N; i++)
+	{
+		for (j = 0; j < MAX_N; j++)
+		{
+			if (INF == map[i][j] && min > d[i][j])
+				min = d[i][j];
+		}
+	}
+	if (INF == min)
+		min = -1;
+	return min;
+}

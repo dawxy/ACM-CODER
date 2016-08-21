@@ -1,0 +1,85 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <stack>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 20010
+int pre[MAXN],sccno[MAXN],dfs_clock, scc_cnt;
+bool in[MAXN], out[MAXN];
+vector<int> g[MAXN];
+stack<int> s;
+
+int dfs(int u)
+{
+	int lowu = pre[u] = ++dfs_clock, sz = g[u].size();
+	s.push(u);
+	rep(i,0,sz)
+	{
+		int v = g[u][i];
+		if(!pre[v]) lowu = min(lowu, dfs(v));//自己define的min WA无数次,以后乖乖用STL吧
+		else if(!sccno[v]) lowu = min(lowu, pre[v]);
+	}
+	if(lowu == pre[u])
+	{
+		int x;
+		scc_cnt++;
+		do{
+			x = s.top();s.pop();
+			sccno[x] = scc_cnt;
+		}while(x != u);
+	}
+	return lowu;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		repe(i,1,n) g[i].clear();
+		repe(a,1,n)
+		{
+			int b;
+			while(~scanf("%d%*c", &b) && b)
+				g[a].push_back(b);
+		}
+		dfs_clock = scc_cnt = 0;
+		clc(pre,0);
+		clc(sccno,0);
+		repe(i,1,n) if(!pre[i]) dfs(i);
+		if(1 == scc_cnt)
+		{
+			puts("0");
+			continue;
+		}
+		clc(in,1);
+		clc(out,1);
+		repe(u,1,n)
+		{
+			int sz = g[u].size();
+			rep(j,0,sz)
+			{
+				int v = g[u][j];
+				if(sccno[u] != sccno[v]) in[sccno[v]] = out[sccno[u]] = 0;
+			}
+		}
+		int ans1 = 0, ans2 = 0;
+		repe(i,1,scc_cnt)
+		{
+			if(in[i]) ans1++;
+			if(out[i]) ans2++;
+		}
+		printf("%d\n", max(ans1,ans2));
+	}
+	return 0;
+}

@@ -1,0 +1,64 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 41
+int dp[MAXN][MAXN][MAXN][MAXN], a[MAXN][4], res = 0, n;
+//dp表示第1~4个篮子分别取出多少个时能放到口袋里面的最大糖果数
+
+int dfs(int s1, int s2, int s3, int s4, int k, int sum)
+{
+	int& ans = dp[s1][s2][s3][s4];
+	if (-1 != ans) return ans;
+	if (sum >= 5) return ans = 0;
+	ans = 0;
+	if (s1 < n)
+	{
+		if (k&(1 << a[s1][0]))
+			ans = max(ans, dfs(s1 + 1, s2, s3, s4, k ^ (1 << a[s1][0]), sum - 1) + 1);
+		else
+			ans = max(ans, dfs(s1 + 1, s2, s3, s4, k | (1 << a[s1][0]), sum + 1));
+	}
+	if (s2 < n)
+	{
+		if (k&(1 << a[s2][1]))
+			ans = max(ans, dfs(s1, s2 + 1, s3, s4, k ^ (1 << a[s2][1]), sum - 1) + 1);
+		else
+			ans = max(ans, dfs(s1, s2 + 1, s3, s4, k | (1 << a[s2][1]), sum + 1));
+	}
+	if (s3 < n)
+	{
+		if (k&(1 << a[s3][2]))
+			ans = max(ans, dfs(s1, s2, s3 + 1, s4, k ^ (1 << a[s3][2]), sum - 1) + 1);
+		else
+			ans = max(ans, dfs(s1, s2, s3 + 1, s4, k | (1 << a[s3][2]), sum + 1));
+	}
+	if (s4 < n)
+	{
+		if (k&(1 << a[s4][3]))
+			ans = max(ans, dfs(s1, s2, s3, s4 + 1, k ^ (1 << a[s4][3]), sum - 1) + 1);
+		else
+			ans = max(ans, dfs(s1, s2, s3, s4 + 1, k | (1 << a[s4][3]), sum + 1));
+	}
+	res = max(res,ans);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &n) && n)
+	{
+		for(int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < 4; j++)
+				scanf("%d%*c", &a[i][j]);
+		}
+		res = 0;
+		memset(dp,-1,sizeof(dp));
+		dfs(0,0,0,0,0,0);
+		printf("%d\n", res);
+	}
+	return 0;
+}

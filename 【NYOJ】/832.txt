@@ -1,0 +1,45 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 10
+#define INF 0x3f3f3f3f
+#define max(a,b) (a>b?a:b)
+int dp[1<<MAXN], a[MAXN][MAXN];
+//dp[s]表示已经合并过的s最大能获得的金币
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+				scanf("%d%*c", &a[i][j]);
+		}
+		int len = (1<<n)-1;
+		memset(dp,0,sizeof(dp));
+		for (int i = 0; i <= len; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (i&(1<<j)) continue;
+				for (int k = 0; k < n; k++)
+				{
+					if (i&(1<<k) || j == k) continue;
+					dp[i|(1<<j)] = max(dp[i|(1<<j)], dp[i]+a[k][j]);
+					dp[i|(1<<k)] = max(dp[i|(1<<k)], dp[i]+a[j][k]);
+				}
+			}
+		}
+		int ans = 0;
+		for(int i = 0; i <= len; i++)
+		{
+			ans = max(ans,dp[i]);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

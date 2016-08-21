@@ -1,0 +1,51 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+char a[MAXN], b[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	scanf("%s%*c%s", a, b);
+	int len = strlen(a);
+	int cnt = 0;
+	rep(i,0,len)
+	{
+		cnt += (a[i] != b[i]);
+	}
+	if(cnt&1)
+	{
+		puts("impossible");
+		return 0;
+	}
+	int sum = 0;
+	rep(i,0,len)
+	{
+		if(a[i] == b[i]) putchar(a[i]);
+		else
+		{
+			if(sum) putchar(b[i]);
+			else putchar(a[i]);
+			sum ^= 1;
+		}
+	}
+	putchar('\n');
+	return 0;
+}

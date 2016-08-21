@@ -1,0 +1,58 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n;i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+typedef long long LL;
+struct MATRIX{
+	LL num[2][2];
+	MATRIX(int a, int b, int c, int d)
+	{
+		num[0][0] = a, num[0][1] = b;
+		num[1][0] = c, num[1][1] = d;
+	}
+};
+const LL MOD = 19999997;
+
+MATRIX mul(const MATRIX &a, const MATRIX &b)
+{
+	MATRIX ans = MATRIX(0,0,0,0);
+	rep(i,0,2)
+	{
+		rep(j,0,2)
+		{
+			rep(k,0,2)
+				ans.num[i][j] = (ans.num[i][j]+(a.num[i][k]*b.num[k][j])%MOD)%MOD;
+		}
+	}
+	return ans;
+}
+MATRIX pow_mod(MATRIX x, int n)
+{
+	MATRIX ans = MATRIX(1,0,0,1);
+	while(n)
+	{
+		if(n&1) ans = mul(ans,x);
+		x = mul(x,x);
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		MATRIX x = MATRIX(1,1,1,0);
+		MATRIX ret = pow_mod(x,n);
+		LL a[2]={1,1};
+		LL ans = ((ret.num[0][1]*a[1])%MOD+(ret.num[1][1]*a[1])%MOD)%MOD;
+		printf("%lld\n", ans);
+	}
+	return 0;
+}

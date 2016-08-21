@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void main (void)
+{
+	int m, n, i, j, s = 0, t = 0;
+	char a[4];
+	while (EOF != scanf("%d %d", &m, &n))
+	{
+		//getchar ();
+		for (i = m, t = 0; i <= n; i++)
+		{
+			s = 0;
+			itoa (i, a, 10);
+			for (j = 0; j < 3; j++)
+			{
+				s = s + (a[j]-'0')*(a[j]-'0')*(a[j]-'0');
+			}
+			if (s == i)
+			{
+				t += 1;
+				if (1 == t)
+					printf ("%d", i);
+				else
+					printf (" %d", i);
+			}
+		}
+		if (0 == t)
+			printf ("no\n");
+		else
+			printf ("\n");
+	}
+}

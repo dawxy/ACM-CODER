@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <string.h>
+int next[10003];
+char w[10003], t[1000003];
+
+void get_next (int);
+int kmp (int ,int);
+
+int main ()
+{
+	int n;
+	scanf ("%d%*c", &n);
+	while (n--)
+	{
+		int lenw, lent;
+		gets (w);
+		gets (t);
+		lenw = strlen(w);
+		lent = strlen(t);
+		get_next (lenw);
+		printf ("%d\n", kmp(lenw, lent));
+	}
+
+	return 0;
+}
+
+void get_next (int lenw)
+{
+	int i, j;
+	next[0] = -1;
+	i = -1;
+	j = 0;
+	while (j < lenw)
+	{
+		if (-1 == i || w[i] == w[j])
+		{
+			i++;
+			j++;
+			if (w[i] != w[j])
+				next[j] = i;
+			else
+				next[j] = next[i];
+		}
+		else
+			i = next[i];
+	}
+}
+
+int kmp (int lenw,int lent)
+{
+	int sum = 0, wi = 0, ti = 0;
+	while (wi < lenw && ti < lent)
+	{
+		if (-1 == wi || w[wi] == t[ti])
+		{
+			wi++;
+			ti++;
+		}
+		else
+			wi = next[wi];
+		if (wi >= lenw)
+		{
+			sum++;
+			wi = next[wi];
+		}
+	}
+	return sum;
+}

@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 12
+struct NODE{
+    int num, data;
+}p[MAXN];
+int n;
+bool g[MAXN][MAXN];
+
+bool cmp(const NODE a, const NODE b)
+{
+	return a.data > b.data;
+}
+bool is_tu()
+{
+	for(int i = 0; i < n-1; i++)
+	{
+		sort(p + i, p + n, cmp);
+		if (i+p[i].data >= n)
+			return false;
+		for(int j = i + 1; j <= i+p[i].data; j++)
+		{
+			p[j].data--;
+			g[p[i].num][p[j].num] = g[p[j].num][p[i].num] = true;
+			if(p[j].data < 0)
+				return false;
+		}
+	}
+    if (p[n-1].data)
+		return false;
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int sum = 0;
+		scanf("%d%*c", &n);
+		for(int i = 0;  i < n; i++)
+		{
+			scanf("%d%*c", &p[i].data);
+			p[i].num = i;
+			sum += p[i].data;
+		}
+        memset(g,false,sizeof(g));
+		if(!sum || (!(sum&1) && is_tu()))
+		{
+			puts("YES");
+			for (int i = 0; i < n; i++)
+			{
+				printf ("%d",g[i][0]);
+				for (int j = 1; j < n; j++)
+                    printf (" %d",g[i][j]);
+                printf ("\n");
+			}
+		}
+		else
+			puts("NO");
+		if (t)
+			printf ("\n");
+	}
+	return 0;
+}

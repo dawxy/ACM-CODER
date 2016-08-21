@@ -1,0 +1,202 @@
+#include <stdio.h>
+//注意E 1 12 20 20 20
+
+//每个人的信息
+struct person{
+	char menpai;
+	int x, y;
+	int neili;
+	int wuyi;
+	int shengming;
+	int direction;
+};
+//地图上当前的各门派数量和记录战斗时的i位置
+struct Map{
+	int s,si;
+	int w,wi;
+	int e,ei;
+};
+//保存最后各门派所有人的信息总和
+struct Sum{
+	int s, ss;
+	int w, ws;
+	int e, es;
+};
+
+void walk (person*, int);//行走.前进
+int attack (person*);//计算攻击力
+void fight (person*, person*);//单次战斗计算
+void all_fight (person*, int);//每一步所有人战斗计算
+void all_sum(person *, int, Sum*);//计算最后各门派数据总和
+Map map[13][13];
+
+int main ()
+{
+	int t;
+	person p[1001]; 
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int n, i = 0, lenp;
+		Sum sum;
+		scanf ("%d%*c", &n);
+		//获取数据
+		while(1)
+		{
+			p[i].menpai = getchar ();
+			getchar ();
+			if ('0' == p[i].menpai)
+				break;
+			scanf ("%d %d %d %d %d%*c", &p[i].x, &p[i].y, &p[i].neili, &p[i].wuyi, &p[i].shengming);
+			if (12 == p[i].x || 12 == p[i].y)
+				p[i].direction = -1;
+			else
+				p[i].direction = 1;
+			i++;
+		}
+		lenp = i;
+		//算法
+		for (i = 0; i < n; i++)
+		{
+			all_fight(p, lenp);
+			walk(p, lenp);
+		}
+		all_sum(p, lenp, &sum);
+		printf ("%d %d\n", sum.s, sum.ss);
+		printf ("%d %d\n", sum.w, sum.ws);
+		printf ("%d %d\n", sum.e, sum.es);
+		printf ("***\n");
+	}
+
+	return 0;
+}
+
+void walk (person * p, int len)
+{
+	int i;
+	for (i = 0; i < len; i++)
+	{
+		switch(p[i].menpai)
+		{
+		case 'S': p[i].x += 1*p[i].direction; 
+			if (1 == p[i].x || 12 == p[i].x)
+				p[i].direction *= -1;
+			break;
+		case 'W': p[i].y += 1*p[i].direction;
+			if (1 == p[i].y || 12 == p[i].y)
+				p[i].direction *= -1;
+			break;
+		case 'E':if ((1 == p[i].x && 12 == p[i].y) || (1 == p[i].y && 12 == p[i].x) ) 
+					 break;
+			p[i].x += 1*p[i].direction;p[i].y += 1*p[i].direction;
+			if (1 == p[i].x || 12 == p[i].x || 1 == p[i].y || 12 == p[i].y)
+				p[i].direction *= -1;
+			break;
+		}
+	}
+	return ;
+}
+
+int attack (person *p)
+{
+	int attack;
+	switch(p->menpai)
+	{
+	case 'S': attack = (0.5*p->neili+0.5*p->wuyi)*(p->shengming+10.0)/100.0;break;
+	case 'W': attack = (0.8*p->neili+0.2*p->wuyi)*(p->shengming+10.0)/100.0;break;
+	case 'E': attack = (0.2*p->neili+0.8*p->wuyi)*(p->shengming+10.0)/100.0;break;
+	}
+	return attack;
+}
+
+void fight (person *p1, person *p2)
+{
+	int attack1, attack2;
+	attack1 = attack(p1);
+	attack2 = attack(p2);
+	p1->shengming -= attack2;
+	p2->shengming -= attack1;
+}
+
+void all_fight (person*p, int len)
+{
+	int i, j;
+	//地图清零
+	for (i = 1; i < 13; i++)
+		for (j = 1; j < 13; j++)
+			map[i][j].s = map[i][j].w = map[i][j].e = 0;
+	//地图上有哪些人
+	for (i = 0; i < len; i++)
+	{
+		if (0 >= p[i].shengming)
+			p[i].x = p[i].y = 0;
+		switch(p[i].menpai)
+		{
+		case 'S': map[p[i].x][p[i].y].s += 1;
+			map[p[i].x][p[i].y].si = i;
+			break;
+		case 'W': map[p[i].x][p[i].y].w += 1;
+			map[p[i].x][p[i].y].wi = i;
+			break;
+		case 'E': map[p[i].x][p[i].y].e += 1;
+			map[p[i].x][p[i].y].ei = i;
+			break;
+		}
+	}
+	//需要战斗的计算
+	for (i = 1; i < 13; i++)
+	{
+		for (j = 1; j < 13; j++)
+		{
+			if (2 == (map[i][j].s)+(map[i][j].w)+(map[i][j].e))
+			{
+				if (2 > map[i][j].s && 2 > map[i][j].w && 2 > map[i][j].e)
+				{
+					if (0 == map[i][j].s)
+						fight(&p[map[i][j].wi], &p[map[i][j].ei]);
+					else
+						if (0 == map[i][j].w)
+							fight(&p[map[i][j].si], &p[map[i][j].ei]);
+						else
+							if(0 == map[i][j].e)
+								fight(&p[map[i][j].si], &p[map[i][j].wi]);
+				}
+			}
+		}
+	}
+	return;
+}
+
+void all_sum(person *p, int len, Sum* sum)
+{
+	int i;
+	sum->s = sum->w = sum->e = 0;
+	sum->ss = sum->ws = sum->es = 0;
+	for (i = 0; i < len; i++)
+	{
+		switch(p[i].menpai)
+		{
+		case 'S': 
+			if (0 < p[i].shengming)
+			{
+				sum->s += 1;
+				sum->ss += p[i].shengming;
+			}
+			break;
+		case 'W': 
+			if (0 < p[i].shengming)
+			{
+				sum->w += 1;
+				sum->ws += p[i].shengming;
+			}
+			break;
+		case 'E': 
+			if (0 < p[i].shengming)
+			{
+				sum->e += 1;
+				sum->es += p[i].shengming;
+			}
+			break;
+		}
+	}
+}

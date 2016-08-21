@@ -1,0 +1,20 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		char a, b;
+		scanf ("%c %c%*c", &a, &b);
+		if (a == b)
+			printf ("%c=%c\n", a,b);
+		else if (a < b)
+			printf ("%c>%c\n", a, b);
+		else
+			printf ("%c<%c\n", a, b);
+	}
+
+	return 0;
+}

@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+int a[MAXN][MAXN], dp[MAXN][MAXN], h, w;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c" , &t);
+	while(t--)
+	{
+		scanf("%d %d%*c", &h, &w);
+		for(int i = 1; i <= h; i++)
+		{
+			for(int j = 1; j <= w; j++)
+				scanf("%d%*c", &a[i][j]);
+		}
+		memset(dp, -0x3f, sizeof(dp));
+		dp[0][1] = 0;
+		for(int i = 1; i <= h; i++)
+			dp[i][1] = a[i][1] + dp[i - 1][1];
+		int buf[MAXN][2];//buf[][1]记录从上方走来的当前最大价值,buf[][1]记录下方走来的当前最大价值
+		for(int j = 2; j <= w; j++)
+		{
+			for(int i = 1; i <= h; i++) //记录从左边走来的价值
+				dp[i][j] = dp[i][j - 1] + a[i][j];
+			buf[1][0] = dp[1][j];
+			for(int i = 2; i <= h; i++) //每次都要比较从左边还是上面走来大
+				buf[i][0] = max(dp[i][j], buf[i - 1][0] + a[i][j]);
+			buf[h][1] = dp[h][j];
+			for(int i = h - 1; i >= 1; i--) //每次都要比较从左边还是下面走来大
+				buf[i][1] = max(dp[i][j], buf[i + 1][1] + a[i][j]);
+			for(int i = 1; i <= h; i++) //找到最大值
+				dp[i][j] = max(buf[i][0], buf[i][1]);
+		}
+		printf("Case #%d:\n%d\n", ++count, dp[1][w]);
+	}
+	return 0;
+}

@@ -1,0 +1,76 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+struct NODE{
+	int v,k;
+	bool operator<(const NODE &t)const{
+		return v < t.v;
+	}
+}p[MAXN];
+int sum[MAXN<<1],n,ans[MAXN];
+
+inline int id(int x, int y){return x+y|x!=y;}
+void insert(int x, int y, int p)
+{
+	sum[id(x,y)]++;
+	if(x == y) return;
+	int m = (x+y)>>1;
+	if(p <= m) insert(x,m,p);
+	else insert(m+1,y,p);
+}
+int query_front(int x, int y, int k)
+{
+	if(x == y)
+		return (0 == sum[id(x,y)] && k == 1)?x:INF;
+	int m = (x+y)>>1;
+	int d = m-x+1-sum[id(x,m)];
+	if(d >= k) return query_front(x,m,k);
+	return query_front(m+1,y,k-d);
+}
+int query_rear(int x, int y, int k)
+{
+	if(x == y)
+		return (0 == sum[id(x,y)] && k == 1)?x:INF;
+	int m = (x+y)>>1;
+	int d = y-m-sum[id(m+1,y)];
+	if(d >= k) return query_rear(m+1,y,k);
+	return query_rear(x,m,k-d);
+}
+bool sloved()
+{
+	clc(sum,0);
+	rep(i,0,n)
+	{
+		int pos = min(query_front(1,n,p[i].k+1),query_rear(1,n,p[i].k+1));
+		if(INF == pos) return false;
+		ans[pos] = p[i].v;
+		insert(1,n,pos);
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d", &n);
+		rep(i,0,n) scanf("%d%d", &p[i].v, &p[i].k);
+		sort(p,p+n);
+		printf("Case #%d: ",++count);
+		if(sloved())
+		{
+			repe(i,1,n) printf("%d%c",ans[i],i==n?'\n':' ');
+		}
+		else puts("impossible");
+	}
+	return 0;
+}

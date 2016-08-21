@@ -1,0 +1,177 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000000+10;
+struct NODE;
+NODE *null;
+struct NODE{
+	NODE *ch[2], *fa;
+	int sz,sum,mx;
+	int v;
+	int chd(){
+		return this == fa->ch[1];
+	}
+	void push_up(){
+		sz = ch[0]->sz+ch[1]->sz+1;
+		sum = ch[0]->sum+ch[1]->sum+v;
+		if(ch[0] != null)
+            mx = max(max(ch[0]->mx,ch[0]->sum+v),ch[0]->sum+v+ch[1]->mx);
+        else
+			mx = max(v,v+ch[1]->mx);
+	}
+};
+inline void setch(NODE *fa, NODE *u, int p)
+{
+	fa->ch[p] = u, u->fa = fa;
+}
+void rot(NODE *u)
+{
+	NODE *y = u->fa;
+	int d = u->chd();
+	setch(y->fa,u,y->chd());
+	setch(y,u->ch[d^1],d);
+	setch(u,y,d^1);
+	y->push_up(), u->push_up();
+}
+NODE *find_kth(NODE *u, int k)
+{
+	int d = k - u->ch[0]->sz;
+	if(1 == d) return u;
+	if(d <= 0) return find_kth(u->ch[0], k);
+	return find_kth(u->ch[1], d-1);
+}
+void splay(NODE* &rt, int k, NODE *p)
+{
+	NODE *x = find_kth(rt, k);
+	if(x == p) return;
+	while(x->fa != p)
+	{
+		NODE *y = x->fa;
+		if(y->fa != p && x->chd() != y->chd()) rot(y);
+		rot(x);
+	}
+	if(null == p) rt = x;
+}
+NODE node[MAXN];
+NODE *rt;
+void init()
+{
+	null->sz = null->sum = 0;
+	null->mx = -INF;
+	rt = &node[0];
+	rt->fa = rt->ch[0] = null;
+	rt->v = 0;
+	setch(rt,&node[1],1);
+	node[1].ch[0] = node[1].ch[1] = null;
+	node[1].v = 0;
+	node[1].push_up();
+	rt->push_up();
+}
+void insert(int k, NODE *x)
+{
+	splay(rt,k,null);
+	if(null == rt->ch[1]) setch(rt,x,1);
+	else
+	{
+		NODE *u = rt->ch[1];
+		while(u->ch[0] != null) u = u->ch[0];
+		setch(u,x,0);
+		while(x->fa != null) x->push_up(),x = x->fa;
+	}
+	rt->push_up();
+}
+void del(int k)
+{
+	splay(rt,k,null);
+	if(rt->ch[0] == null) rt->ch[1]->fa = null,rt = rt->ch[1];
+	else if(rt->ch[1] == null) rt->ch[0]->fa = null, rt = rt->ch[0];
+	else
+	{
+		splay(rt,rt->ch[0]->sz+2,rt);
+		setch(rt->ch[1],rt->ch[0],0);
+		rt = rt->ch[1];
+		rt->fa = null;
+		rt->push_up();
+	}
+}
+int query(int k)
+{
+	splay(rt,1,null);
+	splay(rt,k+1,rt);
+	return rt->ch[1]->ch[0]->mx;
+}
+void pt(NODE *u)
+{
+	if(u == null) return;
+	pt(u->ch[0]);
+	printf("%d\n", u->v);
+	pt(u->ch[1]);
+}
+int in()
+{
+	int f = 1, ans, ch;
+	while((ch = getchar()) < '0' || ch > '9') if('-' == ch) {ch = getchar(),f = -1; break;}
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && ch <= '9') ans = (ans<<3)+(ans<<1)+ch-'0';
+	return f*ans;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int m;
+	null = new NODE;
+	while(~scanf("%d%*c", &m))
+	{
+		int cnt = 2,p = 2;
+		init();
+		char op;
+		int x;
+		rep(i,0,m)
+		{
+			op = getchar();
+			getchar();
+			if('I' == op)
+			{
+				x = in();
+				NODE *v = &node[cnt++];
+				v->ch[0] = v->ch[1] = v->fa = null;
+				v->v = x;
+				insert(p-1,v);
+				p++;
+			}
+			else if('D' == op)
+				del(--p);
+			else if('L' == op)
+			{
+				if(p > 2) p--;
+			}
+			else if('R' == op)
+			{
+				if(p < rt->sz) p++;
+			}
+			else
+			{
+				x = in();
+				printf("%d\n", query(x+1));
+			}
+		}
+	}
+	return 0;
+}

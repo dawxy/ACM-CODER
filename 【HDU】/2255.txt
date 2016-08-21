@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+#define MAXN 310
+#define INF 0x3f3f3f3f;
+struct KM{
+	struct NODE{
+		int to,w;
+		NODE(int a, int b){
+			to = a, w = b;
+		}
+	};
+	int nx,ny;//两边的点数
+	int linker[MAXN],lx[MAXN],ly[MAXN];//y中各点匹配状态，x,y中的点标号
+	int slack[MAXN];
+	bool visx[MAXN],visy[MAXN];
+	int g[MAXN][MAXN];//二分图描述
+	bool dfs(int x)
+	{
+		visx[x] = true;
+		for(int y = 0; y < ny; y++)
+		{
+			if(visy[y]) continue;
+			int tmp = lx[x]+ly[y]-g[x][y];
+			if(!tmp)
+			{
+				visy[y] = true;
+				if(-1 == linker[y] || dfs(linker[y]))
+				{
+					linker[y] = x;
+					return true;
+				}
+			}
+			else if(slack[y] > tmp)
+				slack[y] = tmp;
+		}
+		return false;
+	}
+	int km()
+	{
+		memset(linker,-1,sizeof(linker));
+		memset(ly,0,sizeof(ly));
+		for(int i = 0; i < nx; i++)
+		{
+			lx[i] = -INF;
+			for(int j = 0; j < ny; j++)
+				if(g[i][j] > lx[i]) lx[i] = g[i][j];
+		}
+		for(int x = 0; x < nx; x++)
+		{
+			memset(slack,0x3f,sizeof(slack));
+			while(1)
+			{
+				memset(visx,false,sizeof(visx));
+				memset(visy,false,sizeof(visy));
+				if(dfs(x))break;
+				int d = INF;
+				for(int i = 0; i < ny; i++)
+				{
+					if(!visy[i] && d > slack[i])
+						d = slack[i];
+				}
+				for(int i = 0; i < nx; i++)
+				{
+					if(visx[i]) lx[i] -= d;
+				}
+				for(int i = 0; i < ny; i++)
+				{
+					if(visy[i]) ly[i] += d;
+					else slack[i] -= d;
+				}
+			}
+		}
+		int ans = 0;
+		for(int i = 0; i < ny; i++)
+		{
+			if(~linker[i]) ans += g[linker[i]][i];
+		}
+		return ans;
+	}
+}Km;
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		Km.nx = Km.ny = n;
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = 0; j < n; j++)
+				scanf("%d%*c", &Km.g[i][j]);
+		}
+		printf("%d\n", Km.km());
+	}
+	return 0;
+}

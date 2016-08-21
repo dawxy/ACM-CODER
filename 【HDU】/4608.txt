@@ -1,0 +1,93 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+char a[MAXN];
+int len, sum, inlen;
+
+void add()
+{
+	if(a[len] < '9')
+	{
+		a[len]++;
+		sum++;
+		return;
+	}
+	sum -= 9;
+	a[len] = '0';
+	per(i,len-1,1)
+	{
+		if(a[i] != '9')
+		{
+			sum++;
+			a[i]++;
+			return;
+		}
+		else
+		{
+			sum -= 9;
+			a[i] = '0';
+		}
+	}
+	a[0] = '1';
+	a[len++] = '9';
+	sum = 10;
+}
+void sloved()
+{
+	int od = len;
+	sum = 0;
+	repe(i,1,len) sum += a[i]-'0';
+	add();
+	while(sum%10)
+	{
+		add();
+	}
+	rep(i,len,inlen) putchar('0');
+	if(len != od)
+		puts(a);
+	else puts(a+1);
+}
+void del_zero()
+{
+	inlen = len = strlen(a+1);
+	if(a[1] != '0') return;
+	int i = 1;
+	while(a[i] == '0')i++;
+	i--;
+	repe(j,i,len)
+	{
+		a[j-i] = a[j];
+	}
+	len -= i;
+	a[len+1] = 0;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%s", a+1);
+		del_zero();
+		sloved();
+	}
+	return 0;
+}

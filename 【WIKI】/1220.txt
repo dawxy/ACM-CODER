@@ -1,0 +1,57 @@
+/*
+º«“‰ªØ
+*/
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+int a[MAXN][MAXN], dp[MAXN][MAXN], n;
+bool vis[MAXN][MAXN];
+
+int dfs(int i, int j)
+{
+    if (vis[i][j])
+        return dp[i][j];
+    vis[i][j] = true;
+    if (n-1 == i)
+        return dp[i][j] = a[i][j];
+    return dp[i][j] = max(dfs(i+1,j), dfs(i+1,j+1))+a[i][j];
+}
+int main ()
+{
+    scanf ("%d%*c", &n);
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j <= i; j++)
+            scanf ("%d%*c", &a[i][j]);
+    }
+    printf ("%d\n", dfs(0,0));
+    return 0;
+}
+/*µ›Õ∆*/
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+int a[MAXN][MAXN], dp[MAXN][MAXN];
+
+int main ()
+{
+    int n;
+    scanf ("%d%*c", &n);
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j <= i; j++)
+        {
+            scanf ("%d%*c", &a[i][j]);
+            dp[i][j] = a[i][j];
+        }
+    }
+    for (int i = n-2; i >= 0; i --)
+        for (int j = 0; j <= i; j++)
+            dp[i][j] = max(dp[i+1][j], dp[i+1][j+1])+a[i][j];
+    printf ("%d\n", dp[0][0]);
+    return 0;
+}

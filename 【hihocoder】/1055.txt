@@ -1,0 +1,72 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10, MAXM = 100*2+10;
+int head[MAXN], tol, nxt[MAXM], to[MAXM];
+int val[MAXN], dp[MAXN][MAXN], m, num[MAXN];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+void dfs(int u, int fa)
+{
+	repe(i,1,m) dp[u][i] = val[u];
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(fa == v) continue;
+		dfs(v,u);
+		num[u] += num[v];
+		int mx = min(num[v],m);
+		int tmp[MAXN];
+		memcpy(tmp,dp[u],sizeof(dp[u]));
+		repe(j,1,mx)//v子树取j个点
+		{
+			repe(k,j+1,m)//u树取k个
+				tmp[k] = max(tmp[k], dp[u][k-j]+dp[v][j]);
+		}
+		repe(i,0,m) dp[u][i] = max(dp[u][i], tmp[i]);
+	}
+	num[u]++;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		repe(i,1,n) scanf("%d%*c", &val[i]);
+		clc(head,-1);
+		tol = 0;
+		rep(i,1,n)
+		{
+			int u,v;
+			scanf("%d %d%*c", &u, &v);
+			add_edge(u,v);
+			add_edge(v,u);
+		}
+		clc(dp,0);
+		clc(num,0);
+		dfs(1,-1);
+		printf("%d\n", dp[1][m]);
+	}
+	return 0;
+}

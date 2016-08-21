@@ -1,0 +1,16 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    double sum, a;
+    for (int i = 0; i < 12; i++)
+	{
+		scanf ("%lf%*c", &a);
+        sum += a;
+	}
+    printf ("$%.2lf\n",((int)(sum/12*100+0.5))/100.0);
+    return 0;
+}

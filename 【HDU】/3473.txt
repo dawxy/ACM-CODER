@@ -1,0 +1,97 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int tol[20][MAXN],tree[20][MAXN],sot[MAXN];
+LL sum[20][MAXN];
+
+void bulid(int x, int y, int dep)
+{
+	if(x == y) return;
+	int m = (x+y)>>1;
+	int same = m-x+1;
+	repe(i,x,y) if(tree[dep][i] < sot[m]) same--;
+	int lpos = x, rpos = m+1;
+	repe(i,x,y)
+	{
+		sum[dep][i] = sum[dep][i-1];
+		if(tree[dep][i] < sot[m]) tree[dep+1][lpos++] = tree[dep][i], sum[dep][i] += tree[dep][i];
+		else if(tree[dep][i] == sot[m] && same > 0) tree[dep+1][lpos++] = tree[dep][i], sum[dep][i] += tree[dep][i],same--;
+		else tree[dep+1][rpos++] = tree[dep][i]; 
+		tol[dep][i] = tol[dep][x-1]+lpos-x;
+	}
+	bulid(x,m,dep+1);
+	bulid(m+1,y,dep+1);
+}
+LL lsum, lnum;
+int query(int x, int y, int ql, int qr, int dep, int k)
+{
+	if(ql == qr) return tree[dep][ql];
+	int m = (x+y)>>1, cnt = tol[dep][qr]-tol[dep][ql-1];
+	if(cnt >= k)
+	{
+		int nx = x+tol[dep][ql-1]-tol[dep][x-1];
+		int ny = nx+cnt-1;
+		return query(x,m,nx,ny,dep+1,k);
+	}
+	int ny = qr+tol[dep][y]-tol[dep][qr];
+	int nx = ny-(qr-ql-cnt);
+	lnum += cnt;
+	lsum += sum[dep][qr]-sum[dep][ql-1];
+	return query(m+1,y,nx,ny,dep+1,k-cnt);
+}
+LL tmp[MAXN];
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		repe(i,1,n) scanf("%d%*c", &tree[0][i]), sot[i] = tree[0][i], tmp[i] = tmp[i-1]+sot[i];
+		clc(tol,0);
+		sort(sot+1,sot+1+n);
+		bulid(1,n,0);
+		printf("Case #%d:\n",++count);
+		int q;
+		scanf("%d%*c", &q);
+		while(q--)
+		{
+			int x,y;
+			scanf("%d %d", &x, &y);
+			x++,y++;
+			int m = (y-x+2)>>1;
+			lsum = lnum = 0;
+			LL v = query(1,n,x,y,0,m);
+			LL ans = v*(lnum-(y-x+1-lnum))+(tmp[y]-tmp[x-1]-lsum)-lsum;
+			if(0 == (y-x+1)&1)
+			{
+				lsum = lnum = 0;
+				v = query(1,n,x,y,0,m+1);
+				LL buf = v*(lnum-(y-x+1-lnum))+(tmp[y]-tmp[x-1]-lsum)-lsum;
+				ans = min(ans, buf);
+			}
+			printf("%I64d\n", ans);
+		}
+		putchar('\n');
+	}
+	return 0;
+}

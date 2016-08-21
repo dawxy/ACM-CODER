@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 20
+int ans[MAXN][MAXN];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n, s = 3, x, y, lx, ly;
+		memset(ans,0,sizeof(ans));
+		scanf("%d%*c", &n);
+		ans[0][n/2] = 1;
+		ans[n-1][n/2] = n*n;
+		ans[n-1][n/2+1] = 2;
+		x = n-1, y = n/2+1;
+		while(s < n*n)
+		{
+			lx = x, ly = y;
+			x = (x-1+n)%n, y = (y+1)%n;
+			if (ans[x][y])
+			{
+				ans[lx+1][ly] = s;
+				x = lx+1, y = ly;
+			}
+			else
+				ans[x][y] = s;
+			s++;
+		}
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+				printf ("%4.0d", ans[i][j]);
+			printf ("\n");
+		}
+	}
+	return 0;
+}

@@ -1,0 +1,88 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 300000+10, SIZE = 6000;
+LL a[MAXN],block[MAXN/SIZE+1][SIZE];
+int cnt;
+
+int find_sum(int x, int y, LL v)//在a[x~y]查找<v的数量
+{
+	int bx = x/SIZE, by = y/SIZE, sum = 0;
+	if(bx == by)
+	{
+		repe(i,x,y) if(a[i] < v) sum++;
+	}
+	else
+	{
+		rep(i,x,(bx+1)*SIZE)
+			if(a[i] < v) sum++;
+		repe(i,by*SIZE,y)
+			if(a[i] < v) sum++;
+		rep(i,bx+1,by)
+			sum += lower_bound(block[i],block[i]+SIZE,v)-block[i];
+	}
+	return sum;
+}
+void update(int x, LL v)//把a[x]修改为v
+{
+	int bx = x/SIZE,k;
+	LL *b = block[bx], old = a[x];
+	//找到原来的a[x]在块中的位置
+	for(k = 0;k < SIZE; k++) if(b[k] == old) break;
+	b[k] = a[x] = v;
+	if(v < old)//新插入的v往左移
+		while(k && b[k] < b[k-1]) swap(b[k],b[k-1]), k--;
+	else //新插入的v往右移
+		while(k < SIZE-1 && ~b[k+1] && b[k] > b[k+1]) swap(b[k],b[k+1]), k++;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	LL u;
+	while(~scanf("%d %d %lld%*c", &n, &m, &u))
+	{
+		clc(block,-1);
+		cnt = 0;
+		int j = 0;
+		rep(i,0,n)
+		{
+			scanf("%d%*c", &a[i]);
+			block[cnt][j++] = a[i];
+			if(j == SIZE)
+			{
+				cnt++;
+				j = 0;
+			}
+		}
+		rep(i,0,cnt) sort(block[i],block[i]+SIZE);
+		sort(block[cnt-1],block[cnt-1]+j);
+		while(m--)
+		{
+			int x,y,p;
+			LL v;
+			scanf("%d %d %lld %d%*c", &x, &y, &v, &p);
+			x--,y--,p--;
+			int k = find_sum(x,y,v);
+			update(p,u*k/(y-x+1));
+		}
+		rep(i,0,n) printf("%lld\n", a[i]);
+	}
+	return 0;
+}

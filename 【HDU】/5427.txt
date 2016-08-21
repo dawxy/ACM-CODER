@@ -1,0 +1,52 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10;
+struct NODE{
+    char name[MAXN];
+    int y;
+    bool operator<(const NODE&t)const{
+        return y > t.y;
+    }
+}p[MAXN];
+char s[MAXN*2];
+
+void get_str(char *str, char *name, int &y)
+{
+    int len = strlen(str);
+    per(i,len-1,0)
+    {
+        if(' ' == s[i])
+        {
+            sscanf(str+i,"%d",&y);
+            str[i] = 0;
+            strcpy(name,str);
+            break;
+        }
+    }
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        int n;
+        scanf("%d%*c", &n);
+        rep(i,0,n)
+        {
+            gets(s);
+            get_str(s,p[i].name,p[i].y);
+        }
+        sort(p,p+n);
+        rep(i,0,n) printf("%s\n", p[i].name);
+    }
+    return 0;
+}

@@ -1,0 +1,64 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int cnt;
+LL n,ans[MAXN];
+
+LL gcd(LL a, LL b)
+{
+	while(b){
+		a %= b;
+		if(a < b) swap(a,b);
+	}
+	return a;
+}
+void ok(LL i)
+{
+	LL m = i^n;
+	if(m < 1 || m > n) return;
+	if(gcd(n,m) == i) ans[cnt++] = m;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+	//freopen("e:\\out.txt", "w", stdout);
+#endif
+	int count = 0;
+	while(~scanf("%I64d%*c", &n))
+	{
+		LL sq = sqrt(n+0.5);
+		cnt = 0;
+		for(LL i = 1; i <= sq; i++)
+		{
+			if(n%i) continue;
+			ok(i);
+			ok(n/i);
+		}
+		printf("Case #%d:\n", ++count);
+		printf("%d\n", cnt);
+		sort(ans,ans+cnt);
+		if(cnt)
+		{
+			printf("%I64d", ans[0]);
+			rep(i,1,cnt) printf(" %I64d", ans[i]);
+		}
+		putchar('\n');
+	}
+	return 0;
+}

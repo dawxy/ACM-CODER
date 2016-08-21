@@ -1,0 +1,83 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXM = 1000000*2+10;
+int head[MAXN], tol, nxt[MAXM], to[MAXM], cost[MAXM];
+
+void add_edge(int u, int v, int c)
+{
+	nxt[tol] = head[u], to[tol] = v, cost[tol] = c;
+	head[u] = tol++;
+}
+int dis[MAXN];
+bool inq[MAXN];
+int spfa(int s, int t)
+{
+	clc(inq,0);
+	clc(dis,0x3f);
+	queue<int> q;
+	q.push(s);
+	inq[s] = true;
+	dis[s] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		inq[u] = false;
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(INF != dis[u] && dis[v] > dis[u]+cost[i])
+			{
+				dis[v] = dis[u]+cost[i];
+				if(!inq[v])
+				{
+					inq[v] = true;
+					q.push(v);
+				}
+			}
+		}
+	}
+	return dis[t];
+}
+inline int in()
+{
+	int ch;
+	while((ch = getchar()) < '0' || ch > '9');
+	int ans = ch-'0';
+	while((ch = getchar()) >= '0' && ch <= '9') ans = (ans<<1)+(ans<<3)+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,m,s,t;
+	while(~scanf("%d %d %d %d%*c", &n, &m, &s, &t))
+	{
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,m)
+		{
+			int u = in(),v = in(),c = in();
+			add_edge(u,v,c);
+			add_edge(v,u,c);
+		}
+		printf("%d\n", spfa(s,t));
+	}
+	return 0;
+}

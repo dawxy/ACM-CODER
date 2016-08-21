@@ -1,0 +1,24 @@
+
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int n, i;
+		double max, a;
+		scanf ("%d%*c", &n);
+		scanf ("%lf%*c", &max);
+		for (i = 1; i < n; i++)
+		{
+			scanf ("%lf%*c", &a);
+			if (max < a)
+				max = a;
+		}
+		printf ("%.2lf\n", max);
+	}
+
+	return 0;
+}

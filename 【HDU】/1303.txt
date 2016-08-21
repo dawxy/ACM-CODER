@@ -1,0 +1,41 @@
+#include <stdio.h>
+#define MAXN 20
+int a[MAXN], n;
+
+bool is_ans(int s)
+{
+    for(int i = 0;  i < n; i++)
+	{
+        if (s*2 == a[i])
+			return true;
+	}
+	return false;
+}
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(1)
+	{
+        scanf ("%d%*c", &a[0]);
+        if (!(~a[0]))
+            break;
+        n = 1;
+        while(1)
+		{
+			scanf ("%d%*c", &a[n]);
+			if (!a[n])
+				break;
+			n++;
+		}
+		int ans = 0;
+        for (int i = 0; i < n; i++)
+		{
+            if (is_ans(a[i]))
+                ans++;
+		}
+		printf ("%d\n", ans);
+	}
+    return 0;
+}

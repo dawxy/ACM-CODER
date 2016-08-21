@@ -1,0 +1,44 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXM = 3000+10;
+struct NODE{
+	int a,b,c;
+	bool operator<(const NODE&t) const{
+		return t.b*c < b*t.c;
+	}
+}p[1000+10];
+int dp[MAXM];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d",&t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d%d", &n, &m);
+		rep(i,0,n)
+			scanf("%d%d%d", &p[i].a,&p[i].b,&p[i].c);
+		sort(p,p+n);
+		clc(dp,0);
+		rep(i,0,n)
+		{
+			per(j,m,p[i].c)
+			{
+				dp[j] = max(dp[j],dp[j-p[i].c]+p[i].a-p[i].b*j);
+			}
+		}
+		int ans = 0;
+		repe(i,0,m) ans = max(ans,dp[i]);
+		printf("%d\n", ans);
+	}
+	return 0;
+}

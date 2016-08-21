@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+bool vis[330];
+int x, y, max;
+
+void find(int a, int b)
+{
+	vis[a] = vis[b] = true;
+	vis[abs(a-b)] = vis[a+b] = true;
+}
+void sloved(int a, int b, int c)
+{
+	memset(vis,false,sizeof(vis));
+	int buf[4],n = 0;
+	find(a,b);
+	for (int i = 1; i <= a+b; i++)
+	{
+		if (vis[i])
+		{
+			buf[n++] = i;
+		}
+	}
+	for (int i = 0; i < n; i++)
+		find(buf[i],c);
+	int sum = 0;
+	for (int i = 1; i <= a+b+c; i++)
+	{
+		if (vis[i])
+			sum++;
+	}
+	if (sum > max)
+		max = sum;
+}
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		scanf ("%d %d%*c", &x, &y);
+		max = -1;
+		for (int i = 1; i <= x/2; i++)
+			sloved(i,x-i,y);
+		for (int i = 1; i <= y/2; i++)
+			sloved(i,y-i,x);
+		printf ("%d\n", max);
+	}
+	return 0;
+}

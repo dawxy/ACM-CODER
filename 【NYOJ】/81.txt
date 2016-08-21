@@ -1,0 +1,91 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define MAXM 70
+struct NODE{
+	int len, s[MAXM];
+}p[MAXN];
+int a[MAXN], dp[MAXN][MAXM][MAXM], sum[MAXN][MAXM];
+//dp[i][s][j]表示前i行时,i行选择集合s，i-1行选择集合j时可以摆放的最大人数
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	p[0].len = p[1].len = 1;
+	while(t--)
+	{
+		int h, w;
+		char ch;
+		scanf("%d %d%*c", &h, &w);
+		if (!h || !w)
+		{
+			puts("0");
+			continue;
+		}
+		memset(a,0,sizeof(a));
+		memset(sum,0,sizeof(sum));
+		h += 2;
+		for (int i = 2; i < h; i++) p[i].len = 0;
+		for (int i = 2; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				scanf("%c", &ch);
+				if ('H' == ch)
+					a[i] |= 1<<j;
+			}
+			getchar();
+		}
+		for (int i = 2; i < h; i++)
+		{
+			for (int j = 0; j < (1<<w); j++)
+			{
+				if (a[i]&j || j&(j<<1) || j&(j<<2) || j&(j>>2)) continue;
+				p[i].s[p[i].len++] = j;
+			}
+		}
+		for (int i = 2; i < h; i++)
+		{
+			for (int j = 0; j < p[i].len; j++)
+			{
+				int s = p[i].s[j];
+				while(s)
+				{
+					if (s&1)
+						sum[i][j]++;
+					s >>= 1;
+				}
+			}
+		}
+		memset(dp,0,sizeof(dp));
+		for (int i = 2; i < h; i++)
+		{
+			for (int now = 0; now < p[i].len; now++)
+			{
+				for (int j = 0; j < p[i-1].len; j++)
+				{
+					if (p[i].s[now]&p[i-1].s[j]) continue;
+					for (int k = 0; k < p[i-2].len; k++)
+					{
+						if (p[i].s[now]&p[i-2].s[k] || p[i-1].s[j]&p[i-2].s[k]) continue;
+						dp[i][now][j] = max(dp[i][now][j],dp[i-1][j][k]+sum[i][now]);
+					}
+				}
+			}
+		}
+		int ans = 0;
+		for (int i = 0; i < p[h-1].len; i++)
+		{
+			for (int j = 0; j < p[h-2].len; j++)
+				ans = max(ans,dp[h-1][i][j]);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

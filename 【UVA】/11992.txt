@@ -1,0 +1,145 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 50010
+#define lc u<<1
+#define rc u<<1|1
+struct NODE{
+	int x,y;
+	int sum,mi,mx;
+	int set, add;
+}node[21][MAXN<<2];
+
+void bulid(int rt, int u, int x, int y)
+{
+	node[rt][u].sum = node[rt][u].mx = node[rt][u].mi = node[rt][u].add = 0;
+	node[rt][u].x = x, node[rt][u].y = y;
+	node[rt][u].set = -1;
+	if(x == y) return;
+	int m = (x+y)>>1;
+	bulid(rt,lc,x,m);
+	bulid(rt,rc,m+1,y);
+}
+inline void push_up(int rt, int u)
+{
+	node[rt][u].sum = node[rt][lc].sum+node[rt][rc].sum;
+	node[rt][u].mx = max(node[rt][lc].mx, node[rt][rc].mx);
+	node[rt][u].mi = min(node[rt][lc].mi, node[rt][rc].mi);
+}
+void upd_set(NODE &a, const NODE &fa)
+{
+	a.add = 0;//把子节点add清空
+	a.set = fa.set;
+	a.sum = (a.y-a.x+1)*fa.set;//必须乘上父亲节点的set
+	a.mi = a.mx = fa.set;
+}
+inline void upd_add(NODE &a, const NODE &fa)
+{
+	a.add += fa.add;
+	a.sum += (a.y-a.x+1)*fa.add;
+	a.mi += fa.add;
+	a.mx += fa.add;
+}
+void push_down(int rt, int u)
+{
+	if(~node[rt][u].set)
+	{
+		upd_set(node[rt][lc], node[rt][u]);
+		upd_set(node[rt][rc], node[rt][u]);
+		node[rt][u].set = -1;
+	}
+	if(node[rt][u].add)
+	{
+		upd_add(node[rt][lc], node[rt][u]);
+		upd_add(node[rt][rc], node[rt][u]);
+		node[rt][u].add = 0;
+	}
+}
+int c,ql,qr,v;
+void update(int rt, int u)
+{
+	int x = node[rt][u].x, y = node[rt][u].y;
+	if(ql <= x && y <= qr)
+	{
+		if(1 == c)
+		{
+			node[rt][u].add += v;
+			node[rt][u].mi += v;
+			node[rt][u].mx += v;
+			node[rt][u].sum += (y-x+1)*v;
+		}
+		else
+		{
+			node[rt][u].set = v;
+			node[rt][u].mi = v;
+			node[rt][u].mx = v;
+			node[rt][u].add = 0;
+			node[rt][u].sum = (y-x+1)*v;
+		}
+		return;
+	}
+	push_down(rt,u);
+	int m = (x+y)>>1;
+	if(ql <= m) update(rt,lc);
+	if(qr > m) update(rt,rc);
+	push_up(rt,u);
+}
+int sum, mx, mi;
+void query(int rt, int u)
+{
+	int x = node[rt][u].x, y = node[rt][u].y;
+	if(ql <= x && y <= qr)
+	{
+		sum += node[rt][u].sum;
+		mx = max(mx, node[rt][u].mx);
+		mi = min(mi, node[rt][u].mi);
+		return;
+	}
+	push_down(rt,u);
+	int m = (x+y)>>1;
+	if(ql <= m) query(rt,lc);
+	if(qr > m) query(rt,rc);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int h,w,q;
+	while(~scanf("%d %d %d%*c", &h, &w, &q))
+	{
+		int x1,x2;
+		repe(i,1,h) bulid(i,1,1,w);
+		rep(i,0,q)
+		{
+			scanf("%d %d %d %d %d%*c", &c, &x1, &ql, &x2,&qr);
+			if(3 == c)
+			{
+				sum = 0, mi = INF, mx = -INF;
+				repe(j,x1,x2)
+					query(j,1);
+				printf("%d %d %d\n", sum, mi, mx);
+			}
+			else
+			{
+				scanf("%d%*c", &v);
+				repe(j,x1,x2)
+					update(j,1);
+			}
+		}
+	}
+	return 0;
+}

@@ -1,0 +1,114 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <ctime>
+using namespace std;
+typedef unsigned int LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXH = 200+10, MAXA = 1000+10;
+short mx[MAXH<<1][MAXA<<1];
+
+inline int id(int x, int y){return x+y|x!=y;}
+int p2,v;
+inline void push_up(int x, int y, int u, int m)
+{
+    mx[u][id(x,y)] = max(mx[u][id(x,m)], mx[u][id(m+1,y)]);
+}
+void update2(int x, int y, int ux, int uy, bool yz)
+{
+    if(x == y)
+    {
+        int u = id(ux,uy);
+        if(yz) mx[u][id(x,y)] = max(mx[u][id(x,y)], (short)v);
+        else{
+            int m = (ux+uy)>>1;
+            mx[u][id(x,y)] = max(mx[id(ux,m)][id(x,y)], mx[id(m+1,uy)][id(x,y)]);
+        }
+        return;
+    }
+    int m = (x+y)>>1;
+    if(p2 <= m) update2(x,m,ux,uy,yz);
+    else update2(m+1,y,ux,uy,yz);
+    push_up(x,y,id(ux,uy),m);
+}
+void update(int x, int y, int p)
+{
+    if(x == y)
+    {
+        update2(0,1000,x,y,1);
+        return;
+    }
+    int m = (x+y)>>1;
+    if(p <= m) update(x,m,p);
+    else update(m+1,y,p);
+    update2(0,1000,x,y,0);
+}
+int query2(int x, int y, int ql, int qr, int u)
+{
+    if(ql <= x && y <= qr) return mx[u][id(x,y)];
+    int m = (x+y)>>1, ans = -1;
+    if(ql <= m) ans = max(ans,query2(x,m,ql,qr,u));
+    if(qr > m) ans = max(ans, query2(m+1,y,ql,qr,u));
+    return ans;
+}
+int query(int x, int y, int ql, int qr, int sl,int sr)
+{
+    if(ql <= x && y <= qr) return query2(0,1000,sl,sr,id(x,y));
+    int m = (x+y)>>1, ans = -1;
+    if(ql <= m) ans = max(ans,query(x,m,ql,qr,sl,sr));
+    if(qr > m) ans = max(ans, query(m+1,y,ql,qr,sl,sr));
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("in", "r", stdin);
+#endif
+    int m;
+    while(~scanf("%d%*c", &m) && m)
+    {
+        clc(mx,-1);
+        while(m--)
+        {
+            char op[10];
+            scanf("%s", op);
+            if('I' == op[0])
+            {
+                double a,b,c;
+                scanf("%lf %lf %lf%*c", &a, &b, &c);
+                p2 = b*10;
+                v = c*10;
+                update(100,200,a);
+            }
+            else
+            {
+                double a,b,c,d;
+                scanf("%lf %lf %lf %lf%*c", &a, &b, &c, &d);
+                if(a > b) swap(a,b);
+                if(c > d) swap(c,d);
+                int ans = query(100,200,a,b,c*10,d*10);
+                if(-1 == ans)
+				{
+					puts("-1");
+					continue;
+				}
+                int p = ans%10;
+                ans /= 10;
+                printf("%d.%d\n", ans,p);
+            }
+        }
+    }
+    return 0;
+}
+

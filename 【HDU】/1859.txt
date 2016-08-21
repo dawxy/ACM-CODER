@@ -1,0 +1,39 @@
+#include <stdio.h>
+#define MAX 1000
+int x[MAX], y[MAX];
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(1)
+	{
+		int len = 1;
+		scanf ("%d %d%*c", &x[0], &y[0]);
+		if (!x[0] && !y[0])
+			break;
+		while(1)
+		{
+			scanf ("%d %d%*c", &x[len], &y[len]);
+			if (!x[len] && !y[len])
+				break;
+			len++;
+		}
+		int ai = 300, aj = 300, bi = -300, bj = -300;
+		for (int i = 0;  i < len; i++)
+		{
+			if (ai > x[i])
+				ai = x[i];
+			if (aj > y[i])
+				aj = y[i];
+			if (bi < x[i])
+				bi = x[i];
+			if (bj < y[i])
+				bj = y[i];
+		}
+		printf ("%d %d %d %d\n", ai, aj, bi, bj);
+	}
+
+	return 0;
+}

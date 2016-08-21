@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 800
+struct NODE{
+	int x, y;
+}p[MAXN];
+int r[MAXN], s;
+
+bool cmp(int a, int b)
+{
+	return (p[a].y-p[s].y)*(p[b].x-p[s].x)<(p[b].y-p[s].y)*(p[a].x-p[s].x);
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t, count = 0;
+	scanf ("%d%*c%*c", &t);
+	while(t--)
+	{
+		int n = 0;
+		char c[20];
+		while(NULL != gets(c) && c[0] != 0)
+		{
+			sscanf(c,"%d %d",&p[n].x, &p[n].y);
+			n++;
+		}
+		int ans = 2, m, i, j, k;
+		for (i = 0; i < n; i++)
+		{
+			m = 0;
+			for (j = 0; j < n; j++)
+				if (p[i].x != p[j].x)
+					r[m++] = j;
+			if (n-m > ans)
+				ans = n-m;
+			s = i;
+			sort(r, r+m, cmp);
+			for (j = 1, k = 2; j < m; j++)
+			{
+				int a = r[j-1], b = r[j];
+				if ((p[a].y-p[i].y)*(p[b].x-p[i].x) == (p[b].y-p[i].y)*(p[a].x-p[i].x))
+					k++;
+				else
+				{
+					if (k > ans)
+						ans = k;
+					k = 2;
+				}
+			}
+			if (k > ans)
+				ans = k;
+		}
+		if (count++)
+			printf ("\n");
+		printf ("%d\n", ans);
+	}
+	return 0;
+}

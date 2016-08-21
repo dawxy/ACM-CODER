@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 5010
+char a[MAXN], b[MAXN], buf[MAXN];
+
+void qu_fh(char *s)
+{
+    int len = strlen(s), j = 0;
+    for (int i = 0; i < len; i++)
+	{
+		if (' ' == s[i] || '\t' == s[i] || '\n' == s[i])
+            continue;
+        buf[j++] = s[i];
+	}
+    buf[j] = 0;
+    strcpy(s,buf);
+}
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+    while(t--)
+	{
+		a[0] = b[0] = 0;
+        while(1)
+		{
+            gets(buf);
+            if (!strcmp("END",buf))
+                break;
+            strcat(a,buf);
+            strcat(a,"\n");
+		}
+		while(1)
+		{
+            gets(buf);
+            if (!strcmp("END",buf))
+                break;
+            strcat(b,buf);
+            strcat(b,"\n");
+		}
+        if (!strcmp(a,b))
+		{
+			puts("Accepted");
+			continue;
+		}
+        qu_fh(a);
+        qu_fh(b);
+        if (!strcmp(a,b))
+            puts("Presentation Error");
+		else
+			puts("Wrong Answer");
+	}
+    return 0;
+}

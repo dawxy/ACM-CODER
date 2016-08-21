@@ -1,0 +1,62 @@
+#include <stdio.h>
+
+int count = 0;
+bool notdanger(int, int ,int(*)[8]);
+void eight_queen (int , int (*)[8]);
+
+int main ()
+{
+	int chess[8][8], i, j;
+	for (i = 0; i < 8; i++)
+		for (j = 0; j < 8; j++)
+			chess[i][j] = 0;
+	eight_queen (0,chess);
+
+	return 0;
+}
+
+void eight_queen (int h, int (*chess)[8])
+{
+	int i, j;
+	if (8 == h)//如果h等于8就输出棋盘
+	{
+		printf ("第%d种方法:\n", ++count);
+		for (i = 0; i < 8; i++)
+		{
+			for (j = 0; j < 8; j++)
+				printf ("%d ", chess[i][j]);
+			printf ("\n");
+		}
+		printf ("\n");
+	}
+	else
+	{
+		for (j = 0; j < 8; j++)
+		{
+			if (notdanger(h, j, chess))
+			{
+				for (i = 0; i < 8; i++)
+					chess[h][i] = 0;
+				chess[h][j] = 1;
+				eight_queen (h+1, chess);
+				chess[h][j] = 0;
+			}
+		}
+	}
+}
+
+bool notdanger(int h, int w,int(*chess)[8])
+{
+	int d[6][2] = {{-1,0},{1,0},{1, 1},{-1,-1},{1,-1},{-1,1}}, i, ni, nj, k;
+	for (k = 1; k < 8; k++)
+	{
+		for (i = 0; i < 6; i++)
+		{
+			ni = k*d[i][0]+h;
+			nj = k*d[i][1]+w;
+			if (0 <= ni && 8 > ni && 0 <= nj && 8 > nj && 1 == chess[ni][nj])
+				return false;
+		}
+	}
+	return true;
+}

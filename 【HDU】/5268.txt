@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, f[4] = {1000,1500,2000,2500};
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t, count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int ans = 0;
+        rep(i,0,4)
+        {
+            int a,b;
+            scanf("%d %d%*c", &a, &b);
+            int tmp = (250-a)*f[i]/250;
+            tmp -= 50*b;
+            if(tmp < f[i]*4/10) tmp = f[i]*4/10;
+            ans += tmp;
+        }
+        printf("Case #%d: %d\n", ++count,ans);
+    }
+    return 0;
+}

@@ -1,0 +1,67 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500+10;
+int n, MOD,a[MAXN],buf[MAXN];
+
+void mul(int *ans, int *a, int *b)
+{
+	clc(buf,0);
+	rep(i,0,n)
+	{
+		rep(s,0,n)
+		{
+			int j = (i-s+n)%n;
+			buf[i] += (LL)a[j]*(LL)b[s]%MOD;
+		}
+		buf[i] %= MOD;
+	}
+	memcpy(ans,buf,sizeof(int)*n);
+}
+void pow_mod(int *ans, int *x, int c)
+{
+	int tmp[MAXN];
+	clc(tmp,0);
+	tmp[0] = 1;
+	while(c)
+	{
+		if(c&1) mul(tmp,tmp,x);
+		mul(x,x,x);
+		c >>= 1;
+	}
+	memcpy(ans,tmp,sizeof(int)*n);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int d,k,x[MAXN];
+	while(~scanf("%d %d %d %d%*c", &n, &MOD, &d, &k))
+	{
+		clc(x,0);
+		rep(i,0,n) scanf("%d%*c", &a[i]);
+		repe(i,0,d) x[i] = 1;
+		rep(i,n-d,n) x[i] = 1;
+		pow_mod(x,x,k);
+		mul(x,x,a);
+		printf("%d", x[0]);
+		rep(i,1,n) printf(" %d", x[i]);
+		putchar('\n');
+	}
+	return 0;
+}

@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+#define MAXN 66
+__int64 dp[MAXN][MAXN], sum[MAXN], a[MAXN];
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        int n;
+        scanf ("%d%*c", &n);
+        sum[0] = 0;
+        for (int i = 1; i <= n; i++)
+        {
+            scanf ("%I64d%*c", &a[i]);
+            sum[i] = sum[i-1]+a[i];
+        }
+        for (int len = 0; len < n; len++)
+        {
+            for (int i = 1; i <= n-len; i++)
+            {
+                int j = i+len;
+                if (len < 20)
+                    dp[i][j] = a[i]*(1<<(len+1));
+                else
+                    dp[i][j] = (sum[j]-sum[i-1]) << 1;
+                for (int k = i; k < j; k++)
+                    dp[i][j] = min(dp[i][j], dp[i][k]+dp[k+1][j]);
+            }
+        }
+        printf ("%I64d\n", dp[1][n]);
+    }
+    return 0;
+}

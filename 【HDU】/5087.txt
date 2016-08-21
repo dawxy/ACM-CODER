@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 1010
+int a[MAXN], dp[MAXN][2], n;//dp[][0]表示最大值,dp[][1]是次大值
+
+int sloved()
+{
+    dp[0][0] = 1,dp[0][1] = 0;
+    int fir = 1, sec = 0;
+    for (int i = 1; i < n; i++)
+    {
+        dp[i][0] = 1, dp[i][1] = 0;
+        for (int j = 0; j < i; j++)
+		{
+			if(a[j] >= a[i]) continue;
+			if(dp[i][0] <= dp[j][0]+1)
+			{
+				dp[i][1] = max(dp[j][1]+1,dp[i][0]);
+				dp[i][0] = dp[j][0]+1;
+			}
+			else if(dp[i][1] < dp[j][0]+1)
+				dp[i][1] = dp[j][0]+1;
+		}
+		if(fir <= dp[i][0])
+		{
+			sec = max(fir, dp[i][1]);
+			fir = dp[i][0];
+		}
+		else if(sec < dp[i][0])
+			sec = dp[i][0];
+    }
+	return sec;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d%*c", &n);
+		rep(i,0,n) scanf("%d%*c", &a[i]);
+		int s;
+		printf("%d\n", sloved());
+	}
+	return 0;
+}

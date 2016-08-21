@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define mk make_pair
+const int INF = 0x3f3f3f3f, MAXN = 100+10,f[4][2]={{-1,0},{1,0},{0,-1},{0,1}};
+typedef pair<int,int> P;
+struct NODE{
+	int x, y;
+	int s;
+	NODE(int a, int b, int c){
+		x = a, y = b, s = c;
+	}
+};
+char a[MAXN][MAXN];
+int h,w,k, dp[MAXN][MAXN][20];
+P p[4];
+bool vis[MAXN][MAXN];
+//dp[i][j][k]表示当前在(i,j)位置，已经获得了k状态的宝物时,走的最少的步数
+
+int next_s(const P nt, int s)
+{
+	rep(i,0,k)
+	{
+		if(p[i] == nt)
+			return s|(1<<i);
+	}
+	return s;
+}
+int bfs(int si, int sj)
+{
+	queue<NODE> q;
+	clc(dp,-1);
+	int s = next_s(mk(si,sj),0);
+	dp[si][sj][s] = 0;
+	q.push(NODE(si,sj,s));
+	while(!q.empty())
+	{
+		NODE now = q.front();q.pop();
+		int &ans = dp[now.x][now.y][now.s];
+		if(now.s == (1<<k)-1) return ans;
+		int ni,nj;
+		rep(i,0,4)
+		{
+			int ni = now.x+f[i][0], nj = now.y+f[i][1];
+			if(1 <= ni && h >= ni && 1 <= nj && w >= nj && '#' != a[ni][nj])
+			{
+				int ns = next_s(mk(ni,nj),now.s);
+				if(~dp[ni][nj][ns]) continue;
+				q.push(NODE(ni,nj,ns));
+				dp[ni][nj][ns] = ans+1;
+			}
+		}
+	}
+	return -1;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d %d%*c", &h, &w) && h+w)
+	{
+		int si, sj;
+		repe(i,1,h)
+		{
+			repe(j,1,w)
+			{
+				a[i][j] = getchar();
+				if(a[i][j] == '@')
+					si = i, sj = j;
+			}
+			getchar();
+		}
+		scanf("%d%*c", &k);
+		int cnt = 0;
+		clc(vis,0);
+		rep(i,0,k)
+		{
+			scanf("%d %d%*c", &p[cnt].first, &p[cnt].second);
+			if(!vis[p[cnt].first][p[cnt].second])
+				vis[p[cnt].first][p[cnt++].second] = true;
+		}
+		k = cnt;
+		printf("%d\n", bfs(si,sj));
+	}
+	return 0;
+}

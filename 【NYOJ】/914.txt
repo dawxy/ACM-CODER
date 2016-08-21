@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <math.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 10010
+struct NODE{
+	double w, v;
+}p[MAXN];
+int n, k;
+double maxa, y[MAXN];
+
+bool greedy(double x)
+{
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = p[i].v-x*p[i].w;
+	}
+        sort(y,y+n);
+        double sum = 0;
+        for (int i = n-1; i >= n-k; i--)
+	{
+                sum += y[i];
+	}
+        return sum >= 0;
+}
+double sloved()
+{
+        double l = 0, r = maxa;
+        while(l < r && fabs(l-r) > 1e-6)
+	{
+		double mid = l+(r-l)/2;
+                if (greedy(mid))
+			l = mid;
+		else
+			r = mid;
+	}
+	return l;
+}
+int main()
+{
+	#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+	#endif
+        while(~scanf ("%d %d%*c", &n, &k))
+	{
+		maxa = -1;
+                for(int i = 0; i < n; i++)
+		{
+                        scanf ("%lf %lf%*c", &p[i].w, &p[i].v);
+                        double buf = p[i].v/p[i].w;
+                        if (buf > maxa)
+				maxa = buf;
+		}
+                printf ("%.2lf\n", sloved());
+	}
+	return 0;
+}

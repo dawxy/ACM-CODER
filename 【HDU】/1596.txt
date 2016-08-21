@@ -1,0 +1,106 @@
+/*floyd*/
+#include <cstdio>
+#include <cstring>
+#define MAXN 1010
+#define max(a,b) (a>b?a:b)
+double dp[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = 0; j < n; j++)
+				scanf("%lf%*c", &dp[i][j]);
+		}
+		for(int k = 0; k < n; k++)
+		{
+			for(int i = 0; i < n; i++)
+			{
+				for(int j = 0; j < n; j++)
+					dp[i][j] = max(dp[i][j],dp[i][k]*dp[k][j]);
+			}
+		}
+		int m, a, b;
+		scanf("%d%*c", &m);
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d%*c", &a, &b);
+			a--,b--;
+			if(dp[a][b]-1e-6 < 0)
+				puts("What a pity!");
+			else
+				printf("%.3lf\n", dp[a][b]);
+		}
+	}
+	return 0;
+}
+=====================================================================================
+/*dijkstra*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+double dp[MAXN],cost[MAXN][MAXN];
+bool vis[MAXN];
+int n;
+
+void dijkstra(int st)
+{
+	clc(dp,0);
+	clc(vis,0);
+	dp[st] = 1;
+	rep(i,0,n)
+	{
+		int x = -1;
+		double mx = 0;
+		rep(j,0,n) if(!vis[j] && dp[j] > mx) mx = dp[x=j];
+		if(-1 == x) return;
+		vis[x] = true;
+		rep(j,0,n) dp[j] = max(dp[j],dp[x]*cost[x][j]);
+	} 
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n)
+		{
+			rep(j,0,n) scanf("%lf%*c", &cost[i][j]);
+		}
+		int q;
+		scanf("%d%*c", &q);
+		while(q--)
+		{
+			int u,v;
+			scanf("%d %d%*c", &u, &v);
+			u--,v--;
+			dijkstra(u);
+			if(dp[v] == 0) puts("What a pity!");
+			else printf("%.3lf\n", dp[v]);
+		}
+	}
+	return 0;
+}

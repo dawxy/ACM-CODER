@@ -1,0 +1,155 @@
+/* ***********************************************
+Author :Darkangelwings  
+Created Time :2014/10/25 ÐÇÆÚÁù 15:27:16
+File Name :use.cpp
+************************************************ */
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define eps 1e-8
+#define pi acos(-1.0)
+typedef long long LL;
+#define MAXN 11000
+struct Edge{
+	int next,v;
+	Edge(int a = 0, int b = 0){
+		next = a, v = b;
+	}
+}edge[4*MAXN];
+const int d[4][2]={{-1,0},{1,0},{0,-1},{0,1}};
+int dx[MAXN],dy[MAXN],mx[MAXN],my[MAXN];
+int dis,n, head[MAXN], tol,w;
+bool used[MAXN], can[110][110];
+
+void add_edge(int u, int v){
+	edge[tol] = Edge(head[u],v);
+	head[u] = tol++;
+}
+bool SearchP()
+{
+	queue<int>q;
+	dis = INF;
+	clc(dx,-1);
+	clc(dy,-1);
+	rep(i,0,n)//*==
+	{
+		if (mx[i] == -1)
+		{
+			q.push(i);
+			dx[i] = 0;
+		}
+	}
+	while (!q.empty())
+	{
+		int u = q.front();
+		q.pop();
+		if (dx[u] > dis)break;
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v;
+			if (dy[v] == -1)
+			{
+				dy[v] = dx[u] + 1;
+				if (my[v] == -1)dis = dy[v];
+				else
+				{
+					dx[my[v]] = dy[v] + 1;
+					q.push(my[v]);
+				}
+			}
+		}
+	}
+	return dis != INF;
+}
+bool DFS(int u)
+{
+	for(int i = head[u]; ~i; i = edge[i].next)
+	{
+		int v = edge[i].v;
+		if (!used[v] && dy[v] == dx[u] + 1)
+		{
+			used[v] = true;
+			if (my[v] != -1 && dy[v] == dis)continue;
+			if (my[v] == -1 || DFS(my[v]))
+			{
+				my[v] = u;
+				mx[u] = v;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int MaxMatch()
+{
+	int res = 0;
+	clc(mx,-1);
+	clc(my,-1);
+	while (SearchP())
+	{
+		clc(used,0);
+		rep(i,0,n)//*==
+		{
+			if (mx[i] == -1 && DFS(i))
+				res++;
+		}
+	}
+	return res;
+}
+inline int get_hash(int x, int y){
+	return x*w+y;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int h;
+	while(~scanf("%d %d%*c", &h, &w)&&h+w)
+	{
+		int k,a,b;
+		clc(can,1);
+		scanf("%d%*c", &k);
+		rep(i,0,k)
+		{
+			scanf("%d %d%*c", &a, &b);
+			can[a-1][b-1] = false;
+		}
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,h)
+		{
+			rep(j,0,w)
+			{
+				if(!can[i][j] || (i+j)&1) continue;
+				rep(k,0,4)
+				{
+					int ni = d[k][0]+i, nj = d[k][1]+j;
+					if(0 <= ni && h > ni && 0 <= nj && w > nj && can[ni][nj] && (ni+nj)&1)
+					  add_edge(get_hash(i,j),get_hash(ni,nj));
+				}
+			}
+		}
+		n = h*w;
+		printf("%d\n",MaxMatch());
+		rep(i,0,n)
+		{
+			if(~my[i])
+				printf("(%d,%d)--(%d,%d)\n",i/w+1,i%w+1, my[i]/w+1,my[i]%w+1);
+		}
+		putchar('\n');
+	}
+    return 0;
+}

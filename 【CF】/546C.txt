@@ -1,0 +1,109 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10+10, MOD = 10000007;
+struct NODE{
+	deque<int> a,b;
+};
+struct HASH{
+	int operator()(const NODE &s)const{
+		int ans = 0;
+		int len = s.a.size();
+		rep(i,0,len)
+			ans += s.a[i];
+		len = s.b.size();
+		rep(i,0,len)
+			ans += s.b[i];
+		ans += s.a.size()+s.b.size();
+		return ans%MOD;
+	}
+};
+struct cmp{
+	bool operator()(const NODE& u, const NODE &t)const{
+		if(u.a.size() != t.a.size() || u.b.size() != t.b.size()) return false;
+		int len = u.a.size();
+		rep(i,0,len) if(u.a[i] != t.a[i]) return false;
+		len = u.b.size();
+		rep(i,0,len) if(u.b[i] != t.b[i]) return false;
+		return true;
+	}
+};
+unordered_set<NODE,HASH,cmp> vis;
+
+int cnt;
+bool sloved(NODE &now)
+{
+	vis.clear();
+	cnt = 0;
+	vis.insert(now);
+	while(now.a.size() && now.b.size())
+	{
+		cnt++;
+		if(cnt > 1000000) return false;
+		if(now.a[0] > now.b[0])
+		{
+			now.a.push_back(now.b[0]);
+			now.a.push_back(now.a[0]);
+			now.a.pop_front();
+			now.b.pop_front();
+		}
+		else
+		{
+			now.b.push_back(now.a[0]);
+			now.b.push_back(now.b[0]);
+			now.a.pop_front();
+			now.b.pop_front();
+		}
+		if(vis.find(now) != vis.end()) return false;
+		vis.insert(now);
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int len;
+		scanf("%d%*c", &len);
+		NODE st;
+		st.a.clear();
+		st.b.clear();
+		while(len--)
+		{
+			int a;
+			scanf("%d%*c", &a);
+			st.a.push_back(a);
+		}
+		scanf("%d%*c", &len);
+		while(len--)
+		{
+			int a;
+			scanf("%d%*c", &a);
+			st.b.push_back(a);
+		}
+		if(!sloved(st)) puts("-1");
+		else
+		{
+			printf("%d %d\n", cnt,st.a.size()?1:2);
+		}
+	}
+	return 0;
+}

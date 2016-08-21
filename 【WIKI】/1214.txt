@@ -1,0 +1,88 @@
+/*Ì°ÐÄ*/
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+struct NODE{
+    int a, b;
+}p[MAXN];
+
+bool cmp(NODE a, NODE b){return a.b < b.b;}
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int n;
+    scanf ("%d%*c", &n);
+    for (int i = 0; i < n; i++)
+    {
+        scanf ("%d %d%*c", &p[i].a, &p[i].b);
+        if (p[i].a > p[i].b)
+        {
+            p[i].a ^= p[i].b;
+            p[i].b ^= p[i].a;
+            p[i].a ^= p[i].b;
+        }
+    }
+    sort(p,p+n,cmp);
+    int ans = 1, end = p[0].b;
+    for (int i = 1; i < n; i++)
+    {
+        if (p[i].a >= end)
+        {
+            ans++;
+            end = p[i].b;
+        }
+    }
+    printf ("%d\n", ans);
+    return 0;
+}
+-------------------------------------------------------------------------
+/*DP*/
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+struct NODE{
+    int a, b;
+}p[MAXN];
+int dp[MAXN];
+
+bool cmp(NODE a, NODE b){return a.b < b.b;}
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int n;
+    scanf ("%d%*c", &n);
+    for (int i = 0; i < n; i++)
+    {
+        scanf ("%d %d%*c", &p[i].a, &p[i].b);
+        if (p[i].a > p[i].b)
+        {
+            p[i].a ^= p[i].b;
+            p[i].b ^= p[i].a;
+            p[i].a ^= p[i].b;
+        }
+    }
+    sort(p,p+n,cmp);
+    int ans = 1;
+    dp[0] = 1;
+    for (int i = 1; i < n; i++)
+    {
+        dp[i] = 1;
+        for (int j = 0; j < i; j++)
+        {
+            if (p[j].b <= p[i].a)
+                dp[i] = max(dp[i], dp[j]+1);
+        }
+        if (ans < dp[i])
+            ans = dp[i];
+    }
+    printf ("%d\n", ans);
+    return 0;
+}

@@ -1,0 +1,36 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 100010
+#define max(a,b) (a>b?a:b)
+typedef long long LL;
+LL a[MAXN];
+int l[MAXN], r[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		for(int i = 1; i <= n; i++)
+			scanf("%lld%*c", &a[i]);
+		l[1]=1, r[n] = n;
+		for(int i = 2; i <= n; i++)
+		{
+			l[i] = i;
+			while(a[l[i]-1] >= a[i] && l[i] >= 2) l[i] = l[l[i]-1];
+		}
+		for(int i = n-1; i >= 1; i--)
+		{
+			r[i] = i;
+			while(a[r[i]+1] >= a[i] && r[i] < n) r[i] = r[r[i]+1];
+		}
+		LL ans = 0;
+		for (int i = 1; i <= n; i++)
+			ans = max(ans,(r[i]-l[i]+1)*a[i]);
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

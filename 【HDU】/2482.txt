@@ -1,0 +1,221 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <cmath>
+#include <map>
+#include <vector>
+using namespace std;
+#define MAXM 5010
+#define MAXN 105
+#define INF 0x3f3f3f3f
+#define min(a,b) (a<b?a:b)
+map<string,int> num;
+struct NODE{
+	int len, r[35];
+}p[MAXN];
+int x[MAXM], y[MAXM], dp[MAXN][MAXN];
+bool vis[MAXN];
+vector<int> st,ed,start,endth;
+vector<int> h[MAXM];//每个车站所在的线路
+
+inline double dis(int a, int b){return sqrt((double)(x[a]-x[b])*(x[a]-x[b])+(y[a]-y[b])*(y[a]-y[b]));}
+void get_xy(char *s, int& x, int& y)
+{
+	int base = 5120;
+	for(int i = 0; i < 8; i++)
+	{
+		if('1' == s[i]) y += base;
+		else if('2' == s[i]) x += base;
+		else if('3' == s[i]) x += base, y += base;
+		base >>= 1;
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int sx, sy, ex, ey, n, m;
+		char ch[30];
+		num.clear();
+		scanf("%s %d %d%*c", ch, &sx, &sy);
+		get_xy(ch,sx,sy);
+		scanf("%s %d %d%*c", ch, &ex, &ey);
+		get_xy(ch,ex,ey);
+		scanf("%d%*c", &m);
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%s %d %d%*c", ch, &x[i], &y[i]);
+			num[ch] = i;
+		}
+		x[m] = sx, y[m] = sy, x[m+1] = ex, y[m+1] = ey;
+		scanf("%d%*c", &n);
+		for(int i = 0; i < n; i++)
+		{
+			scanf("%d%*c", &p[i].len);
+			for(int j = 0; j < p[i].len; j++)
+			{
+				scanf("%s%*c", ch);
+				p[i].r[j] = num[ch];
+			}
+		}
+		if(dis(m,m+1) <= 2000.0)
+		{
+			puts("walk there");
+			continue;
+		}
+		st.clear();
+		ed.clear();
+		for(int i = 0; i < m; i++)//找到所有起点和终点站
+		{
+			if(dis(i,m) <= 1000.0)
+				st.push_back(i);
+			if(dis(i,m+1) <= 1000.0)
+				ed.push_back(i);
+		}
+		if(0 == st.size() || 0 == ed.size())
+		{
+			puts("take a taxi");
+			continue;
+		}
+		for(int i = 0; i < m; i++) h[i].clear();
+		memset(dp,0x3f,sizeof(dp));
+		for(int i = 0; i < n; i++)//把线路看成点建图
+		{
+			for(int j = 0; j < p[i].len; j++)
+			{
+				int a = p[i].r[j];
+				if(h[a].size() > 0)
+				{
+					for(int k = 0; k < h[a].size(); k++)
+						dp[i][h[a][k]] = dp[h[a][k]][i] = 1;
+				}
+				h[a].push_back(i);
+			}
+		}
+		for(int i = 0; i < n; i++) dp[i][i] = 0;
+		for(int k = 0; k < n; k++)//floyd
+		{
+			for(int i = 0; i < n; i++)
+			{
+				for(int j = 0; j < n; j++)
+					dp[i][j] = min(dp[i][j], dp[i][k]+dp[k][j]);
+			}
+		}
+		int ans = INF;
+		start.clear();
+		endth.clear();
+		memset(vis,0,sizeof(vis));
+		for(int i = 0; i < st.size(); i++)
+		{
+			int a = st[i];
+			for(int j = 0; j < h[a].size(); j++)
+			{
+				if(!vis[h[a][j]])
+				{
+					vis[h[a][j]] = true;
+					start.push_back(h[a][j]);
+				}
+			}
+		}
+		memset(vis,0,sizeof(vis));
+		for(int i = 0; i < ed.size(); i++)
+		{
+			int a = ed[i];
+			for(int j = 0; j < h[a].size(); j++)
+			{
+				if(!vis[h[a][j]])
+				{
+					vis[h[a][j]] = true;
+					endth.push_back(h[a][j]);
+				}
+			}
+		}
+		for(int i = 0; i < start.size(); i++)
+		{
+			for(int j = 0; j < endth.size(); j++)
+				ans = min(ans,dp[start[i]][endth[j]]);
+		}
+		if(INF == ans) puts("take a taxi");
+		else printf("%d\n", ans+1);
+	}
+	return 0;
+}
+/*
+5
+00000000 1 1
+03231130 5 5
+5
+a 1 1
+b 1000 1000
+c 3000 3000
+d 3000 4000
+e 4500 4000
+3
+3
+a b c
+2
+c d
+2
+d e
+00000000 1 1
+03231130 5 5
+5
+a 1 1
+b 1000 1000
+e 3000 3000
+d 3000 4000
+c 4500 4000
+2
+3
+a b c
+3
+c d e
+00000000 1 1
+03231130 5 5
+5
+a 1 1
+b 1000 1000
+c 3000 3000
+d 3000 4000
+e 4500 4000
+2
+3
+a b c
+3
+c d e
+00000000 1 1
+00001000 3 3
+4
+a 1 1
+b 20 30
+c 40 50
+d 100 100
+2
+3
+a b c
+3
+b c d
+00000000 1 1
+03231130 5 5
+4
+a 1 1
+b 1000 1000
+c 3000 3000
+d 3000 4000
+2
+3
+a b c
+3
+b c d
+
+3
+1
+2
+walk there
+take a taxi
+*/

@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+inline int id(int x,int y){return (x+y|x!=y);}
+const int INF = 0x3f3f3f3f, MAXN = 200000+10;
+struct P{
+	int x,y;
+};
+struct IN{
+	char op[10];
+	P p;
+}in[MAXN];
+unordered_set<int> vis;//x判重
+unordered_map<int,int> num;//x离散
+set<int> ay[MAXN];//每个num[x]对应的y坐标集合
+int mx[MAXN<<1], ax[MAXN];
+
+inline void push_up(int x, int y, int m){
+	mx[id(x,y)] = max(mx[id(x,m)], mx[id(m+1,y)]);
+}
+int p;
+void update(int x, int y)
+{
+	if(x == y)
+	{
+		if(0 == ay[x].size()) mx[id(x,y)] = -1;
+		else mx[id(x,y)] = *(--ay[x].end());
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(x,m);
+	else update(m+1,y);
+	push_up(x,y,m);
+}
+int v;
+int query(int x, int y)
+{
+	if(mx[id(x,y)] <= v || y <= p) return -1;//保证[x,y]区间至少存在一个合法的点(xi>x && yi>y)
+	if(x == y) return x;
+	int m = (x+y)>>1;
+	if(-1 == query(x,m)) return query(m+1,y);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int q;
+	while(~scanf("%d%*c", &q))
+	{
+		int n = 0;
+		vis.clear();
+		rep(i,0,q)
+		{
+			scanf("%s %d %d", in[i].op, &in[i].p.x, &in[i].p.y);
+			if(vis.find(in[i].p.x) == vis.end())
+			{
+				vis.insert(in[i].p.x);
+				ax[n++] = in[i].p.x;
+			}
+		}
+		sort(ax,ax+n);
+		num.clear();
+		rep(i,0,n) num[ax[i]] = i;
+		rep(i,0,n) ay[i].clear();
+		clc(mx,-1);
+		rep(i,0,q)
+		{
+			p = num[in[i].p.x], v = in[i].p.y;
+			if('f' == in[i].op[0])
+			{
+				int d = query(0,n-1);
+				if(~d) printf("%d %d\n",ax[d],*(ay[d].upper_bound(v)));
+				else puts("-1");
+			}
+			else
+			{
+				if('a' == in[i].op[0]) ay[p].insert(v);
+				else ay[p].erase(v);
+				update(0,n-1);
+			}
+		}
+	}
+	return 0;
+}

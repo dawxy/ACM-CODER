@@ -1,0 +1,17 @@
+#include <stdio.h>
+
+int main ()
+{
+	int a, max = -1, min = 11111111;
+	for (int i = 0; i < 5; i++)
+	{
+		scanf ("%d%*c", &a);
+		if (max < a)
+			max = a;
+		if (min > a)
+			min = a;
+	}
+	printf ("%d %d\n", min, max);
+
+	return 0;
+}

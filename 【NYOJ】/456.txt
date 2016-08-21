@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1010
+#define MAXM 100
+#define min(a,b) (a<b?a:b)
+int ans, ch, w[MAXN];
+bool dp[MAXN*MAXM];
+//dp[j]表示前i个西瓜能否达到重量为j
+
+int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int sum = 0,n;
+		scanf("%d%*c", &n);
+		for (int i = 1; i <= n; i++)
+		{
+			w[i] = in();
+			sum += w[i];
+		}
+		memset(dp,false,sizeof(dp));
+		dp[0] = true;
+		for(int i = 1; i <= n; i++)
+		{
+			for (int j = sum>>1; j >= w[i]; j--)
+			{
+				if (dp[j-w[i]])
+					dp[j] = true;
+			}
+		}
+		for (int i = sum>>1; i >= 0; i--)
+		{
+			if (dp[i])
+			{
+				ans = sum-(i<<1);
+				break;
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

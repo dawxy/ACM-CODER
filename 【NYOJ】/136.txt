@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10, MOD = 1000007;
+struct HASH{
+	int head[MOD], next[MAXN], sum[MAXN], cnt, node[MAXN];
+	void clear(){
+		cnt = 0;
+		clc(head,-1);
+		clc(sum,0);
+	}
+	int hash(int s){
+		if(s < 0) s = -s;
+		return s%MOD;
+	}
+	void insert(int s)
+	{
+		int id = hash(s);
+		int u = head[id];
+		while(~u)
+		{
+			if(s == node[u])
+			{
+				sum[u]++;
+				return;
+			}
+			u = next[u];
+		}
+		sum[cnt] = 1;
+		node[cnt] = s;
+		next[cnt] = head[id];
+		head[id] = cnt++;
+	}
+	int query(int s)
+	{
+		int id = hash(s);
+		int u = head[id];
+		while(~u)
+		{
+			if(node[u] == s) return sum[u];
+			u = next[u];
+		}
+		return 0;
+	}
+}vis;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int a[5];
+		rep(i,0,5) scanf("%d%*c", &a[i]);
+		vis.clear();
+		repe(i,-50,50)
+		{
+			if(!i) continue;
+			repe(j,-50,50)
+			{
+				if(!j) continue;
+				int x = a[0]*i*i*i+a[1]*j*j*j;
+				vis.insert(x);
+			}
+		}
+		LL ans = 0;
+		repe(i,-50,50)
+		{
+			if(!i) continue;
+			repe(j,-50,50)
+			{
+				if(!j) continue;
+				repe(k,-50,50)
+				{
+					if(!k) continue;
+					int x = -(i*i*i*a[2]+j*j*j*a[3]+k*k*k*a[4]);
+					ans += vis.query(x);
+				}
+			}
+		}
+		printf("%lld\n", ans);
+	}
+	return 0;
+}

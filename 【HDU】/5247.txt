@@ -1,0 +1,93 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10, MOD = 1000007;
+int a[MAXN],mx[MAXN][20], mi[MAXN][20],cnt;
+map<int,int> num;
+
+void st_init(int n)
+{
+	repe(i,1,n) mx[i][0] = mi[i][0] = a[i];//下标从1开始的
+	for(int j = 1; (1<<j) <= n; j++)
+	{
+		for(int i = 1; i+(1<<j)-1 <= n; i++)//下标从1开始的
+		{
+			mx[i][j] = max(mx[i][j-1], mx[i+(1<<(j-1))][j-1]);
+			mi[i][j] = min(mi[i][j-1], mi[i+(1<<(j-1))][j-1]);
+		}
+	}
+}
+void st(int x, int y, int &mxv, int &miv)
+{
+	int k = 0;
+	while((1<<(k+1)) <= y-x+1) k++;
+	mxv = max(mx[x][k], mx[y-(1<<k)+1][k]);
+	miv = min(mi[x][k], mi[y-(1<<k)+1][k]);
+}
+int get_id(int v)
+{
+	if(num.find(v) == num.end())
+	{
+		num[v] = cnt++;
+		return cnt-1;
+	}
+	return num[v];
+}
+int vis[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	scanf("%d %d%*c", &n, &m);
+	cnt = 0;
+	repe(i,1,n) scanf("%d%*c", &a[i]);
+	st_init(n);
+	repe(i,1,n) a[i] = get_id(a[i]);
+	puts("Case #1:");
+	while(m--)
+	{
+		int k;
+		scanf("%d%*c", &k);
+		if(k > n)
+		{
+			puts("0");
+			continue;
+		}
+		int ans = 0, sum = 0;
+		clc(vis,0);
+		rep(i,1,k)
+		{
+			if(!vis[a[i]]) sum++;
+			vis[a[i]]++;
+		}
+		repe(i,k,n)
+		{
+			int mxv,miv;
+			st(i-k+1,i,mxv,miv);
+			int tmp = mxv-miv;
+			if(!vis[a[i]]) sum++;
+			vis[a[i]]++;
+			if(k-1 == tmp && sum == k) ans++;
+			if(!--vis[a[i-k+1]]) sum--;
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

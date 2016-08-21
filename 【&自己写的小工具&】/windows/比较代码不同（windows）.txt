@@ -1,0 +1,74 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <io.h>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 1000000
+char a[MAXN], b[MAXN], tmp[MAXN];
+
+void del(char *c)
+{
+	int len = strlen(c), sum = 0;
+	rep(i,0,len)
+	{
+		if(' ' == c[i] || '\n' == c[i] || '\t' == c[i]) continue;
+		tmp[sum++] = c[i];
+	}
+	strcpy(c,tmp);
+}
+void same()
+{
+	int lena = strlen(a), lenb = strlen(b);
+	for(int i = 0; i < lena && i < lenb; i++)
+	{
+		if(a[i] != b[i])
+		{
+			puts("不同:");
+			rep(j,i-5,i+5) putchar(a[j]); 
+			putchar('\n');
+			rep(j,i-5,i+5) putchar(b[j]); 
+			putchar('\n');
+			return;
+		}
+	}
+	puts("same!");
+}
+int main()
+{	
+	int len = 0;
+	if(access("1.txt",0))
+	{
+		puts("请把比较文件1.txt放在同一目录下!");
+		system("pause");
+		return -1;
+	}
+	if(access("2.txt",0))
+	{
+		puts("请把比较文件2.txt放在同一目录下!");
+		system("pause");
+		return -1;
+	}
+	freopen("1.txt","r",stdin);
+	while(~(a[len++] = getchar()));
+	freopen("2.txt","r",stdin);
+	len = 0;
+	while(~(b[len++] = getchar()));
+	freopen("CON","r",stdin);
+	del(a);
+	del(b);
+	same();
+	system("pause");
+	return 0;
+}

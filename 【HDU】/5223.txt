@@ -1,0 +1,79 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+const LL MAX = 1000000000;
+LL a[MAXN];
+LL vis[MAXN][MAXN];
+
+LL gcd(LL a, LL b)
+{
+    while(b){
+        a %= b;
+        if(a < b) swap(a,b);
+    }
+    return a;
+}
+int main()
+{
+#ifdef SHY
+    freopen("in", "r", stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n,q;
+        scanf("%d %d%*c", &n, &q);
+        repe(i,1,n) a[i] = 1;
+        clc(vis,-1);
+        bool ok = true;
+        rep(i,0,q)
+        {
+            int x,y;
+            LL v;
+            scanf("%d %d %I64d%*c", &x, &y, &v);
+            if(!ok) continue;
+            if(~vis[x][y] && vis[x][y] != v)
+            {
+                ok = false;
+                continue;
+            }
+            vis[x][y] = v;
+            repe(j,x,y)
+            {
+                int g = gcd(a[j],v);
+                int tmp = v/g;
+                a[j] *= tmp;
+                if(a[j] > MAX)
+                {
+                    ok = false;
+                    break;
+                }
+            }
+        }
+        if(!ok)
+        {
+            puts("Stupid BrotherK!");
+            continue;
+        }
+        printf("%I64d", a[1]);
+        repe(i,2,n) printf(" %I64d", a[i]);
+        putchar('\n');
+    }
+    return 0;
+}

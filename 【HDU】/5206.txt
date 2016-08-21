@@ -1,0 +1,79 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+struct NODE{
+    LL x,y,z;
+}p[4];
+
+LL dis(NODE &a, NODE &b)
+{
+	return (a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)+(a.z-b.z)*(a.z-b.z);
+}
+NODE cha(NODE &a, NODE &b)
+{
+	NODE ans;
+	ans.x = a.x-b.x;
+	ans.y = a.y-b.y;
+	ans.z = a.z-b.z;
+	return ans;
+}
+bool chuizhi(NODE &a, NODE &b)
+{
+	return 0 == a.x*b.x+a.y*b.y+a.z*b.z;
+}
+bool sloved()
+{
+    rep(i,1,4)
+	{
+		rep(j,1,4)
+		{
+			if(i == j) continue;
+			rep(k,1,4)
+			{
+				if(k == i || k == j) continue;
+				NODE xa = cha(p[i],p[0]), xb = cha(p[j],p[0]);
+				if(dis(p[0],p[i]) != dis(p[0],p[j]) || !chuizhi(xa, xb)) continue;
+				NODE xk = p[k];
+				NODE tmp;
+				tmp.x = p[i].x+p[j].x-p[0].x;
+				tmp.y = p[i].y+p[j].y-p[0].y;
+				tmp.z = p[i].z+p[j].z-p[0].z;
+				if(xk.x == tmp.x && xk.y == tmp.y && xk.z == tmp.z)
+					return true;
+			}
+		}
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t,count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        rep(i,0,4)
+            scanf("%I64d %I64d %I64d%*c", &p[i].x, &p[i].y, &p[i].z);
+        printf("Case #%d: ",++count);
+        if(sloved()) puts("Yes");
+        else puts("No");
+    }
+    return 0;
+}

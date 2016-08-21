@@ -1,0 +1,70 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int MAXN = 20+10;
+const LL INF = 0x3f3f3f3f3f3f3f3f;
+LL sum[MAXN][MAXN][MAXN], s[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int a,b,c;
+		scanf("%d %d %d%*c", &a, &b, &c);
+		repe(i,1,a)
+		{
+			repe(j,1,b)
+			{
+				repe(k,1,c)
+				{
+					LL v;
+					scanf("%lld%*c", &v);
+					sum[i][j][k] = sum[i][j-1][k]+sum[i][j][k-1]-sum[i][j-1][k-1]+v;
+				}
+			}
+		}
+		LL ans = -INF;
+		repe(j1,1,b)
+		{
+			repe(j2,j1,b)
+			{
+				repe(k1,1,c)
+				{
+					repe(k2,k1,c)
+					{
+						LL mx = 0;
+						repe(i,1,a)
+						{
+							LL v = sum[i][j2][k2]-sum[i][j2][k1-1]-sum[i][j1-1][k2]+sum[i][j1-1][k1-1];
+							s[i] = s[i-1]+v;
+							ans = max(ans, s[i]-mx);
+							mx = min(mx, s[i]);
+						}
+					}
+				}
+			}
+		}
+		printf("%lld\n", ans);
+		if(t) putchar('\n');
+	}
+	return 0;
+}

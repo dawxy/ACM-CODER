@@ -1,0 +1,12 @@
+#include <stdio.h>
+
+int main ()
+{
+	long long a,b;
+	while (EOF != scanf ("%lld %lld%*c", &a, &b))
+	{
+		printf ("%lld\n", ((1+a)*a/2)*((1+b)*b/2));
+	}
+
+	return 0;
+}

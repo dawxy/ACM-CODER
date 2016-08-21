@@ -1,0 +1,76 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+using namespace std;
+#define MAXN 60
+typedef long long LL;
+struct NODE{
+	int x,y;
+	NODE(int a = 0, int b = 0)
+	{
+		x = a;
+		y = b;
+	}
+};
+const int f[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+int n, v[MAXN][MAXN], a[MAXN][MAXN];
+LL dp[MAXN][MAXN];
+bool vis[MAXN][MAXN];
+queue<NODE> q;
+
+void bfs()
+{
+	q.push(NODE(n,n));
+	memset(v,0x3f,sizeof(v));
+	memset(vis,0,sizeof(vis));
+	vis[n][n] = true;
+	v[n][n] = a[n][n];
+	while(!q.empty())
+	{
+		int x = q.front().x, y = q.front().y;
+		q.pop();
+		vis[x][y] = false;
+		for(int i = 0; i < 4; i++)
+		{
+			int ni = x+f[i][0], nj = y+f[i][1];
+			if(1 <= ni && n >= ni && 1 <= nj && n >= nj && v[ni][nj] > v[x][y]+a[ni][nj])
+			{
+				v[ni][nj] = v[x][y]+a[ni][nj];
+				if(!vis[ni][nj])
+					q.push(NODE(ni,nj)),vis[ni][nj] = true;
+			}
+		}
+	}
+}
+LL dfs(int si, int sj)
+{
+    LL& ans = dp[si][sj];
+    if(~ans) return ans;
+    if(si == n && sj == n) return ans = 1;
+    ans = 0;
+    for(int i = 0; i < 4; i++)
+    {
+        int ni = si+f[i][0], nj = sj+f[i][1];
+        if(1 <= ni && n >= ni && 1 <= nj && n >= nj && v[ni][nj] < v[si][sj])
+            ans += dfs(ni,nj);
+    }
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    while(~scanf("%d%*c", &n))
+    {
+        for(int i = 1; i <= n; i++)
+        {
+            for(int j = 1; j <= n; j++)
+                scanf("%d%*c", &a[i][j]);
+        }
+		bfs();
+        memset(dp,-1,sizeof(dp));
+        printf("%I64d\n",dfs(1,1));
+    }
+    return 0;
+}

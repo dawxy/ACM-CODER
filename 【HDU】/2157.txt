@@ -1,0 +1,76 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MOD 1000
+#define MAXN 30
+struct MATRIX{
+	int num[MAXN][MAXN];
+};
+
+MATRIX mul(const MATRIX& a, const MATRIX& b, int mx)
+{
+	MATRIX ans;
+	clc(ans.num,0);
+	rep(i,0,mx)
+	{
+		rep(j,0,mx)
+		{
+			rep(k,0,mx)
+				ans.num[i][j] = (ans.num[i][j]+a.num[i][k]*b.num[k][j]%MOD)%MOD;
+		}
+	}
+	return ans;
+}
+MATRIX pow_mod(MATRIX x, int n, int mx)
+{
+	MATRIX ans;
+	clc(ans.num,0);
+	rep(i,0,mx) ans.num[i][i] = 1;
+	while(n)
+	{
+		if(n&1) ans = mul(ans,x,mx);
+		x = mul(x,x,mx);
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		MATRIX x;
+		int a,b,k;
+		clc(x.num,0);
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a, &b);
+			x.num[a][b] = 1;
+		}
+		int q;
+		scanf("%d%*c", &q);
+		rep(i,0,q)
+		{
+			scanf("%d %d %d%*c", &a, &b, &k);
+			MATRIX ans = pow_mod(x,k,n);
+			printf("%d\n", ans.num[a][b]);
+		}
+	}
+	return 0;
+}

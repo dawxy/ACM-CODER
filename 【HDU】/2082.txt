@@ -1,0 +1,29 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+int num[27];
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        int dp[52] = {0};
+        for(int i = 1; i <= 26; i++)
+            scanf ("%d%*c", &num[i]);
+        dp[0] = 1;
+        for (int i = 1; i <= 26; i++)
+            for (int j = 50; j >= 1; j--)
+                for (int k = 1; k <= num[i] && k*i <= j; k++)
+                    dp[j] += dp[j-k*i];
+        int ans = 0;
+        for (int i = 1;  i <= 50; i++)
+            ans += dp[i];
+        printf ("%d\n", ans);
+    }
+    return 0;
+}

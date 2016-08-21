@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int a, m;
+        scanf ("%d %d%*c", &a, &m);
+        bool find = false;
+        if (1 == m)
+		{
+			puts("1");
+			continue;
+		}
+        for (int i = 1; i < m; i++)
+		{
+            if ((a*i)%m == 1)
+			{
+				printf ("%d\n", i);
+                find = true;
+                break;
+			}
+		}
+        if (!find)
+			puts("Not Exist");
+	}
+    return 0;
+}

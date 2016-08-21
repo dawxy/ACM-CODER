@@ -1,0 +1,20 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 56
+int dp[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	dp[1] = dp[2] = 1;
+	for (int i = 3; i <= 55; i++)
+		dp[i] = dp[i-1]+dp[i-3]+1;
+	while(~scanf("%d%*c", &n))
+	{
+		printf("%d\n", dp[n]);
+	}
+	return 0;
+}

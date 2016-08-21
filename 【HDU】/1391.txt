@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <string.h>
+const int d[4][2] = {{1,1},{1,-1},{1,1},{-1,1}};
+
+int sloved(int x, int y)
+{
+	int i = 0, j = 0, s = 0, f = 0;
+	while(i < 5000 || j < 5000)
+	{
+        if(i == x && j == y)
+            return s;
+        s++;
+        i += d[f][0];
+        j += d[f][1];
+        f = (f+1) %4;
+	}
+	return -1;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int x,y, ans;
+        scanf ("%d %d%*c", &x, &y);
+        ans = sloved(x,y);
+        if (-1 == ans)
+			puts("No Number");
+		else
+			printf ("%d\n", ans);
+	}
+    return 0;
+}

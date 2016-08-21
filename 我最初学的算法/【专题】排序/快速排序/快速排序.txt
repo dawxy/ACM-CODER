@@ -1,0 +1,47 @@
+/*快排思想：先确定第一个数字在所有数字中的位置下标,
+在按递归分别求这个数字左边的数字的第一数字在左边的数字中的位置，
+和这个数右边的第一个数字在这右边的数字中的位置,按次递归下去,
+*/ 
+#include <stdio.h>
+
+void quicksort (int *, int, int);
+int findpos (int *, int, int);
+
+int main ()
+{
+	int a[5] = {-2,3,5,6,1};
+	int i;
+	quicksort(a, 0, 4);
+	for (i = 0; i < 5; i++)
+		printf ("%d ", a[i]);
+	printf ("\n");
+
+	return 0;
+}
+
+void quicksort (int * a, int f, int l)//f是需要排序的第一个元素的下标，l是最后一个
+{
+	int pos;
+	if (f < l)
+	{
+		pos = findpos(a, f, l);
+		quicksort (a, f, pos-1);
+		quicksort (a, pos+1, l);
+	}
+}
+
+int findpos (int *a, int f, int l)//找到第一个数的位置
+{                                //定义两个变量f,l分别记录最左边和最右边数字的下标,val记录第一个数字的值
+	int val = a[f];				//如果最右边的数字比val大或者相等l往左移
+	while (f < l)              //当找到一个比val小的数字就把此时l位置的数字赋值到f位置，此时l不动，f右移相反判断
+	{                          //f==l时就找到了val的位置了，此时把val赋值到这个位置,返回位置
+		while (f < l && a[l] >= val)
+			l--;
+		a[f] = a[l];
+		while (f < l && a[f] <= val)
+			f++;
+		a[l] = a[f];
+	}
+	a[f] = val;
+	return f;
+}

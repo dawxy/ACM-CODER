@@ -1,0 +1,17 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		double u,v,w,l;
+        scanf ("%lf %lf %lf %lf%*c", &u,&v,&w,&l);
+        printf ("%.3lf\n",l/(u+v)*w);
+	}
+    return 0;
+}

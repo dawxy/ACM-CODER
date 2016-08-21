@@ -1,0 +1,91 @@
+/*正整数高精度四则运算+比较*/
+#include<cstdio>
+#include<cstring>
+#include<string>
+#include<vector>
+#define max(a,b) (a>b?a:b)
+#define MAXW 501 //输入数字最长位数
+using namespace std;
+
+struct BigInteger {
+	static const int BASE = 100000000;//每一个s[i]保存的最大整数
+	static const int WIDTH = 8;//每一个s[i]的最大位数
+	vector<int> s;
+	int f;
+	BigInteger operator = (const string& ch) // 重新定义'='赋值运算符
+	{
+		f = 1;
+		s.clear();
+		string str = ch;
+		while (str.size() > 1 && '0' == str[0]) str.erase(str.begin());//删除前面的0
+		int x, len = (str.length() - 1) / WIDTH + 1;
+		for (int i = 0; i < len; i++)
+		{
+			int end = str.length() - i*WIDTH;
+			int start = max(0, end - WIDTH);
+			sscanf(str.substr(start, end - start).c_str(), "%d", &x);
+			s.push_back(x);
+		}
+		return *this;
+	}
+	bool operator < (const BigInteger& b) const//重新定义比较
+	{
+		if (s.size() != b.s.size()) return s.size() < b.s.size();
+		for (int i = s.size() - 1; i >= 0; i--)
+		if (s[i] != b.s[i]) return s[i] < b.s[i];
+		return false;
+	}
+	//重定义减法
+	BigInteger operator - (const BigInteger& b) const
+	{
+		BigInteger c;
+		if (*this < b)
+		{
+			c = b-*this;
+			c.f = -1;
+			return c;
+		}
+		c.s.clear();
+		for (int i = 0, g = 0;; i++)
+		{
+			if (!g && i >= s.size() && i >= b.s.size()) break;
+			int x = g;
+			if (i < s.size()) x += s[i];
+			if (i < b.s.size()) x -= b.s[i];
+			c.s.push_back((x + BASE) % BASE);
+			g = x<0 ? -1 : x / BASE;
+		}
+		while (!c.s[c.s.size() - 1] && c.s.size() > 1) c.s.pop_back();//删除前缀0
+		return c;
+	}
+};
+
+BigInteger in()
+{
+	char c[MAXW];
+	scanf("%s%*c", c);
+	BigInteger ans;
+	ans = c;
+	return ans;
+}
+void out(BigInteger a)
+{
+	if (-1 == a.f) putchar('-');
+	printf("%d", a.s.back());
+	for (int i = a.s.size() - 2; i >= 0; i--)
+	{
+		char buf[20];
+		sprintf(buf, "%08d", a.s[i]);//这里的几位根据WIDTH决定
+		int len = strlen(buf);
+		for (int j = 0; j < len; j++) putchar(buf[j]);
+	}
+	putchar('\n');
+}
+int main() {
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	BigInteger a = in(), b = in();
+	out(a - b);
+	return 0;
+}

@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <malloc.h>
+
+typedef struct node
+{
+	int a;
+	struct node * next;
+}Node, *PNode;
+
+void main ()
+{
+	int n, m;
+
+	while (1)
+	{
+		int i;
+		scanf ("%d %d", &n, &m);
+		if (0 == n && 0 == m)
+			return;
+		getchar ();
+
+		PNode head = (PNode) malloc (sizeof(Node));
+		PNode pi = head;
+		pi->next = NULL;
+		for (i = 0; i < n+m; i++)//数据存入链表
+		{
+			PNode pnew = (PNode) malloc (sizeof(Node));
+			if (n+m-1 != i)
+				scanf("%d ",&pnew->a);
+			else
+				scanf ("%d", &pnew->a);
+			pi->next = pnew;
+			pnew->next = NULL;
+			pi = pnew;			
+		}
+		getchar();
+
+		int *p = (int*) malloc (sizeof(int)*(m));
+		for (i = 0, pi = head->next; i < n; i++)//pi指向链表第n+1个数
+		{
+			pi = pi->next;
+		}
+		for (i = 0; i < m; i++)//把后面m个数存入数组p
+		{
+			p[i] = pi->a;
+			pi = pi->next;
+		}
+		
+		for (i = 0, pi = head->next; i < n; i++)//删除链表后面的M个数
+		{
+			if (n - 1 == i)
+			{
+				pi->next = NULL;
+				free (pi->next);
+			}
+			pi = pi->next;
+		}
+
+		for (i = 0; i < m; i++)//主代码 在N中删除M中出现的数字
+		{
+			pi = head;
+			while (NULL != pi)
+			{
+				if (pi->next == NULL && pi->a == p[i])
+				{
+					*(&pi) = NULL;
+					break;
+				}
+				if (pi->next != NULL && pi->next->a == p[i])
+				{
+					PNode v = pi->next;
+					if (head == pi)
+					{
+						head->next = pi->next;
+					}
+					pi->next = v->next;
+					free (v);
+				}
+				pi = pi->next;
+			}
+		}
+
+		int xu[201], jishu, j, t;
+		pi = head->next;
+		for (i = 0; NULL != pi; i++, pi = pi->next)
+		{
+			xu[i] = pi->a;
+		}
+		jishu = i;
+		for (i = 0; i < jishu-1; i++)
+		{
+			for (j = 0; j < jishu-1-i; j++)
+			{
+				if (xu[j] > xu[j+1])
+				{
+					t = xu[j];
+					xu[j] = xu[j+1];
+					xu[j+1] = t;
+				}
+			}
+		}
+
+		pi = head->next;
+		if (NULL == pi)
+		{
+			printf ("NULL");
+		}
+		for (i = 0; i < jishu; i++)
+		{
+			printf ("%d ", xu[i]);
+		}
+		printf ("\n");
+		
+
+	}
+}

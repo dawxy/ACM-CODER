@@ -1,0 +1,112 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 110
+#define INF 0x3f3f3f3f
+struct KM{
+	struct NODE{
+		int to,w;
+		NODE(int a, int b){
+			to = a, w = b;
+		}
+	};
+	int nx,ny;//两边的点数
+	int linker[MAXN],lx[MAXN],ly[MAXN];//y中各点匹配状态，x,y中的点标号
+	int slack[MAXN];
+	bool visx[MAXN],visy[MAXN];
+	int g[MAXN][MAXN];//二分图描述,纵坐标为左边，横坐标为右边
+	bool dfs(int x)
+	{
+		visx[x] = true;
+		repe(y,1,ny)
+		{
+			if(visy[y]) continue;
+			int tmp = lx[x]+ly[y]-g[x][y];
+			if(!tmp)
+			{
+				visy[y] = true;
+				if(-1 == linker[y] || dfs(linker[y]))
+				{
+					linker[y] = x;
+					return true;
+				}
+			}
+			else if(slack[y] > tmp)
+				slack[y] = tmp;
+		}
+		return false;
+	}
+	int max_km()
+	{
+		clc(linker,-1);
+		clc(ly,0);
+		repe(i,1,nx)
+		{
+			lx[i] = -INF;
+			for(int j = 0; j < ny; j++)
+				if(g[i][j] > lx[i]) lx[i] = g[i][j];
+		}
+		repe(x,1,nx)
+		{
+			clc(slack,0x3f);
+			while(1)
+			{
+				clc(visx,0);
+				clc(visy,0);
+				if(dfs(x))break;
+				int d = INF;
+				repe(i,1,ny)
+				{
+					if(!visy[i] && d > slack[i])
+						d = slack[i];
+				}
+				repe(i,1,nx) if(visx[i]) lx[i] -= d;
+				repe(i,1,ny)
+				{
+					if(visy[i]) ly[i] += d;
+					else slack[i] -= d;
+				}
+			}
+		}
+		//最后统计最大值
+		int ans = 0;
+		repe(i,1,ny)
+		{
+			if(-INF == g[linker[i]][i]) return -1;//不存在完美匹配，返回-1
+			if(~linker[i]) ans += g[linker[i]][i];
+		}
+		return -ans;
+	}
+}km;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		repe(i,1,n)
+			repe(j,1,n) km.g[i][j] = -INF;
+		km.nx = km.ny = n;
+		repe(i,1,n)
+		{
+			int j,c;
+			while(~scanf("%d%*c", &j) && j)
+			{
+				scanf("%d%*c", &c);
+				km.g[i][j] = max(km.g[i][j],-c);
+			}
+		}
+		int ans = km.max_km();
+		if(~ans) printf("%d\n", ans);
+		else puts("N");
+	}
+	return 0;
+}

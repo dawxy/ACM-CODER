@@ -1,0 +1,90 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 85;
+struct MATRIX{
+	int num[MAXN][MAXN];
+};
+int n,m;
+
+MATRIX mul(const MATRIX& a, const MATRIX& b)
+{
+	MATRIX ans;
+	clc(ans.num,0);
+	rep(i,0,n)
+	{
+		rep(j,0,n)
+		{
+			rep(k,0,n)
+				ans.num[i][j] += a.num[i][k]*b.num[k][j];
+		}
+	}
+	return ans;
+}
+MATRIX k_pow(MATRIX x, int m)
+{
+	MATRIX ans;
+	clc(ans.num,0);
+	rep(i,0,n) ans.num[i][i] = 1;
+	while(m)
+	{
+		if(m&1) ans = mul(ans,x);
+		x = mul(x,x);
+		m >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		int a;
+		MATRIX x;
+		clc(x.num,0);
+		rep(i,0,n)
+		{
+			scanf("%d%*c", &a);
+			x.num[i][a-1] = 1;
+		}
+		rep(i,0,n)
+		{
+			rep(j,i+1,n)
+				swap(x.num[i][j],x.num[j][i]);
+		}
+		char str[MAXN];
+		gets(str);
+		x = k_pow(x,m);
+		int ans[MAXN];
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+			{
+				if(x.num[i][j])
+				{
+					ans[i] = j;
+					break;
+				}
+			}
+		}
+		rep(i,0,n) putchar(str[ans[i]]);
+		putchar('\n');
+	}
+	return 0;
+}

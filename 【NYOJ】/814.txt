@@ -1,0 +1,46 @@
+#include<cstdio>
+#include<cstring>
+#define MAXN 3001
+int ans, ch, a[MAXN], d[MAXN];
+
+int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && ~n)
+	{
+		int l, r, mid;
+		for(int i = 0; i < n; i++)
+			a[i] = in();
+		ans = 0;
+		for (int i = 0; i < n; i++)
+		{
+			if(d[ans] < a[i])
+				d[++ans] = a[i];
+			else
+			{
+				l = 0, r = ans;
+				while(l <= r)
+				{
+					mid = (l+r)>>1;
+					if (d[mid] < a[i])
+						l = mid+1;
+					else
+						r = mid-1;
+				}
+				d[l] = a[i];
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

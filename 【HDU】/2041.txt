@@ -1,0 +1,29 @@
+#include <stdio.h>
+
+void main ()
+{
+	int n;
+	scanf("%d", &n);
+	getchar();
+
+	while (n--)
+	{
+		int a, i,count[40];
+		scanf("%d", &a);
+
+		count [1] = count[2] = 1;
+		if (1 == a || 2 == a)
+		{
+			printf ("1\n");
+			continue;
+		}
+		for (i = 3;i <= a; i++)
+		{
+			count[i] = count[i-1] + count[i-2];
+		}
+		
+
+		printf ("%d\n", count[i-1]);
+	}
+}
+

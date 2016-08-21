@@ -1,0 +1,39 @@
+#include <stdio.h>
+#define MAX 515
+char a[MAX];
+
+int main ()
+{
+	int count = 0;
+	while(1)
+	{
+		int n;
+		scanf ("%d%*c", &n);
+		if (0 == n)
+			break;
+		int i, w = 2, m, ans;
+		char c;
+		for (i = 1; i < n; i++)
+			w *= 2;
+		while('\n' != (c = getchar()));
+		for (i = w; '\n' != a[i-1];i++)
+			a[i] = getchar();
+		scanf ("%d%*c", &m);
+		printf ("S-Tree #%d:\n", ++count);
+		while(m--)
+		{
+			ans = 1;
+			while('\n' != (c = getchar()))
+			{
+				if ('0' == c)
+					ans *= 2;
+				else
+					ans = ans*2 + 1;
+			}
+			printf ("%c", a[ans]);
+		}
+		printf ("\n\n");
+	}
+	
+	return 0;
+}

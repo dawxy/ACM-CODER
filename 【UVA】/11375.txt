@@ -1,0 +1,99 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, v[10]={6,2,5,5,4,5,6,3,7,6};
+const int MAXN = 9999,MAXSIZE = 1010,DLEN = 4;//大数一个int存几位,一般不改,改动下面的4都要改
+const int LEN = 150;//可以控制大数位数=DLEN*LEN
+struct BigInter{
+	int a[LEN];
+	int len;
+	BigInter(){ len = 1; memset(a, 0, sizeof(a)); } //构造函数
+	BigInter(const int); //将一个int类型的变量转化成大数
+	BigInter(const BigInter &); //拷贝构造函数
+	BigInter &operator=(const BigInter &); //重载赋值运算符，大数之间进行赋值运算
+	BigInter operator+(const BigInter &)const; //重载加法运算符，两个大数之间的相加运算
+	void print(); //输出大数
+};
+BigInter::BigInter(const int b) //将一个int类型的变量转化为大数
+{
+	int c,d = b;
+	len = 0;
+	clc(a,0);
+	while(d > MAXN)
+	{
+		c = d-(d/(MAXN+1))*(MAXN+1);
+		d = d/(MAXN+1);
+		a[len++] = c;
+	}
+	a[len++] = d;
+}
+BigInter::BigInter(const BigInter &T) :len(T.len) //拷贝构造函数
+{
+	clc(a,0);
+	rep(i,0,len) a[i] = T.a[i];
+}
+BigInter & BigInter::operator=(const BigInter &n) //重载赋值运算符，大数之间赋值运算
+{
+	len = n.len;
+	clc(a,0);
+	rep(i,0,len) a[i] = n.a[i];
+	return *this;
+}
+BigInter BigInter::operator+(const BigInter &T)const //两个大数之间的相加运算
+{
+	BigInter t(*this);
+	int i, big;
+	big = T.len > len ? T.len : len;
+	for (i = 0; i < big; i++)
+	{
+		t.a[i] += T.a[i];
+		if (t.a[i] > MAXN)
+		{
+			t.a[i + 1]++;
+			t.a[i] -= MAXN + 1;
+		}
+	}
+	if (t.a[big] != 0)
+		t.len = big + 1;
+	else t.len = big;
+	return t;
+}
+void BigInter::print() //输出大数
+{
+	int i;
+	printf("%d", a[len - 1]);
+	for (i = len - 2; i >= 0; i--)
+		printf("%04d", a[i]);
+	printf("\n");
+}
+BigInter dp[2000+10];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d", &n))
+	{
+		repe(i,0,n) dp[i] = BigInter(0);
+		dp[0] = BigInter(1);
+		repe(i,0,n)
+		{
+			rep(j,0,10)
+			{
+				if(!(0 == i && 0 == j) && v[j]+i <= n)
+					dp[v[j]+i] = dp[v[j]+i]+dp[i];
+			}
+		}
+		BigInter ans = 0;
+		repe(i,1,n) ans = ans+dp[i];
+		if(n >= 6) ans = ans+dp[0];
+		ans.print();
+	}
+	return 0;
+}

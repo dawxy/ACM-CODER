@@ -1,0 +1,48 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+#define dis(a,b) (sqrt((x[a]-x[b])*(x[a]-x[b])+(y[a]-y[b])*(y[a]-y[b])))
+#define MAXN 105
+struct NODE{
+	int a, b;
+	double v;
+	bool operator < (const NODE& t) const{ return v < t.v;}
+}p[MAXN*MAXN];
+double x[MAXN], y[MAXN];
+int f[MAXN];
+
+int find(int x) {return ~f[x] ? f[x] = find(f[x]) : x;}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int m = 0;
+		for(int i = 0;  i < n; i++)
+			scanf("%lf %lf%*c", &x[i], &y[i]);
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = i+1; j < n; j++)
+			{
+				double d = dis(i,j);
+				p[m].a = i, p[m].b = j, p[m++].v = d;
+				p[m].a = j, p[m].b = i, p[m++].v = d;
+			}
+		}
+		sort(p,p+m);
+		double ans = 0;
+		memset(f,-1,sizeof(f));
+		for(int i = 0; i < m; i++)
+		{
+			int x = find(p[i].a), y = find(p[i].b);
+			if(x != y) ans += p[i].v, f[x] = y;
+		}
+		printf("%.2lf\n", ans);
+	}
+	return 0;
+}

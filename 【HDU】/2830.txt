@@ -1,0 +1,37 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define max(a,b) (a>b?a:b)
+#define MAXN 1005
+int sum[MAXN], buf[MAXN], ch;
+
+inline bool cmp(const int a, const int b) { return a>b; }
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int h,w;
+	while(~scanf("%d %d%*c", &h, &w))
+	{
+		memset(sum,0,sizeof(sum));
+		int ans = 0;
+		for(int i = 0; i < h; i++)
+		{
+			for(int j = 0; j < w; j++)
+			{
+				ch = getchar();
+				if('1' == ch) sum[j]++;
+				else sum[j] = 0;
+			}
+			getchar();
+			memcpy(buf,sum,sizeof(int)*w);
+			sort(buf,buf+w,cmp);
+			for(int j = 0; j < w; j++)
+				ans = max(ans,buf[j]*(j+1));
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

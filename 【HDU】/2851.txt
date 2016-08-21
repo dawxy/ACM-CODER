@@ -1,0 +1,79 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 2010
+struct NODE{
+	int x,y;
+}p[MAXN];
+struct Edge{
+	int next,v;
+	Edge(int a = 0, int b = 0){next = a, v = b;}
+}edge[MAXN*MAXN/2];
+int head[MAXN], tol, dis[MAXN], cost[MAXN];
+bool inq[MAXN];
+
+void add_edge(int u, int v)
+{
+	edge[tol] = Edge(head[u],v);
+	head[u] = tol++;
+}
+int dfs(int u)
+{
+	int& ans = dis[u];
+	if(~ans) return ans;
+	if(u == 1) return ans = cost[u];
+	ans = INF;
+	for(int i = head[u]; ~i; i = edge[i].next)
+	{
+		int v = edge[i].v;
+		ans = min(ans, dfs(v)+cost[u]);
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,q, a;
+		scanf("%d %d%*c", &n, &q);
+		clc(head,-1);
+		tol = 0;
+		repe(i,1,n)
+			scanf("%d %d %d%*c", &p[i].x, &p[i].y, &cost[i]);
+		repe(i,1,n)
+		{
+			repe(j,i+1,n)
+			{
+				if(p[i].y >= p[j].x)
+					add_edge(j,i);
+			}
+		}
+		clc(dis,-1);
+		rep(i,0,q)
+		{
+			scanf("%d%*c", &a);
+			int ans = dfs(a);
+			if(INF == ans) puts("-1");
+			else printf("%d\n", ans);
+		}
+	}
+	return 0;
+}

@@ -1,0 +1,85 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 800010
+int du[MAXN], f[MAXN], cnt, n, sum;
+struct Trie{
+	int next[26], end;
+}tree[MAXN];
+
+int insert(char *c, int root)
+{
+	for(;*c; c++)
+	{
+		int p = *c-'a';
+		if(0 == tree[root].next[p])
+		{
+			clc(tree[cnt].next,0);
+			tree[cnt].end = 0;
+			tree[root].next[p] = cnt++;
+		}
+		root = tree[root].next[p];
+	}
+	if(0 == tree[root].end)
+		tree[root].end = ++n;
+	return tree[root].end;
+}
+int find(int x){return f[x] == x ? x : f[x] = find(f[x]);}
+bool oula()
+{
+	int sum = 0;
+	repe(i,1,n) if(du[i]&1) sum++;
+	if(!sum || 2 == sum) return true;
+	return false;
+}
+void Union(int a, int b)
+{
+	int x = find(a), y = find(b);
+	if(x != y) f[x] = y, sum++;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int m,x,y;
+		char a[20], b[20];
+		scanf("%d%*c", &m);
+		clc(du,0);
+		clc(tree[1].next,0), tree[1].end = 0;
+		rep(i,0,m<<1) f[i] = i;
+		cnt = 2, n = 0, sum = 1;
+		rep(i,0,m)
+		{
+			scanf("%s %s%*c", a,b);
+			x = insert(a,1), y = insert(b,1);
+			Union(x,y);
+			du[x]++, du[y]++;
+		}
+		if(!m)
+		{
+			puts("Possible");
+			continue;
+		}
+		if(!oula())
+		{
+			puts("Impossible");
+			continue;
+		}
+		if(sum == n) puts("Possible");
+		else puts("Impossible");
+	}
+	return 0;
+}

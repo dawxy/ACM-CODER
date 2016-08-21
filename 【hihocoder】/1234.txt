@@ -1,0 +1,65 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+const double eps = 1e-11;
+struct NODE{
+	double x,y;
+}a[MAXN],b[MAXN],c[MAXN],d[MAXN];
+
+bool equal(double x, double y)
+{
+	return fabs(x-y)<eps;
+}
+bool same(NODE &p,double k)
+{
+	return equal(p.x,k);
+}
+bool biger(double a,double k)
+{
+	return a < k && !equal(a,k);
+}
+int sloved(double k)
+{
+	int ans = 0;
+	for(int i = 0; i <= 200; i += 2)
+	{
+		if(same(a[i],k) || same(b[i],k) || same(d[i],k) || same(c[i],k)) return -1;
+	}
+	per(i,200,0)
+	{
+		if(i&1)
+		{
+			double mi = min(min(a[i].x,b[i].x),min(c[i].x,d[i].x));
+			if(biger(mi,k))
+				return (i+1)/2*4;
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	a[0]=NODE{0,0},b[0] = NODE{0,1},c[0] = NODE{1,1},d[0] = NODE{1,0};
+	repe(i,1,1000)
+	{
+		a[i] = NODE{(a[i-1].x+b[i-1].x)/2.0, (a[i-1].y+b[i-1].y)/2.0};
+		b[i] = NODE{(b[i-1].x+c[i-1].x)/2.0, (b[i-1].y+c[i-1].y)/2.0};
+		c[i] = NODE{(c[i-1].x+d[i-1].x)/2.0, (c[i-1].y+d[i-1].y)/2.0};
+		d[i] = NODE{(d[i-1].x+a[i-1].x)/2.0, (d[i-1].y+a[i-1].y)/2.0};
+	}
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		double k;
+		scanf("%lf", &k);
+		printf("%d\n", sloved(k));
+	}
+	return 0;
+}

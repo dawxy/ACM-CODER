@@ -1,0 +1,57 @@
+/*拓扑排序a<b,c<d,d<c;
+算法竞赛入门经典:P111
+*/
+#include <stdio.h>
+#include <string.h>
+#define scanf scanf_s
+#define MAX 5
+int g[MAX][MAX], topo[MAX], c[MAX], t, n = 4;
+
+bool dfs(int u)
+{
+	c[u] = -1;
+	for (int v = 0; v < n; v++)
+	{
+		if (g[u][v])
+		{
+			if (c[v] < 0)
+				return false;
+			else if (!c[v] && !dfs(v))
+				return false;
+		}
+	}
+	c[u] = 1;topo[--t] = u;
+	return true;
+}
+
+int main ()
+{
+	bool have = true;
+	t = n;
+	memset(c, 0, sizeof(c));
+	g['a'-'a']['b'-'a'] = 1;//表示a<b,0~3表示a~d
+	g['c'-'a']['b'-'a'] = 1;
+	g['d'-'a']['c'-'a'] = 1;
+	for (int u = 0; u < n; u++)
+	{
+		if (!c[u])
+		{
+			if (!dfs(u))
+			{
+				have = false;
+				break;
+			}
+		}
+	}
+	if (have)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			printf ("%c", topo[i]+'a');
+			if (i != n-1)
+				printf ("<");
+		}
+		puts("");
+	}
+	return 0;
+}

@@ -1,0 +1,94 @@
+/*二分*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int a[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,k;
+		scanf("%d %d%*c", &n, &k);
+		rep(i,0,n) scanf("%d%*c", &a[i]);
+		sort(a,a+n);
+		LL ans = 0;
+		rep(i,0,n-1)
+		{
+			int tmp = upper_bound(a+i+1,a+n,a[i]+k)-(a+i+1);
+			ans += tmp;
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}
+===================================================================================
+/*单调队列*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+deque<int> q;
+int a[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,k;
+		scanf("%d %d%*c", &n, &k);
+		rep(i,0,n) scanf("%d%*c", &a[i]);
+		sort(a,a+n);
+		LL ans = 0;
+		q.clear();
+		q.push_front(a[0]);
+		rep(i,1,n)
+		{
+			int tmp = a[i]-k;
+			while(!q.empty() && tmp > q[0]) q.pop_front();
+			ans += q.size();
+			q.push_back(a[i]);
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

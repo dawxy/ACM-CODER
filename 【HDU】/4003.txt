@@ -1,0 +1,59 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <vector>
+using namespace std;
+#define MAXN 10010
+struct NODE{
+	int s, v;
+};
+vector<NODE> g[MAXN];
+int dp[MAXN][11], m;
+
+void dfs(int root, int fa)
+{
+	int len = g[root].size();
+	for (int i = 0; i < len; i++)
+	{
+		int s = g[root][i].s;
+		int v = g[root][i].v;
+		if (fa == s) continue;
+		dfs(s,root);
+		for (int j = m; j >= 0; j--)
+		{
+			/*增加一个子树后为了保持这个子树必须选，先加上dp[s][0]+2*v
+			（用一个机器人遍历这个子树再返回到s节点，为了返回到i需要再加上2*v）*/
+			dp[root][j] += dp[s][0]+2*v;
+			for (int k = 1; k <= j; k++)//分别放入k个机器人到这个子树，找到最小的费用
+			{
+				dp[root][j] = min(dp[root][j], dp[root][j-k]+dp[s][k]+k*v);
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n, s;
+	while (~scanf("%d %d %d%*c", &n, &s, &m))
+	{
+		int a, b, val;
+		NODE buf;
+		for (int i = 1; i <= n; i++)
+			g[i].clear();
+		for (int i = 1; i < n; i++)
+		{
+			scanf("%d %d %d%*c",&a, &b, &val);
+			buf.s = b, buf.v = val;
+			g[a].push_back(buf);
+			buf.s = a;
+			g[b].push_back(buf);
+		}
+		memset(dp,0,sizeof(dp));
+		dfs(s, -1);
+		printf("%d\n",dp[s][m]);
+	}
+	return 0;
+}

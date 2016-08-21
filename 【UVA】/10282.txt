@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <string.h>
+#include <string>
+#include <map>
+using namespace std;
+map <string,string> vis;
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	vis.clear();
+	char a[15], b[15], ch[100];
+	while(gets(ch) && ch[0])
+	{
+		sscanf(ch,"%s%s", a, b);
+		vis[string(b)] = string(a);
+	}
+	map<string ,string >::iterator it;;
+	while(EOF != scanf ("%s", a))
+	{
+		it = vis.find(a);
+		if (vis.end() != it)
+			printf ("%s\n", it->second.c_str());
+		else
+			printf ("eh\n");
+	}
+	return 0;
+}

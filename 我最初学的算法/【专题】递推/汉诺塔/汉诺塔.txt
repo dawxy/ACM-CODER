@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+void hannuota (int n, char a, char b, char c);
+
+int main ()
+{
+	hannuota(3, 'A', 'B', 'C');
+	return 0;
+}
+
+void hannuota (int n, char a, char b, char c)
+{
+	if (1 == n)
+		printf ("把第%d个盘子从%c柱子移到%c柱子\n", n, a, c);
+	else
+	{
+		hannuota(n-1, a, c, b);
+		printf ("把第%d个盘子从%c柱子移到%c柱子\n", n, a, c);
+		hannuota(n-1, b, a, c);
+	}
+}

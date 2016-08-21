@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <math.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 10010
+struct NODE{
+    double x, y;
+}p[MAXN];
+int n;
+
+bool cmp(const NODE a, const NODE b)
+{
+    return a.x < b.x;
+}
+double sloved(int, int);
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(EOF != scanf ("%d%*c", &n) && n)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			scanf ("%lf %lf%*c", &p[i].x, &p[i].y);
+		}
+        sort(p, p+n, cmp);
+        double ans = sloved(0,n-1);
+        if (ans < 10000.0)
+			printf ("%.4lf\n", ans);
+		else
+			puts("INFINITY");
+	}
+	return 0;
+}
+
+double dis(int a, int b)
+{
+    return sqrt((p[a].y-p[b].y)*(p[a].y-p[b].y)+(p[a].x-p[b].x)*(p[a].x-p[b].x));
+}
+double sloved(int l, int r)
+{
+    if (l == r)
+        return 1000000.0;
+    if (l == r-1)
+		return dis(l,r);
+    double ans,buf;
+    int mid = l+(r-l)/2;
+    ans = min(sloved(l,mid),sloved(mid,r));
+    for (int i = mid-1; i >= l && p[mid].x-p[i].x < ans; i--)
+	{
+        for (int j = mid+1; j <= r && p[i].x-p[mid].x < ans;j++)
+		{
+            buf = dis(i,j);
+            if (buf < ans)
+				ans = buf;
+		}
+	}
+	return ans;
+}

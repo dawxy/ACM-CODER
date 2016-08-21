@@ -1,0 +1,96 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 35
+#define INF 0x3f3f3f3f
+struct Edge{
+	int from, to;
+	double cost;
+	Edge(int a, int b, double c){from = a, to = b, cost = c;}
+};
+map<string,int> vis;
+vector<int> g[MAXN];
+vector<Edge> edge;
+int cnt[MAXN], n;
+double dis[MAXN];
+bool inq[MAXN];
+
+void add_edge(int from ,int to, double cost)
+{
+	edge.push_back(Edge(from, to, cost));
+	g[from].push_back(edge.size()-1);
+}
+bool spfa(int s)
+{
+	queue<int> q;
+	rep(i,0,n) dis[i] = -1;
+	clc(inq,0);
+	clc(cnt,0);
+	q.push(s);
+	inq[s] = true;
+	dis[s] = 1;
+	while(!q.empty())
+	{
+		int u = q.front(); q.pop();
+		inq[u] = false;
+		int sz = g[u].size();
+		rep(i,0,sz)
+		{
+			Edge& e = edge[g[u][i]];
+			if(dis[u] > 0 && dis[e.to] < dis[u]*e.cost)
+			{
+				dis[e.to] = dis[u]*e.cost;
+				if(!inq[e.to])
+				{
+					q.push(e.to);
+					inq[e.to] = true;
+					if(++cnt[e.to] > n) return false;
+				}
+			}
+		}
+	}
+	return true;
+}
+bool sloved()
+{
+	rep(i,0,n) if(!spfa(i)) return true;
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int count = 0;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		char a[100], b[100];
+		double c;
+		vis.clear();
+		edge.clear();
+		rep(i,0,n) g[i].clear();
+		rep(i,0,n)
+		{
+			scanf("%s%*c", a);
+			vis[a] = i;
+		}
+		int m;
+		scanf("%d%*c", &m);
+		rep(i,0,m)
+		{
+			scanf("%s %lf %s%*c", a, &c, b);
+			add_edge(vis[a],vis[b],c);
+		}
+		printf("Case %d: ", ++count);
+		if(sloved()) puts("Yes");
+		else puts("No");
+	}
+	return 0;
+}

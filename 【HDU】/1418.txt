@@ -1,0 +1,12 @@
+#include <cstdio>
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	unsigned int n, m;
+	while(~scanf("%u %u%*c", &n, &m) && n+m)
+		printf("%u\n", n+m-2);
+	return 0;
+}

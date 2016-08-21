@@ -1,0 +1,98 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, MAXM = 200000+10;
+struct Edge{
+    int next,to,cost,p;
+    Edge(int a = 0, int b = 0, int c = 0, int d = 0){
+        next = a, to = b, cost = c, p = d;
+    }
+}edge[MAXM];
+int tol,head[MAXN],dis[MAXN],p[MAXN];
+bool inq[MAXN];
+
+void add_edge(int u, int v, int cost ,int p)
+{
+    edge[tol] = Edge(head[u],v,cost,p);
+    head[u] = tol++;
+}
+void spfa(int s)
+{
+    queue<int> q;
+    clc(dis,0x3f);
+    clc(p,0x3f);
+    clc(inq,0);
+    q.push(s);
+    inq[s] = true;
+    dis[s] = 0;
+    p[s] = 0;
+    while(!q.empty())
+    {
+        int u = q.front();q.pop();
+        inq[u] = false;
+        for(int i = head[u]; ~i; i = edge[i].next)
+        {
+            int v = edge[i].to, cost = edge[i].cost, cp = edge[i].p;
+            if(INF != dis[u])
+            {
+                if(dis[v] > dis[u]+cost)
+                {
+                    dis[v] = dis[u]+cost;
+                    p[v] = p[u]+cp;
+                    if(!inq[v])
+                    {
+                        q.push(v);
+                        inq[v] = true;
+                    }
+                }
+                if(dis[v] == dis[u]+cost && p[v] > p[u]+cp)
+                {
+                    p[v] = p[u]+cp;
+                    /*if(!inq[v])
+                    {
+                        q.push(v);
+                        inq[v] = true;
+                    }*/
+                }
+            }
+        }
+    }
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int n,m;
+    while(~scanf("%d %d%*c", &n, &m) && n+m)
+    {
+        tol = 0;
+        clc(head,-1);
+        int a,b,c,d;
+        rep(i,0,m)
+        {
+            scanf("%d %d %d %d%*c", &a,&b,&c,&d);
+            add_edge(a,b,c,d);
+            add_edge(b,a,c,d);
+        }
+        int st,ed;
+        scanf("%d %d%*c", &st,&ed);
+        spfa(st);
+        printf("%d %d\n", dis[ed],p[ed]);
+    }
+    return 0;
+}

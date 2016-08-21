@@ -1,0 +1,36 @@
+#include <stdio.h>
+#define MAX_N 10
+int a[10];
+
+bool dfs (int, int ,int);
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int i;
+		for (i = 0; i < MAX_N; i++)
+			scanf ("%d%*c", &a[i]);
+		
+		if (dfs(0, 0, 0))
+			printf ("YES\n");
+		else
+			printf ("NO\n");
+
+	}
+
+	return 0;
+}
+
+bool dfs (int i, int b, int c)
+{
+	if (i == MAX_N-1)
+		return a[i] > b || a[i] > c;
+	if (a[i] > b && dfs(i+1, a[i], c))
+		return true;
+	if (a[i] > c && dfs(i+1, b, a[i]))
+		return true;
+	return false;
+}

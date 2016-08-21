@@ -1,0 +1,149 @@
+#pragma comment(linker, "/STACK:102400000,102400000") 
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 300000+10, MAXM = 300000*2+10;
+int head[MAXN], tol, nxt[MAXM], to[MAXM];
+
+void add_edge(int u, int v)
+{
+    nxt[tol] = head[u], to[tol] = v;
+    head[u] = tol++;
+}
+int cnt, ft[MAXN], pft[MAXN<<1],d[MAXN<<1],num[MAXN<<1];//d数组点数为2*n-1
+bool vis[MAXN];
+//ft[i]是i点第一次在d中出现的下标,d[]是所有点进入或者返回到时都加入的点的深入(最多有2*n-1个)，num是d对应的点编号
+void dfs(int u, int deep, int fa)//找到每个点进入和返回时的所有ft,d,num
+{
+    ft[u] = cnt;pft[cnt] = u;
+    d[cnt] = deep, num[cnt++] = u;
+    vis[u] = true;
+    for(int i = head[u]; ~i; i = nxt[i])
+    {
+        int v = to[i];
+        if(fa == v) continue;
+        dfs(v,deep+1,u);
+        d[cnt] = deep, num[cnt++] = u;
+    }
+}
+int mx[MAXN<<1], mi[MAXN<<1],n;//维护树中点区间的ft最值以及那个点的编号
+inline int id(int x, int y){return x+y|x!=y;}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		int u = id(x,y);
+		mx[u] = mi[u] = ft[x];
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	int u = id(x,y), l = id(x,m), r = id(m+1,y);
+	mx[u] = max(mx[l], mx[r]);
+	mi[u] = min(mi[l], mi[r]);
+}
+int query_mx(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr) return mx[id(x,y)];
+	int m = (x+y)>>1, ans = 0;
+	if(ql <= m) ans = max(ans, query_mx(x,m,ql,qr));
+	if(qr > m) ans = max(ans, query_mx(m+1,y,ql,qr));
+	return ans;
+}
+int query_mi(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr) return mi[id(x,y)];
+	int m = (x+y)>>1, ans = INF;
+	if(ql <= m) ans = min(ans, query_mi(x,m,ql,qr));
+	if(qr > m) ans = min(ans, query_mi(m+1,y,ql,qr));
+	return ans;
+}
+int dp[MAXN<<1][20], dp_num[MAXN<<1][20];//dp_num记录dp对应的点的编号
+void st_init()
+{
+    rep(i,0,cnt) dp[i][0] = d[i], dp_num[i][0] = num[i];
+    for(int j = 1; (1<<j) <= cnt; j++)
+    {
+        for(int i = 0; i+(1<<j)-1 < cnt; i++)
+        {
+            if(dp[i][j-1] < dp[i+(1<<(j-1))][j-1])
+            {
+                dp[i][j] = dp[i][j-1];
+                dp_num[i][j] = dp_num[i][j-1];
+            }
+            else
+            {
+                dp[i][j] = dp[i+(1<<(j-1))][j-1];
+                dp_num[i][j] = dp_num[i+(1<<(j-1))][j-1];
+            }
+        }
+    }
+}
+int st_query(int x, int y)//查询d[x~y]中最小值对应的点编号
+{
+    if(x > y) swap(x,y);
+    int k = 0;
+    while((1<<(k+1)) <= y-x+1) k++;
+    if(dp[x][k] <= dp[y-(1<<k)+1][k]) return dp_num[x][k];
+    return dp_num[y-(1<<k)+1][k];
+}
+/*LCA初始化和查询*/
+void lca_init(int rt)//初始化O(n*log(n))
+{
+    cnt = 0;
+    clc(vis,0);
+    dfs(rt,0,-1);
+    st_init();
+	bulid(1,n);
+}
+int lca_query(int x, int y)//x,y的LCA, O(1)
+{
+    if(x > y) swap(x,y);
+    int mi = pft[query_mi(1,n,x,y)], mx = pft[query_mx(1,n,x,y)];
+    return st_query(ft[mi],ft[mx]);
+}
+
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    while(~scanf("%d%*c", &n))
+    {
+        clc(head,-1);
+        tol = 0;
+        rep(i,1,n)
+        {
+            int u,v;
+            scanf("%d %d%*c", &u, &v);
+            add_edge(u,v);
+            add_edge(v,u);
+        }
+        lca_init(1);
+        int q;
+        scanf("%d%*c", &q);
+        while(q--)
+        {
+            int u,v;
+            scanf("%d %d%*c", &u, &v);
+            printf("%d\n", lca_query(u,v));
+        }
+    }
+    return 0;
+}

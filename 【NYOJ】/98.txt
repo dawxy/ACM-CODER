@@ -1,0 +1,31 @@
+#include <stdio.h>
+
+int main()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int m;
+		scanf ("%d%*c", &m);
+		if (m >= 80)
+		{
+			if (m >= 90)
+				printf ("A\n");
+			else
+				printf ("B\n");
+		}
+		else
+		{
+			if (m >= 70)
+				printf ("C\n");
+			else
+				if (m >= 60)
+					printf ("D\n");
+				else
+					printf ("E\n");
+		}
+	}
+
+	return 0;
+}

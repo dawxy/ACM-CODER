@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 105
+struct NODE{
+    int link[MAXN], len;
+}g[MAXN];
+bool vis[MAXN][MAXN];
+int ans, k;
+
+bool same(int a, int b)
+{
+	int sum = 0;
+    if (vis[a][b])
+        return false;
+    for (int i = 0; i < g[a].len; i++)
+	{
+        if(vis[g[a].link[i]][b])
+		{
+            sum++;
+            if (sum >= k)
+                break;
+		}
+	}
+    if (sum >= k)
+	{
+        g[a].link[g[a].len++] = b;
+        g[b].link[g[b].len++] = a;
+        vis[a][b] = vis[b][a] = true;
+        return true;
+	}
+    return false;
+}
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif // SHY
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		int n, m, a, b;
+        scanf ("%d %d %d%*c", &n, &m, &k);
+        for (int i = 0; i < n; i++)
+            g[i].len = 0;
+        memset(vis,false,sizeof(vis));
+        for (int i = 0; i < m; i++)
+		{
+			scanf ("%d %d%*c", &a, &b);
+            g[a].link[g[a].len++] = b;
+            g[b].link[g[b].len++] = a;
+            vis[a][b] = vis[b][a] = true;
+		}
+        ans = 0;
+        while(1)
+		{
+			bool end = true;
+            for (int i = 0; i < n; i++)
+			{
+                for (int j = 0; j < n; j++)
+				{
+                    if (i != j && same(i,j))
+                    {
+						ans++;
+						end = false;
+						break;
+                    }
+				}
+				if (!end)
+					break;
+			}
+			if (end)
+				break;
+		}
+		printf ("%d\n", ans);
+	}
+    return 0;
+}

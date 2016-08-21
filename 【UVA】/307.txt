@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <algorithm>
+#include <string.h>
+using namespace std;
+#define MAXN 65
+int a[MAXN], n, sum, ans;
+bool vis[MAXN];
+
+bool dfs(int cur, int p, int sum)
+{
+	if (cur == n)return true;
+	for (int i = p; i < n; i++)
+	{
+		if (!vis[i])
+		{
+			if (a[i]+sum < ans)
+			{
+				vis[i] = true;
+				if (dfs(cur+1,i+1,sum+a[i]))
+					return true;
+				vis[i] = false;
+				while(a[i] == a[i+1] && i+1 < n)++i;
+			}
+			else if (a[i]+sum == ans)
+			{
+				vis[i] = true;
+				if (dfs(cur+1,0,0)) return true;
+				vis[i] = false;
+				return false;
+			}
+			if (!sum)
+				return false;
+		}
+	}
+	return false;
+}
+bool cmp(int a, int b)
+{
+	return a>b;
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(scanf ("%d%*c", &n) , n)
+	{
+		sum = 0;
+		for (int i = 0; i < n; i++)
+		{
+			scanf ("%d%*c", &a[i]);
+			sum += a[i];
+		}
+		sort(a, a+n, cmp);
+		for (int i = n; i > 0; i--)
+		{
+			if (0 == sum%i && sum/i >= a[0])
+			{
+				memset(vis,false,sizeof(vis));
+				ans = sum / i;
+				if (dfs(0,0,0))
+				{
+					printf ("%d\n", ans);
+					break;
+				}
+			}
+		}
+	}
+	return 0;
+}

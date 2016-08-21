@@ -1,0 +1,53 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <algorithm>
+#include <vector>
+#include <queue>
+using namespace std;
+#define MAXN 30010
+vector<int> g[MAXN];
+priority_queue<int> q;
+int ans[MAXN], in[MAXN],p;
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int a,b, n,m;
+		scanf("%d %d%*c", &n, &m);
+		for(int i = 0; i <= n; i++)
+			g[i].clear();
+		memset(in,0,sizeof(in));
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d%*c", &a, &b);
+			g[b].push_back(a);
+			in[a] ++;
+		}
+		p = 0;
+		for(int i = 1; i <= n; i++)
+			if(!in[i]) q.push(i);
+		while(!q.empty())
+		{
+			int s = q.top();
+			q.pop();
+			for(int i = 0; i < g[s].size(); i++)
+			{
+				in[g[s][i]]--;
+				if(!in[g[s][i]]) q.push(g[s][i]);
+			}
+			ans[p++] = s;
+		}
+		printf("%d", ans[n-1]);
+		for(int i = n-2; i >= 0; i--)
+			printf(" %d", ans[i]);
+		putchar('\n');
+	}
+	return 0;
+}

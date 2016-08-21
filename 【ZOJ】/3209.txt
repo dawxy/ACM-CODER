@@ -1,0 +1,113 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 30*30+10, M = 500*MAXN;
+int lt[M],rt[M],up[M],down[M],row[M],col[M],tol;
+int m,cnt[MAXN];
+
+int get_id(int x, int y){return x*m+y+1;}
+void init(int maxc)
+{
+	repe(i,0,maxc)
+		lt[i] = i-1,rt[i] = i+1, up[i] = down[i] = i;
+	lt[0] = maxc, rt[maxc] = 0;
+	tol = maxc+1;
+	clc(cnt,0);
+}
+void remove(int c)
+{
+	rt[lt[c]] = rt[c], lt[rt[c]] = lt[c];
+	for(int i = down[c]; i != c; i = down[i])
+	{
+		for(int j = rt[i]; j != i; j = rt[j])
+		{
+			down[up[j]] = down[j],up[down[j]] = up[j];
+			--cnt[col[j]];
+		}
+	}
+}
+void reset(int c)
+{
+	for(int i = up[c]; i != c; i = up[i])
+	{
+		for(int j = lt[i]; j != i; j = lt[j])
+		{
+			up[down[j]] = down[up[j]] = j;
+			++cnt[col[j]];
+		}
+	}
+	rt[lt[c]] = lt[rt[c]] = c;
+}
+int mi;
+void dfs(int d)
+{
+	if(0 == rt[0])
+	{
+		if(mi > d)
+			mi = d;
+		return;
+	}
+	if(d >= mi) return;
+	int c = rt[0];
+	for(int i = rt[0];i;i = rt[i]) if(cnt[i] < cnt[c]) c = i;
+	remove(c);
+	for(int i = down[c]; i != c; i = down[i])
+	{
+		for(int j = rt[i]; j != i; j = rt[j]) remove(col[j]);
+		dfs(d+1);
+		for(int j = lt[i]; j != i; j = lt[j]) reset(col[j]);
+	}
+	reset(c);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n,p;
+		scanf("%d %d %d", &n, &m, &p);
+		init(n*m);
+		repe(r,1,p)
+		{
+			int x1,y1,x2,y2;
+			scanf("%d %d %d %d", &x1, &y1, &x2,&y2);
+			x2--,y2--;
+			int ft = tol;
+			repe(i,x1,x2)
+			{
+				repe(j,y1,y2)
+				{
+					int c = get_id(i,j);
+					row[tol] = r,col[tol] = c;
+					lt[tol] = tol-1,rt[tol] = tol+1,up[tol] = up[c],down[tol] = c;
+					down[up[c]] = tol,up[c] = tol;
+					cnt[c]++, tol++;
+				}
+			}
+			lt[ft] = tol-1,rt[tol-1] = ft;
+		}
+		mi = INF;
+		dfs(0);
+		if(INF != mi) printf("%d\n", mi);
+		else puts("-1");
+	}
+	return 0;
+}

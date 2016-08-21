@@ -1,0 +1,58 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 12
+#define MAXM 510
+int a[MAXN][MAXN], dp[1<<MAXN][MAXM], f[MAXN+1];
+
+int gcd(int a, int b){ return b == 0?a:gcd(b,a%b);}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	f[1] = 1;
+	for (int i = 2; i <= 12; i++)
+		f[i] = f[i-1]*i;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n, m, ans;
+		scanf("%d %d%*c", &n, &m);
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+				scanf("%d%*c", &a[i][j]);
+		}
+		memset(dp,0,sizeof(dp));
+		int len = 1<<n;
+		dp[0][0] = 1;
+		for (int i = 0; i < len; i++)
+		{
+			int sum = 0;
+			for (int j = 0; j < n; j++)
+				if (i&(1<<j)) sum++;
+			for (int j = 0; j < n; j++)
+			{
+				if (i&(1<<j)) continue;
+				for (int k = 0; k <= m; k++)
+				{
+					int buf = k+a[sum][j];
+					if (buf >= m)
+						dp[i|(1<<j)][m] += dp[i][k];
+					else
+						dp[i|(1<<j)][buf] += dp[i][k];
+ 				}
+			}
+		}
+		if (!dp[len-1][m]) puts("No solution");
+		else
+		{
+			int c = gcd(f[n],dp[len-1][m]);
+			printf("%d/%d\n", f[n]/c, dp[len-1][m]/c);
+		}
+	}
+	return 0;
+}

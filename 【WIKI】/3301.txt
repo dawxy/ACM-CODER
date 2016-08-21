@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 510
+int dp[MAXN][MAXN], n;
+char a[MAXN];
+
+int lcs(int sj)
+{
+    memset(dp,0,sizeof(dp));
+    for (int i = 1; i <= sj; i++)
+    {
+        for (int j = 1; j <= n-sj; j++)
+        {
+            int sum = 0;
+            if (a[i-1] == a[sj+j-1])
+                sum++;
+            dp[i][j] = max(max(dp[i-1][j], dp[i][j-1]), dp[i-1][j-1]+sum);
+        }
+    }
+    return dp[sj][n-sj];
+}
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    scanf ("%d%*c%s%*c",&n, a);
+    int ans = -1, buf;
+    for (int i = 1; i < n; i++)
+    {
+        buf = lcs(i);
+        if (buf > ans)
+            ans = buf;
+    }
+    printf ("%d\n", n-2*ans);
+    return 0;
+}

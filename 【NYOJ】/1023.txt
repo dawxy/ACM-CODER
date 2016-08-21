@@ -1,0 +1,38 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 2001
+#define min(a,b) (a<b?a:b)
+char a[MAXN];
+int dp[MAXN][MAXN], cost[26];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int m,n;
+	while(~scanf("%d %d%*c", &m, &n))
+	{
+		int add,del;
+		char c;
+		gets(a);
+		for (int i = 0; i < m; i++)
+		{
+			scanf("%c %d %d%*c", &c, &add, &del);
+			cost[c-'a'] = min(add,del);
+		}
+		memset(dp,0,sizeof(dp));
+		for (int len = 1; len < n; len++)
+		{
+			for (int i = n-len-1; i >= 0; i--)
+			{
+				int j = len+i;
+				if (a[i] == a[j]) dp[i][j] = dp[i+1][j-1];
+				else
+					dp[i][j] = min(dp[i+1][j]+cost[a[i]-'a'],dp[i][j-1]+cost[a[j]-'a']);
+			}
+		}
+		printf("%d\n", dp[0][n-1]);
+	}
+	return 0;
+}

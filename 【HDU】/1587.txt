@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n, m, a;
+    while(~scanf ("%d %d%*c", &n, &m))
+    {
+        int min = 99999999;
+        for (int i = 0; i < n; i++)
+        {
+            scanf ("%d%*c", &a);
+            if (a < min)
+                min = a;
+        }
+        printf ("%d\n", m/min);
+    }
+    return 0;
+}

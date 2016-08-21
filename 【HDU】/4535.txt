@@ -1,0 +1,22 @@
+//¥Ì≈≈À„∑®
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	__int64 a[101], i;
+	for (i = 3, a[1] = 0, a[2] = 1; i <= 100; i++)
+	{
+		a[i] = (i-1)*(a[i-1]+a[i-2]);
+		a[i] %= 1000000007;
+	}
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int n;
+		scanf ("%d%*c", &n);
+		printf ("%d\n", a[n]);
+	}
+
+	return 0;
+}

@@ -1,0 +1,78 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define id(x,y) (x+y|x!=y)
+const int INF = 0x3f3f3f3f, MAXN = 1000000+10;
+int w[MAXN],p[MAXN], mx[MAXN<<1];
+LL sum[MAXN];
+
+inline void push_up(int x, int y, int m)
+{
+	mx[id(x,y)] = max(mx[id(x,m)],mx[id(m+1,y)]);
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		mx[id(x,y)] = p[x];
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+int ql,qr;
+int query(int x, int y)
+{
+	if(ql <= x && y <= qr)
+		return mx[id(x,y)];
+	int m = (x+y)>>1;
+	int ans = -1;
+	if(ql <= m) ans = max(ans,query(x,m));
+	if(qr > m) ans = max(ans,query(m+1,y));
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	sum[0] = 0;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		clc(w,-1);
+		int a;
+		repe(i,1,n)
+		{
+			scanf("%d%*c", &a);
+			sum[i] = sum[i-1]+a;
+			p[i] = w[a];
+			w[a] = i;
+		}
+		bulid(1,n);
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &ql, &qr);
+			LL num = qr-ql+1;
+			if(sum[qr]-sum[ql-1] == (1+num)*num/2 && query(1,n) < ql) puts("YES");
+			else puts("NO");
+		}
+	}
+	return 0;
+}

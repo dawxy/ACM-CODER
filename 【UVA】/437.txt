@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 190
+struct NODE{
+	int x, y, z;
+	NODE(int a = 0, int b = 0, int c = 0)
+	{
+		x = a;
+		y = b;
+		z = c;
+	}
+}p[MAXN];
+int dp[MAXN], lenp;
+
+bool cmp(const NODE &a, const NODE &b)
+{
+	if (a.x == b.x)
+		return a.y < b.y;
+	return a.x < b.x;
+}
+int dfs(int r)
+{
+	if (dp[r] >= 0)
+		return dp[r];
+	dp[r] = p[r].z;
+	for (int i = 0; i < r; i++)
+	{
+		if (p[i].x < p[r].x && p[i].y < p[r].y)
+			dp[r] = max(dp[r], dfs(i)+p[r].z);
+	}
+	return dp[r];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, count = 0;
+	while (~scanf("%d%*c", &n) && n)
+	{
+		int a, b, c, ans = 0;
+		lenp = 0;
+		memset(dp,-1, sizeof(dp));
+		for (int i = 0; i < n; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b, &c);
+			p[lenp++] = NODE(a, b, c);
+			p[lenp++] = NODE(a, c, b);
+			p[lenp++] = NODE(b, a, c);
+			p[lenp++] = NODE(b, c, a);
+			p[lenp++] = NODE(c, a, b);
+			p[lenp++] = NODE(c, b, a);
+		}
+		sort(p, p + lenp,cmp);
+		for (int i = 0; i < lenp; i++)
+			ans = max(ans,dfs(i));
+		printf("Case %d: maximum height = %d\n", ++count, ans);
+	}
+	return 0;
+}

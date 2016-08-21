@@ -1,0 +1,171 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 300*2+10, MAXM = 300*300+300+10;
+struct Edge{
+	int next, u,v,cap;
+}edge[MAXM];
+struct P{
+	double c;
+	int x,y,r;
+}p[MAXN];
+int head[MAXN], tol, st,ed;
+
+bool ok(int a, int b)
+{
+	if(p[a].c < p[b].c) return false;
+	return sqrt((p[a].x-p[b].x)*(p[a].x-p[b].x)+(p[a].y-p[b].y)*(p[a].y-p[b].y)+0.0) < p[a].r+p[b].r+0.0;
+}
+void add_edge(int u, int v, int cap)
+{
+	Edge e = {head[u],u,v,cap};
+	edge[tol] = e;
+	head[u] = tol++;
+	Edge e1 = {head[v],v,u,0};
+	edge[tol] = e1;
+	head[v] = tol++;
+}
+int d[MAXN];
+bool bfs()
+{
+	clc(d,-1);
+	queue<int> q;
+	q.push(st);
+	d[st] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v;
+			if(-1 == d[v] && edge[i].cap)
+			{
+				d[v] = d[u]+1;
+				q.push(v);
+				if(~d[ed]) return true;
+			}
+		}
+	}
+	return false;
+}
+int stack[MAXN],top,cur[MAXN];
+int maxflow()
+{
+	int ans = 0;
+	while(bfs())
+	{
+		memcpy(cur,head,sizeof(head));
+		int u = st;
+		top = 0;
+		while(1)
+		{
+			if(u == ed)
+			{
+				int flow = INF,loc;
+				rep(i,0,top)
+				{
+					if(flow > edge[stack[i]].cap)
+					{
+						flow = edge[stack[i]].cap;
+						loc = i;
+					}
+				}
+				rep(i,0,top)
+				{
+					edge[stack[i]].cap -= flow;
+					edge[stack[i]^1].cap += flow;
+				}
+				ans += flow;
+				top = loc;
+				u = edge[stack[top]].u;
+			}
+			for(int i = cur[u]; ~i; cur[u] = i = edge[i].next)
+				if(edge[i].cap && d[u]+1 == d[edge[i].v]) break;
+			if(~cur[u])
+			{
+				stack[top++] = cur[u];
+				u = edge[cur[u]].v;
+			}
+			else
+			{
+				if(!top) break;
+				d[u] = -1;
+				u = edge[stack[--top]].u;
+			}
+		}
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		double mx =-1, mi = INF;
+		rep(i,0,n)
+		{
+			scanf("%lf %d %d %d%*c", &p[i].c, &p[i].x, &p[i].y, &p[i].r);
+			if(mi > p[i].c) mi = p[i].c, ed = i;
+			if(mx < p[i].c) mx = p[i].c, st = i;
+		}
+		if(ok(st,ed))
+		{
+			puts("Game is VALID");
+			continue;
+		}
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,n)
+		{
+			if(i == st || i == ed) continue;
+			rep(j,0,n)
+			{
+				if(j == st || j == ed || i == j) continue;
+				if(ok(i,j))
+				{
+					add_edge(i+n,j,1);
+				}
+			}
+		}
+		rep(i,0,n)
+		{
+			if(i == st || i == ed) continue;
+			add_edge(i,i+n,1);
+		}
+		rep(i,0,n)
+		{
+			if(i == st) continue;
+			if(ok(st,i)) add_edge(st,i,1);
+		}
+		rep(i,0,n)
+		{
+			if(i == ed) continue;
+			if(ok(i,ed)) add_edge(i+n,ed,1);
+		}
+		int tmp = n*2;
+		add_edge(tmp,st,2);
+		st = tmp;
+		if(2 == maxflow()) puts("Game is VALID");
+		else puts("Game is NOT VALID");
+	}
+	return 0;
+}

@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 35
+#define add(a,b,c) p[len].x[0] = buf.x[a], p[len].x[1] = buf.x[b], p[len++].x[2] = buf.x[c];
+struct NODE{
+	int x[3];
+}p[MAXN*6], buf;
+int dp[MAXN*6];
+
+inline bool cmp(const NODE& a, const NODE& b)
+{
+	return a.x[0] < b.x[0];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n, count = 0;
+	while(~scanf("%d%*c", &n)&&n)
+	{
+		int len = 0;
+		for (int i = 0; i < n; i++)
+		{
+			scanf("%d %d %d%*c", &buf.x[0], &buf.x[1], &buf.x[2]);
+			add(0,1,2);
+			add(0,2,1);
+			add(1,0,2);
+			add(1,2,0);
+			add(2,0,1);
+			add(2,1,0);
+		}
+		sort(p,p+len,cmp);
+		int ans = 0;
+		for (int i = 0; i < len; i++)
+		{
+			dp[i] = p[i].x[2];
+			for (int j = 0; j < i; j++)
+			{
+				if (p[i].x[0] > p[j].x[0] && p[i].x[1] > p[j].x[1])
+					dp[i] = max(dp[i], dp[j]+p[i].x[2]);
+			}
+			ans = max(ans,dp[i]);
+		}
+		printf("Case %d: maximum height = %d\n",++count, ans);
+	}
+	return 0;
+}

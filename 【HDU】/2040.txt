@@ -1,0 +1,33 @@
+#include <stdio.h>
+
+void main ()
+{
+	int n;
+	scanf ("%d", &n);
+
+	while (n--)
+	{
+		int a, b, i, asum = 0, bsum = 0;
+
+		scanf("%d %d", &a, &b);
+		getchar();
+
+		for (i = 1; i < a-1; i++)
+		{
+			if (0 == a%i)
+				asum += i;
+		}
+		for (i = 1; i < b-1; i++)
+		{
+			if (0 == b%i)
+				bsum += i;
+		}
+
+		if (asum == b && bsum == a)
+			printf ("YES\n");
+		else
+			printf ("NO\n");
+
+
+	}
+}

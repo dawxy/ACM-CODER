@@ -1,0 +1,23 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+ 
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    char a[100];
+    while(gets(a))
+    {
+        int sum = 0, n;
+        n = strlen(a);
+        if ('-' != a[0])
+            sum += a[0]-'0';
+        for (int i = 1; i < n; i++)
+            sum += a[i]-'0';
+        printf ("%d\n", sum);
+    }
+    return 0;
+}

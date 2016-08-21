@@ -1,0 +1,158 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <ctime>
+using namespace std;
+typedef unsigned int LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500+10;
+int a[MAXN][MAXN];
+int mx[MAXN<<1][MAXN<<1], mi[MAXN<<1][MAXN<<1];
+
+int ys,y2,qmx,qmi,M;
+inline int id(int x, int y){return x+y|x!=y;}
+void query2(int u, int x, int y, int ql, int qr)
+{
+		if(ql <= x && y <= qr)
+		{
+			qmx = max(qmx,mx[u][id(x,y)]);
+			qmi = min(qmi,mi[u][id(x,y)]);
+			return;
+		}
+		int m = (x+y)>>1;
+		if(ql <= m) query2(u,x,m,ql,qr);
+		if(qr > m) query2(u,m+1,y,ql,qr);
+}
+void query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr)
+	{
+		query2(id(x,y),1,M,ys,y2);
+		return;
+	}
+	int m = (x+y)>>1;
+	if(ql <= m) query(x,m,ql,qr);
+	if(qr > m) query(m+1,y,ql,qr);
+}
+int p2,v;
+inline void push_up(int rt,int x, int y, int m)
+{
+	int u = id(x,y), l = id(x,m), r = id(m+1,y);
+	mx[rt][u] = max(mx[rt][l],mx[rt][r]);
+	mi[rt][u] = min(mi[rt][l], mi[rt][r]);
+}
+void update2(int ux,int uy, int x, int y, bool yz)
+{
+	int m = (x+y)>>1;
+	if(x == y)
+	{
+		if(yz) mx[id(ux,uy)][id(x,y)] = mi[id(ux,uy)][id(x,y)] = v;
+		else
+		{
+			int mu = (ux+uy)>>1;
+			int u = id(ux,uy), l = id(ux,mu), r = id(mu+1,uy);
+			mx[u][id(x,y)] = max(mx[l][id(x,y)], mx[r][id(x,y)]);
+			mi[u][id(x,y)] = min(mi[l][id(x,y)], mi[r][id(x,y)]);
+		}
+		return;
+	}
+	if(p2 <= m) update2(ux,uy,x,m,yz);
+	else update2(ux,uy,m+1,y,yz);
+	push_up(id(ux,uy),x,y,m);
+}
+void update(int x, int y, int p)
+{
+	if(x == y)
+	{
+		update2(x,y,1,M,1);
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(x,m,p);
+	else update(m+1,y,p);
+	update2(x,y,1,M,0);
+}
+
+void bulid2(int ux,int uy, int x, int y, bool yz)
+{
+	int m = (x+y)>>1;
+	if(x == y)
+	{
+		if(yz) mx[id(ux,uy)][id(x,y)] = mi[id(ux,uy)][id(x,y)] = a[ux][x];
+		else
+		{
+			int mu = (ux+uy)>>1;
+			int u = id(ux,uy), l = id(ux,mu), r = id(mu+1,uy);
+			mx[u][id(x,y)] = max(mx[l][id(x,y)], mx[r][id(x,y)]);
+			mi[u][id(x,y)] = min(mi[l][id(x,y)], mi[r][id(x,y)]);
+		}
+		return;
+	}
+	bulid2(ux,uy,x,m,yz);
+	bulid2(ux,uy,m+1,y,yz);
+	push_up(id(ux,uy),x,y,m);
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		bulid2(x,y,1,M,1);
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	bulid2(x,y,1,M,0);
+}
+int main()
+{
+#ifdef SHY
+    freopen("in", "r", stdin);
+#endif
+    int n;
+    while(~scanf("%d %d%*c", &n, &M))
+	{
+		repe(i,1,n)
+		{
+			repe(j,1,M)
+			{
+				scanf("%d%*c", &a[i][j]);
+			}
+		}
+		bulid(1,n);
+		int q;
+		scanf("%d%*c", &q);
+		while(q--)
+		{
+			char op;
+			op = getchar();
+			if('q' == op)
+			{
+				int x1,x2;
+				scanf("%d %d %d %d%*c", &x1,&ys,&x2, &y2);
+				qmx = -INF, qmi = INF;
+				query(1,n,x1,x2);
+				printf("%d %d\n", qmx,qmi);
+			}
+			else
+			{
+				int p;
+				scanf("%d %d %d%*c", &p, &p2,&v);
+				update(1,n,p);
+			}
+		}
+	}
+    return 0;
+}
+

@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 10010
+#define INF 0x3f3f3f3f
+int d[MAXN];
+
+int min (int a, int b)
+{
+        if (a < b)
+		return a;
+        return b;
+}
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+        int t;
+        scanf ("%d%*c", &t);
+        while(t--)
+	{
+                int c, e, n, p, w;
+                scanf ("%d %d%*c", &e, &c);
+                c -= e;
+                scanf ("%d%*c", &n);
+                memset(d,0x3f,sizeof(d));
+                d[0] = 0;
+                for (int i = 0; i < n; i++)
+		{
+                        scanf ("%d %d%*c", &p, &w);
+                        for (int j = 0; j <= c; j++)
+			{
+                                if (j >= w)
+                                        d[j] = min(d[j],d[j-w]+p);
+			}
+		}
+		if (INF == d[c])
+                        puts("This is impossible.");
+		else
+			printf ("The minimum amount of money in the piggy-bank is %d.\n", d[c]);
+	}
+        return 0;
+}

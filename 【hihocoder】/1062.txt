@@ -1,0 +1,123 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 400+10, MAXM = 200*2+10;
+map<string, int> id;
+map<int, string> name;
+int head[MAXN], tol, to[MAXM], nxt[MAXM],n;
+int h2[MAXN], tol2, to2[MAXM], nxt2[MAXM], num[MAXM];
+int ans[MAXM];
+int f[MAXN];
+bool root[MAXN];
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+void bing(int a, int b)
+{
+	int x = find(a), y = find(b);
+	if(x != y) f[y] = x;
+}
+int get_id(char *x)
+{
+	if(id.find(x) == id.end())
+	{
+		name[n] = x;
+		id[x] = n++;
+		return n-1;
+	}
+	return id[x];
+}
+void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+void add_edge2(int u, int v, int p)
+{
+	nxt2[tol2] = h2[u], to2[tol2] = v, num[tol2] = p;
+	h2[u] = tol2++;
+}
+bool vis[MAXN];
+void lca(int u)
+{
+	vis[u] = true;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(vis[v]) continue;
+		lca(v);
+		bing(u,v);
+	}
+	for(int i = h2[u]; ~i; i = nxt2[i])
+	{
+		int v = to2[i];
+		if(vis[v])
+		{
+			ans[num[i]] = find(v);
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	id.clear();
+	name.clear();
+	tol = n = tol2 = 0;
+	int m;
+	scanf("%d%*c", &m);
+	char a[1000], b[1000];
+	clc(root,1);
+	clc(head,-1);
+	clc(h2,-1);
+	rep(i,0,m)
+	{
+		scanf("%s %s%*c", a, b);
+		int u = get_id(a), v = get_id(b);
+		add_edge(u,v);
+		root[v] = false;
+	}
+	int q;
+	scanf("%d%*c", &q);
+	rep(i,0,q)
+	{
+		scanf("%s %s%*c", a, b);
+		int u = get_id(a), v = get_id(b);
+		add_edge2(u,v,i);
+		add_edge2(v,u,i);
+	}
+	clc(ans,-1);
+	rep(i,0,n) f[i] = i;
+	clc(vis,0);
+	rep(i,0,n)
+	{
+		if(root[i])
+		{
+			rep(i,0,n) f[i] = i;
+			clc(vis,0);
+			lca(i);
+		}
+	}
+	rep(i,0,q)
+	{
+		if(~ans[i])
+			printf("%s\n", name[ans[i]].c_str());
+		else puts("-1");
+	}
+	//printf("%s %s\n", name[10].c_str(), name[5].c_str());
+	return 0;
+}

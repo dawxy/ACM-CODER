@@ -1,0 +1,70 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f,cnt[13]={0,31,28,31,30,31,30,31,31,30,31,30,31};
+LL sum;
+char s[13];
+int a,b;
+
+bool same()
+{
+	repe(i,7,10) if(s[6] != s[i]) return false;
+	return true;
+}
+bool lx_add()
+{
+	repe(i,7,10) if(s[i]-s[i-1] != 1) return false;
+	return true;
+}
+bool lx_del()
+{
+	repe(i,7,10) if(s[i-1]-s[i] != 1) return false;
+	return true;
+}
+bool isrun(int y)
+{
+	return (0 == y%4 && y%100 != 0)||(y%400 == 0);
+}
+bool isdate()
+{
+	int y = (s[3]-'0')*1000+(s[4]-'0')*100+(s[5]-'0')*10+(s[6]-'0'),m = (s[7]-'0')*10+(s[8]-'0'),d = (s[9]-'0')*10+(s[10]-'0');
+	if(!(1980 <= y && y <= 2016)) return false;
+	if(!(1 <= m && m <= 12)) return false;
+	if(2 == m)
+	{
+		int c = cnt[m];
+		if(isrun(y)) c++;
+		return 1 <= d && d <= c;
+	}
+	return 1<= d && d <= cnt[m];
+}
+int sloved()
+{
+	if(same() || lx_add() || lx_del() || isdate()) return a;
+	return b;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d %d %d",&n,&a,&b);
+		sum = 0;
+		rep(i,0,n)
+		{
+			scanf("%s", &s);
+			sum += sloved();
+		}
+		printf("%lld\n", sum);
+	}
+	return 0;
+}

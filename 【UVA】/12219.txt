@@ -1,0 +1,116 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <map>
+#include <algorithm>
+using namespace std;
+#define MAXN 500010
+struct NODE{
+	string name;
+	int l,r;
+	bool operator <(const NODE& a) const
+	{
+		if(l != a.l)
+			return l < a.l;
+		if(r != a.r)
+			return r < a.r;
+		return name < a.name;
+	}
+};
+map<NODE, int> num;
+map<NODE, bool> vis;
+char c[MAXN], name[MAXN][6];
+int child[MAXN][2], x[MAXN],sum, p;
+
+bool get_p(char* a)//获取每一个节点名称
+{
+	int cnt = 0;
+	while('a' <= c[p] && 'z' >= c[p]) a[cnt++] = c[p++];
+	a[cnt] = 0;
+	return cnt;
+}
+int creat(int u)
+{
+	if(!name[++p][0]) return u;
+	child[u][0] = creat(p+1);
+	child[u][1] = creat(p+1);
+	return u;
+}
+void number(int u)
+{
+	//if(!name[u][0])return;
+	NODE buf;
+	buf.name = name[u];
+	if(!name[u][0] || (!name[child[u][0]][0] && !name[child[u][1]][0]) || (x[child[u][0]] && x[child[u][1]]))
+	{
+		buf.l = x[child[u][0]], buf.r = x[child[u][1]];
+		if(num.find(buf) == num.end())
+			num[buf] = ++p, x[u] = p;
+		else x[u] = num[buf];
+		return;
+	}
+	x[u] = ++p;
+	number(child[u][0]);
+	number(child[u][1]);
+	buf.l = x[child[u][0]], buf.r = x[child[u][1]];
+	if(num.find(buf) == num.end())
+		num[buf] = x[u];
+	else p--, x[u] = num[buf];
+}
+void pt(int u)
+{
+	NODE buf;
+	buf.name = name[u], buf.l = x[child[u][0]], buf.r = x[child[u][1]];
+	if(vis.find(buf) != vis.end())
+	{
+		printf("%d", x[u]);
+		return;
+	}
+	printf("%s", name[u]), vis[buf] = true;
+	if(!name[u][0]) return;
+	if(!name[child[u][0]][0] && !name[child[u][1]][0]) return;
+	putchar('(');
+	pt(child[u][0]);
+	putchar(',');
+	pt(child[u][1]);
+	putchar(')');
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+	freopen("e:\\out.txt","w",stdout);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		sum = 1;
+		p = 0;
+		num.clear();
+		vis.clear();
+		memset(child,0,sizeof(child));
+		memset(x,0,sizeof(x));
+		memset(name,0,sizeof(name));
+		gets(c);
+		int len = strlen(c);
+		while(p < len)//把输入转换成先序序列，用空串表示没有儿子
+		{
+			if(get_p(name[sum]))
+			{
+				sum++;
+				if(',' == c[p] || ')' == c[p])
+					name[sum][0] = name[sum+1][0] = 0,sum += 2;
+			}
+			else if(',' == c[p-1] || (',' == c[p] && '(' == c[p-1])) sum++;
+			p++;
+		}
+		p = 0;
+		creat(1);
+		p = 0;
+		number(1);
+		pt(1);
+		putchar('\n');
+	}
+	return 0;
+}

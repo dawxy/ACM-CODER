@@ -1,0 +1,70 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 16;
+int a[MAXN][MAXN], x[MAXN], n;
+
+int find(int s)
+{
+	int sum = 0, la1 = 0, la2 = 0;
+	per(i,n-1,0)
+	{
+		int now = (bool)(s&(1<<i));
+		la1 = (la1<<1)+now;
+		if(!now && a[0][i]) return INF;
+		if(now != a[0][i]) sum++;
+	}
+	rep(i,1,n)
+	{
+		rep(j,0,n)
+		{
+			int val = (bool)(la2&(1<<j));
+			if(j) val += (bool)(la1&(1<<(j-1)));
+			if(j < n-1) val += (bool)(la1&(1<<(j+1)));
+			x[j] = val&1;
+		}
+		la2 = la1;
+		la1 = 0;
+		per(j,n-1,0)
+		{
+			la1 = (la1<<1)+x[j];
+			if(!x[j] && a[i][j]) return INF;
+			if(x[j] != a[i][j]) sum++;
+		}
+	}
+	return sum;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d%*c", &n);
+		rep(i,0,n)
+			rep(j,0,n) scanf("%d%*c", &a[i][j]);
+		int mx = 1<<n, ans = INF;
+		rep(s,0,mx)
+			ans = min(ans,find(s));
+		if(INF == ans) ans = -1;
+		printf("Case %d: %d\n",++count, ans);
+	}
+	return 0;
+}

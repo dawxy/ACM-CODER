@@ -1,0 +1,64 @@
+/*
+直接0-1背包(N*C) = 100000*10000肯定超时
+然后看，能不能转换，发现Vi和Ci都小于10,而一共又有N(100000)个单词肯定会有大部分重复的(题目说的只是前面的单词不会出现重复)，只要把所有在0~10之内的(Vi,Ci)出现的次数都记录下来
+然后就可以转换成：给出每种价值和复杂度的物品的数量，求背包容量为C时的最大价值(这是一个多重背包问题)
+这样复杂度就就降为11*11*10000 是10^6级别可以接受
+*/
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXC 10010
+int vis[15][15];//记录每种(Vi,Ci)物品出现的次数
+int dp[MAXC];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, c;
+	while(~scanf ("%d %d%*c", &n, &c))
+	{
+		memset(vis,0,sizeof(vis));
+		memset(dp,0,sizeof(dp));
+		int a,b;
+                for (int i = 0; i < n; i++)
+		{
+			scanf ("%*s %d %d%*c", &a, &b);
+                        vis[a][b]++;
+		}
+		//多重背包，a是价值，b是单词复杂度
+                for (a = 0; a <= 10; a++)
+		{
+			for (b = 0;  b <= 10; b++)
+			{
+                                if (!vis[a][b])
+					continue;
+                                if (vis[a][b]*b >= c)//如果 数量*复杂度>=背包容量 的话就是完全背包
+				{
+                                        for (int i = b; i <= c; i++)
+						dp[i] = max(dp[i],dp[i-b]+a);
+				}
+				else//二进制分解多重背包
+				{
+					int num = vis[a][b], val, w;
+                                        for (int i = 1; i <= num; num -= i, i <<= 1)
+					{
+						val = i*a, w = i*b;
+                                                for (int j = c; j >= w; j--)
+                                                        dp[j] = max(dp[j],dp[j-w]+val);
+					}
+					if (num > 0)
+					{
+						val = num*a, w = num*b;
+                                                for (int j = c; j >= w; j--)
+                                                        dp[j] = max(dp[j],dp[j-w]+val);
+					}
+				}
+			}
+		}
+		printf ("%d\n", dp[c]);
+	}
+        return 0;
+}

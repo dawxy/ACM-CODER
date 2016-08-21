@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <string.h>
+char c[205];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int m1,m2;
+    while(~scanf ("%d %d%*c",&m1,&m2))
+	{
+		gets(c);
+		int r[4] = {0};
+		for (int i = 0; c[i];i++)
+		{
+			switch (c[i])
+			{
+                case 'A':r[1] = m1;break;
+                case 'B':r[2] = m2;break;
+                case 'C':m1 = r[3];break;
+                case 'D':m2 = r[3];break;
+                case 'E':r[3] = r[1]+r[2];break;
+                case 'F':r[3] = r[1]-r[2];break;
+			}
+		}
+		printf ("%d,%d\n", m1, m2);
+	}
+    return 0;
+}

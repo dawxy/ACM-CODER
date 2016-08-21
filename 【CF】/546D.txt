@@ -1,0 +1,81 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 5000000;
+char buf[MAXN], *ps = buf,*pe = ps+1;
+inline void rnext(){
+	if(++ps == pe){
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+	}
+}
+inline int in()
+{
+	do{
+		rnext();
+	}while(!isdigit(*ps) && ps != pe);
+	int ans = 0;
+	do{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	return ans;
+}
+int dp[MAXN+10], prime[MAXN+10];
+LL sum[MAXN+10];
+
+void getprime()
+{
+	for (int i = 2; i <= MAXN; i++)
+	{
+		if (!prime[i])prime[++prime[0]] = i;
+		for (int j = 1; j <= prime[0] && prime[j] <= MAXN / i; j++)
+		{
+			prime[prime[j] * i] = 1;
+			if (i%prime[j] == 0) break;
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t = in();
+	getprime();
+	repe(i,1,prime[0])
+		dp[prime[i]] = 1;
+	repe(i,4,MAXN)
+	{
+		int tmp = i;
+		if(binary_search(prime+1,prime+1+prime[0],i)) continue;
+		for(int j = 1; j <= prime[0] && prime[j] <= tmp; j++)
+		{
+			if(0 == tmp%prime[j])
+			{
+				dp[i] = dp[tmp/=prime[j]]+dp[prime[j]];
+				break;
+			}
+		}
+	}
+	repe(i,1,MAXN) sum[i] = sum[i-1]+dp[i];
+	while(t--)
+	{
+		int a = in(),b = in();
+		printf("%I64d\n", sum[a]-sum[b]);
+	}
+	return 0;
+}

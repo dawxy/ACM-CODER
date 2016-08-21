@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define D(a) dis[a.x][a.y][a.f][a.have][a.cnt]
+const int INF = 0x3f3f3f3f, MAXN = 20+10,d[4][2]={{0,1},{1,0},{0,-1},{-1,0}};
+struct NODE{
+	int x,y,f,cnt;
+	bool have;
+};
+queue<NODE> q;
+int mp[MAXN][MAXN], dis[MAXN][MAXN][4][2][200],n;
+
+inline bool ok(int x, int y)
+{
+	return mp[x][y] != 1 && mp[x][y] != 2;
+}
+int sloved()
+{
+	if(2 == mp[0][0]) return -1;
+	clc(dis,-1);
+	while(!q.empty()) q.pop();
+	q.push(NODE{0,0,1,0,0});
+	dis[0][0][1][0][0] = 0;
+	while(!q.empty())
+	{
+		NODE now = q.front();q.pop();
+		if(now.x == 0 && now.y == 0 && D(now) >= 10)
+			return D(now)-10;
+		if(now.have && D(now) < 10) continue;
+		if(!now.have && now.cnt > 100) continue;
+		NODE nxt;
+		//直走
+		nxt = now;nxt.cnt++;
+		nxt.x = now.x+d[now.f][0],nxt.y = now.y+d[now.f][1];
+		if(0 <= nxt.x && nxt.x < n && 0 <= nxt.y && nxt.y < n && -1 == D(nxt) && ok(nxt.x,nxt.y))
+		{
+			D(nxt) = D(now)-10;
+			q.push(nxt);
+		}
+		//左转
+		nxt = now;nxt.cnt++;
+		nxt.f = (now.f-1+4)%4;
+		if(-1 == D(nxt) && ok(nxt.x,nxt.y))
+		{
+			D(nxt) = D(now)-10;
+			q.push(nxt);
+		}
+		//右转
+		nxt = now;nxt.cnt++;
+		nxt.f = (now.f+1)%4;
+		if(-1 == D(nxt) && ok(nxt.x,nxt.y))
+		{
+			D(nxt) = D(now)-10;
+			q.push(nxt);
+		}
+		//拿黄金
+		nxt = now;nxt.cnt++;
+		nxt.have = 1;
+		if(-1 == D(nxt) && !now.have && 3 == mp[nxt.x][nxt.y])
+		{
+			D(nxt) = D(now)+990;
+			q.push(nxt);
+		}
+	}
+	return -1;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d", &n);
+		clc(mp,0);
+		int k,x,y;
+		while(~scanf("%d%d%d",&k, &x, &y) && ~k)
+		{
+			mp[x][y] = k;
+		}
+		printf("%d\n", sloved());
+	}
+	return 0;
+}

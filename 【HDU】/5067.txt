@@ -1,0 +1,67 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 11
+struct NODE{
+    int x,y;
+}p[MAXN];
+int dp[MAXN][1<<MAXN],len;
+
+inline int dis(int a, int b)
+{
+    return abs(p[a].x-p[b].x)+abs(p[a].y-p[b].y);
+}
+int dfs(int cnt, int s)
+{
+    int& ans = dp[cnt][s];
+    if(~ans) return ans;
+    if(s == (1<<len)-1) ans = dis(0,cnt);
+    else ans = INF;
+    rep(i,1,len)
+    {
+        if((1<<i)&s) continue;
+        ans = min(ans, dfs(i,s|(1<<i)) + dis(cnt,i)) ;
+    }
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("f:\\1.txt", "r", stdin);
+#endif
+    int n,m;
+    while(~scanf("%d %d%*c", &n, &m))
+    {
+        int a;
+        len = 1;
+        rep(i,0,n)
+        {
+            rep(j,0,m)
+            {
+                scanf("%d%*c", &a);
+                if(a && i+j)
+                {
+                    p[len].x = i;
+                    p[len++].y = j;
+                }
+            }
+        }
+        clc(dp,-1);
+        int ans = INF;
+        ans = dfs(0,1);
+        printf("%d\n",ans);
+    }
+    return 0;
+}

@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1002
+#define max(a,b) (a>b?a:b)
+int ch, sum[MAXN],y[MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int h,w, ans = 0;
+		scanf("%d %d%*c", &h, &w);
+		memset(sum,0,sizeof(sum));
+		for(int i = 1; i <= h; i++)
+		{
+			for(int j = 1; j <= w; j++)
+			{
+				while((ch = getchar()) == ' ' || '\n' == ch);
+				if('F' == ch) sum[j]++;
+				else sum[j] = 0;
+			}
+			for(int j = w; j >= 1; j--)
+			{
+				y[j] = j;
+				while (sum[y[j]+1] >= sum[j] && y[j] < w)
+					y[j] = y[y[j]+1];
+			}
+			for(int j = 1; j <= w; j++)
+				ans = max(ans,(y[j]-j+1)*sum[j]);
+		}
+		printf("%d\n", ans*3);
+	}
+	return 0;
+}

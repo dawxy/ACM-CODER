@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500+10;
+int a[MAXN][MAXN], sum[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,m,q;
+	scanf("%d %d %d%*c", &n, &m, &q);
+	repe(i,1,n)
+	{
+		int mx = 0, tmp = 0;
+		repe(j,1,m)
+		{
+			scanf("%d%*c", &a[i][j]);
+			if(j > 1 && a[i][j] && a[i][j] == a[i][j-1])
+				tmp++;
+			else if(a[i][j]) tmp = 1;
+			else tmp = 0;
+			mx = max(mx,tmp);
+		}
+		sum[i] = mx;
+	}
+	while(q--)
+	{
+		int x,y;
+		scanf("%d %d%*c", &x, &y);
+		a[x][y] ^= 1;
+		int mx = 0, tmp = 0;
+		repe(j,1,m)
+		{
+			if(j > 1 && a[x][j] && a[x][j] == a[x][j-1])
+				tmp++;
+			else if(a[x][j]) tmp = 1;
+			else tmp = 0;
+			mx = max(mx,tmp);
+		}
+		int now = 0;
+		sum[x] = mx;
+		repe(i,1,n)
+			now = max(now,sum[i]);
+		printf("%d\n", now);
+	}
+	return 0;
+}

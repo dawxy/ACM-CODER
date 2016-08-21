@@ -1,0 +1,27 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		char c;
+		int a,b;
+		scanf ("%c %d %d%*c", &c, &a, &b);
+		if ('+' == c)
+			printf ("%d\n", a+b);
+		else if ('-' == c)
+			printf ("%d\n", a-b);
+		else if ('*' == c)
+			printf ("%d\n", a*b);
+		else
+		{
+			if (a%b)
+				printf ("%.2lf\n", 1.0*a/b);
+			else
+				printf ("%d\n", a/b);
+		}
+	}
+	return 0;
+}

@@ -1,0 +1,40 @@
+#include <stdio.h>
+
+int jiwei(long long a)
+{
+	int sum = 1;
+	while(a>>1)
+	{
+		sum++;
+		a >>= 1;
+	}
+	return sum;
+}
+int main ()
+{
+	#ifdef SHY
+		freopen("e:\\1.txt","r",stdin);
+	#endif
+	long long n, l, u, ans, buf;
+	while(EOF != scanf ("%lld %lld %lld%*c", &n, &l, &u))
+	{
+		int len = jiwei(u)-1;
+        ans = 0;
+        for (int i = len; i >= 0; i--)
+		{
+            buf = ans|(1LL << i);
+            if ((n>>i) & 1)
+			{
+                if (buf <= l)
+                    ans = buf;
+			}
+			else
+			{
+                if (buf <= u)
+                    ans = buf;
+			}
+		}
+		printf ("%lld\n", ans);
+	}
+	return 0;
+}

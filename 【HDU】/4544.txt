@@ -1,0 +1,62 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+struct NODE{
+	int a,c;
+	bool operator<(const NODE&t)const{
+		return c>t.c;
+	}
+}p[MAXN];
+priority_queue<NODE> q;
+int b[MAXN];
+
+inline bool cmp(int x, int y)
+{
+	return x > y;
+}
+inline bool cmp2(const NODE& x, const NODE &y)
+{
+	return x.a > y.a;
+}
+int n,m;
+LL sloved()
+{
+	while(!q.empty()) q.pop();
+	LL ans = 0;
+	int s = 0;
+	rep(i,0,n)
+	{
+		while(s < m && p[s].a >= b[i])
+		{
+			q.push(p[s]);
+			s++;
+		}
+		if(q.empty()) return -1;
+		ans += q.top().c;
+		q.pop();
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%d", &n, &m))
+	{
+		rep(i,0,n) scanf("%d", &b[i]);
+		sort(b,b+n,cmp);
+		rep(i,0,m) scanf("%d", &p[i].a);
+		rep(i,0,m) scanf("%d", &p[i].c);
+		sort(p,p+m,cmp2);
+		LL ans = sloved();
+		if(-1 == ans) puts("No");
+		else printf("%lld\n", ans);
+	}
+	return 0;
+}

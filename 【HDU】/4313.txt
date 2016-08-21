@@ -1,0 +1,69 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+struct Edge{
+	int u,v,cost;
+	bool operator<(const Edge& t)const{
+		return cost > t.cost;
+	}
+}edge[MAXN];
+int n,k,f[MAXN];
+bool vis[MAXN];
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+LL kruskal()
+{
+	sort(edge+1,edge+n);
+	LL sum = 0,sub = 0;
+	rep(i,0,n) f[i] = i;
+	rep(i,1,n)
+	{
+		sum += edge[i].cost;
+		int x = find(edge[i].u), y = find(edge[i].v);
+		if(x != y && vis[x]+vis[y] < 2)
+		{
+			sub += edge[i].cost;
+			f[x] = y;
+			vis[y] += vis[x];
+		}
+	}
+	return sum-sub;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d %d%*c", &n, &k);
+		rep(i,1,n)
+			scanf("%d %d %d%*c",&edge[i].u, &edge[i].v, &edge[i].cost);
+		clc(vis,0);
+		int a;
+		rep(i,0,k)
+		{
+			scanf("%d%*c", &a);
+			vis[a] = 1;
+		}
+		printf("%I64d\n", kruskal());
+	}
+	return 0;
+}

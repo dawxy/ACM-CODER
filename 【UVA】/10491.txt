@@ -1,0 +1,15 @@
+#include <cstdio>
+#include <cstring>
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	double a,b,c;
+	while(~scanf("%lf %lf %lf%*c", &a, &b, &c))
+	{
+		printf("%.5lf\n", (a*b+b*(b-1))/((a+b-c-1)*(a+b)));
+	}
+	return 0;
+}

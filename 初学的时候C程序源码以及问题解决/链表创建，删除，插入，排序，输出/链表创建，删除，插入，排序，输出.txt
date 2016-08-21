@@ -1,0 +1,140 @@
+#include <stdio.h>
+#include <malloc.h>
+#include <stdlib.h>
+
+typedef struct node{
+	int data;
+	struct node *PNEXT;
+}NODE, *PNODE;
+
+PNODE create_list (void);//创建链表
+void traverse_list (PNODE);//遍历输出
+int lenth_list (PNODE);//求链表长度
+void sort_list (PNODE);//链表排序
+bool insert_list (PNODE, int ,int);//插入
+bool delete_list (PNODE, int, int*);//删除
+
+int main ()
+{
+	PNODE pHead = create_list ();
+	//sort_list (pHead);
+	//insert_list (pHead, 3, 330);
+	int val;
+	if ( delete_list (pHead, 3, &val) )
+		printf ("删除成功， 您删除的元素是%d\n", val);
+	else
+		printf ("删除失败\n");
+	traverse_list (pHead);
+}
+
+PNODE create_list (void)
+{
+	int i, len, buf;
+	printf ("请输入要创建的链表的长度：");
+	scanf_s ("%d", &len);
+	PNODE pHead = NULL;
+	pHead = (PNODE) malloc (sizeof(NODE));
+	if (NULL == pHead)
+	{
+		printf ("创建失败！\n");
+		exit(-1);
+	}
+	PNODE plast  = pHead;
+	plast->PNEXT = NULL;
+	for (i = 0; i < len; i++)
+	{
+		PNODE pnew = (PNODE) malloc (sizeof(NODE));
+		printf ("请输入第%d个链表的值：", i+1);
+		scanf_s ("%d", &buf);
+		plast->PNEXT = pnew;
+		pnew->data   = buf;
+		pnew->PNEXT  = NULL;
+		plast = pnew;
+	}
+	return pHead;
+}
+
+void traverse_list (PNODE pHead)
+{
+	PNODE p = pHead->PNEXT;
+	while (NULL != p)
+	{
+		printf ("%d\n", p->data);
+		p = p->PNEXT;
+	}
+	return;
+}
+
+int lenth_list (PNODE pHead)
+{
+	int i;
+	PNODE p = pHead->PNEXT;
+	for (i = 0; NULL != p; i++)
+		p = p->PNEXT;
+	return i;
+}
+
+void sort_list (PNODE pHead)
+{
+	int i, j, len, t;
+	PNODE p, q;
+	len = lenth_list(pHead);
+	for (i = 0; i < len-1; i++)
+	{
+		for (j = 0, p = pHead->PNEXT, q = p->PNEXT; j < len-i-1; j++, p = p->PNEXT, q = q->PNEXT)
+		{
+			if (p->data > q->data)
+			{
+				t       = p->data;
+				p->data = q->data;
+				q->data = t;
+			}
+		}
+	}
+	return;
+}
+
+bool insert_list (PNODE pHead, int pos, int val)
+{
+	int i = 0;
+	PNODE p = pHead;
+	while (NULL != p && i < pos-1)
+	{
+		p = p->PNEXT;
+		i++;
+	}
+	if (i > pos-1 || NULL == p)
+		return false;
+	PNODE pnew = (PNODE) malloc (sizeof(NODE));
+	if (NULL == pnew)
+	{
+		printf ("分配动态内存失败！\n");
+		return false;
+	}
+	pnew->data = val;
+	pnew->PNEXT = p->PNEXT;
+	p->PNEXT = pnew;
+	return true;
+}
+
+bool delete_list (PNODE pHead, int pos, int *val)
+{
+	int i = 0;
+	PNODE p = pHead;
+	while (NULL != p->PNEXT && i < pos-1)
+	{
+		p = p->PNEXT;
+		i++;
+	}
+	if (i > pos-1 || NULL == p->PNEXT)
+		return false;
+	PNODE buf;
+	buf = p->PNEXT;
+	*val = buf->data;
+	p->PNEXT = p->PNEXT->PNEXT;
+	free (buf);
+	return true;
+}
+
+
+

@@ -1,0 +1,70 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10;
+LL a[MAXN], m,k;
+int n;
+
+bool sloved()
+{
+    sort(a,a+n);
+    int st = -1;
+    rep(i,0,n)
+    {
+        if(a[i] > m)
+        {
+            st = i;
+            break;
+        }
+    }
+    if(-1 == st) return true;
+    if(0 == st) return false;
+     LL now = a[st-1]+k;
+    k--;
+    int i = st;
+    while(i < n)
+    {
+        int p = upper_bound(a+i,a+n,now)-a-1;
+        if(p < i) return false;
+        now = a[p]+k;
+        i = p+1;
+        if(k > 0)
+            k--;
+        else break;
+    }
+    return now+k >= a[n-1];
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t,count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        scanf("%d %I64d %I64d%*c", &n, &m, &k);
+        rep(i,0,n)
+        {
+            scanf("%I64d%*c", &a[i]);
+        }
+        printf("Case #%d:\n", ++count);
+        if(sloved()) puts("why am I so diao?");
+        else puts("madan!");
+    }
+    return 0;
+}

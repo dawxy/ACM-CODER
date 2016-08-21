@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <string.h>
+
+int deletezero(char *, int, int);
+int weishu(int);
+void sort (int*, int);
+
+int main ()
+{
+	char a[1001];
+	int s[1000];
+	while (NULL != gets(a))
+	{
+		int i = 0, j = 0, f = 0, in = 0, len;
+		len = strlen(a);
+		while (i < len)
+		{
+			in = 0;
+			for (; '5' != a[i] && i < len; i++)
+				in = 1;
+			if (1 == in)
+			{
+				s[j] = deletezero(a, f, i);
+				j++;
+			}
+			f = i+1;
+			i++;
+		}
+		sort (s, j);
+		for (i = 0; i < j; i++)
+		{
+			printf ("%d", s[i]);
+			if (j-1 != i)
+				printf (" ");
+			else
+				printf ("\n");
+		}
+	}
+	return 0;
+}
+
+int deletezero(char *p, int f, int i)
+{
+	int j, sum = 0;
+	for (j = f; j < i && '0' == p[j]; j++)
+		;
+	if (i == j)
+		return 0;
+	for (; j < i; j++)
+		sum += (p[j]-'0') * weishu(i-j);
+	return sum;
+}
+
+int weishu(int n)
+{
+	int i, f = 1;
+	for (i = 1; i < n; i++)
+		f *= 10;
+	return f;
+}
+
+void sort (int *p, int len)
+{ 
+	int i, j, t;
+	for (i = 0; i < len-1; i++)
+	{
+		for (j = 0; j < len-1-i; j++)
+		{
+			if (p[j] > p[j+1])
+			{
+				t = p[j];
+				p[j] = p[j+1];
+				p[j+1] = t;
+			}
+		}
+	}
+}
+
+
+
+

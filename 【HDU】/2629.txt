@@ -1,0 +1,46 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	char c[30];
+	while(t--)
+	{
+		gets(c);
+		if('3' == c[0])
+		{
+			if('3' == c[1]) printf("He/She is from Zhejiang,");
+			else printf("He/She is from Shanghai,");
+		}
+		else if ('1' == c[0]) printf("He/She is from Beijing,");
+		else if('7' == c[0]) printf("He/She is from Taiwan,");
+		else if('8' == c[0])
+		{
+			if('1' == c[1]) printf("He/She is from Hong Kong,");
+			else printf("He/She is from Macao,");
+		}
+		else if('5' == c[0]) printf("He/She is from Tibet,");
+		else printf("He/She is from Liaoning,");
+		printf("and his/her birthday is on %c%c,%c%c,%c%c%c%c based on the table.\n",c[10],c[11],c[12],c[13],c[6],c[7],c[8],c[9]);
+	}
+	return 0;
+}

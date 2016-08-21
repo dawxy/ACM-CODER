@@ -1,0 +1,48 @@
+/*
+没用依赖背包做
+*/
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 70
+#define MAXV 3210
+
+int main()
+{
+	int c, n;
+	while(~scanf("%d %d%*c", &c, &n))
+	{
+		int dp[MAXV], w[MAXN], v[MAXN], s[MAXN], link[MAXN][3] = {0};
+		//link[i][0]记录编号为i的主件的附件数量,link[i][j]表示第i个主件的第j(j>0)个附件的编号
+		c /= 10;
+		memset(dp, 0, sizeof(dp));
+		for(int i = 1; i <= n; i++)
+		{
+			scanf("%d %d %d%*c", &w[i], &v[i], &s[i]);
+			w[i] /= 10, v[i] *= w[i];//w都是10的倍数，所以压缩10倍，最后在还原
+			if(s[i])
+				link[s[i]][++link[s[i]][0]] = i;
+		}
+		for(int i = 1; i <= n; i++)
+		{
+			if(s[i])//不是主件忽略
+				continue;
+			for(int j = c; j >= w[i]; j--)
+			{
+				dp[j] = max(dp[j], dp[j - w[i]] + v[i]);//选不选主件
+                                if (1 <= link[i][0] && j >= w[i]+w[link[i][1]])//当只有一个附件时选不选择该策略，或者当有两个附件时选不选择主件+第一个附件的策略
+					dp[j] = max(dp[j], dp[j-w[i]-w[link[i][1]]] + v[i]+v[link[i][1]]);
+				if (2 == link[i][0])//当有2个附件时
+				{
+                                        if (j >= w[i]+w[link[i][2]])//选不选择主件+第2个附件的策略
+						dp[j] = max(dp[j], dp[j-w[i]-w[link[i][2]]] + v[i]+v[link[i][2]]);
+					if (j >= w[i]+w[link[i][1]] + w[link[i][2]])//选不选择主件+第1个附件+第2个附件的策略
+                                                dp[j] = max(dp[j], dp[j-w[i]-w[link[i][1]]-w[link[i][2]]] + v[i]+v[link[i][1]]+v[link[i][2]]);
+				}
+			}
+		}
+		printf("%d\n", dp[c] * 10);
+	}
+	return 0;
+}

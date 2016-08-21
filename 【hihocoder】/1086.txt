@@ -1,0 +1,67 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20000+10;
+struct NODE{
+	int id,cnt,p;
+	bool operator<(const NODE&t)const{
+		return p < t.p;
+	}
+};
+set<NODE> buf;
+int vis[MAXN],la[MAXN];
+unordered_map<string,int> id;
+int tol,m;
+
+int get_id(char *s)
+{
+	if(id.find(s) == id.end())
+	{
+		id[s] = tol++;
+		return tol-1;
+	}
+	return id[s];
+}
+bool find(char *s)
+{
+	int num = get_id(s);
+	return ~la[num];
+}
+void insert(char *s, int p)
+{
+	int num = get_id(s);
+	if(~la[num])
+	{
+		auto it = buf.find(NODE{num,vis[num],la[num]});
+		buf.erase(it);
+	}
+	else if(buf.size() == m)
+		vis[buf.begin()->id] = 0,la[buf.begin()->id] = -1,buf.erase(buf.begin());
+	vis[num]++;
+	la[num] = p;
+	buf.insert(NODE{num,vis[num],p});
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	scanf("%d %d", &n, &m);
+	tol = 0;
+	id.clear();
+	clc(la,-1);
+	char str[100];
+	rep(i,0,n)
+	{
+		scanf("%s", str);
+		if(find(str)) puts("Cache");
+		else puts("Internet");
+		insert(str,i);
+	}
+	return 0;
+}

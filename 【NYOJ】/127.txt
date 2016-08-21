@@ -1,0 +1,32 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MOD 10003
+
+int pow_mod(int a, int n)//ตÝน้
+{
+	if(!n) return 1;
+	int x = pow_mod(a,n>>1);
+	long long ans = (long long)x*x%MOD;
+	if(n&1) ans = ans*a%MOD;
+	return (int)ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		printf("%d\n", pow_mod(n,n-2));
+	}
+	return 0;
+}

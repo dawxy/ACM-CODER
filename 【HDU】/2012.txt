@@ -1,0 +1,44 @@
+#include <stdio.h>
+int a, b;
+
+bool is_prime(int a)
+{
+	for(int i = 2; i * i <= a; i++)
+	{
+		if(!(a % i))
+			return false;
+	}
+
+	return true;
+}
+bool sloved()
+{
+	for(int i = a; i <= b; i++)
+	{
+		if(!is_prime(i * i + i + 41))
+			return false;
+	}
+
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+
+	while(1)
+	{
+		scanf("%d %d%*c", &a, &b);
+
+		if(!a && !b)
+			break;
+
+		if(sloved())
+			puts("OK");
+		else
+			puts("Sorry");
+	}
+
+	return 0;
+}

@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAXN 110
+int a[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n, count = 0;
+    while(~scanf ("%d%*c", &n) && n)
+	{
+		int sum = 0;
+		for (int i = 0; i < n; i++)
+		{
+                scanf ("%d%*c", &a[i]);
+                sum += a[i];
+		}
+        int avg = sum/n, ans = 0;
+        for (int i = 0; i < n; i++)
+			ans += abs(a[i]-avg);
+		if (count++)
+			printf ("\n");
+		printf ("%d\n", ans/2);
+	}
+    return 0;
+}

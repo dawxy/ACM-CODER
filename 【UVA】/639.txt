@@ -1,0 +1,65 @@
+#include <stdio.h>
+int n, max, d[4][2] = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+char g[5][5];
+
+bool canput(int si, int sj)
+{
+	int ni, nj;
+	for (int i = 0; i < 4; i++)
+	{
+		for(int j = 1; ;j++)
+		{
+			ni = j*d[i][0]+si;
+			nj = j*d[i][1]+sj;
+			if (0 <= ni && n > ni && 0 <= nj && n > nj)
+			{
+				if ('b' == g[ni][nj])
+					return false;
+				if ('X' == g[ni][nj])
+					break;
+			}
+			else
+				break;
+		}
+	}
+	return true;
+}
+
+void dfs(int sum)
+{
+	if (sum > max)
+		max = sum;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if ('.' == g[i][j] && canput(i, j))
+			{
+				g[i][j] = 'b';
+				dfs(sum+1);
+				g[i][j] = '.';
+			}
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(EOF != scanf ("%d%*c", &n) && n)
+	{
+		int i, j;
+		for (i = 0; i < n; i++)
+		{
+			for (j = 0; j < n; j++)
+				g[i][j] = getchar();
+			getchar();
+		}
+		max = -1;
+		dfs(0);
+		printf ("%d\n", max);
+	}
+
+	return 0;
+}

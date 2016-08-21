@@ -1,0 +1,26 @@
+#include <stdio.h>
+
+bool shuchu (int);
+void sov (int *, bool (shuchu)(int));//（函数返回值类型）（函数名）（函数调用参数）
+
+int main ()
+{
+	int i, a[10];
+	for (i = 0; i < 10; i++)
+		a[i] = i;
+	sov (a, shuchu);
+}
+
+bool shuchu (int a)
+{
+	printf ("%d\n", a);
+	return true;
+}
+
+void sov (int * a, bool (shuchu)(int))
+{
+	int i;
+	for (i = 0; i < 10; i++)
+		shuchu (a[i]);
+	return;
+}

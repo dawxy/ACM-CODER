@@ -1,0 +1,105 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define min(a,b) (a>b?b:a)
+#define max(a,b) (a>b?a:b)
+#define MAXN 10010
+struct Edge{
+    int from,to;
+    Edge(int a = 0, int b = 0){from = a, to = b;}
+};
+int pre[MAXN], bccno[MAXN], bcc[MAXN],clock,bcc_cnt,n;
+//bcc[1~n]存放当前块中的各个节点，bccno[1~n]标记每个节点所在块的编号
+vector<int> g[MAXN];
+stack<Edge> s;
+
+int ans1, ans2;
+
+void count()
+{
+    bool vis[MAXN] = {0};
+    int sum = 0;//块中的变数
+    repe(i,1,bcc[0]) vis[bcc[i]] = true;
+    repe(i,1,bcc[0])
+    {
+        int u = bcc[i];
+        rep(i,0,g[u].size()) if(vis[g[u][i]]) sum++;
+    }
+    sum >>= 1;
+    if(sum > bcc[0]) ans2 += sum;
+}
+int dfs(int u,int fa)
+{
+    int lowu = pre[u] = ++clock;
+    int sz = g[u].size(), child = 0;
+    rep(i,0,sz)
+    {
+        int v = g[u][i];
+        if(v == fa) continue;
+        Edge e =Edge(u,v);
+        if(!pre[v])
+        {
+            s.push(e);
+            int lowv = dfs(v,u);
+            lowu = min(lowu,lowv);
+            if(lowv >= pre[u])
+            {
+                if(lowv > pre[u]) ans1++;
+                bcc_cnt++;
+                bcc[0] = 0;
+                Edge x;
+                do{
+                    x = s.top();s.pop();
+                    if(bccno[x.from] != bcc_cnt) bcc[++bcc[0]] = x.from, bccno[x.from] = bcc_cnt;
+                    if(bccno[x.to] != bcc_cnt) bcc[++bcc[0]] = x.to, bccno[x.to] = bcc_cnt;
+                }while(!(x.from == u && x.to == v));
+                count();
+            }
+        }
+        else if(pre[v] < pre[u])
+        {
+            s.push(e);
+            lowu = min(lowu,pre[v]);
+        }
+    }
+    return lowu;
+}
+void sloved()
+{
+    bcc_cnt = clock = 0;
+    clc(pre,0);
+    clc(bccno,0);
+    rep(i,0,n) if(!pre[i]) dfs(i,-1);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int m;
+    while(~scanf("%d %d%*c", &n, &m) && n+m)
+    {
+        int a,b;
+        rep(i,0,n) g[i].clear();
+        rep(i,0,m)
+        {
+            scanf("%d %d%*c", &a, &b);
+            g[a].push_back(b);
+            g[b].push_back(a);
+        }
+        ans1 = ans2 = 0;
+        sloved();
+        printf("%d %d\n", ans1,ans2);
+    }
+    return 0;
+}

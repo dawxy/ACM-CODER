@@ -1,0 +1,74 @@
+/*N^3*/
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 55
+#define MAX(a,b,c,d) max(max(a,b),max(c,d))
+int dp[MAXN*2][MAXN][MAXN], a[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int h, w;
+	scanf("%d %d%*c", &h, &w);
+	for (int i = 1; i <= h; i++)
+	{
+		for (int j = 1; j <= w; j++)
+			scanf("%d%*c", &a[i][j]);
+	}
+	int m = h+w;
+	for (int i = 2; i <= m; i++)
+	{
+		for (int j = 1; j <= h && j <= i; j++)
+		{
+			for (int k = 1; k <= h && k <= i; k++)
+			{
+				if (j != k)
+					dp[i][j][k] = MAX(dp[i-1][j-1][k],dp[i-1][j-1][k-1],dp[i-1][j][k],dp[i-1][j][k-1]) + a[j][i-j]+a[k][i-k];
+			}
+		}
+	}
+	printf("%d\n", max(dp[m-1][h-1][h], dp[m-1][h][h-1]));
+	return 0;
+}
+-----------------------------------------------------------------------------------
+/*N^4*/
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 60
+int dp[MAXN][MAXN][MAXN][MAXN], a[MAXN][MAXN];
+
+int main ()
+{
+    int h, w;
+    scanf ("%d %d%*c", &h, &w);
+    for (int i = 1; i <= h; i++)
+    {
+        for (int j = 1; j <= w; j++)
+            scanf ("%d%*c", &a[i][j]);
+    }
+    for (int i = 1; i <= h; i++)
+    {
+        for (int j = 1; j <= w; j++)
+        {
+            for (int i2 = 1; i2 <= h; i2++)
+            {
+                for (int j2 = 1;  j2 <= w; j2++)
+                {
+                    int maxn = max(max(dp[i-1][j][i2-1][j2], dp[i-1][j][i2][j2-1]),max(dp[i][j-1][i2-1][j2],dp[i][j-1][i2][j2-1]));
+                    if (i == i2 && j == j2)
+                        dp[i][j][i2][j2] = maxn+a[i][j];
+                    else
+                        dp[i][j][i2][j2] = maxn+a[i][j]+a[i2][j2];
+                }
+            }
+        }
+    }
+    printf ("%d\n", dp[h][w][h][w]);
+    return 0;
+}

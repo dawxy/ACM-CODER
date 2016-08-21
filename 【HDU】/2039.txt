@@ -1,0 +1,36 @@
+#include <stdio.h>
+
+void main ()
+{
+	int n;
+	scanf ("%d", &n);
+	getchar ();
+
+	while(n--)
+	{
+		double a[3], t;
+		int i, j;
+		scanf ("%lf %lf %lf", &a[0], &a[1], &a[2]);
+		getchar();
+
+		for (i = 0; i < 2; i++)
+		{
+			for (j = 0; j < 2-i; j++)
+			{
+				if (a[i] > a[i+1])
+				{
+					t = a[i];
+					a[i] = a[i+1];
+					a[i+1] = t;
+				}
+			}
+		}
+
+		if (a[0]+a[1] > a[2])
+			printf ("YES\n");
+		else
+			printf ("NO\n");
+
+
+	}
+}

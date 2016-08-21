@@ -1,0 +1,46 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+vector<int> ans[MAXN];
+int a[5]={2,3,5,8,16};
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int n;
+    rep(i,0,5) ans[a[i]].push_back(1);
+    repe(i,2,100000)
+    {
+        rep(j,0,5)
+        {
+            a[j]++;
+            if(a[j] <= 100000)
+                ans[a[j]].push_back(i);
+        }
+    }
+    while(~scanf("%d%*c", &n))
+    {
+        sort(ans[n].begin(), ans[n].end());
+        printf("%d", ans[n][0]);
+        rep(i,1,ans[n].size()) printf(" %d", ans[n][i]);
+        putchar('\n');
+    }
+    return 0;
+}

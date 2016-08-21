@@ -1,0 +1,27 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+int dp[MAXN][MAXN];
+
+int main()
+{
+	int c, g;
+	scanf("%d %d%*c", &c, &g);
+	int n, v, w, t;
+	scanf("%d%*c", &n);
+	for(int i = 0; i < n; i++)
+	{
+		scanf("%d %d %d%*c", &v, &w, &t);
+		for(int j = c; j >= w; j--)
+		{
+			for(int k = g; k >= t; k--)
+			{
+				dp[j][k] = max(dp[j][k], dp[j - w][k - t] + v);
+			}
+		}
+	}
+	printf("%d\n", dp[c][g]);
+	return 0;
+}

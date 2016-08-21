@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 205
+char a[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(NULL != gets(a+1))
+	{
+		bool vis[MAXN] = {0};
+        int len = strlen(a+1)+1;
+        for (int i = 1; i < len; i++)
+		{
+            if (' ' == a[i])
+			{
+                for (int j = i; j < len; j++)
+                    a[j] = a[j+1];
+				len--, i--;
+			}
+		}
+        for (int i = 3; i < len; i += 3)
+		{
+            printf ("%c", a[i]);
+            vis[i] = true;
+		}
+        for (int i = 2; i < len; i += 2)
+		{
+			if (vis[i])
+				continue;
+			printf ("%c", a[i]);
+            vis[i] = true;
+		}
+		for (int i = 1; i < len; i++)
+            if (!vis[i])
+                printf ("%c", a[i]);
+		printf ("\n");
+	}
+    return 0;
+}

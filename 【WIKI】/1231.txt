@@ -1,0 +1,55 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 100010
+#define MAXM 100010
+struct NODE{
+	int u, v;
+	LL cost;
+	bool operator<(const NODE& t) const{return cost < t.cost;}
+}p[MAXM];
+int f[MAXN], n, m;
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+LL sloved()
+{
+	LL ans = 0;
+	int cnt = n;
+	repe(i,0,n) f[i] = i;
+	rep(i,0,m)
+	{
+		int x = find(p[i].u), y = find(p[i].v);
+		if(x != y)
+		{
+			ans += p[i].cost;
+			f[x] = y;
+			if(--cnt == 1) return ans;
+		}
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	scanf("%d %d%*c", &n, &m);
+	rep(i,0,m)
+		scanf("%d %d %lld%*c", &p[i].u, &p[i].v, &p[i].cost);
+	sort(p,p+m);
+	printf("%lld\n", sloved());
+	return 0;
+}

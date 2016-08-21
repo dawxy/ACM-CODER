@@ -1,0 +1,16 @@
+#include <stdio.h>
+char c[1000];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    double sum = 0, n, p;
+    while(~scanf ("%s %lf %lf%*c", c,&n, &p))
+	{
+        sum +=  n*p;
+	}
+	printf ("%.1lf\n", sum);
+    return 0;
+}

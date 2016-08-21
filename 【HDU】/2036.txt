@@ -1,0 +1,36 @@
+#include <stdio.h>
+
+void main ()
+{
+	int n;
+
+	while (1)
+	{
+		int i, x[100], y[100];
+		double s;
+
+		scanf ("%d", &n);
+		getchar();
+		if (0 == n)
+			return;
+
+		for (i = 0; i < n; i++)
+		{
+			scanf ("%d ", &x[i]);
+			scanf ("%d", &y[i]);
+			getchar();
+		}
+
+		for (i = 0, s = 0; i < n-1; i++)
+		{
+			s += x[i]*y[i+1] - x[i+1]*y[i];
+			if (n-2 == i)
+				s += x[i+1]*y[0] - x[0]*y[i+1];
+		}
+		s *= 0.5;
+
+		printf ("%.1lf\n", s);
+
+
+	}
+}

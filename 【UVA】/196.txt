@@ -1,0 +1,105 @@
+#include <stdio.h>
+//#define scanf scanf_s
+//#define sscanf sscanf_s
+#define MAX 1001
+int h, w, sheet[MAX][MAX];
+char c[MAX], buf[10];
+struct Node{
+	int i[10], j[10], len;
+}g[MAX][MAX];
+
+void input();
+void dfs(int, int);
+int main ()
+{
+	//FILE *f;
+	//freopen_s (&f, "e:\\1.txt","r",stdin);
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int i, j;
+		scanf ("%d %d%*c", &w, &h);
+		for (i = 1; i < MAX; i++)
+			for (j = 1; j < MAX; j++)
+				sheet[i][j] = g[i][j].len = 0;
+		input();
+		for (i = 1; i <= h; i++)
+		{
+			for (j = 1; j <= w; j++)
+			{
+				if (g[i][j].len)
+					dfs(i, j);
+			}
+		}
+		//Êä³ö
+		for (i = 1; i <= h; i++)
+		{
+			for (j = 1; j <= w; j++)
+			{
+				printf ("%d", sheet[i][j]);
+				if (w != j)
+					printf (" ");
+			}
+			printf ("\n");
+		}
+	}
+	return 0;
+}
+
+void input()
+{
+	int i, j, k, l, num, we;
+	for (i = 1; i <= h; i++)
+	{
+		for (j = 1; j <= w; j++)
+		{
+			scanf ("%s%*c", c);//////////
+			if ('=' == c[0])
+			{
+				for (k = 1; '\0' != c[k-1]; k++)
+				{
+					l = 0;
+					while('+' != c[k] && '\0' != c[k])
+						buf[l++] = c[k++];
+					buf[l] = '\0';
+					if ('0' <= buf[0] && '9' >= buf[0])
+					{
+						sscanf(buf,"%d", &num);
+						sheet[i][j] += num;
+					}
+					else
+					{
+						we = num = 0;
+						int cc = 1, ss;
+						while('A' <= buf[we] && 'Z' >= buf[we++]);
+						ss = we;
+						while(we--)
+						{
+							num += cc*(buf[we]-'A'+1);
+							cc *= 26;
+						}
+						g[i][j].j[g[i][j].len] = num;
+						sscanf (buf+ss, "%d", &g[i][j].i[g[i][j].len++]);
+					}
+				}
+			}
+			else
+				sscanf (c, "%d", &sheet[i][j]);
+		}
+	}
+}
+
+void dfs(int si, int sj)
+{
+	int ni, nj;
+	for (int i = 0; i < g[si][sj].len; i++)
+	{
+		ni = g[si][sj].i[i];
+		nj = g[si][sj].j[i];
+		if (0 < g[ni][nj].len)
+			dfs(ni, nj);
+		sheet[si][sj] += sheet[ni][nj];
+	}
+	g[si][sj].len = 0;
+}

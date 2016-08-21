@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXV 120010
+#define MAXN 100
+int num[6], w[MAXN], d[MAXV];
+
+int max(int a, int b){return a>b?a:b;}
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int count = 0;
+	while(1)
+	{
+		int sum = 0, end = 0;
+                for (int i = 0; i < 6; i++)
+		{
+			scanf ("%d%*c", &num[i]);
+			sum += num[i]*(i+1);
+			end += num[i];
+		}
+                if (!end)
+                        break;
+		printf ("Collection #%d:\n", ++count);
+		if (sum&1)
+		{
+			puts("Can't be divided.\n");
+			continue;
+		}
+		sum >>= 1;
+		int n = 0;
+		for (int i = 0; i < 6; i++)
+		{
+			for (int j = 1; j <= num[i]; num[i] -= j, j <<= 1)
+                                w[n++] = j*(i+1);
+                        if (num[i] > 0)
+                                w[n++] = num[i]*(i+1);
+		}
+                memset(d,-0x3f,sizeof(d));
+                d[0] = 0;
+                for (int i = 0; i < n; i++)
+		{
+                        for (int j = sum; j >= w[i]; j--)
+			{
+                                d[j] = max(d[j],d[j-w[i]]+w[i]);
+			}
+		}
+                if (d[sum] < 0)
+			puts("Can't be divided.\n");
+		else
+			puts("Can be divided.\n");
+	}
+        return 0;
+}

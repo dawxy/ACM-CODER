@@ -1,0 +1,18 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n, w, d, v;
+    while(~scanf ("%d %d %d %d%*c", &n, &w, &d, &v))
+	{
+        int ans = n*(n-1)/2*w-v;
+        if (!ans)
+			printf ("%d\n", n);
+		else
+            printf ("%d\n", ans/d);
+	}
+    return 0;
+}

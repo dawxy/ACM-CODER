@@ -1,0 +1,125 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 450
+struct Isap{
+	int n, s, t, d[MAXN], num[MAXN];
+	//n是所有节点数量,s源点，t汇点
+	struct Edge{//不需要flow，cap即可，最后的flow=原来的cap-现在的cap
+		int from, to, cap;
+		Edge(int a, int b, int c){
+			from = a, to = b, cap = c;
+		}
+	};
+	vector<Edge> edge;
+	vector<int> g[MAXN];
+	void init(int n)
+	{
+		this->n = n;
+		edge.clear();
+		rep(i, 0, n) g[i].clear();
+		clc(num, 0);
+		clc(d, 0);
+	}
+	void add_edge(int from, int to, int cap)
+	{
+		edge.push_back(Edge(from, to, cap));
+		edge.push_back(Edge(to, from, 0));
+		int m = edge.size();
+		g[from].push_back(m - 2);
+		g[to].push_back(m - 1);
+	}
+	int dfs(int x, int a)
+	{
+		if (x == t) return a;
+		int i,delta, mi = n - 1, ans = 0, sz = g[x].size();
+		rep(i, 0, sz)
+		{
+			int id = g[x][i];
+			Edge& e = edge[id];
+			if (!e.cap) continue;
+			if (d[e.to] + 1 == d[x])
+			{
+				delta = dfs(e.to, min(a, e.cap));
+				if (delta)
+				{
+					e.cap -= delta;
+					edge[id ^ 1].cap += delta;
+					ans += delta;
+					a -= delta;
+				}
+				else if (d[s] >= n || !a)
+					return ans;
+			}
+			mi = min(mi, d[edge[id].to]);
+		}
+		if (!ans)
+		{
+			if (!--num[d[x]])
+			{
+				d[s] = n;
+				return 0;
+			}
+			num[d[x] = mi+1]++;
+		}
+		return ans;
+	}
+	int maxflow(int s, int t)
+	{
+		this->s = s, this->t = t;
+		int flow = 0;
+		num[0] = n;
+		while (d[s] < n)
+			flow += dfs(s, INF);
+		return flow;
+	}
+}isap;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,f,d;
+	while(~scanf("%d %d %d%*c", &n, &f, &d))
+	{
+		int nf, nd, a, st = 0, ed = 2*n+f+d+1;
+		isap.init(ed+1);
+		repe(i,1,n)//牛拆点连1 cap边
+			isap.add_edge(i,i+n,1);
+		repe(i,1,f)//源点到食物连边
+			isap.add_edge(st,2*n+i,1);
+		repe(i,1,d)//饮料到汇点连边
+			isap.add_edge(2*n+f+i,ed,1);
+		repe(i,1,n)
+		{
+			scanf("%d %d%*c", &nf, &nd);
+			rep(j,0,nf)
+			{
+				scanf("%d%*c", &a);
+				int num = 2*n+a;
+				isap.add_edge(num,i,1);
+			}
+			rep(j,0,nd)
+			{
+				scanf("%d%*c", &a);
+				int num = 2*n+f+a;
+				isap.add_edge(n+i,num,1);
+			}
+		}
+		printf("%d\n", isap.maxflow(st,ed));
+	}
+	return 0;
+}

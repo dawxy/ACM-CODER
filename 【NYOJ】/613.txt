@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <cstring>
+#define MAXT 100002
+#define MAXN 12
+#define max(a,b) (a>b?a:b)
+int ans, ch, a[MAXT][MAXN], dp[MAXT][MAXN];
+
+int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(n = in())
+	{
+		int time, x, maxt = 0;
+		memset(a,0,sizeof(a));
+		for (int i = 0; i < n; i++)
+		{
+			x = in();
+			time = in();
+			a[time][x]++;
+			maxt = max(maxt,time);
+		}
+		memset(dp,0,sizeof(dp));
+		for (int i = maxt; i >= 0; i--)
+		{
+			dp[i][0] = max(dp[i+1][0],dp[i+1][1])+a[i][0];
+			for (int j = 1; j <= 10; j++)
+				dp[i][j] = max(dp[i+1][j], max(dp[i+1][j+1], dp[i+1][j-1]))+a[i][j];
+		}
+		printf("%d\n", dp[0][5]);
+	}
+	return 0;
+}

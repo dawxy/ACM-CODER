@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define MAXN 35
+vector<int> p;
+int dp[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		p.clear();
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = 0; j < n; j++)
+				scanf("%d%*c", &dp[i][j]);
+		}
+		int a, q, now = 0, ans = 0;
+		char ch;
+		scanf("%d%*c", &q);
+		for(int i = 0; i < q; i++)
+		{
+			scanf("%c%*c%*c", &ch);
+			if('U' == ch)
+			{
+				scanf("%d%*c", &a);
+				if(a == now || p.size() == 7) continue;
+				p.push_back(a);
+			}
+			else
+			{
+				if(0 == p.size()) continue;
+				int to = p[0];
+				ans += dp[now][to];
+				for(int j = 0; j < p.size(); )
+				{
+					if(to == p[j])
+						p.erase(p.begin()+j);
+					else
+						j++;
+				}
+				now = to;
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

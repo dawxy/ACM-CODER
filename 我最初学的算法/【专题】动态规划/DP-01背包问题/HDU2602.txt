@@ -1,0 +1,82 @@
+/*
+滚动数组做的
+*/
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+int v[MAXN], w[MAXN], d[MAXN];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n, c;
+		scanf ("%d %d%*c", &n, &c);
+                for (int i = 1; i <= n; i++)
+			scanf ("%d%*c", &w[i]);
+		for (int i = 1; i <= n; i++)
+			scanf ("%d%*c", &v[i]);
+		memset(d,0,sizeof(d));
+                for (int i = 1; i <= n; i++)
+		{
+			for (int j = c; j >= 0; j--)
+			{
+				if (j >= v[i])
+					d[j] = max(d[j],d[j-v[i]]+w[i]);
+				else//因为是滚动数组，所以当j<v[i]时不需要在往下判断更新了，肯定不会出现更优解
+				    //不是滚动数组的话就不用每次把原来的值都复制一下
+					break;
+			}
+		}
+		printf ("%d\n", d[c]);
+	}
+        return 0;
+}
+=============================================================================
+/*这种可打印路径*/
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+int v[MAXN], w[MAXN], dp[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while (t--)
+	{
+		int n, c;
+		scanf("%d %d%*c", &n, &c);
+		for (int i = 1; i <= n; i++)
+			scanf("%d%*c", &w[i]);
+		for (int i = 1; i <= n; i++)
+			scanf("%d%*c", &v[i]);
+		memset(dp, -1, sizeof(dp));
+		dp[0] = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = c; j >= v[i]; j--)
+			{
+				if (-1 != dp[j-v[i]])
+					dp[j] = max(dp[j], dp[j - v[i]] + w[i]);
+			}
+		}
+		int ans = 0;
+		for (int i = 0; i <= c; i++)
+			ans = max(ans,dp[i]);
+		printf("%d\n", ans);
+	}
+	return 0;
+}

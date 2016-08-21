@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, p[10]={1,1,2,6,24,120,720,5040,40320,362880};
+const LL MAXN = 2147483647;
+struct NODE{
+	LL val,sum;
+	NODE(LL a, LL b){
+		val = a, sum = b;
+	}
+};
+queue<NODE> q;
+vector<LL> ans;
+
+void bfs()
+{
+	rep(i,1,10) q.push(NODE(i,p[i]));
+	while(!q.empty())
+	{
+		NODE now = q.front();q.pop();
+		if(now.val > MAXN) continue;
+		if(now.val == now.sum) printf("%d\n", now.val);
+		rep(i,0,10)
+		{
+			NODE nt = NODE(now.val*10+i,now.sum+p[i]);
+			if(nt.sum <= MAXN && nt.val <= MAXN)
+				q.push(nt);
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	printf("1\n2\n145\n40585\n");
+	return 0;
+}

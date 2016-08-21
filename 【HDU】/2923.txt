@@ -1,0 +1,71 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
+using namespace std;
+#define MAXN 105
+#define INF 0x3f3f3f3f
+map<string,int> num;
+int sum, dp[MAXN][MAXN], h[MAXN*10];
+
+int get_num(char *ch)
+{
+	if(num.find(ch) == num.end())
+		return num[ch] = sum++;
+	return num[ch];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,c,r, count = 0;
+	while(~scanf("%d %d %d%*c", &n, &c, &r) && n+c+r)
+	{
+		int st, a, b, v;
+		char ca[100],cb[100], buf[100];
+		sum = 0;
+		num.clear();
+		memset(dp,0x3f,sizeof(dp));
+		scanf("%s%*c", ca);
+		st = get_num(ca);
+		for(int i = 0; i < c; i++)
+		{
+			scanf("%s%*c", ca);
+			h[i] = get_num(ca);
+		}
+		for(int i = 0; i < r; i++)
+		{
+			scanf("%s %s %s%*c", ca,buf,cb);
+			a = get_num(ca), b = get_num(cb);
+			sscanf(buf+2,"%d",&v);
+			int len = strlen(buf);
+			if(buf[0] == '<')
+			{
+				if(dp[b][a] > v)
+					dp[b][a] = v;
+			}
+			if(buf[len-1] == '>')
+			{
+				if(dp[a][b] > v)
+					dp[a][b] = v;
+			}
+		}
+		for(int i = 0; i < sum; i++) dp[i][i] = 0;
+		for(int k = 0; k < sum; k++)
+		{
+			for(int i = 0; i < sum; i++)
+			{
+				for(int j = 0; j < sum; j++)
+					dp[i][j] = min(dp[i][j],dp[i][k]+dp[k][j]);
+			}
+		}
+		int ans = 0;
+		for(int i = 0; i < c; i++)
+			ans += (dp[0][h[i]]+dp[h[i]][0]);
+		printf("%d. %d\n", ++count, ans);
+	}
+	return 0;
+}

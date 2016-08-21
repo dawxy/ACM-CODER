@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <cstring>
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        __int64 n,m,v,k;
+        bool end = false;
+        scanf ("%I64d %I64d %I64d %I64d%*c", &n, &m, &v, &k);
+        if (m >= n)
+        {
+            printf("0\n");
+            continue;
+        }
+        __int64 ans = 0, last = m;
+        while(m < n)
+        {
+            if (m <= v)
+            {
+                end = true;
+                break;
+            }
+            m = (m-v)*k;
+            if (m < 0 || last >= m)
+            {
+                end = true;
+                break;
+            }
+            last = m;
+            ans++;
+        }
+        if (end)
+            puts("-1");
+        else
+            printf ("%I64d\n", ans);
+    }
+    return 0;
+}

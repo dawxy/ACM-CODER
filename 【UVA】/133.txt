@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <malloc.h>
+typedef struct Node{
+	int num;
+	Node *next, *last;
+}node, *pnode;
+
+pnode init_list(int);
+void proved (pnode, int, int);
+
+int main ()
+{
+	while (1)
+	{
+		int n, k, m;
+		scanf ("%d %d %d%*c", &n, &k, &m);
+		if (0 == n && 0 == k && 0 == m)
+			break;
+		pnode ph = init_list(n);
+		proved(ph, k, m);
+	}
+
+	return 0;
+}
+
+pnode init_list(int n)
+{
+	pnode ph = (pnode)malloc(sizeof(node)), p = ph;
+	ph->num = n;
+	ph->last = ph->next = ph;
+	int i;
+	for (i = 1; i <= n; i++)
+	{
+		pnode buf = (pnode)malloc(sizeof(node));
+		buf->num = i;
+		buf->next = ph;
+		buf->last = p;
+		p->next = buf;
+		ph->last = buf;
+		p = buf;
+	}
+	ph->next->last = ph->last;
+	ph->last->next = ph->next;
+	return ph;
+}
+
+void del(pnode p)
+{
+	p->last->next = p->next;
+	p->next->last = p->last;
+}
+
+void proved (pnode ph, int k, int m)
+{
+	int i, count = 0;
+	pnode pk, pm, buf;
+	pk = ph->next;
+	pm = ph->last;
+	while(ph->num)
+	{
+		if (2 == ph->num)
+			i = i;
+		for (i = 1; i < k; i++)
+			pk = pk->next;
+		for (i = 1; i < m; i++)
+			pm = pm->last;
+		if (pk == pm)
+		{
+			if (count)
+				printf (",");
+			printf ("%3.d", pk->num);
+			ph->num--;
+			del(pk);
+			buf = pk;
+			pk = buf->next;
+			pm = buf->last;
+			free(buf);
+			count++;
+		}
+		else
+		{
+			if (count)
+				printf (",");
+			printf ("%3.d%3.d", pk->num, pm->num);
+			ph->num -= 2;
+			del(pk);
+			del(pm);
+			buf = pk;
+			pk = pk->last->next;
+			free(buf);
+			buf = pm;
+			pm = pm->next->last;
+			free(buf);
+			count ++;
+		}
+	}
+	printf ("\n");
+}

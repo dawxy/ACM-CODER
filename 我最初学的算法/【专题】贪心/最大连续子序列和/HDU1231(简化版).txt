@@ -1,0 +1,44 @@
+#include <stdio.h>
+#define MAXN 10010
+int a[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+
+	while(EOF != scanf("%d%*c", &n) && n)
+	{
+		for(int i = 0; i < n; i++)
+			scanf("%d%*c", &a[i]);
+
+		int max = a[0], sum = a[0], ansl = 0, ansr = 0, st = 0;
+
+		for(int i = 1; i < n; i++)
+		{
+			if(sum < 0)
+			{
+				sum = 0;
+				st = i;
+			}
+
+			sum += a[i];
+
+			if(sum > max)
+			{
+				max = sum;
+				ansl = st;
+				ansr = i;
+			}
+		}
+
+		if(max < 0)
+			ansl = 0, ansr = n - 1, max = 0;
+
+		printf("%d %d %d\n", max, a[ansl], a[ansr]);
+	}
+
+	return 0;
+}

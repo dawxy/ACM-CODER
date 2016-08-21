@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define min(a,b) (a>b?b:a)
+#define MAXN 110
+vector<int> g[MAXN];
+int n,clock, pre[MAXN], low[MAXN];//pre[]记录每个点的dfs进入计数
+bool iscut[MAXN];
+//low[u]记录u和u的后代能回到的最早的祖先的pre值
+
+void dfs(int u, int fa)
+{
+	low[u] = pre[u] = ++clock;
+	int sz = g[u].size(), child = 0;
+	rep(i,0,sz)
+	{
+		int v = g[u][i];
+		if(v == fa) continue;
+		if(!pre[v])
+		{
+			child++;
+			dfs(v,u);
+			low[u] = min(low[u],low[v]);
+			if(low[v] >= pre[u]) iscut[u] = true;
+		}
+		else if(pre[v] < pre[u]) low[u] = min(low[u],pre[v]);
+	}
+	if(fa < 0 && child == 1) iscut[u] = 0;//根节点是否只有一个儿子,写在外面要判断重边
+}
+int sloved(int s)
+{
+	clc(pre,0);
+	clc(iscut,0);
+	clock = 0;
+	dfs(s,-1);
+	if(clock != n) return -1;//原图不连通
+	int ans = 0;
+	repe(i,1,n) if(iscut[i]) ans++;
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int a,b;
+		repe(i,1,n) g[i].clear();
+		while(~scanf("%d",&a) && a)
+		{
+			while('\n' != getchar())
+			{
+				scanf("%d", &b);
+				g[a].push_back(b);
+				g[b].push_back(a);
+			}
+		}
+		printf("%d\n", sloved(1));
+	}
+	return 0;
+}

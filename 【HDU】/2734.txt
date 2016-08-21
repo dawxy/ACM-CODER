@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 300
+char a[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(gets(a) && '#' != a[0])
+	{
+        int len = strlen(a);
+        int sum = 0;
+        for (int i = 0; i < len; i++)
+		{
+			if (' ' != a[i])
+				sum += (i+1)*(a[i]-'A'+1);
+		}
+		printf ("%d\n", sum);
+	}
+    return 0;
+}

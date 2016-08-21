@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+int main ()
+{
+    int t;
+    scanf ("%d",&t);
+    getchar();
+    while(t--)
+    {
+        int a, b;
+        char c;
+        scanf("%c%*c%d¡°",&c,&b);
+        getchar ();
+        if('a' <= c && 'z' >= c)
+            a=-1*(c-'a'+1);
+		else 
+			if('A' <= c && 'Z' >= c)
+                a=c-'A'+1;
+		
+        printf ("%d\n",a+b);
+    }
+    return 0;
+}

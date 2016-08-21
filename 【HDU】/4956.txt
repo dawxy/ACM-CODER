@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <cstring>
+typedef long long LL;
+LL x,y;
+
+LL one(LL a)
+{
+	LL sum[2]={0};
+	int p = 1;
+	while(a)
+	{
+		sum[p=!p] += a%10;
+		a /= 10;
+	}
+	return sum[0]-sum[1];
+}
+LL get_sum(LL l, LL r)
+{
+	LL sum = 0;
+	for(; l <= r; l++)
+	{
+		if(one(l) == 3)
+			sum++;
+	}
+	return sum;
+}
+inline LL res(LL l, LL r) {return (r + 8) / 11 - (l - 1 + 8) / 11;}
+LL sloved()
+{
+	LL l = x;
+	while(x <= y)
+	{
+		if(get_sum(l,x) != res(l,x))
+			return x;
+		x++;
+	}
+	return -1;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%I64d %I64d%*c", &x, &y);
+		printf("%I64d\n", sloved());
+	}
+	return 0;
+}

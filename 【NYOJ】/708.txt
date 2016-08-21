@@ -1,0 +1,30 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 10010
+#define min(a,b) (a<b?a:b)
+int dp[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	dp[0] = 0;
+	dp[1] = 1;
+	dp[2] = 2;
+	for (int i = 3;i <= 10000; i++)
+	{
+		dp[i] = dp[i-1]+1;
+		for (int j = 2; j*j <= i; j++)
+		{
+			if (0 == i%j)
+				dp[i] = min(dp[i], dp[i/j]+dp[j]);
+		}
+	}
+	while(~scanf("%d%*c", &n))
+	{
+		printf("%d\n", dp[n]);
+	}
+	return 0;
+}

@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <cstring>
+#define max(a,b) (a>b?a:b)
+typedef long long LL;
+#define MAXN 15
+LL dp[MAXN][1<<11];
+int h, w, i;
+//dp[i][j]表示1~i行全部填满
+
+void dfs(int j, int now, int last)
+{
+	if (j == w)
+	{
+		dp[i][now] += dp[i-1][last];
+		return;
+	}
+	if (j+1 <= w)
+	{
+		dfs(j+1,now<<1|1,last<<1);
+		dfs(j+1,now<<1, last<<1|1);
+	}
+	if (j+2 <= w)
+		dfs(j+2,now<<2|3,last<<2|3);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &h, &w) && h+w)
+	{
+		if ((h&1) && (w&1))
+		{
+			puts("0");
+			continue;
+		}
+		if (h<w)
+		{
+			h ^= w;
+			w ^= h;
+			h ^= w;
+		}
+		memset(dp,0,sizeof(dp));
+		dp[0][(1<<w)-1] = 1;
+		for (i = 1; i <= h; i++)
+			dfs(0,0,0);
+		printf("%lld\n", dp[h][(1<<w)-1]);
+	}
+	return 0;
+}

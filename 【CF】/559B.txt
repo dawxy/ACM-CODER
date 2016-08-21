@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10;
+char a[MAXN],b[MAXN];
+
+bool dfs(int x1, int y1, int x2, int y2)
+{
+	int len = y1-x1+1;
+	if(!strncmp(a+x1,b+x2,len)) return true;
+	if(len&1) return false;
+	int m1 = (x1+y1)>>1, m2 = (x2+y2)>>1;
+	if(dfs(x1,m1,m2+1,y2)) return dfs(m1+1,y1,x2,m2);
+	else return dfs(x1,m1,x2,m2) && dfs(m1+1,y1,m2+1,y2);
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	scanf("%s%s", a,b);
+	int len = strlen(a);
+	if(dfs(0,len-1,0,len-1)) puts("YES");
+	else puts("NO");
+	return 0;
+}

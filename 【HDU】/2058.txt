@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <math.h>
+
+void main ()
+{
+	while (1)
+	{
+		int n, m, i, j;
+		scanf ("%d %d", &n,&m);
+		getchar ();
+		if (0 == n && 0 == m)
+			return;
+
+		for (j = (int)sqrt(2*(double)m); j >= 1; j--)
+		{
+			i = m/j - (j-1)/2;
+			if (m == i*j + (j*(j-1))/2)
+			{
+				printf ("[%d,%d]\n", i, i+j-1);
+			}
+		}
+		printf ("\n");
+
+	}
+}

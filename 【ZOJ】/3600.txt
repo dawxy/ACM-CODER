@@ -1,0 +1,31 @@
+#include <stdio.h>
+
+int sishe(double a)
+{
+    return int((a*10+5)/10);
+}
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int n;
+    scanf ("%d%*c", &n);
+    while(n--)
+	{
+        int d, t;
+        scanf ("%d %d%*c", &d, &t);
+        double a = 2.0*t/5.0, b = 2.5*t/4.0;
+        if (3 < d)
+		{
+			if (10 >= d)
+				a += (d-3)*2, b += (d-3)*2.5;
+			else
+				a += 14+(d-10)*3, b += 17.5+(d-10)*3.75;
+		}
+		int ansa = sishe(a), ansb = sishe(b);
+		printf ("%d\n", ansb-ansa);
+	}
+    return 0;
+}
+

@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MOD 7
+struct MATRIX{
+    LL num[2][2];
+    MATRIX(LL a, LL b, LL c, LL d){num[0][0] = a, num[0][1] = b, num[1][0] = c, num[1][1] = d;}
+};
+
+MATRIX mul(const MATRIX &a, const MATRIX &b)
+{
+    MATRIX ans = MATRIX(0,0,0,0);
+    rep(i,0,2)
+    {
+        rep(j,0,2)
+        {
+            rep(k,0,2)
+                ans.num[i][j] = (ans.num[i][j]+a.num[i][k]*b.num[k][j]%MOD)%MOD;
+        }
+    }
+    return ans;
+}
+MATRIX pow_mod(MATRIX a, int n)
+{
+    MATRIX ans = MATRIX(1,0,0,1), x = a;
+    while(n)
+    {
+        if(n&1) ans = mul(ans,x);
+        x = mul(x,x);
+        n >>= 1;
+    }
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int a,b,n;
+    while(~scanf("%d %d %d%*c", &a, &b, &n) && a+b+n)
+    {
+        MATRIX x = MATRIX(0,b,1,a);
+        x = pow_mod(x,n-1);
+        int ans = (x.num[0][0]+x.num[1][0])%MOD;
+        printf("%d\n", ans);
+    }
+    return 0;
+}

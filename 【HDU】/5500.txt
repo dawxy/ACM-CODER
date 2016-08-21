@@ -1,0 +1,74 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 30;
+int a[MAXN],tmp[MAXN],n;
+
+void nxt(int p)
+{
+    tmp[0] = a[p];
+    int cnt = 1;
+    rep(i,0,n)
+    {
+        if(p != i)
+            tmp[cnt++] = a[i];
+    }
+    memcpy(a,tmp,sizeof(int)*n);
+}
+bool end()
+{
+    rep(i,0,n) if(a[i] != i+1) return false;
+    return true;
+}
+bool have(int ed, int v)
+{
+    repe(i,0,ed)
+        if(a[i] > v) return true;
+    return false;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        scanf("%d", &n);
+        rep(i,0,n) scanf("%d", &a[i]);
+        int ans = 0;
+        while(!end())
+        {
+            ans++;
+            int mx = 0,id = -1;
+            rep(i,1,n)
+            {
+                if(have(i-1,a[i]) && mx < a[i])
+                {
+                    mx = a[i];
+                    id = i;
+                }
+            }
+            if(-1 == id) break;
+            nxt(id);
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

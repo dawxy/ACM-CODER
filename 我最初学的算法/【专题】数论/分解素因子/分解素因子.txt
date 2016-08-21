@@ -1,0 +1,32 @@
+//分解素因子
+#include <stdio.h>
+#include <math.h>
+
+void yinzi(int);
+
+int main ()
+{
+	int a;
+	
+	while(1)
+	{
+		scanf("%d%*c", &a);
+		yinzi(a);
+	}
+		
+
+	return 0;
+}
+
+void yinzi(int a)
+{
+	int i;
+	for (i = 2; i <= a; i++)
+		if (0 == a%i)
+		{
+			printf ("%d\n", i);	
+			break;
+		}
+	if (a+1 != i)//只要不是素数就继续算除以刚刚找到的因子后的下一个因子，直到都是素数为止 
+		yinzi (a/i);
+}

@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 105
+struct NODE{
+	int a, b, v;
+	bool operator <(const NODE& t) const{ return v < t.v; }
+}p[MAXN*MAXN];
+int dis[MAXN][MAXN], f[MAXN];
+
+int find(int x){ return ~f[x] ? f[x] = find(f[x]) : x; }
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while (~scanf("%d%*c", &n))
+	{
+		int q, a, b, m = 0, cnt = 1;
+		memset(f, -1, sizeof(f));
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 1; j <= n; j++)
+				scanf("%d%*c", &dis[i][j]);
+		}
+		scanf("%d%*c", &q);
+		for (int i = 0; i < q; i++)
+		{
+			scanf("%d %d%*c", &a, &b);
+			dis[a][b] = dis[b][a] = -1;
+			int x = find(a), y = find(b);
+			if (x != y) f[x] = y, cnt++;
+		}
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = i + 1; j <= n; j++)
+			{
+				if (~dis[i][j])
+					p[m].a = i, p[m].b = j, p[m++].v = dis[i][j];
+			}
+		}
+		sort(p, p + m);
+		int ans = 0;
+		for (int i = 0; i < m && cnt < n; i++)
+		{
+			int x = find(p[i].a), y = find(p[i].b);
+			if (x != y) ans += p[i].v, f[x] = y, cnt++;
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,13 @@
+#include <stdio.h>
+
+int main ()
+{
+    int a, b, t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        scanf ("%d %d%*c", &a, &b);
+        printf ("%d\n",a+b);
+    }
+    return 0;
+}

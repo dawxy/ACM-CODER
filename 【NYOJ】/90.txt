@@ -1,0 +1,26 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 11
+int dp[MAXN];//dp[j]用前i个数能够构成j的个数
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	dp[0] = 1;
+	for (int i = 1; i <= 10; i++)
+	{
+		for (int j = i; j <= 10; j++)
+			dp[j] += dp[j-i];
+	}
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		printf("%d\n", dp[n]);
+	}
+	return 0;
+}

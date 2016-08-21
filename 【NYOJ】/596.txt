@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main ()
+{
+	while (1)
+	{
+		int a, b, ans = -1, n;
+		scanf("%d%*c", &n);
+		if (0 == n)
+			break;
+		for (int i = 0; i < n; i++)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			if (ans < a+b)
+				ans = a+b;
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

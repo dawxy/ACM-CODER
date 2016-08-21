@@ -1,0 +1,19 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int a, b, c;
+    while(~scanf ("%d %d %d%*c", &a, &b, &c))
+	{
+        int ans = a < b? a:b;
+        ans = ans < c ? ans : c;
+        if (ans <= 168)
+			printf ("CRASH %d\n", ans);
+		else
+			puts("NO CRASH");
+	}
+    return 0;
+}

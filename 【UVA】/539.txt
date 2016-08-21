@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 26
+int n, max;
+bool g[MAX][MAX];
+
+void dfs(int p, int s)
+{
+	if (p > max)
+		max = p;
+	for (int i = 0; i < n; i++)
+	{
+		if (g[s][i])
+		{
+			g[s][i] = g[i][s] = false;
+			dfs(p+1, i);
+			g[s][i] = g[i][s] = true;
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int m;
+	while(EOF != scanf ("%d %d%*c", &n, &m)&&n&&m)
+	{
+		int a, b;
+		memset(g,false,sizeof(g));
+		while(m--)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			g[a][b] = g[b][a] = true;
+		}
+		max = -1;
+		for (int i = 0; i < n; i++)
+			dfs(0,i);
+		printf ("%d\n", max);
+	}
+
+	return 0;
+}

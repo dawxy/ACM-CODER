@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <malloc.h>
+
+int MIN (int *p, int n)
+{
+	int i, min;
+	for (i = 0, min = p[0]; i < n; i++)
+	{
+		if (min > p[i])
+			min = p[i];
+	}
+	return min;
+}
+
+void main ()
+{
+	int n, *p, i, min, min_g;
+
+	while (EOF != scanf ("%d", &n))
+	{
+		getchar ();
+		p = (int*) malloc (sizeof(int)*(n+1));
+
+		for (i = 0; i < n; i++)
+		{
+			if (n-1 != i)
+			{
+				scanf ("%d ", &p[i]);
+			}
+			else
+			{
+				scanf ("%d", &p[i]);
+				getchar();
+			}
+		}
+
+		min = MIN(p, n);
+		for (min_g = min; ; min_g++)
+		{
+			for (i = 0; i < n; i++)
+			{
+				if (0 != min_g%p[i])
+				{
+					break;
+				}
+			}
+			if (n == i)
+			{
+				break;
+			}
+		}
+		printf ("%d\n", min_g);
+
+		
+	}
+}

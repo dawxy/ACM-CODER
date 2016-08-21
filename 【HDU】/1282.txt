@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <string.h>
+char c[100];
+__int64 ans[1000];
+
+__int64 sloved(__int64 a)
+{
+    sprintf (c,"%I64d",a);
+    int len = strlen(c);
+    for (int i = 0, j = len-1; i < j; i++, j--)
+	{
+        if (c[i] != c[j])
+		{
+            __int64 b;
+            for (i = 0, j = len-1; i < j; i++,j--)
+			{
+                c[i] ^= c[j];
+                c[j] ^= c[i];
+                c[i] ^= c[j];
+			}
+            sscanf (c,"%I64d",&b);
+            return a+b;
+		}
+	}
+    return -1;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    __int64 a, b;
+    while(~scanf ("%I64d%*c", &a))
+	{
+        int sum = 0;
+        b = a;
+        while((b = sloved(b)) != -1)
+		{
+			ans[sum++] = b;
+		}
+		printf ("%d\n%I64d", sum, a);
+        for (int i = 0; i < sum; i++)
+			printf ("--->%I64d",ans[i]);
+        printf ("\n");
+	}
+    return 0;
+}

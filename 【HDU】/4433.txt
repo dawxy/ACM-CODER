@@ -1,0 +1,70 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+char s1[MAXN], s2[MAXN];
+int dp[MAXN][10][10];
+//dp[i][j][k]前i个已经全部匹配，第i+1个偏移到了j，第i+2个偏移到了k,最小的移动次数
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%s %s%*c", s1+1, s2+1))
+	{
+		int n = strlen(s1+1);
+		clc(dp,0x3f);
+		dp[0][0][0] = 0;
+		rep(i,0,n)
+		{
+			rep(j,0,10)
+			{
+				rep(k,0,10)
+				{
+					//向上转
+					int p = (s2[i+1]-s1[i+1]-j+20)%10;
+					repe(a,0,p)//i+1连带i+2位置旋转
+					{
+						repe(b,0,a)//i+1连带i+2和i+3一起旋转
+						{
+							int &ans = dp[i+1][(k+a)%10][b];
+							ans = min(ans, dp[i][j][k]+p);
+						}
+					}
+					//向下转
+					p = (10-p)%10;
+					repe(a,0,p)
+					{
+						repe(b,0,a)
+						{
+							int &ans = dp[i+1][(k-a+10)%10][(-b+10)%10];
+							ans = min(ans, dp[i][j][k]+p);
+						}
+					}
+				}
+			}
+		}
+		int ans = INF;
+		rep(i,0,10)
+		{
+			rep(j,0,10) ans = min(ans, dp[n][i][j]);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

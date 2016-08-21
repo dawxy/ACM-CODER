@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+	{
+		__int64 x, sum = 0;
+		scanf ("%I64d*c", &x);
+        int ans = 0;
+        while(sum < x)
+		{
+			ans++;
+            sum += ans*ans*ans;
+		}
+        printf ("%d\n", ans);
+	}
+    return 0;
+}

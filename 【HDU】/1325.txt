@@ -1,0 +1,67 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1010
+#define max(a,b) (a>b?a:b)
+int f[MAXN], in[MAXN], n, cnt, maxn;
+bool vis[MAXN];
+
+int find(int x){return ~f[x]?f[x] = find(f[x]):x;}
+void add(int a)
+{
+	if(!vis[a]) n++, vis[a] = true;
+	maxn = max(maxn,a);
+}
+bool make(int a, int b)
+{
+	add(a), add(b);
+	in[b]++;
+	int x = find(a), y = find(b);
+	if(x != y)
+	{
+		f[x] = y;
+		cnt++;
+		return true;
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int a,b, count = 0;
+	while(~scanf("%d %d%*c", &a, &b))
+	{
+		if(a < 0 || b < 0) break;
+		printf("Case %d ", ++count);
+		if(0 == a && 0 == b)
+		{
+			puts("is a tree.");
+			continue;
+		}
+		memset(f,-1,sizeof(f));
+		memset(vis,0,sizeof(vis));
+		memset(in,0,sizeof(in));
+		cnt = 1;
+		n = maxn = 0;
+		bool ok = true;
+		if(!make(a,b)) ok = false;
+		while(~scanf("%d %d%*c", &a, &b) && a+b)
+		{
+			if(!make(a,b)) ok = false;
+		}
+		if(cnt != n) ok = false;
+		for(int i = 1; i <= maxn; i++)
+		{
+			if(!vis[i]) continue;
+			if(1 < in[i])
+			{
+				ok = false;
+				break;
+			}
+		}
+		if(ok) puts("is a tree.");
+		else puts("is not a tree.");
+	}
+	return 0;
+}

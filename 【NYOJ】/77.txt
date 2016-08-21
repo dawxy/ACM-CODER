@@ -1,0 +1,42 @@
+#include <stdio.h>
+
+int main()
+{
+	int n, k;
+	while (EOF != scanf ("%d %d%*c", &n, &k))
+	{
+		bool d[1001];
+		int i, j;
+		for (i = 1; i <= n; i++)
+			d[i] = true;
+		for (i = 2;  i <= k; i++)
+		{
+			for (j = i; j <= n; j += i)
+			{
+				if (d[j])
+					d[j] = false;
+				else
+					d[j] = true;
+			}
+			i = i;
+		}
+
+		for (i = 1; i <= n; i++)
+		{
+			if (d[i])
+			{
+				printf ("%d",i);
+				break;
+			}
+		}
+		for (i++; i <= n; i++)
+		{
+			if (d[i])
+				printf (" %d",i);
+		}
+		printf ("\n");
+
+	}
+
+	return 0;
+}

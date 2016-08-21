@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+int a[MAXN], b[MAXN], c[MAXN*2], na, nb;
+bool vis[MAXN][MAXN];
+
+void dfs(int i, int j)
+{
+    if (i > na || j > nb || vis[i][j])
+        return;
+    vis[i][j] = true;
+    if (i == na && j == nb)
+        return;
+    if (c[i+j+1] == a[i+1])
+        dfs(i+1,j);
+    if (c[i+j+1] == b[j+1])
+        dfs(i,j+1);
+}
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    while(~scanf ("%d %d%*c", &na, &nb) && na+nb)
+    {
+        for(int i = 1; i <= na; i++)
+            scanf ("%d%*c", &a[i]);
+        for (int i = 1; i <= nb; i++)
+            scanf ("%d%*c", &b[i]);
+        for (int i = 1; i <= na+nb; i++)
+            scanf ("%d%*c", &c[i]);
+        memset(vis,0,sizeof(vis));
+        dfs(0,0);
+        if (vis[na][nb])
+            puts("possible");
+        else
+            puts("not possible");
+    }
+    return 0;
+}

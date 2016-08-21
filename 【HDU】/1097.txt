@@ -1,0 +1,27 @@
+#include <cstdio>
+#include <cstring>
+#define MOD 10
+
+int pow_mod(long long a, int n)
+{
+	long long ans = 1;
+	while(n)
+	{
+		if(n&1) ans = (ans*a)%MOD;
+		a = (a*a)%MOD;
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int a,n;
+	while(~scanf("%d %d%*c", &a, &n))
+	{
+		printf("%d\n", pow_mod(a,n));
+	}
+	return 0;
+}

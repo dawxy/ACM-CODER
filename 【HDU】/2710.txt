@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#define MAXN 20000
+bool prime[MAXN+1];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int len = sqrt(MAXN+0.5);
+	memset(prime,1,sizeof(prime));
+	for(int i = 2; i <= len; i++)
+	{
+		if(!prime[i]) continue;
+		for(int j = i*i; j <= MAXN; j += i) prime[j] = false;
+	}
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int a, ans, maxn = -1, now;
+		for(int i = 0; i < n; i++)
+		{
+			scanf("%d%*c", &a);
+			if(prime[a]) now = a;
+			else
+			{
+				for(int j = a>>1; j >= 1; j--)
+				{
+					if(0 == a%j && prime[j])
+					{
+						now = j;
+						break;
+					}
+				}
+			}
+			if(now > maxn)
+				maxn = now, ans = a;
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

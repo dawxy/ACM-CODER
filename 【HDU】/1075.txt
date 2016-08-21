@@ -1,0 +1,95 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 500010
+int tree[MAXN][30], cnt;//tree树的路径,cnt当前已经建立的结点数
+char val[MAXN][15];//每个叶子的信息
+
+void init()
+{
+	clc(tree[0],-1);
+	cnt = 1;
+}
+void insert(char *s, char *v)//插入key为s，值为v
+{
+	int u = 0, n = strlen(s);//从根节点(0)开始
+	rep(i,0,n)
+	{
+		int c = s[i]-'a';
+		if(-1 == tree[u][c])//不存在的前缀，新建结点
+		{
+			val[cnt][0] = 0;//中间节点val赋值为空
+			clc(tree[cnt],-1);
+			tree[u][c] = cnt++;
+		}
+		u = tree[u][c];
+	}
+	strcpy(val[u],v);//叶子节点赋值
+}
+bool query(char *s, char *v)//根据s查找,成功返回true,并且存到v
+{
+	int u = 0, n = strlen(s);
+	rep(i,0,n)
+	{
+		int c = s[i]-'a';
+		if(-1 == tree[u][c])//不存在的key
+			return false;
+		u = tree[u][c];
+	}
+	if(!val[u][0]) return false;
+	strcpy(v,val[u]);
+}
+char in(char *s, char *buf)
+{
+	int ch, len = 0, n = 0;
+	while(!isalpha(ch = getchar())) buf[n++] = ch;
+	s[len++] = ch;
+	while(isalpha(ch = getchar())) s[len++] = ch;
+	s[len] = buf[n] = 0;
+	return ch;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	char a[100], b[100], st[3010];
+	in(a, st);
+	init();
+	while(1)
+	{
+		in(a,st);
+		if('E' == a[0]) break;
+		in(b,st);
+		insert(b,a);
+	}
+	in(a,st);
+	while(1)
+	{
+		char ed = in(a,st);
+		if('E' == a[0]) break;
+		printf("%s", st);
+		if(query(a,b))
+			printf("%s", b);
+		else printf("%s", a);
+		putchar(ed);
+	}
+	putchar('\n');
+	return 0;
+}

@@ -1,0 +1,49 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 100010
+#define min(a,b) (a<b?a:b)
+int ans, ch, a[MAXN];
+
+int b_search(int x, int y, int val)//在a[x]~a[y]中找到第一个>a[x]*2的下标
+{
+	int mid;
+	while(x<y)
+	{
+		mid = (x+y)>>1;
+		if (val < a[mid]) y = mid;
+		else x = mid+1;
+	}
+	return x;
+}
+int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int i;
+		for (i = 0; i < n; i++)
+			a[i] = in();
+		sort(a,a+n);
+		ans = 0x3f3f3f3f;
+		for (int i = 0; i < n; i++)
+		{
+			int s = i;
+			s += n-b_search(i+1,n, a[i]<<1);
+			ans = min(ans,s);
+		}
+		printf("%d\n",ans);
+	}
+	return 0;
+}

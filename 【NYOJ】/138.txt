@@ -1,0 +1,85 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100*10000+10, MOD = 1000007;
+struct HASH{
+	int head[MOD], next[MAXN], node[MAXN], cnt;
+	void clear(){
+		cnt = 0;
+		clc(head,-1);
+	}
+	int hash(int s){
+		return s%MOD;
+	}
+	void insert(int s){
+		int id = hash(s);
+		int u = head[id];
+		while(~u)
+		{
+			if(node[u] == s) return;
+			u = next[u];
+		}
+		node[cnt] = s;
+		next[cnt] = head[id];
+		head[id] = cnt++;
+	}
+	bool query(int s)
+	{
+		int u = head[hash(s)];
+		while(~u)
+		{
+			if(s == node[u]) return true;
+			u = next[u];
+		}
+		return false;
+	}
+}vis;
+
+int in(){
+	int ch,ans;
+	while(!isdigit(ch = getchar()));
+	ans = ch-'0';
+	while(isdigit(ch = getchar())) ans = (ans<<3)+(ans<<1)+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, m;
+	char c[20];
+	vis.clear();
+	scanf("%d%*c", &n);
+	rep(i,0,n)
+	{
+		scanf("%s %d%*c", c, &m);
+		if('A' == c[0])
+		{
+			rep(j,0,m) vis.insert(in());
+		}
+		else
+		{
+			rep(j,0,m)
+			{
+				if(vis.query(in())) puts("YES");
+				else puts("NO");
+			}
+		}
+	}
+	return 0;
+}

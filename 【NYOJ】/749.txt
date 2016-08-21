@@ -1,0 +1,38 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1010
+#define min(a,b) (a<b?a:b)
+char a[MAXN];
+int dp[MAXN];
+
+bool ok(int x, int y)
+{
+	while(x<=y)
+	{
+		if (a[x] != a[y]) return false;
+		x++;
+		y--;
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(gets(a))
+	{
+		int len = strlen(a);
+		for (int i = 0; i < len; i++)
+		{
+			dp[i] = i+1;
+			for (int j = 0; j <= i; j++)
+			{
+				if (ok(j,i))
+					dp[i] = min(dp[i], dp[j-1]+1);
+			}
+		}
+		printf("%d\n", dp[len-1]);
+	}
+	return 0;
+}

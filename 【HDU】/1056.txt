@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    double a;
+    while(1)
+	{
+        scanf ("%lf", &a);
+        if (0.00 == a)
+			break;
+        int c = 2;
+        double sum = 0;
+        for (; sum < a && sum-a < 1e-6; c++)
+		{
+            sum += 1.0/c;
+		}
+        printf ("%d card(s)\n", c-2);
+	}
+    return 0;
+}

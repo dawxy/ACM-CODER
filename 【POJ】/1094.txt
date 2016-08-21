@@ -1,0 +1,81 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <string>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 50
+vector<int> g[MAXN];
+int in[MAXN], tmp[MAXN],ans[MAXN], t, n;
+bool ct;
+
+int topo()//返回-1说明有环，返回1表示找到topo排序,0表示没找到
+{
+	int p = 0, c = 1;
+	queue<int> q;
+	rep(i,0,n) if(!in[i]) q.push(i);
+	while(!q.empty())
+	{
+		if(q.size() > 1) c = 0;
+		int u = q.front();q.pop();
+		int sz = g[u].size();
+		rep(i,0,sz)
+		{
+			int v = g[u][i];
+			if(!--in[v]) q.push(v);
+		}
+		ans[p++] = u;
+	}
+	if(p < n) return -1;
+	return c;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int m;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		bool find = false;
+		ct = false;
+		int id;
+		char a,b;
+		rep(i,0,n) g[i].clear();
+		clc(tmp,0);
+		repe(i,1,m)
+		{
+			scanf("%c<%c%*c", &a, &b);
+			if(find || ct) continue;
+			g[a-'A'].push_back(b-'A');
+			tmp[b-'A']++;
+			memcpy(in,tmp,sizeof(int)*n);
+			int p = topo();
+			if(1 == p)
+			{
+				find =true;
+				id = i;
+			}
+			else if(-1 == p) ct = true, id = i;
+		}
+		if(find)
+		{
+			printf("Sorted sequence determined after %d relations: ", id);
+			rep(i,0,n) putchar(ans[i]+'A');
+			printf(".\n");
+		}
+		else if(ct) printf("Inconsistency found after %d relations.\n", id);
+		else puts("Sorted sequence cannot be determined.");
+	}
+	return 0;
+}

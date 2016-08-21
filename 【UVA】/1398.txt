@@ -1,0 +1,80 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+struct NODE{
+	double t;
+	bool right;
+	bool operator<(const NODE& v) const{
+		if(t != v.t) return t < v.t;
+		return right > v.right;
+	}
+}p[MAXN<<1];
+
+void update(int x, int a, int w, double &l, double &r)
+{
+	if(!a)
+	{
+		if(x <= 0 || x >= w) r = l-1;
+	}
+	else if(a > 0)
+	{
+		l = max(l, -x*1.0/a*1.0);
+		r = min(r, (w-x)*1.0/a*1.0);
+	}
+	else
+	{
+		l = max(l, (w-x)*1.0/a*1.0);
+		r = min(r, -x*1.0/a*1.0);
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int w,h;
+		scanf("%d %d%*c", &w, &h);
+		int n;
+		scanf("%d%*c", &n);
+		int cnt = 0;
+		rep(i,0,n)
+		{
+			int x,y,a,b;
+			scanf("%d %d %d %d%*c", &x, &y, &a, &b);
+			double l = 0,r = INF;
+			update(x,a,w,l,r);
+			update(y,b,h,l,r);
+			if(l > r) continue;
+			p[cnt].t = l, p[cnt++].right = false;
+			p[cnt].t = r, p[cnt++].right = true;
+		}
+		sort(p,p+cnt);
+		int sum = 0, ans = 0;
+		rep(i,0,cnt)
+		{
+			if(p[i].right) sum--;
+			else ans = max(ans,++sum);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

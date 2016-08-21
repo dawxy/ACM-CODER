@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAXN 5010
+char a[MAXN], b[MAXN];
+int s1[MAXN],s2[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(gets(a))
+	{
+        gets(b);
+        int lena = strlen(a), lenb = strlen(b), e = 0,f = 0;
+        if (lena != lenb)
+		{
+			puts("-1");
+			continue;
+		}
+        for (int i = 0; i < lena; i++)
+		{
+            if ('+' == a[i])
+				s1[e++] = i;
+			if ('+' == b[i])
+				s2[f++] = i;
+		}
+        if (e != f)
+		{
+			puts("-1");
+			continue;
+		}
+        int ans = 0;
+        for (int i = 0; i < e; i++)
+            ans += abs(s1[i]-s2[i]);
+		printf ("%d\n", ans);
+	}
+    return 0;
+}

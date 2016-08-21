@@ -1,0 +1,78 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <vector>
+using namespace std;
+#define MAXN 1005
+#define INF 0x3f3f3f3f
+struct NODE{
+	int dis,s;
+	NODE(int a, int b){dis = a, s = b;}
+	bool operator<(const NODE& a)const{return dis>a.dis;}
+};
+int cost[MAXN][MAXN], dp[MAXN], ans, ch;
+bool vis[MAXN];
+priority_queue<NODE> q;
+vector<int> g[MAXN];
+
+int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+void dijkstra(int st)
+{
+	memset(dp,0x3f,sizeof(dp));
+	memset(vis,0,sizeof(vis));
+	q.push(NODE(0,st));
+	dp[st] = 0;
+	while(!q.empty())
+	{
+		NODE now = q.top();q.pop();
+		int u = now.s;
+		if(vis[u]) continue;
+		vis[u] = true;
+		int len = g[u].size();
+		for(int i = 0; i < len; i++)
+		{
+			int to = g[u][i];
+			if(dp[to] > dp[u]+cost[u][to])
+			{
+				dp[to] = dp[u]+cost[u][to];
+				q.push(NODE(dp[to],to));
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,m,st;
+	while(~scanf("%d %d %d%*c", &n, &m, &st))
+	{
+		int a,b,c;
+		memset(cost,0x3f,sizeof(cost));
+		for(int i = 1; i <= n; i++) g[i].clear();
+		for(int i = 0; i < m; i++)
+		{
+			a = in(),b = in(),c = in();
+			if(INF == cost[b][a])
+				g[b].push_back(a);
+			if(cost[b][a] > c)
+				cost[b][a] = c;
+		}
+		dijkstra(st);
+		int res = INF;
+		m = in();
+		for(int i = 0; i < m; i++)
+			res = min(res,dp[in()]);
+		if(INF == res) puts("-1");
+		else
+			printf("%d\n",res);
+	}
+	return 0;
+}

@@ -1,0 +1,57 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 5000000+10;
+int x[MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t,count = 0;
+    scanf("%d", &t);
+    while(t--)
+    {
+        int n,a,b;
+        scanf("%d %d %d", &n, &a, &b);
+        int mx = -INF, mi = INF,p = 0;
+        rep(i,0,n)
+        {
+            scanf("%d",&x[i]);
+            if(a > 0)
+            {
+                if(mx < abs(x[i]))
+                {
+                    mx = abs(x[i]);
+                    p = i;
+                }
+            }
+            else
+            {
+                if(mi > abs(x[i]))
+                {
+                    mi = abs(x[i]);
+                    p = i;
+                }
+            }
+        }
+        int s = b > 0?-INF:INF;
+        rep(i,0,n)
+        {
+            if(p == i) continue;
+            if(b > 0)
+                s = max(s,x[i]);
+            else s = min(s,x[i]);
+        }
+        LL ans;
+        if(a > 0) ans = (LL)a*mx*mx+(LL)b*s;
+        else ans = (LL)a*mi*mi+(LL)b*s;
+        printf("Case #%d: %I64d\n", ++count,ans);
+    }
+    return 0;
+}

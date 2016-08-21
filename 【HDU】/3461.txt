@@ -1,0 +1,56 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000000+10, MAXM = 1000+10, MOD = 1000000007;
+int f[MAXN];
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int pow_mod(LL x, int n)
+{
+	LL ans = 1;
+	while(n)
+	{
+		if(n&1) ans = ans*x%MOD;
+		x = x*x%MOD;
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		int a,b, cnt = 0;
+		repe(i,0,n) f[i] = i;
+		while(m--)
+		{
+			scanf("%d %d%*c", &a, &b);
+			int x = find(a-1), y = find(b);
+			if(x != y)
+			{
+				f[x] = y;
+				cnt++;
+			}
+		}
+		printf("%d\n",pow_mod(26,n-cnt));
+	}
+	return 0;
+}

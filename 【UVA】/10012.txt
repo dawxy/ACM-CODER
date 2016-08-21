@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <math.h>
+int n;
+double r[9], x[9], minnum, br[9];
+bool vis[9] = {0};
+
+double rdis(double r1, double r2)
+{
+	return 2*(sqrt)(r1*r2);
+}
+double pdis(double x, double y)
+{
+	return (sqrt)(x*x+y*y);
+}
+double the_ans()
+{
+	double left = 0;
+	for (int i = 0; i < n; i++)
+	{
+		if (0 == i)
+			x[i] = br[i];
+		else
+			x[i] = x[i-1]+rdis(br[i],br[i-1]);
+		if (x[i] < br[i])
+			x[i] = br[i];
+		for (int j = 0; j < i; j++)
+		{
+			if (pdis(x[i]-x[j], br[i]-br[j]) < br[i]+br[j])
+				x[i] = x[j]+rdis(br[i],br[j]);
+		}
+		if (left < x[i]+br[i])
+			left = x[i]+br[i];
+	}
+	return left;
+}
+void dfs(int p)
+{
+	if (p == n)
+	{
+		double tem = the_ans();
+		if (tem < minnum)
+			minnum = tem;
+		return;
+	}
+	for (int i = 0; i < n; i++)
+	{
+		if (!vis[i])
+		{
+			vis[i] = true;
+			br[p] = r[i];
+			dfs(p+1);
+			vis[i] = false;
+		}
+	}
+
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		scanf ("%d%*c", &n);
+		for (int i = 0; i < n; i++)
+			scanf ("%lf%*c", &r[i]);
+		minnum = 1000000000;
+		dfs(0);
+		printf ("%.3lf\n", minnum);
+	}
+	return 0;
+}

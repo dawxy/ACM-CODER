@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <cstring>
+#define min(a,b) (a>b?b:a)
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 100010
+int sum[MAXN],dp[MAXN];
+
+int in()
+{
+	int ch;
+	while((ch = getchar()) < '0' || '9' < ch);
+	int ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = (ans<<3)+(ans<<1)+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t = in(), count = 0;
+	while(t--)
+	{
+		int m = in(), n = in(), down = in(), up = in();
+		clc(sum,0);
+		clc(dp,0x3f);
+		repe(i,1,n) sum[in()]++;
+		dp[0] = dp[1] = dp[2] = 0;
+		int mi = min(up,down);
+		dp[3] = sum[2]*mi;
+		repe(i,4,m)
+		{
+			dp[i] = min(dp[i],dp[i-2]+sum[i-1]*mi);
+			int buf = min(sum[i-1]*up+sum[i-2]*up*2,sum[i-2]*down+sum[i-1]*down*2);
+			buf = min(buf,sum[i-1]*up+sum[i-2]*up);
+			buf = min(buf,sum[i-2]*up*2+sum[i-1]*down*2);
+			dp[i] = min(dp[i], dp[i-3]+buf);
+		}
+		printf("Case %d: %d\n", ++count, dp[m]);
+	}
+	return 0;
+}

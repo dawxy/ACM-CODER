@@ -1,0 +1,27 @@
+#include <cstdio>
+int ans[501];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	ans[1] = 1;
+	int sum = 1;
+	for(int i = 2; i <= 500; i++)
+	{
+		ans[i] = ans[i-1]+i*(i+1)/2;
+		sum = i-1;
+		while(sum > 0)
+		{
+			ans[i] += sum;
+			sum -= 2;
+		}
+	}
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		printf("%d\n", ans[n]);
+	}
+	return 0;
+}

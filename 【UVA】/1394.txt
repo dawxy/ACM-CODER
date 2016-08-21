@@ -1,0 +1,90 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10;
+int sum[MAXN<<1];
+
+inline int id(int x, int y){
+	return x+y|x!=y;
+}
+void push_up(int x, int y, int m){
+	sum[id(x,y)] = sum[id(x,m)]+sum[id(m+1,y)];
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		sum[id(x,y)] = 1;
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+void del(int x, int y, int p)//删除数p
+{
+	if(x == y)
+	{
+		sum[id(x,y)]--;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) del(x,m,p);
+	else del(m+1,y,p);
+	push_up(x,y,m);
+}
+int k_th(int x, int y, int k)//查找没删除的第k个数
+{
+	if(x == y) return x;
+	int m = (x+y)>>1;
+	if(sum[id(x,m)] >= k)
+		return k_th(x,m,k);
+	return k_th(m+1,y,k-sum[id(x,m)]);
+}
+int get_sum(int x, int y, int ql, int qr)//查找[ql,qr]有多少个数没删除
+{
+	if(ql <= x && y <= qr) return sum[id(x,y)];
+	int m = (x+y)>>1, ans = 0;
+	if(ql <= m) ans += get_sum(x,m,ql,qr);
+	if(qr > m) ans += get_sum(m+1,y,ql,qr);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,k,m;
+	while(~scanf("%d %d %d%*c", &n, &k, &m) && n+k+m)
+	{
+		bulid(1,n);
+		del(1,n,m);
+		int p = m, cnt = n-1;
+		rep(i,2,n)
+		{
+			int c = k%(cnt--);//p向右走c格
+			if(!c) c = cnt+1;
+			int ls = get_sum(1,n,1,p), rs = get_sum(1,n,p,n);
+			if(rs >= c) p = k_th(1,n,ls+c);		
+			else p = k_th(1,n,c-rs);
+			del(1,n,p);
+		}
+		printf("%d\n", k_th(1,n,1));
+	}
+	return 0;
+}

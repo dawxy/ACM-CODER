@@ -1,0 +1,98 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int MAXN = 300000+10, MAXM = 300000*2+10;
+int head[MAXN], tol, nxt[MAXM], to[MAXM], c[MAXM];
+
+inline void add_edge(int u, int v, int cost)
+{
+    nxt[tol] = head[u], to[tol] = v, c[tol] = cost;
+    head[u] = tol++;
+}
+bool inq[MAXN];
+LL dis[MAXN];
+int fre[MAXN];
+void spfa(int st)
+{
+    queue<int> q;
+    q.push(st);
+    inq[st] = true;
+    clc(dis,0x3f);
+    dis[st] = 0;
+    while(!q.empty())
+    {
+        int u = q.front();q.pop();
+        inq[u] = false;
+        for(int i = head[u]; ~i; i= nxt[i])
+        {
+            int v = to[i];
+            if(dis[v] > dis[u]+c[i])
+            {
+                dis[v] = dis[u]+c[i];
+                fre[v] = i;
+                if(!inq[v])
+                {
+                    q.push(v);
+                    inq[v] = true;
+                }
+            }
+            else if(dis[v] == dis[u]+c[i] && c[i] < c[fre[v]])
+            {
+                fre[v] = i;
+                /*if(!inq[v])
+                {
+                    q.push(v);
+                    inq[v] = true;
+                }*/
+            }
+        }
+    }
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int n,m;
+    scanf("%d %d%*c", &n,&m);
+    clc(head,-1);
+    tol = 0;
+    rep(i,0,m)
+    {
+        int u,v,cost;
+        scanf("%d %d %d%*c", &u, &v, &cost);
+        add_edge(u,v,cost);
+        add_edge(v,u,cost);
+    }
+    int st;
+    scanf("%d\n", &st);
+    spfa(st);
+    LL sum = 0;
+    repe(i,1,n)
+    {
+        if(i != st)
+            sum += c[fre[i]];
+    }
+    printf("%I64d\n", sum);
+    repe(i,1,n)
+    {
+        if(i == st) continue;
+        printf("%d ", fre[i]/2+1);
+    }
+    putchar('\n');
+    return 0;
+}

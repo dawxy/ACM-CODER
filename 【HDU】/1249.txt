@@ -1,0 +1,23 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 10010
+int ans[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	ans[1] = 2;
+	for(int i = 2; i <= 10000; i++)
+		ans[i] = ans[i-1]+6*(i-1);
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		printf("%d\n", ans[n]);
+	}
+	return 0;
+}

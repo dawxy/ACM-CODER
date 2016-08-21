@@ -1,0 +1,55 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+LL a[MAXN],sum[MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t;
+    sum[0] = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n,m;
+        scanf("%d %d%*c", &n, &m);
+        repe(i,1,n-1)
+        {
+            scanf("%d%*c", &a[i]);
+            sum[i] = sum[i-1]+a[i];
+        }
+        repe(i,1,m)
+        {
+            int x,y;
+            scanf("%d %d%*c", &x, &y);
+            int st = (i-1)%n+1;
+            if(x < y)
+            {
+                if(x >= st)
+                    printf("%I64d\n", sum[y-1]-sum[st-1]);
+                else
+                    printf("%I64d\n", sum[n-1]-sum[st-1]+sum[n-1]+sum[y-1]);
+            }
+            else
+                printf("%I64d\n", sum[n-1]-sum[st-1]+sum[n-1]-sum[y-1]);
+        }
+    }
+    return 0;
+}

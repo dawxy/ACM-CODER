@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 55
+int a[MAXN][MAXN];
+int num[MAXN], ans, n;
+
+bool ok(int sum, int now)
+{
+	rep(i,0,sum) if(!a[now][num[i]]) return false;
+	return true;
+}
+void dfs(int to, int sum, int now)
+{
+	if(sum+n-now-1 < ans) return;
+	if(ans < sum) ans = sum;
+	rep(i,to+1,n)
+	{
+		if(ok(sum,i))
+		{
+			num[sum] = i;
+			dfs(i,sum+1,now+1);
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &n) && n)
+	{
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+			{
+				a[i][j] = getchar()-'0';
+				getchar();
+			}
+		}
+		ans = 0;
+		rep(i,0,n)
+		{
+			num[0] = i;
+			dfs(i,1,0);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

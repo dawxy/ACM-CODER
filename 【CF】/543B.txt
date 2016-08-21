@@ -1,0 +1,90 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 3000+10, MAXM = 3000*2+10;
+int head[MAXN], tol, nxt[MAXM], to[MAXM], la[MAXN], n, m;
+bool vis[MAXM];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int dis[MAXN][MAXN];
+void bfs(int st)
+{
+	queue<int> q;
+	clc(dis[st],-1);
+	dis[st][st] = 0;
+	q.push(st);
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(-1 == dis[st][v])
+			{
+				dis[st][v] = dis[st][u]+1;
+				q.push(v);
+			}
+		}
+	}
+}
+bool sloved()
+{
+	int st1,ed1,l1,st2,ed2,l2;
+	scanf("%d %d %d %d %d %d%*c", &st1, &ed1, &l1,&st2, &ed2, &l2);
+	repe(i,1,n) bfs(i);
+	if(dis[st1][ed1] > l1 || dis[st2][ed2] > l2) return false;
+	int mi = dis[st1][ed1]+dis[st2][ed2];
+	repe(i,1,n)
+	{
+		repe(j,1,n)
+		{
+			if(i == j) continue;
+			int da = dis[st1][i]+dis[i][j]+dis[j][ed1], db = dis[st2][i]+dis[i][j]+dis[j][ed2];
+			if(da <= l1 && db <= l2)
+				mi = min(mi,da+db-dis[i][j]);
+			da = dis[st1][j]+dis[i][j]+dis[i][ed1];
+			if(da <= l1 && db <= l2)
+				mi = min(mi,da+db-dis[i][j]);
+		}
+	}
+	printf("%d\n", m-mi);
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,m)
+		{
+			int u,v;
+			scanf("%d %d%*c", &u, &v);
+			add_edge(u,v);
+			add_edge(v,u);
+		}
+		if(!sloved()) puts("-1");
+	}
+	return 0;
+}

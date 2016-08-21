@@ -1,0 +1,15 @@
+#include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    __int64 n, ans;
+    while(~scanf ("%I64d%*c", &n))
+	{
+        ans = ((n*(n+1)/2)%10000)*((n*(n+1)/2)%10000)%10000;
+        printf ("%04I64d\n", ans);
+	}
+    return 0;
+}

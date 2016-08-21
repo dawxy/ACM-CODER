@@ -1,0 +1,84 @@
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10;
+double h[MAXN],w[MAXN];
+int n;
+
+double get_one_down(int id, double d)
+{
+    double x = (double)(h[id]-d)*w[id]/h[id];
+    double s1 = x*x,s2 = w[id]*w[id];
+    return (s1+s2+x*w[id])*d/3.0;
+}
+double get_down(double d)
+{
+    double ans = 0;
+    rep(i,0,n) ans += get_one_down(i,d);
+    return ans;
+}
+double get_one_up(int id, double d)
+{
+ if(d>h[id])   return 0;
+double x = (double)(h[id]-d)*w[id]/h[id];
+    double s = x*x;
+    return s*(h[id]-d)/3.0;
+}
+double get_up(double d)
+{
+    double ans = 0;
+    rep(i,0,n)
+        ans += get_one_up(i,d);
+    return ans;
+}
+inline bool equal(double a, double b)
+{
+    return fabs(a-b) < 1e-6;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        scanf("%d", &n);
+        double mx = 0;
+        double sum = 0;
+        rep(i,0,n) scanf("%lf", &h[i]),mx = max(mx,h[i]);
+        rep(i,0,n) scanf("%lf", &w[i]);
+        rep(i,0,n) sum += get_one_up(i,0);
+        sum /= 2;
+        double ans,x = 0,y = mx;
+        while(x < y || equal(x,y))
+        {
+            double m = (x+y)/2.0;
+            double up = get_up(m);
+            if(equal(up,sum))
+            {
+                ans = m;
+                break;
+            }
+            if(up > sum) x = m+1e-9;
+            else y = m-1e-9;
+        }
+        printf("%d\n", (int)ans);
+    }
+    return 0;
+}

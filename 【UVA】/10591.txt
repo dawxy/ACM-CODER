@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <string.h>
+bool vis[740];
+
+bool sloved(int a)
+{
+	char buf[20];
+	int len, ans;
+	while(1)
+	{
+		sprintf (buf,"%d",a);
+		len = strlen(buf);
+		ans = 0;
+		for (int i = 0; i < len; i++)
+			ans += (buf[i]-'0')*(buf[i]-'0');
+		if (vis[ans])
+			return false;
+		if (1 == ans)
+			return true;
+		vis[ans] = true;
+		a = ans;
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t, count = 0;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int a;
+		memset(vis,false,sizeof(vis));
+		scanf ("%d%*c", &a);
+		if (730 > a && 1 != a)
+			vis[a] = true;
+		if (sloved(a))
+			printf ("Case #%d: %d is a Happy number.\n", ++count, a);
+		else
+			printf ("Case #%d: %d is an Unhappy number.\n", ++count, a);
+	}
+	return 0;
+}

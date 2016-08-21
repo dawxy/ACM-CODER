@@ -1,0 +1,197 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20000+10, MAXM = 60000+10, MAXQ = 600000+10;
+/*
+Treap同时有二叉搜索树(BST,键值:左儿子<根<右儿子)和堆的性质(根节点的优先级大于儿子节点)
+这样能保证在优先级唯一且不相等的情况下树是唯一的
+这里的r(优先级)是用rand()生成的，能证明查找，插入，删除，找第K大，名次的时间复杂度都是log(n)
+注意:rand()最大值是RAND_MAX(系统不同值不同，可以输出看看),所以不够的话不能直接用
+rand()是在0~RAND_MAX中的书按照某个顺序输出的，在输出前RAND_MAX+1中是不会重复的
+*/
+struct NODE{
+	NODE *ch[2];
+	int r;//随机优先级
+	int v;//键值
+	int sum;//以当前节点为根的总结点数
+	NODE(int a){
+		v = a,ch[0] = ch[1] = NULL, r = rand(), sum = 1;
+	}
+	int cmp(int x){
+		if(x == v) return -1;
+		return x<v?0:1;
+	}
+	void push_up(){
+		sum = 1;
+		if(ch[0]) sum += ch[0]->sum;
+		if(ch[1]) sum += ch[1]->sum;
+	}
+};
+void clear(NODE* &u)//清空树
+{
+	if(!u) return;
+	if(u->ch[0]) clear(u->ch[0]);
+	if(u->ch[1]) clear(u->ch[1]);
+	delete u;
+	u = NULL;
+}
+void rotate(NODE* &u, int d)//旋转，d = 0左旋,d = 1右旋
+{
+	NODE *k = u->ch[d^1];
+	u->ch[d^1] = k->ch[d], k->ch[d] = u;
+	u->push_up(), k->push_up();  //更新sum,先更新u
+	u = k;
+}
+void insert(NODE* &u, int v)//插入键值v(不需要保证v是否存在)
+{
+	if(!u) u = new NODE(v);
+	else
+	{
+		int d = v < u->v?0:1;//不要使用cmp(),可能已经存在相同的v
+		insert(u->ch[d], v);
+		if(u->r < u->ch[d]->r) //如果儿子的r比当前大则需要旋转
+			rotate(u,d^1);//左儿子则右旋，右儿子左旋
+	}
+	u->push_up();//更新sum
+}
+void del(NODE* &u, int v)//删除键值v
+{
+	int d = u->cmp(v);
+	if(~d)//没找到继续往下找
+		del(u->ch[d],v);
+	else
+	{
+		NODE *o = u;
+		if(u->ch[0] && u->ch[1])//左右儿子都存在
+		{
+			int d2 = u->ch[0]->r > u->ch[1]->r?1:0;//优先级大的儿子旋转为根
+			rotate(u,d2);
+			del(u->ch[d2],v);
+		}
+		else
+		{
+			if(!u->ch[0]) u = u->ch[1];//只有右儿子
+			else u = u->ch[0];//只有左儿子
+			delete o;
+			//u = NULL;
+		}
+	}
+	if(u) u->push_up();
+}
+int kth(NODE* u, int k)//寻找第k大键值
+{
+	if(!u || k <= 0 || k > u->sum) return 0;//不存在
+	int s = u->ch[1]?u->ch[1]->sum:0;//比当前v大的数目
+	if(k == s+1) return u->v;//找到第k大值
+	if(k <= s) return kth(u->ch[1],k);//比v大的数量>=k时说明在右儿子
+	return kth(u->ch[0],k-s-1);
+}
+void merge(NODE* &u, NODE * &to)//把u树合并到to树,O(n1*log(n2)) n1,n2是u和to中的节点数
+{
+	if(u->ch[0]) merge(u->ch[0],to);
+	if(u->ch[1]) merge(u->ch[1],to);
+	insert(to,u->v);
+	delete u;
+	u = NULL;
+}
+
+struct Edge{
+	int u,v;
+}edge[MAXM];
+struct CMD{
+	char op;
+	int x,y;
+}cmd[MAXQ];
+NODE *rt[MAXN];//treap
+int a[MAXN], f[MAXN];
+bool isdel[MAXM];//边是否已经删除
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+void hebing(int a, int b)
+{
+	int x = find(a), y = find(b);
+	if(x != y)
+	{
+		if(rt[x]->sum < rt[y]->sum)
+			f[x] = y, merge(rt[x],rt[y]);
+		else
+			f[y] = x, merge(rt[y],rt[x]);
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m,count = 0;
+	while(~scanf("%d %d%*c", &n, &m) &&n+m)
+	{
+		//init
+		repe(i,0,n) f[i] = i,clear(rt[i]);
+		clc(isdel,0);
+		//input
+		repe(i,1,n)
+			scanf("%d%*c", &a[i]);
+		repe(i,1,m)
+			scanf("%d %d%*c", &edge[i].u, &edge[i].v);
+		int q = 0;
+		char str[10];
+		while(~scanf("%s",str) && 'E' != str[0])
+		{
+			cmd[q].op = str[0];
+			if('D' == str[0])
+				scanf("%d%*c", &cmd[q].x), isdel[cmd[q].x] = true;
+			else if('Q' == str[0])
+				scanf("%d %d%*c", &cmd[q].x, &cmd[q].y);
+			else
+			{
+				scanf("%d %d%*c", &cmd[q].x, &cmd[q].y);
+				int buf = a[cmd[q].x];
+				a[cmd[q].x] = cmd[q].y;
+				cmd[q].y = buf;
+			}
+			q++;
+		}
+		repe(i,1,n) rt[i] = new NODE(a[i]);
+		//合并树成为最终的图
+		repe(i,1,m)
+		{
+			if(isdel[i]) continue;
+			hebing(edge[i].u,edge[i].v);
+		}
+		//从后往前倒过来计算每个Q的值,这样就能把删除变成合并了
+		int cnt = 0;
+		double sum = 0;
+		per(i,q-1,0)
+		{
+			if('D' == cmd[i].op)
+				hebing(edge[cmd[i].x].u,edge[cmd[i].x].v);
+			else if('Q' == cmd[i].op)
+			{
+				cnt++;
+				sum += kth(rt[find(cmd[i].x)],cmd[i].y);
+			}
+			else
+			{
+				int u = find(cmd[i].x);//找到要删除节点在哪颗树
+				del(rt[u],a[cmd[i].x]);//删除原来的
+				insert(rt[u],cmd[i].y);//插入
+				a[cmd[i].x] = cmd[i].y;
+			}
+		}
+		printf("Case %d: %.6lf\n", ++count,sum/cnt);
+	}
+	return 0;
+}

@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <string.h>
+const int d[8][2] = {{-1,-2},{-2,-1},{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2}}, MAXS = 300000;
+struct QUE{
+	int i, j, dis;
+}que[MAXS],ed;
+bool g[8][8];
+int front, rear;
+
+int bfs();
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	char buf1[5], buf2[5];
+	while(EOF != scanf ("%s %s%*c", buf1, buf2))
+	{
+		que[0].i = buf1[0]-'a';
+		que[0].j = buf1[1]-'1';
+		ed.i = buf2[0]-'a';
+		ed.j = buf2[1]-'1';
+		memset(g, false, sizeof(g));
+		printf ("To get from %s to %s takes %d knight moves.\n", buf1,buf2,bfs());
+	}
+	return 0;
+}
+
+int bfs()
+{
+	int ni, nj;
+	front = -1; rear = 0;
+	g[que[rear].i][que[rear].j] = true;
+	que[rear++].dis = 0;
+	while(1 != rear-front)
+	{
+		++front;
+		if (que[front].i == ed.i && que[front].j == ed.j)
+			return que[front].dis;
+		for (int i = 0; i < 8; i++)
+		{
+			ni = d[i][0]+que[front].i;
+			nj = d[i][1]+que[front].j;
+			if (0 <= ni && 8 > ni && 0 <= nj && 8 > nj && !g[ni][nj])
+			{
+				g[ni][nj] = true;
+				que[rear].dis = que[front].dis+1;
+				que[rear].i = ni;
+				que[rear++].j = nj;
+			}
+		}
+	}
+	return -1;
+}

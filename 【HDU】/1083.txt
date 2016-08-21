@@ -1,0 +1,116 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <queue>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a));
+#define pb push_back
+#define MAXN 310
+#define INF 0x3f3f3f3f
+vector<int> g[MAXN];
+int dx[MAXN], dy[MAXN], mx[MAXN], my[MAXN];;
+int dis, n;
+bool used[MAXN];
+//n是左边点数的数量(从0开始，1开始需要改掉//*==的地方)；
+//g[i]：i表示左边的点标号，g[i]里面的是右边的点标号
+bool SearchP()
+{
+	queue<int>q;
+	dis = INF;
+	memset(dx, -1, sizeof(dx));
+	memset(dy, -1, sizeof(dy));
+	rep(i, 0, n)//*==
+	{
+		if (mx[i] == -1)
+		{
+			q.push(i);
+			dx[i] = 0;
+		}
+	}
+	while (!q.empty())
+	{
+		int u = q.front();
+		q.pop();
+		if (dx[u] > dis)break;
+		int sz = g[u].size();
+		rep(i, 0, sz)
+		{
+			int v = g[u][i];
+			if (dy[v] == -1)
+			{
+				dy[v] = dx[u] + 1;
+				if (my[v] == -1)dis = dy[v];
+				else
+				{
+					dx[my[v]] = dy[v] + 1;
+					q.push(my[v]);
+				}
+			}
+		}
+	}
+	return dis != INF;
+}
+bool DFS(int u)
+{
+	int sz = g[u].size();
+	rep(i, 0, sz)
+	{
+		int v = g[u][i];
+		if (!used[v] && dy[v] == dx[u] + 1)
+		{
+			used[v] = true;
+			if (my[v] != -1 && dy[v] == dis)continue;
+			if (my[v] == -1 || DFS(my[v]))
+			{
+				my[v] = u;
+				mx[u] = v;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int MaxMatch()
+{
+	int res = 0;
+	clc(mx, -1);
+	clc(my, -1);
+	while (SearchP())
+	{
+		clc(used, 0);
+		rep(i, 0, n)//*==
+		{
+			if (mx[i] == -1 && DFS(i))
+				res++;
+		}
+	}
+	return res;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while (t--)
+	{
+		int p, len, a;
+		scanf("%d %d%*c", &p, &n);
+		rep(i, 0, n) g[i].clear();
+		rep(i, 0, p)
+		{
+			scanf("%d%*c", &len);
+			rep(j, 0, len)
+			{
+				scanf("%d%*c", &a);
+				g[i].pb(a);
+			}
+		}
+		if (MaxMatch() >= p)  puts("YES");
+		else puts("NO");
+	}
+	return 0;
+}

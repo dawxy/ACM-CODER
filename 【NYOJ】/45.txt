@@ -1,0 +1,40 @@
+/*
+¹«Ê½£ºf[i] = f[i-1]*4+1;
+*/
+#include <stdio.h>
+const int MAXN = 101;
+int a[MAXN];
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int k, c;
+		scanf ("%d%*c", &k);
+		a[0] = 1;
+		int w = 0;
+		for (int i = 1; i < k; i++)
+		{
+			int c = 0;
+			for (int j = 0; j <= w; j++)
+			{
+				a[j] = a[j]*4+c;
+				c = a[j]/10000;
+				a[j] %= 10000;
+			}
+			if (c)
+				a[++w] = c;
+			a[0]++;
+		}
+		printf ("%d",a[w]);
+		for (int i = w-1; i >= 0; i--)
+			printf ("%04d",a[i]);
+		printf ("\n");
+	}
+	return 0;
+}

@@ -1,0 +1,39 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 2000+10;
+int dp[MAXN],la[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int m,n;
+		scanf("%d%d", &m, &n);
+		clc(dp,0);clc(la,0);
+		rep(i,0,n)
+		{
+			int w,a,b;
+			scanf("%d %d %d", &w,&a,&b);
+			repe(j,w,m)
+			{
+				dp[j] = max(dp[j],dp[j-w]+a);
+				dp[j] = max(dp[j],la[j-w]+a+b);
+			}
+			memcpy(la,dp,sizeof(dp));
+		}
+		int ans = 0;
+		repe(i,1,m) ans = max(ans,dp[i]);
+		printf("%d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,116 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10+10;
+const int mp[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
+int ans[MAXN], cnt, n;
+vector<string> out;
+
+inline int get_id(int x, int y)
+{
+	return mp[x][y];
+}
+
+bool vis[MAXN], can[MAXN];
+bool ok(int x, int y, int ni, int nj)
+{
+	int mi = (x+ni)>>1, mj = (y+nj)>>1;
+	if(nj == y && abs(x-ni) > 1 && !vis[get_id(mi,mj)])
+	{
+		return false;
+	}
+	if(x == ni && abs(nj-y) > 1 && !vis[get_id(mi,mj)])
+	{
+		return false;
+	}
+	if(abs(x-ni) == abs(y-nj) && abs(x-ni) == 2 && !vis[get_id(mi,mj)])
+		return false;
+	return true;
+}
+void dfs(int p, int x, int y)
+{
+	if(p == n-1)
+	{
+		char tmp[20];
+		rep(i,0,n) tmp[i] = ans[i]+'0';
+		tmp[n] = 0;
+		out.push_back(tmp);
+	}
+	rep(i,0,3)
+	{
+		rep(j,0,3)
+		{
+			if(can[get_id(i,j)] && !vis[get_id(i,j)] && ok(x,y,i,j))
+			{
+				vis[get_id(i,j)] = true;
+				ans[p+1] = get_id(i,j);
+				dfs(p+1,i,j);
+				vis[get_id(i,j)] = false;
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d%*c", &n);
+		clc(can,0);
+		rep(i,0,n)
+		{
+			int v;
+			scanf("%d%*c", &v);
+			can[v] = true;
+		}
+		cnt = 0;
+		clc(vis,0);
+		out.clear();
+		rep(i,0,3)
+		{
+			rep(j,0,3)
+			{
+				if(can[get_id(i,j)])
+				{
+					vis[get_id(i,j)] = true;
+					ans[0] = get_id(i,j);
+					dfs(0,i,j);
+					vis[get_id(i,j)] = false;
+				}
+			}
+		}
+		int sz = out.size();
+		printf("%d\n", sz);
+		rep(i,0,sz)
+		{
+			char buf[100];
+			sprintf(buf,"%s",out[i].c_str());
+			rep(j,0,n)
+			{
+				printf("%c",buf[j]);
+				if(j == n-1) putchar('\n');
+				else putchar(' ');
+			}
+		}
+	}
+	return 0;
+}
+

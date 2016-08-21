@@ -1,0 +1,68 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+typedef long long LL;
+#define MOD 100000000
+int phi[205];
+
+int pow_mod(LL a, int n, int mod)
+{
+    LL ans = 1;
+    while(n)
+    {
+        if(n&1) ans = ans*a%mod;
+        a = a*a%mod;
+        n >>= 1;
+    }
+    return ans;
+}
+int get_phi(int n)
+{
+    int ans = n, m = sqrt(n+0.5);
+    for(int i = 2; i <= m; i++)
+    {
+        if(0 == n%i)
+        {
+            ans -= ans/i;
+            while(0 == n%i) n /= i;
+        }
+    }
+    if(n > 1) ans -= ans/n;
+    return ans;
+}
+LL check(LL a, int n, int phi)
+{
+    LL ans = 1;
+    for(int i = 0; i < n; i++)
+    {
+        ans *= a;
+        if(ans >= phi) return ans;
+    }
+    return ans;
+}
+int f(LL a, int k, int m)
+{
+    if(1 == phi[m]) return 1;
+    if(!k) return 1;
+    int b = f(a,k-1,m+1);
+    LL ans = check(a,b,phi[m]);
+    if(ans >= phi[m])
+        ans = pow_mod(a%phi[m],b,phi[m])+phi[m];
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    LL a;
+    int k;
+    phi[0] = MOD;
+    for(int i = 1; i <= 201; i++)
+        phi[i] = get_phi(phi[i-1]);
+    while(~scanf("%I64d %d%*c", &a, &k))
+    {
+        printf("%d\n", f(a,k,0)%MOD);
+    }
+    return 0;
+}

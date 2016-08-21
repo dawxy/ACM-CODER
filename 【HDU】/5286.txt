@@ -1,0 +1,107 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50000+10, SIZE = 200,SN = MAXN/SIZE+2, MOD = 1000000007;//SIZE-每一块的大小
+int n,a[MAXN],sot[MAXN],num[MAXN];//离散
+int sn,ret[SN][SN],c[SN][MAXN],sum[MAXN];
+//sn-块数,ret[x][y]-块x~y的所有答案,c[x][i]-第0~k块中a[i]出现的次数
+vector<LL> sqr[MAXN];//x[i]^b,b>=1
+
+void init()
+{
+	rep(i,0,n) sqr[i].clear(),sqr[i].push_back(0);
+	rep(i,0,n)
+	{
+		LL tmp;
+		if(1 == sqr[num[i]].size()) tmp = a[i];
+		else tmp = sqr[num[i]][sqr[num[i]].size()-1]*a[i]%MOD;
+		sqr[num[i]].push_back(tmp);
+	}
+	sn = n/SIZE+bool(n%SIZE);
+	rep(i,0,sn)
+	{
+		clc(sum,0);
+		int tmp = 0;
+		rep(j,i*SIZE,n)
+		{
+			tmp = (tmp-sqr[num[j]][sum[num[j]]]+sqr[num[j]][sum[num[j]]+1]+MOD)%MOD;
+			ret[i][j/SIZE] = tmp;
+			sum[num[j]]++;
+		}
+	}
+	clc(c,0);
+	rep(i,0,sn)
+	{
+		if(i) memcpy(c[i],c[i-1],sizeof(c[i]));
+		for(int j = 0; j < SIZE && j+i*SIZE < n;j++)
+			c[i][num[i*SIZE+j]]++;
+	}
+	clc(sum,0);
+}
+int p[SIZE<<1];
+int query(int x, int y)
+{
+	int ans = 0,cnt = 0;
+	int st = x/SIZE,ed = y/SIZE;
+	if(st < ed)
+	{
+		per(i,SIZE*(st+1)-1,x) p[cnt++] = num[i];
+		repe(i,SIZE*ed,y) p[cnt++] = num[i];
+		if(st+1 < ed) ans = ret[st+1][ed-1];
+	}
+	else repe(i,x,y) p[cnt++] = num[i];
+	rep(i,0,cnt)
+	{
+		if(!sum[p[i]] && st+1 < ed) sum[p[i]] = c[ed-1][p[i]]-c[st][p[i]];
+		ans = (ans-sqr[p[i]][sum[p[i]]]+sqr[p[i]][sum[p[i]]+1]+MOD)%MOD;
+		sum[p[i]]++;
+	}
+	rep(i,0,cnt) sum[p[i]] = 0;
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int q;
+		scanf("%d %d", &n, &q);
+		rep(i,0,n)
+		{
+			scanf("%d", &a[i]);
+			sot[i] = a[i];
+		}
+		sort(sot,sot+n);
+		int cnt = unique(sot,sot+n)-sot;
+		rep(i,0,n) num[i] = lower_bound(sot,sot+cnt,a[i])-sot;
+		init();
+		int la = 0;
+		while(q--)
+		{
+			int a,b;
+			scanf("%d %d", &a, &b);
+			int x = min((a^la)%n,(b^la)%n),y = max((a^la)%n,(b^la)%n);
+			la = query(x,y);
+			printf("%d\n", la);
+		}
+	}
+	return 0;
+}

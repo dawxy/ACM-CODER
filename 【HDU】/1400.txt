@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 11
+typedef long long LL;
+struct NODE{
+	int now,last;
+}s[10000];
+int h,w,len;
+LL dp[2][1<<MAXN];
+
+void dfs(int p, int now ,int last)
+{
+	if(p == w)
+	{
+		s[len].now = now, s[len++].last = last;
+		return;
+	}
+	if(p+1 <= w)
+	{
+		dfs(p+1,now<<1, last<<1|1);//不放
+		dfs(p+1,now<<1|1,last<<1);//竖放
+	}
+	if(p+2 <= w)//横放
+		dfs(p+2,now<<2|3,last<<2|3);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &h, &w) && h+w)
+	{
+		if(h&1 && w&1)
+		{
+			puts("0");
+			continue;
+		}
+		if(h < w)
+			h ^= w,w ^= h,h ^= w;
+		len = 0;
+		dfs(0,0,0);
+		memset(dp[0],0,sizeof(dp[0]));
+		dp[0][(1<<w)-1] = 1;
+		int v = 0;
+		for(int i = 0; i < h; i++)
+		{
+			memset(dp[v^=1],0,sizeof(dp[v]));
+			for(int j = 0; j < len; j++)
+				dp[v][s[j].now] += dp[v^1][s[j].last];
+		}
+		printf("%I64d\n", dp[v][(1<<w)-1]);
+	}
+	return 0;
+}

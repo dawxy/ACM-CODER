@@ -1,0 +1,32 @@
+#include <cstdio>
+#include <cmath>
+
+int gcd(int a, int b)
+{
+	while(b)
+	{
+		a %= b;
+		if(a < b) a ^= b, b ^= a, a ^= b;
+	}
+	return a;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+	int L;
+	while(~scanf("%d%*c", &L) && L)
+	{
+		int sx, sy, px, py;
+		scanf("%d %d %d %d%*c", &sx, &sy, &px, &py);
+		if(abs(px) > L || abs(py) > L)
+		{
+			puts("Out Of Range");
+			continue;
+		}
+		if(gcd(abs(sx-px),abs(sy-py)) != 1) puts("No");
+		else puts("Yes");
+	}
+	return 0;
+}

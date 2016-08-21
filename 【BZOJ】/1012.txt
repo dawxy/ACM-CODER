@@ -1,0 +1,106 @@
+/*线段树*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10;
+int mx[MAXN<<1],cnt;
+
+inline int id(int x, int y){return x+y|x!=y;}
+void update(int x, int y, int p, int v)
+{
+	if(x == y)
+	{
+		mx[id(x,y)] = v;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(x,m,p,v);
+	else update(m+1,y,p,v);
+	mx[id(x,y)] = max(mx[id(x,m)],mx[id(m+1,y)]);
+}
+int query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr) return mx[id(x,y)];
+	int m = (x+y)>>1, ans = 0;
+	if(ql <= m) ans = max(ans,query(x,m,ql,qr));
+	if(qr > m) ans = max(ans,query(m+1,y,ql,qr));
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int q,d,n;
+	while(~scanf("%d %d", &q, &d))
+	{
+		n = q;
+		int ans = 0;
+		clc(mx,-1);
+		cnt = 0;
+		while(q--)
+		{
+			char op[10];
+			int v;
+			scanf("%s %d", op, &v);
+			if('A' == op[0])
+			{
+				cnt++;
+				update(1,n,cnt,(v+ans)%d);
+			}
+			else
+			{
+				ans = query(1,n,cnt-v+1,cnt);
+				printf("%d\n", ans);
+			}
+		}
+	}
+	return 0;
+}
+==================================================================================
+/*单调栈+二分*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10;
+int q[MAXN],id[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,d;
+	while(~scanf("%d %d", &n, &d))
+	{
+		int ans = 0,cnt = 0,ed = -1;
+		cnt = 0;
+		while(n--)
+		{
+			char op[10];
+			int v;
+			scanf("%s %d", op, &v);
+			if('A' == op[0])
+			{
+				cnt++;
+				v = (v+ans)%d;
+				while(ed >= 0 && q[ed] < v) ed--;
+				q[++ed] = v;id[ed] = cnt;
+			}
+			else
+			{
+				ans = q[lower_bound(id,id+ed+1,cnt-v+1)-id];
+				printf("%d\n", ans);
+			}
+		}
+	}
+	return 0;
+}

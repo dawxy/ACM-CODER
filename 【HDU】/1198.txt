@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 60
+#define hash(a,b) (a*w+b)
+struct SIZE{
+	bool ok[4];
+	SIZE(bool a = 0, bool b = 0, bool c = 0, bool d = 0)
+	{
+		ok[0] = a,  ok[1] = b, ok[2] = c, ok[3] = d;
+	}
+}s[11];
+const int d[4][2] = {{-1,0},{0,-1},{1,0},{0,1}};//ÉÏ£¬×ó£¬ÏÂ£¬ÓÒ
+bool vis[MAXN][MAXN];
+int h,w, f[MAXN*MAXN], map[MAXN][MAXN],cnt;
+
+void init()
+{
+	s[0] = SIZE(1,1,0,0),s[1] = SIZE(1,0,0,1),s[2] = SIZE(0,1,1,0),s[3] = SIZE(0,0,1,1);
+	s[4] = SIZE(1,0,1,0),s[5] = SIZE(0,1,0,1),s[6] = SIZE(1,1,0,1),s[7] = SIZE(1,1,1,0);
+	s[8] = SIZE(0,1,1,1),s[9] = SIZE(1,0,1,1),s[10] = SIZE(1,1,1,1);
+}
+int find(int x){return ~f[x] ? f[x] = find(f[x]):x;}
+void dfs(int si, int sj)
+{
+	vis[si][sj] = true;
+	for(int i = 0; i < 4; i++)
+	{
+		int ni = d[i][0]+si, nj = d[i][1]+sj;
+		if(0 <= ni && h > ni && 0 <= nj && w > nj && !vis[ni][nj] && s[map[si][sj]].ok[i] && s[map[ni][nj]].ok[(i+2)%4])
+		{
+			int x = find(hash(si,sj)), y = find(hash(ni,nj));
+			if(x != y) cnt--,f[x] = y;
+			dfs(ni,nj);
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	init();
+	while(~scanf("%d %d%*c", &h, &w))
+	{
+		if(-1 == h && -1 == w) break;
+		memset(vis,0,sizeof(vis));
+		memset(f,-1,sizeof(f));
+		for(int i = 0; i < h; i++)
+		{
+			for(int j = 0; j < w; j++)
+				map[i][j] = getchar()-'A';
+			getchar();
+		}
+		cnt = h*w;
+		for(int i = 0; i < h; i++)
+		{
+			for(int j = 0; j < w; j++)
+				dfs(i,j);
+		}
+		printf("%d\n", cnt);
+	}
+	return 0;
+}

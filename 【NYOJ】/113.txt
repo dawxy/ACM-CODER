@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <string.h>
+
+int main ()
+{
+	char a[1008];
+	while (NULL != gets(a))
+	{
+		int i, len;
+		len = strlen(a);
+		for (i = 0; i < len; i++)
+		{
+			if ('y' != a[i])
+				printf ("%c", a[i]);
+			else
+			{
+				if ('o' == a[i+1] && 'u' == a[i+2])
+				{
+					printf ("we");
+					i += 2;
+				}
+				else
+					printf ("y");
+			}
+		}
+		printf ("\n");
+	}
+
+	return 0;
+}

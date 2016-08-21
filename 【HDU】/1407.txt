@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <math.h>
+int num, x, y, z;
+
+void sloved()
+{
+    int len = ceil(sqrt(1.0*num));
+    for (x = 1; x <= len; x++)
+	{
+        for (y = x; y <= len; y++)
+		{
+            for (z = y; z <= len; z++)
+			{
+				if (x*x + y*y + z*z == num)
+                    return;
+			}
+		}
+	}
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(~scanf ("%d%*c", &num))
+	{
+		sloved();
+        printf ("%d %d %d\n", x, y, z);
+	}
+    return 0;
+}

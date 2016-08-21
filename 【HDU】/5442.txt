@@ -1,0 +1,85 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20000+10;
+
+int get_max(char*s, int len, char *ans)//ans为最小表示后的串，不输入就不求
+{
+	int i = 0,j = 1,k = 0,tmp;
+	while(i < len && j < len && k < len)
+	{
+		tmp = s[(i+k)%len] - s[(j+k)%len];
+		if(!tmp) k++;
+		else
+		{
+			if(tmp < 0) i += k+1;//改成<就是最大表示法
+			else j += k+1;
+			if(i == j) j++;
+			k = 0;
+		}
+	}
+	int st = min(i, j);//st-最小表示法在原串起始位置
+	rep(i,0,len) ans[i] = s[(st+i)%len];
+	ans[len] = 0;
+	return st;
+}
+char a[MAXN<<1],b[MAXN<<1],s1[MAXN],s2[MAXN];
+
+int nt[MAXN];//nt[i]为满足x[i-z…i-1]=x[0…z-1]的最大z值(就是相同的最大前缀后缀)
+void get_next(char *x, int m)//这个nt[i]表示nt’[i] = nt[nt[…nt[i]]]
+{							//直到nt'[i] < 0 或者x[nt’[i]] != x[i],这样要快一些
+	int i = 0,j;
+	j = nt[0] = -1;
+	while(i < m)
+	{
+		while(~j && x[i] != x[j]) j = nt[j];
+		if(x[++i] == x[++j]) nt[i] = nt[j];
+		else nt[i] = j;
+	}
+}
+//返回x在y中出现的次数,可以重叠
+int kmp(char *x, int m, char *y, int n)//x是模式串,y是主串
+{
+	int i = 0,j = 0,ans = 0;
+	get_next(x,m);
+	while(i < n)
+	{
+		while(~j && y[i] != x[j]) j = nt[j];
+		i++,j++;
+		if(j == m)
+		{
+			ans = max(ans,i%m);
+			j = nt[j];//改为j=0，则计算不重复数量
+		}
+	}
+	return ans;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d %s", &n,a);
+		rep(i,0,n) b[n-i-1] = a[i];
+		rep(i,0,n) a[i+n] = a[i],b[i+n] = b[i];
+		int st1 = get_max(a,n,s1),st2 = get_max(b,n,s2);
+		st2 = kmp(s2,n,b,n*2);
+
+		int ans = st1,f = 0;
+		int d = strcmp(s1,s2);
+		if(d < 0) ans = n-st2-1,f = 1;
+		else if(0 == d && n-st2-1 < st1) ans = n-st2-1,f = 1;
+		printf("%d %d\n", ans+1,f);
+	}
+	return 0;
+}

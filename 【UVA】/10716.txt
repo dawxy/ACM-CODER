@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 105
+char a[MAXN], d;
+int len,jishu;
+
+bool is_huiwen();
+int sloved();
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+        gets(a);
+        if (!is_huiwen())
+		{
+			puts("Impossible");
+			continue;
+		}
+		printf ("%d\n", sloved());
+	}
+	return 0;
+}
+
+bool is_huiwen()
+{
+    int num[26] = {0};
+    jishu = 0;
+    len = strlen(a);
+    for (int i = 0; i < len; i++)
+        num[a[i]-'a']++;
+    for (int i = 0; i < 26; i++)
+	{
+        if (num[i] & 1)
+		{
+			jishu++;
+            if (jishu > 1)
+                return false;
+			d = i+'a';
+		}
+	}
+	return true;
+}
+
+int sloved()
+{
+    int sum = 0, end = len-1, vis[MAXN] = {0};
+    for (int i = 0; i < len/2; i++)
+	{
+        for (int j = end; j > i; j--)
+		{
+            if (a[j] == a[i])
+			{
+                sum += end-j;
+                vis[i] = 1;
+                for (int k = j; k < end; k++)
+                    a[k] = a[k+1];
+                end--;
+                break;
+			}
+		}
+	}
+    if (jishu)
+	{
+        for (int i = 0; i < len; i++)
+		{
+			if (d == a[i] && !vis[i])
+			{
+                sum += len/2-i;
+                break;
+			}
+		}
+	}
+    return sum;
+}

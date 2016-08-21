@@ -1,0 +1,113 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define FOR(i,a,b) for(int i = b[a]; i != a; i = b[i])
+const int N = 9, SN = 3;
+const int INF = 0x3f3f3f3f, MAXN = N*N*N+10,MAXM = N*N*4+10,M = MAXN*4+10;
+int lt[M],rt[M],up[M],down[M],row[M],col[M],tol,cnt[MAXM];
+char a[N*N+10];
+
+int get_s(int x){return x/N/SN*SN+x%N/SN;}
+void init()
+{
+	int maxc = N*N*4;
+	repe(i,0,maxc) lt[i] = i-1,rt[i] = i+1,up[i] = down[i] = i;
+	lt[0] = maxc,rt[maxc] = 0;
+	tol = maxc+1;
+	clc(cnt,0);
+}
+void add_row(int r,int *tmp)
+{
+	int st = tol;
+	rep(i,0,4)
+	{
+		int c = tmp[i];
+		row[tol] = r;col[tol] = c;
+		lt[tol] = tol-1,rt[tol] = tol+1,up[tol] = up[c],down[tol] = c;
+		down[up[c]] = tol,up[c] = tol;
+		cnt[c]++,tol++;
+	}
+	lt[st] = tol-1,rt[tol-1] = st;
+}
+void remove(int c)
+{
+	lt[rt[c]] = lt[c], rt[lt[c]] = rt[c];
+	FOR(i,c,down)
+	{
+		FOR(j,i,rt)
+			down[up[j]] = down[j], up[down[j]] = up[j],--cnt[col[j]];
+	}
+}
+void reset(int c)
+{
+	FOR(i,c,up)
+	{
+		FOR(j,i,lt)
+			down[up[j]] = up[down[j]] = j,++cnt[col[j]];
+	}
+	lt[rt[c]] = rt[lt[c]] = c;
+}
+int ans[N*N+10];
+bool dfs(int d)
+{
+	if(!rt[0]) return true;
+	int c = rt[0];
+	FOR(i,0,rt) if(cnt[i] < cnt[c]) c = i;
+	remove(c);
+	FOR(i,c,down)
+	{
+		ans[d] = row[i];
+		FOR(j,i,rt) remove(col[j]);
+		if(dfs(d+1)) return true;
+		FOR(j,i,lt) reset(col[j]);
+	}
+	reset(c);
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	while(gets(a) && strcmp(a,"end"))
+	{
+		init();
+		int tmp[10];
+		rep(i,0,N)
+		{
+			rep(j,0,N)
+			{
+				int p = i*N+j;
+				rep(k,0,N)
+				{
+					if('.' == a[p] || k+'1' == a[p])
+					{
+						tmp[0] = p+1;
+						tmp[1] = N*N+i*N+k+1;
+						tmp[2] = N*N*2+j*N+k+1;
+						tmp[3] = N*N*3+get_s(p)*N+k+1;
+						add_row(p*N+k+1,tmp);
+					}
+				}
+			}
+		}
+		dfs(0);
+		rep(i,0,N*N) a[(ans[i]-1)/N] = (ans[i]-1)%N+'1';
+		puts(a);
+	}
+	return 0;
+}

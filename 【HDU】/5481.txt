@@ -1,0 +1,63 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MOD = 1e9+7, MAXIN = 50000;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+int l[MAXN],r[MAXN],sot[MAXN<<1],b[MAXN],sum[MAXN<<1];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	in(t);
+	b[0] = 1;
+	repe(i,1,100000) b[i] = (b[i-1]<<1)%MOD;
+	while(t--)
+	{
+		int n;
+		in(n);
+		int tmp = 0;
+		rep(i,0,n) in(l[i]), in(r[i]),sot[tmp++] = l[i],sot[tmp++] = r[i];
+		sort(sot,sot+tmp);
+		int cnt = unique(sot,sot+tmp)-sot;
+		clc(sum,0);
+		rep(i,0,n)
+		{
+			int x = lower_bound(sot,sot+cnt,l[i])-sot;
+			int y = lower_bound(sot,sot+cnt,r[i])-sot;
+			sum[x]++,sum[y]--;
+		}
+		rep(i,1,cnt) sum[i] += sum[i-1];
+		LL ans = 0;
+		rep(i,0,cnt-1)
+		{
+			LL len = sot[i+1]-sot[i];
+			int m = sum[i];
+			ans = (ans+len*(b[n]-b[n-m]))%MOD;
+		}
+		if(ans < 0) ans += MOD;
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

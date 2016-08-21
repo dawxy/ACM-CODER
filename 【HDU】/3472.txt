@@ -1,0 +1,178 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 30, MAXM = 1000+60+10;
+int nxt[MAXM],from[MAXM],to[MAXM],cap[MAXM],tol,head[MAXN];
+
+void add_edge(int u, int v, int c)
+{
+	nxt[tol] = head[u],from[tol] = u,to[tol] = v,cap[tol] = c;
+	head[u] = tol++;
+	nxt[tol] = head[v],from[tol] = v,to[tol] = u,cap[tol] = c;
+	head[v] = tol++;
+}
+int d[MAXN],st,ed;
+bool bfs()
+{
+	clc(d,-1);
+	queue<int> q;
+	q.push(st);
+	d[st] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(-1 == d[v] && cap[i])
+			{
+				d[v] = d[u]+1;
+				q.push(v);
+				if(~d[ed]) return true;
+			}
+		}
+	}
+	return false;
+}
+int s[MAXN],top,cur[MAXN];
+int maxflow()
+{
+	int ans = 0;
+	while(bfs())
+	{
+		memcpy(cur,head,sizeof(head));
+		int u = st;
+		top = 0;
+		while(1)
+		{
+			if(u == ed)
+			{
+				int flow = INF, loc;
+				rep(i,0,top)
+				{
+					if(flow > cap[s[i]])
+					{
+						flow = cap[s[i]];
+						loc = i;
+					}
+				}
+				rep(i,0,top)
+				{
+					cap[s[i]] -= flow;
+					cap[s[i]^1] += flow;
+				}
+				ans += flow;
+				u = from[s[top=loc]];
+			}
+			for(int i = cur[u]; ~i; cur[u] = i = nxt[i])
+				if(cap[i] && d[u]+1 == d[to[i]]) break;
+			if(~cur[u])
+			{
+				s[top++] = cur[u];
+				u = to[cur[u]];
+			}
+			else
+			{
+				if(!top) break;
+				d[u] = -1;
+				u = from[s[--top]];
+			}
+		}
+	}
+	return ans;
+}
+int du[MAXN],f[MAXN];
+bool vis[MAXN];
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d%*c", &t);
+	st = 27,ed = 28;
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		clc(head,-1);
+		tol = 0;
+		clc(du,0);
+		clc(vis,0);
+		char ch[30];
+		rep(i,0,26) f[i] = i;
+		int sum = 0,cnt = 1;
+		rep(i,0,n)
+		{
+			int fz;
+			scanf("%s %d", ch, &fz);
+			int a = ch[0]-'a', b = ch[strlen(ch)-1]-'a';
+			du[a]--, du[b]++;
+			if(!vis[a]) vis[a] = true,sum++;
+			if(!vis[b]) vis[b] = true,sum++;
+			int x = find(a), y = find(b);
+			if(x != y) f[x] = y, cnt++;
+			if(fz)//所有无向图加入网络流判断方向
+			{
+				add_edge(a,b,1);
+			}
+		}
+		int ji = 0;
+		rep(i,0,26)
+		{
+			if(du[i]&1) ji++;
+		}
+		printf("Case %d: ",++count);
+		if((ji && ji != 2) || cnt != sum)//不是0个或2个点度数是奇数，图不连通
+		{
+			puts("Poor boy!");
+			continue;
+		}
+		sum = 0;
+		if(ji == 2)//有两个点的度数是奇数，加一条边变成欧拉回路
+		{
+			int a,b;
+			rep(i,0,26)
+			{
+				if(du[i]&1)
+				{
+					if(du[i] < 0) a = i;
+					else if(du[i] > 0) b = i;
+				}
+			}
+			add_edge(a,b,1);
+		}
+		repe(i,0,26)//把st和入度<出度的边相连，ed和入度>出度的边连，权值都是abs(du[i])/2
+		{
+			int c = abs(du[i])/2;
+			if(du[i] < 0)
+			{
+				sum += c;
+				add_edge(st,i,c);
+			}
+			else if(du[i] > 0)
+			{
+				add_edge(i,ed,c);
+			}
+		}
+		int ans = maxflow();
+		if(ans == sum) puts("Well done!");
+		else puts("Poor boy!");
+	}
+	return 0;
+}

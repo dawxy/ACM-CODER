@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <malloc.h>
+
+void main (void)
+{
+    int n, m, *p, i, a;
+    while (1)
+    {
+        scanf ("%d %d", &n, &m);
+        if (0 == n && 0 == m)
+            return;
+        getchar();
+        p = (int*) malloc (sizeof(int)*n);
+        
+        for (i = 0; i < n; i++)
+        {
+            if (n-1 != i)
+                scanf("%d ", &p[i]);
+            else
+                scanf("%d", &p[i]);
+        }
+
+        for (i = 0; i < n; i++)
+        {
+            if (m < p[i])
+            {
+                a = i;
+                break;
+            }
+        }
+        if (n == i)
+            a = n;
+        i = 0;
+        for (; i < a;i++)
+        {
+             printf ("%d ", p[i]);
+ 
+        }
+        if (n != i)
+                printf ("%d ", m);
+            else
+                printf ("%d\n", m);
+        for (;i < n;i++)
+        {
+            if (n-1 != i)
+                printf ("%d ", p[i]);
+            else
+                printf ("%d\n", p[i]);
+        }
+    }
+}

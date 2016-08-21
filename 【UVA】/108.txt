@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 105
+int n, g[MAXN][MAXN], a[MAXN];
+
+int maxnum()
+{
+    int max = a[0], sum = a[0];
+    for (int i = 1; i < n; i++)
+	{
+        if (sum < 0)
+            sum = 0;
+		sum += a[i];
+        if (sum > max)
+			max = sum;
+	}
+	return max;
+}
+void add(int l, int r)
+{
+	memset(a,0,sizeof(a));
+    for (int i = 0; i < n; i++)
+	{
+        for (int j = l; j <= r; j++)
+			a[i] += g[i][j];
+	}
+}
+int main ()
+{
+    #ifdef SHY
+		freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(EOF != scanf ("%d%*c", &n))
+	{
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                scanf ("%d%*c", &g[i][j]);
+        int ans = -1270000;
+        for (int i = 0; i < n; i++)
+		{
+            for (int j = i; j < n; j++)
+			{
+                add(i,j);
+                int buf = maxnum();
+                if (ans < buf)
+                    ans = buf;
+			}
+		}
+        printf ("%d\n", ans);
+	}
+    return 0;
+}

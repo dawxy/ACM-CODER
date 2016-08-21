@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <math.h>
+
+void main (void)
+{
+	double a, b, c, d;
+	double s;
+	char ch;
+	while (EOF != scanf ("%lf %lf %lf %lf", &a, &b, &c, &d))
+	{
+		while ( (ch=getchar()) !='\n' )
+		continue;
+		s = (sqrt) ((double)(a-c)*(a-c)+(b-d)*(b-d));
+		printf("%.2lf\n", s);
+	}
+}

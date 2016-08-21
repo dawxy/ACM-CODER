@@ -1,0 +1,64 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 3145728+10;
+char buf[MAXN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline void in(char *s)
+{
+	do{
+		rnext();
+	}while(!islower(*ps) && ps != pe);
+	do{
+		*s = *ps;
+		s++;
+		rnext();
+	}while(islower(*ps) && ps != pe);
+	*s = 0;
+}
+char a[MAXN];
+
+bool sloved()
+{
+    int w = -1,y = -1, len = strlen(a);
+    rep(i,0,len)
+    {
+        if('w' == a[i] && -1 == w) w = i;
+        if('y' == a[i]) y = i;
+        if('h' == a[i] && ~w && ~y && w < y) return true;
+        if('v' == a[i] && i > 0 && 'v' == a[i-1] && -1 == w) w = i;
+    }
+    return false;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        in(a);
+        if(sloved()) puts("Yes");
+        else puts("No");
+    }
+    return 0;
+}

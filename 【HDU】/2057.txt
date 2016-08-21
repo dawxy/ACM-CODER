@@ -1,0 +1,18 @@
+#include <stdio.h>
+
+int main ()
+{
+    __int64 a, b;
+
+    while (EOF != scanf ("%I64X %I64X", &a, &b))
+    {
+        getchar();
+        __int64 c = a+b;
+        if (a+b >= 0)
+            printf ("%I64X\n", a+b);
+        else
+        {
+            printf ("-%I64X\n", -a-b);
+        }
+    }
+}

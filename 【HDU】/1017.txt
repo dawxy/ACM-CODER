@@ -1,0 +1,34 @@
+#include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c%*c", &t);
+    while(t--)
+	{
+		int count = 0;
+        while(1)
+		{
+			int n,m;
+			scanf ("%d %d%*c", &n, &m);
+            if (!n && !m)
+				break;
+			int ans = 0;
+            for (int i = 1; i < n; i++)
+			{
+				for (int j = i+1; j < n; j++)
+				{
+                    if (0 == (i*i+j*j+m)%(i*j))
+                        ans++;
+				}
+			}
+            printf ("Case %d: %d\n", ++count,ans);
+		}
+		if (t)
+            printf ("\n");
+	}
+    return 0;
+}

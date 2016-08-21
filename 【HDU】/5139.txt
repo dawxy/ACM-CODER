@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000000+10, MOD = 1000000007, MAXT = 100000+10;
+struct NODE{
+	int id,a;
+	NODE(int c = 0, int b = 0){
+		id = c, a = b;
+	}
+	bool operator<(NODE& t)const{
+		return a < t.a;
+	}
+}p[MAXT];
+map<int,LL> vis;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+	//freopen("e:\\out.txt", "w", stdout);
+#endif
+	int t = 0;
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		p[t] = NODE(t,n);
+		t++;
+	}
+	sort(p,p+t);
+	LL ans, lans = 1;
+	LL a,la = 1;
+	int cnt = 0;
+	repe(i,1,p[t-1].a)
+	{
+		ans = (i*(la)%MOD)*(LL)(lans)%MOD;
+		lans = ans;
+		a = i*la%MOD;
+		la = a;
+		while(p[cnt].a == i)
+		{
+			vis[p[cnt++].id] = ans;
+		}
+	}
+	rep(i,0,t)
+		printf("%I64d\n", vis[i]);
+	return 0;
+}

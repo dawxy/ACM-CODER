@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 15
+struct NODE{
+	char name[MAXN];
+	int sum, time;
+}p[1010];
+
+bool cmp(const NODE& a, const NODE& b)
+{
+	if (a.sum != b.sum)
+		return a.sum > b.sum;
+	if (a.time != b.time)
+		return a.time < b.time;
+	return strcmp(a.name,b.name) < 0;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, t, a, b = 0, len = 0;
+	scanf("%d %d%*c", &n, &t);
+	while(~scanf("%s%*c", &p[len]))
+	{
+		for (int i = 0; i < n; i++)
+		{
+			scanf("%d(%d)%*c", &a, &b);
+			if (a > 0)
+			{
+				p[len].sum++;
+				p[len].time += a+t*b;
+			}
+			b = 0;
+		}
+		len++;
+	}
+	sort(p, p + len, cmp);
+	for (int i = 0; i < len; i++)
+		printf("%-10s %2d %4d\n", p[i].name, p[i].sum, p[i].time);
+	return 0;
+}

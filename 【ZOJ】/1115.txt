@@ -1,0 +1,36 @@
+#include <stdio.h>
+
+long fun (long s);
+
+int main (void)
+{
+	char a[1000];
+	long i, s = 0;
+
+	while (1)
+	{
+		gets (a);
+		if ('0' == a[0])
+			break;
+		for (i = 0, s = 0; a[i] != '\0'; i++)
+		{
+			s += a[i] - '0';
+		}
+		printf ("%d\n", fun(s));
+	}
+
+	return 0;
+}
+
+long fun (long s)
+{
+	if (s==s%10)
+		return s;
+	else
+	{
+		do 
+		s = s/10 + s%10;
+		while (s >= 10);
+		return s;
+	}
+}

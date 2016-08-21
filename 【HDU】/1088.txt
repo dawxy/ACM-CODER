@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <string.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    freopen("e:\\out.txt","w",stdout);
+    #endif
+    char a[100];
+    int len = 0;
+    bool is_first = true;
+    while(EOF != scanf ("%s", a))
+	{
+        if (!strcmp("<br>", a))
+            printf ("\n"), len = 0,is_first = true;
+        else if (!strcmp("<hr>",a))
+		{
+            if (len)
+				printf ("\n");
+			puts ("--------------------------------------------------------------------------------");
+			len = 0;
+			is_first = true;
+		}
+        else
+		{
+			int lena = strlen(a);
+            if (!is_first)
+                lena++;
+            if (len+lena <= 80)
+			{
+				if (!is_first)
+					printf (" ");
+				printf ("%s", a);
+                len += lena;
+			}
+			else
+			{
+                printf ("\n");
+                printf ("%s", a);
+                len = strlen(a);
+			}
+			 is_first = false;
+		}
+	}
+	printf ("\n");
+    return 0;
+}

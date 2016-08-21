@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <string.h>
+#include <malloc.h>
+struct NODE{
+	char name[10];
+	NODE *child, *brother;
+}root;
+int n;
+char buf[100];
+
+void get_path();
+void output(NODE *, int);
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		getchar();
+		scanf ("%d%*c", &n);
+		root.child = NULL;
+		for (int i = 0; i < n; i++)
+		{
+			get_path();
+		}
+		output(root.child,0);
+		if (t)
+			printf ("\n");
+	}
+	return 0;
+}
+
+NODE* insert(NODE *ph, char *name)
+{
+	if (!ph->child || strcmp(ph->child->name,name) > 0)
+	{
+		NODE *q = (NODE*)malloc(sizeof(NODE));
+		strcpy(q->name, name);
+		q->child = NULL;
+		q->brother = ph->child;
+		ph->child = q;
+		return q;
+	}
+	if (strcmp(ph->child->name,name) == 0)
+		return ph->child;
+	NODE *q, *p;
+	for (p = ph->child, q = p->brother;q && strcmp(q->name, name) < 0;p = q, q = q->brother);
+	if (!q || strcmp(q->name,name) > 0)
+	{
+		NODE *t = (NODE*)malloc(sizeof(NODE));
+		strcpy(t->name,name);
+		t->brother = p->brother;
+		p->brother = t;
+		t->child = NULL;
+		return t;
+	}
+	return q;
+}
+void get_path()
+{
+	char name[10];
+	NODE *p = &root;
+	gets(buf);
+	int len = strlen(buf), j = 0;
+	buf[len] = '\\', buf[len+1] = 0;
+	for (int i = 0; i <= len; i++)
+	{
+		if ('\\' == buf[i])
+		{
+			name[j] = 0;
+			j = 0;
+			p = insert(p, name);
+		}
+		else
+			name[j++] = buf[i];
+	}
+}
+
+void output(NODE *p, int c)
+{
+	while(p)
+	{
+		for (int i = 0; i < c; i++)
+			printf (" ");
+		puts(p->name);
+		if (p->child)
+			output(p->child,c+1);
+		p = p->brother;
+	}
+}
+

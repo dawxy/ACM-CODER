@@ -1,0 +1,145 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int MAXN = 100*2+200+10;
+const int INF = 0x3f3f3f3f; 
+typedef int type;
+int g[MAXN][MAXN];//二分图描述,纵坐标为左边，横坐标为右边，这里下标从1开始的
+struct KM{
+	struct NODE{
+		int to,w;
+		NODE(int a, int b){
+			to = a, w = b;
+		}
+	};
+	int nx,ny;//两边的点数
+	int linker[MAXN],lx[MAXN],ly[MAXN];//y中各点匹配状态，x,y中的点标号
+	int slack[MAXN];
+	bool visx[MAXN],visy[MAXN];
+	bool dfs(int x)
+	{
+		visx[x] = true;
+		repe(y,1,ny)
+		{
+			if(visy[y]) continue;
+			int tmp = lx[x]+ly[y]-g[x][y];
+			if(!tmp)
+			{
+				visy[y] = true;
+				if(-1 == linker[y] || dfs(linker[y]))
+				{
+					linker[y] = x;
+					return true;
+				}
+			}
+			else if(slack[y] > tmp)
+				slack[y] = tmp;
+		}
+		return false;
+	}
+	int max_km(int nx, int ny)//传入两边点数
+	{
+		this->nx = nx, this->ny = ny;
+		clc(linker,-1);
+		clc(ly,0);
+		repe(i,1,nx)
+		{
+			lx[i] = -INF;
+			repe(j,1,ny)
+				if(g[i][j] > lx[i]) 
+					lx[i] = g[i][j];
+		}
+		repe(x,1,nx)
+		{
+			clc(slack,0x3f);
+			while(1)
+			{
+				clc(visx,0);
+				clc(visy,0);
+				if(dfs(x))break;
+				int d = INF;
+				repe(i,1,ny)
+				{
+					if(!visy[i] && d > slack[i])
+						d = slack[i];
+				}
+				repe(i,1,nx) if(visx[i]) lx[i] -= d;
+				repe(i,1,ny)
+				{
+					if(visy[i]) ly[i] += d;
+					else slack[i] -= d;
+				}
+			}
+		}
+		//最后统计最大值，加负号就是最小值，然后要把所有g[][]*-1
+		int ans = 0;
+		repe(i,1,ny)
+		{
+			//如果求最小值就是-INF，最大值才是INF
+			if(-INF == g[linker[i]][i]) return -1;//不存在完美匹配，返回-1，注释掉这句可以求不完全匹配下的最小/大费用
+			if(~linker[i]) ans += g[linker[i]][i];
+		}
+		return -ans;
+	}
+}km;
+int s[MAXN];
+type dis[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,kk,m,p;
+	while(~scanf("%d %d %d %d%*c", &n, &kk, &m, &p))
+	{
+		int cnt = n+kk;
+		clc(dis,0x3f);
+		repe(i,1,cnt) dis[i][i] = 0;
+		repe(i,1,n) scanf("%d%*c", &s[i]);
+		rep(i,0,m)
+		{
+			int a,b,c;
+			scanf("%d %d %d%*c", &a, &b, &c);
+			dis[a][b] = dis[b][a] = c;
+		}
+		rep(i,0,p)
+		{
+			int a,b,c;
+			scanf("%d %d %d%*c", &a, &b, &c);
+			dis[b][a+kk] = c;
+		}
+		repe(k,1,cnt)
+		{
+			repe(i,1,cnt)
+			{
+				repe(j,1,cnt)
+					dis[i][j] = min(dis[i][j], dis[i][k]+dis[k][j]);
+			}
+		}
+		repe(i,1,n)
+		{
+			repe(j,1,n)
+			{
+				if(INF == dis[s[i]][j+kk]) g[i][j] = 0;
+				else g[i][j] = -dis[s[i]][j+kk];
+			}
+		}
+		printf("%d\n", km.max_km(n,n));
+	}
+	return 0;
+}

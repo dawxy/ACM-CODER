@@ -1,0 +1,63 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+
+int gcd(int a, int b)
+{
+	while(b)
+	{
+		a %= b;
+		if(a < b) swap(a,b);
+	}
+	return a;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int h,m,s;
+		scanf("%d:%d:%d", &h, &m, &s);
+		int sum = abs(3600*h-660*m-11*s),d = 120;
+		int g = gcd(sum,d);
+		if(0 == sum) printf("0 ");
+		else
+		{
+			sum /= g, d /= g;
+			while(sum > 180*d) sum = abs(sum-360*d);
+			if(1 == d) printf("%d ", sum/d);
+			else printf("%d/%d ",sum,d);
+		}
+		sum = abs(3600*h+60*m-719*s),d = 120;
+		g = gcd(sum,d);
+		if(0 == sum) printf("0 ");
+		else
+		{
+			sum /= g, d /= g;
+			while(sum > 180*d) sum = abs(sum-360*d);
+			if(1 == d) printf("%d ", sum/d);
+			else printf("%d/%d ",sum,d);
+		}
+		sum = abs(60*m-59*s),d = 10;
+		g = gcd(sum,d);
+		if(0 == sum) printf("0 ");
+		else
+		{
+			sum /= g, d /= g;
+			while(sum > 180*d) sum = abs(sum-360*d);
+			if(1 == d) printf("%d ", sum/d);
+			else printf("%d/%d ",sum,d);
+		}
+		putchar('\n');
+	}
+	return 0;
+}

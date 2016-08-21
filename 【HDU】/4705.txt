@@ -1,0 +1,45 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <vector>
+#pragma comment(linker, "/STACK:16777216")
+using namespace std;
+#define MAXN 100005
+#define LL __int64
+vector<int> s[MAXN];
+LL ans, n;
+
+LL dfs(int r, int fa)
+{
+	int len = s[r].size();
+	LL sum = 0, son;
+	for (int i = 0; i < len; i++)
+	{
+		if (fa == s[r][i]) continue;
+		sum += son = dfs(s[r][i], r);
+		ans += son*(n-sum-1);
+	}
+	return sum+1;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while (~scanf("%I64d%*c", &n))
+	{
+		int a, b;
+		for (int i = 0; i <= n; i++)
+			s[i].clear();
+		for (int i = 1; i < n; i++)
+		{
+			scanf("%d %d%*c", &a, &b);
+			s[a].push_back(b);
+			s[b].push_back(a);
+		}
+		ans = 0;
+		dfs(1,-1);
+		printf("%I64d\n", n*(n-1)*(n-2)/6-ans);
+	}
+	return 0;
+}

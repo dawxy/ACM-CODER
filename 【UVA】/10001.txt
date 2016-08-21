@@ -1,0 +1,50 @@
+#include <stdio.h>
+#define MAX 9
+#define MAXN 33
+int a[MAX], ans[MAXN+2], n,d[8][3] = {{0,0,0},{0,0,1},{0,1,0},{0,1,1},{1,0,0},{1,0,1},{1,1,0},{1,1,1}};
+char b[MAXN];
+bool find;
+
+void dfs(int p)
+{
+	if (find)
+		return;
+	if (p == n)
+	{
+		if (ans[n] == ans[0] && ans[n+1] == ans[1])
+			find = true;
+		return;
+	}
+	for (int i = 0;  i < 8; i++)
+	{
+		if (b[p]-'0' == a[i] && (0 == p || d[i][0] == ans[p] && d[i][1] == ans[p+1]))
+		{
+			if (0 == p)
+			{
+				ans[0] = d[i][0];
+				ans[1] = d[i][1];
+			}
+			ans[p+2] = d[i][2];
+			dfs(p+1);
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen ("E:\\1.txt","r",stdin);
+#endif
+	int k;
+	while(EOF != scanf ("%d %d %s", &k, &n, b))
+	{
+		for (int i = 0; i < 8; i++)//获得k的从个位开始的二进制序列
+			a[i] = (k>>i)&1;
+		find = false;
+		dfs(0);
+		if (find)
+			printf ("REACHABLE\n");
+		else
+			printf ("GARDEN OF EDEN\n");
+	}
+	return 0;
+}

@@ -1,0 +1,52 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50+10,d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+int a[MAXN][MAXN];
+
+int get_sum(int x, int y)
+{
+	if(!a[x][y]) return 0;
+	int ans = 0;
+	rep(i,0,4)
+	{
+		int ni = x+d[i][0],nj = y+d[i][1];
+		int tmp = a[x][y]-a[ni][nj];
+		if(tmp <= 0) continue;
+		ans += tmp;
+	}
+	return ans+1;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d%d", &n, &m);
+		clc(a,0);
+		repe(i,1,n)
+		{
+			repe(j,1,m)
+				scanf("%d", &a[i][j]);
+		}
+		int ans = 0;
+		repe(i,1,n)
+		{
+			repe(j,1,m)
+			{
+				ans += get_sum(i,j);
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

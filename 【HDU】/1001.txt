@@ -1,0 +1,12 @@
+#include <stdio.h>
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	long long n;
+	while (~scanf ("%I64d%*c", &n))
+		printf ("%I64d\n\n", n*(n+1)/2);
+	return 0;
+}

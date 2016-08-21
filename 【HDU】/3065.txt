@@ -1,0 +1,117 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000*50+10, MAXM = 2000000+10, MAXSIZE = 130;
+char name[1010][55];
+struct Trie{
+	int cnt, ch[MAXN][MAXSIZE], fail[MAXN], num[MAXN], count[1010];
+	int newnode()
+	{
+		clc(ch[cnt],-1);
+		num[cnt++] = -1;
+		return cnt-1;
+	}
+	void init()
+	{
+		cnt = 0;
+		newnode();
+	}
+	void insert(char *s, int id)
+	{
+		int u = 0, len = strlen(s);
+		rep(i,0,len)
+		{
+			int &c = ch[u][s[i]];
+			if(-1 == c)
+				c = newnode();
+			u = c;
+		}
+		num[u] = id;
+	}
+	void get_fail()
+	{
+		queue<int> q;
+		fail[0] = 0;
+		rep(i,0,MAXSIZE)
+		{
+			int &c = ch[0][i];
+			if(~c)
+			{
+				fail[c] = 0;
+				q.push(c);
+			}
+			else c = 0;
+		}
+		while(!q.empty())
+		{
+			int u = q.front();q.pop();
+			rep(i,0,MAXSIZE)
+			{
+				int &c = ch[u][i];
+				int p = ch[fail[u]][i];
+				if(~c)
+				{
+					fail[c] = p;
+					q.push(c);
+				}
+				else c = p;
+			}
+		}
+	}
+	void query(char *s)
+	{
+		clc(count,0);
+		int u = 0, len = strlen(s);
+		rep(i,0,len)
+		{
+			u = ch[u][s[i]];
+			int temp = u;
+			while(temp)
+			{
+				count[num[temp]]++;
+				temp = fail[temp];
+			}
+		}
+	}
+}ac;
+
+char a[MAXM];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		ac.init();
+		repe(i,1,n)
+		{
+			scanf("%s%*c", name[i]);
+			ac.insert(name[i],i);
+		}
+		ac.get_fail();
+		gets(a);
+		ac.query(a);
+		repe(i,1,n)
+		{
+			if(ac.count[i])
+				printf("%s: %d\n", name[i],ac.count[i]);
+		}
+	}
+	return 0;
+}

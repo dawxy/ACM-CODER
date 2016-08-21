@@ -1,0 +1,34 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 500010
+int a[MAXN], b[MAXN];
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(EOF != scanf ("%d%*c", &n) && n)
+	{
+		for (int i = 0; i < n; i++)
+			scanf ("%d %d%*c", &a[i], &b[i]);
+		sort(a,a+n);
+		sort(b,b+n);
+		bool ans = true;
+		for (int i = 0; i < n; i++)
+		{
+			if (a[i] != b[i])
+			{
+				ans = false;
+				break;
+			}
+		}
+		if (ans)
+			puts("YES");
+		else
+			puts("NO");
+	}
+	return 0;
+}

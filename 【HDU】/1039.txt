@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 30
+char a[MAXN];
+
+bool is_yuanyin(char val)
+{
+    if ('a' == val)
+		return true;
+    if ('e' == val)
+		return true;
+	if ('i' == val)
+		return true;
+    if ('o' == val)
+		return true;
+	if ('u' == val)
+		return true;
+	return false;
+}
+bool sloved();
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif // SHY
+   while(1)
+   {
+		gets(a);
+		if (!strcmp("end", a))
+			break;
+		if (sloved())
+            printf ("<%s> is acceptable.\n", a);
+		else
+			printf ("<%s> is not acceptable.\n", a);
+   }
+    return 0;
+}
+
+bool sloved()
+{
+	bool have_yuanyin = false, nyy = true;
+    int three = 0, len = strlen(a);
+    for (int i = 0; i < len; i++)
+	{
+        if (is_yuanyin(a[i]))
+		{
+			have_yuanyin = true;
+            if (nyy)
+                three++;
+			else
+                three = 1, nyy = true;
+		}
+        else
+		{
+            if (!nyy)
+                three++;
+            else
+                three = 1, nyy = false;
+		}
+		if (three >= 3)
+            return false;
+        if (i && 'e' != a[i] && 'o' != a[i] && a[i] == a[i-1])
+            return false;
+	}
+	if (!have_yuanyin)
+		return false;
+	return true;
+}

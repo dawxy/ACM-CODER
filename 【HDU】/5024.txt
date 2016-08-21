@@ -1,0 +1,72 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+const int d[8][2]={{0,-1},{-1,0},{0,1},{1,0},{-1,-1},{-1,1},{1,1},{1,-1}};
+char map[MAXN][MAXN];
+int n, dp[MAXN][MAXN][8][2];
+//dp[i][j][k][m]表示在(i,j)点上人朝向为k时最长能走到的长度，m表示是否已经转弯过
+
+bool ok(int f, int to, bool& trun)
+{
+	if(abs(f-to) > 1) return false;
+	if((3 == f && 4 == to) || (4 == f && 3 == to)) return false;
+	if(trun)
+	{
+		if(f != to)
+			return false;
+		else
+			return true;
+	}
+	else
+	{
+		if(f != to)
+			trun = 1;
+		return true;
+	}
+}
+int dfs(int x, int y, int f, bool trun)
+{
+	int& ans = dp[x][y][f][trun];
+	if(~ans) return ans;
+	ans = 1;
+	for(int i = 0; i < 8; i++)
+	{
+		int ni = x+d[i][0], nj = y+d[i][1];
+		bool buf = trun;
+		if(0 <= ni && n > ni && 0 <= nj && n > nj && '.' == map[ni][nj] && ok(f,i,buf))
+			ans = max(ans,dfs(ni,nj,i,buf)+1);
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d%*c", &n) && n)
+	{
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = 0; j < n; j++)
+				map[i][j] = getchar();
+			getchar();
+		}
+		int ans = 2;
+		memset(dp,-1,sizeof(dp));
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = 0; j < n; j++)
+			{
+				if('.' == map[i][j])
+				{
+					for(int k = 0; k < 8; k++)
+						ans = max(ans,dfs(i,j,k,0));
+				}
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

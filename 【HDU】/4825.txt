@@ -1,0 +1,59 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 100005
+typedef unsigned int LL;
+int tree[MAXN*16][2], sum,ch;
+LL ans;
+
+LL in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+void add(LL num)
+{
+	int r = 0,b;
+	for(int i = 31; i >= 0; i--)
+	{
+		b = (num>>i)&1;
+		if(~tree[r][b])
+			r = tree[r][b];
+		else
+			r = tree[r][b] = ++sum;
+	}
+}
+LL find(LL num)
+{
+	int r = 0,b;
+	ans = 0;
+	for(int i = 31; i >= 0; i--)
+	{
+		b = (num>>i)&1;
+		if(!(~tree[r][b]))
+			b = !b;
+		r = tree[r][b];
+		ans = (ans<<1)+b;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t = in(), count = 0;
+	while(t--)
+	{
+		int n = in(),m = in();
+		memset(tree,-1,sizeof(tree));
+		sum = 0;
+		for(int i = 0; i < n; i++)
+			add(in());
+		printf("Case #%d:\n", ++count);
+		for(int i = 0; i < m; i++)
+			printf("%u\n", find(~in()));
+	}
+	return 0;
+}

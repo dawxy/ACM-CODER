@@ -1,0 +1,76 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+int bit[35],len,cnt,sum[35];
+
+void get_bit(int n)
+{
+    clc(sum,0);
+    len = 0;
+    cnt = 0;
+    while(n)
+    {
+        if(1 == (n&1)) cnt++, sum[len+1] = 1;
+        bit[len++] = n&1;
+        sum[len] += sum[len-1];
+        n >>= 1;
+    }
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t,count = 0;
+    scanf("%d",&t);
+    while(t--)
+    {
+        int n,s1,s2;
+        scanf("%d%d%d", &n,&s1,&s2);
+        printf("Case #%d: ",++count);
+        get_bit(n);
+        LL ans = 0;
+        if(cnt == len) ans = (LL)n+1, cnt = 1;
+        else
+        {
+            int st = 0;
+            rep(i,0,len)
+            {
+                if(bit[i] == 0 && sum[len]-sum[i]+1 <= s2)
+                {
+                    st = i;
+                    bit[st] = 1;
+                    cnt++;
+                    cnt -= sum[i];
+                    break;
+                }
+            }
+            //ans |= (((LL)1)<<(len-1));
+            per(i,len-1,st) ans = (ans<<1)+bit[i];
+            rep(i,0,st) ans <<= 1;
+        }
+        //cnt++;
+        if(ans <= n || cnt > s2)
+        {
+            ans = ((LL)1)<<(len);
+            cnt = 1;
+        }
+        if(cnt < s1)
+        {
+            rep(i,0,len)
+            {
+                if(0 == ((1<<i)&ans))
+                    ans |= (1<<i);
+                cnt++;
+                if(cnt >= s1) break;
+            }
+        }
+        printf("%I64d\n", ans);
+    }
+    return 0;
+}

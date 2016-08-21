@@ -1,0 +1,77 @@
+#include <stdio.h>
+#define MAX 36
+struct G{
+	int len, link[MAX];
+}g[MAX];
+int n, ans, td[MAX];
+
+bool can(int s, int num)
+{
+	for (int i = s; i <= n; i++)
+	{
+		for (int j = 0; j < g[i].len; j++)
+		{
+			if (num == g[i].link[j])
+				return true;
+		}
+	}
+	return false;
+}
+void dfs(int p, int num, int sum)
+{
+	if (sum >= ans || 1 == ans)
+		return;
+	if (num == n)
+	{
+		if (sum < ans)
+			ans = sum;
+		return;
+	}
+	if (p > n)
+		return;
+	for (int i = 1; i < p; i++)
+	{
+		if (!td[i] && !can(p, i))
+			return;
+	}
+	int jia = 0;
+	for (int i = 0;  i < g[p].len ;i++)
+	{
+		if (0 == td[g[p].link[i]])
+			jia++;
+		td[g[p].link[i]]++;
+	}
+	if (jia)
+		dfs(p+1, num+jia, sum+1);
+	for (int i = 0;  i < g[p].len ;i++)
+		td[g[p].link[i]]--;
+	dfs(p+1, num, sum);
+}
+int main ()
+{
+#ifdef DSHY
+	freopen ("E:\\1.txt","r",stdin);
+#endif
+	while(1)
+	{
+		int m;
+		scanf("%d %d%*c", &n, &m);
+		if (!n && !m)
+			break;
+		for (int i = 0; i < MAX; i++)
+			g[i].len = td[i] = 0;
+		int a, b;
+		while(m--)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			g[a].link[g[a].len++] = b;
+			g[b].link[g[b].len++] = a;
+		}
+		for (int i = 1;  i <= n; i++)
+			g[i].link[g[i].len++] = i;//把这个点本身也放进去，因为自己可以给自己通网
+		ans = 99999999;
+		dfs(1, 0, 0);
+		printf ("%d\n", ans);
+	}
+	return 0;
+}

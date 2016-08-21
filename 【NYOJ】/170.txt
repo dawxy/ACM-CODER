@@ -1,0 +1,28 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 10010
+int du[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int a,b;
+		clc(du,0);
+		rep(i,1,n)
+			scanf("%d %d%*c", &a, &b), du[a]++, du[b]++;
+		int ans = 0;
+		repe(i,1,n) if(1 == du[i]) ans++;
+		printf("%d\n", (ans+1)>>1);
+	}
+	return 0;
+}

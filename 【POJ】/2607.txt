@@ -1,0 +1,99 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 510
+#define INF 0x3f3f3f3f
+struct G{
+	int to[MAXN], cost[MAXN], len;
+}g[MAXN];
+vector<int> f;
+bool isf[MAXN],inq[MAXN];
+int dis[MAXN], tmp[MAXN], q[MAXN*MAXN], rear, front;
+
+void add_edge(int a, int b, int c)
+{
+	int& len = g[a].len;
+	g[a].to[len] = b, g[a].cost[len] = c;
+	len++;
+}
+void spfa(int s)
+{
+	rear = front = 0;
+	clc(inq,0);
+	dis[s] = 0;
+	inq[s] = true;
+	q[front++] = s;
+	while(front != rear)
+	{
+		int u = q[rear++];
+		inq[u] = false;
+		int sz = g[u].len;
+		rep(i,0,sz)
+		{
+			if(dis[u] < INF && dis[g[u].to[i]] > dis[u]+g[u].cost[i])
+			{
+				dis[g[u].to[i]] = dis[u]+g[u].cost[i];
+				if(!inq[g[u].to[i]]) inq[g[u].to[i]] = true, q[front++] = g[u].to[i];
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int a,b,c,s,n;
+	char str[100];
+	while(~scanf("%d %d%*c", &s, &n))
+	{
+		clc(dis,0x3f);
+		clc(isf,0);
+		f.clear();
+		repe(i,1,n) g[i].len = 0;
+		rep(i,0,s)
+		{
+			scanf("%d%*c", &a);
+			isf[a] = true;
+			f.push_back(a);
+		}
+		while(gets(str)&& strlen(str))sscanf(str,"%d %d %d", &a, &b, &c),add_edge(a,b,c),add_edge(b,a,c);
+		if(n == s)
+		{
+			puts("1");
+			continue;
+		}
+		int sz = f.size(), ans = INF, id = 1;
+		rep(i,0,sz)
+			spfa(f[i]);
+		memcpy(tmp,dis,sizeof(int)*(n+1));
+		repe(j,1,n)if(!isf[j]) ans = max(ans,tmp[j]);
+		repe(i,1,n)
+		{
+			if(isf[i]) continue;
+			spfa(i);
+			int buf = -1;
+			repe(j,1,n)
+			{
+				if(!isf[j])
+					buf = max(buf,dis[j]);
+			}
+			if(ans > buf)
+			{
+				ans = buf;
+				id = i;
+			}
+			memcpy(dis,tmp,sizeof(int)*(n+1));
+		}
+		printf("%d\n", id);
+	}
+	return 0;
+}

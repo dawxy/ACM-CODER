@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <string.h>
+const int jinzhi[25] = {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97};
+int a[30], b[30], ans[30];
+
+void daozhi(int *val, int len)
+{
+    for (int i = 0, j = len-1; i < j; i++, j--)
+	{
+        val[i] ^= val[j];
+        val[j] ^= val[i];
+        val[i] ^= val[j];
+	}
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+	while(1)
+	{
+        int  lena = 0, lenb = 0,  v, c = ',';
+        memset(a,0,sizeof(a));
+        memset(b,0,sizeof(b));
+        while(' ' != c)
+		{
+            scanf ("%d", &v);
+            c = getchar();
+            a[lena++] = v;
+		}
+        while('\n' != c)
+		{
+            scanf ("%d", &v);
+            b[lenb++] = v;
+            c = getchar();
+            if (-1 == c)
+				break;
+		}
+		if (1 == lena && 1 == lenb && !a[0] && !b[0])
+            break;
+        daozhi(a,lena);
+        daozhi(b,lenb);
+        c = 0;
+        int max = lena > lenb ? lena : lenb;
+        for (int i = 0; i < max; i++)
+		{
+            ans[i] = a[i]+b[i]+c;
+			if (ans[i] >= jinzhi[i])
+                ans[i] -= jinzhi[i], c = 1;
+            else
+				c = 0;
+		}
+		if (c)
+			max++, ans[max-1] = 1;
+        printf ("%d", ans[max-1]);
+        for (int i = max-2; i >= 0; i--)
+		{
+            printf (",%d", ans[i]);
+		}
+		printf ("\n");
+	}
+    return 0;
+}

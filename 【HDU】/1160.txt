@@ -1,0 +1,48 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+#define MAXV 10010
+struct NODE{
+    int x, w, s;
+}p[MAXN];
+int f[MAXN], dp[MAXN];
+
+void pt(int s)
+{
+    if (-1 == s)
+        return;
+    pt(f[s]);
+    printf ("%d\n", p[s].x+1);
+}
+bool cmp(NODE a, NODE b){return a.w < b.w;}
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n = 0, ans = 0, end;
+    while(~scanf ("%d %d%*c", &p[n].w, &p[n].s))
+    {
+        p[n].x = n;
+        n++;
+    }
+    sort(p,p+n,cmp);
+    dp[0] = 1;
+    memset(f,-1,sizeof(f));
+    for (int i = 1; i < n; i++)
+    {
+        dp[i] = 1;
+        for (int j = 0; j < i; j++)
+        {
+            if (p[j].w != p[i].w && p[j].s > p[i].s && dp[i] < dp[j]+1)//加个判断p[j].w != p[i].w就可以了
+                dp[i] = dp[j]+1, f[i] = j;
+        }
+        if (ans < dp[i])
+            ans = dp[i], end = i;
+    }
+    printf ("%d\n", ans);
+    pt(end);
+    return 0;
+}

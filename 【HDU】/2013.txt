@@ -1,0 +1,15 @@
+#include <stdio.h>
+
+void main (void)
+{
+	int n, s, i;
+	while (	EOF != scanf("%d", &n))
+	{
+		s = 1;
+		for (i = 0; i < n-1; i++)
+		{
+			s = 2 * (1 + s);
+		}
+		printf ("%d\n", s);
+	}
+}

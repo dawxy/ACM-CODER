@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int shuzi (char a)
+{
+	if (48 <= a && 57 >= a)
+		return 1;
+	else
+		return 0;
+}
+
+void main (void)
+{
+	int n, s;
+	char a;
+	scanf ("%d", &n);
+	getchar();
+	while (n--)
+	{
+		s = 0;
+		while (1)
+		{
+			a = getchar ();
+			if ('\n' == a || EOF == a)
+				break;
+			s += shuzi (a);
+		}
+		printf ("%d\n", s);
+		
+	}
+}

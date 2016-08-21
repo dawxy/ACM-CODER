@@ -1,0 +1,52 @@
+#include <stdio.h>
+#define MAXN 1000010
+int t, n, ans[MAXN];
+
+void updata(int s, int val)
+{
+	while(s > 0)
+	{
+		ans[s] += val;
+		s -= s & -s;
+	}
+}
+int sum(int s)
+{
+	int sum = 0;
+
+	while(s <= n)
+	{
+		sum += ans[s];
+		s += s & -s;
+	}
+
+	return sum;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	scanf("%d %d%*c", &t, &n);
+	char c[10];
+	int a, b, val;
+
+	while(t--)
+	{
+		scanf("%s", c);
+
+		if('Q' == c[0])
+		{
+			scanf("%d%*c", &a);
+			printf("%d\n", sum(a));
+		}
+		else
+		{
+			scanf("%d %d %d%*c", &a, &b, &val);
+			updata(b, val);
+			updata(a - 1, -val);
+		}
+	}
+
+	return 0;
+}

@@ -1,0 +1,85 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20;
+const LL MOD = 1000000007;
+struct NODE{
+	LL n,sum,qsum;
+	NODE(){
+		n = sum = qsum = 0;
+	}
+}dp[MAXN][7][7];
+bool vis[MAXN][7][7];
+LL z[MAXN];
+int bit[MAXN];
+
+NODE dfs(int len, int s, int c,bool ismax)
+{
+	if(!len)
+	{
+		NODE tmp;
+		if(s&&c) tmp.n = 1;
+		return tmp;
+	}
+	NODE &ans = dp[len][s][c];
+	if(!ismax && vis[len][s][c]) return ans;
+	NODE cnt;
+	int mx = ismax?bit[len]:9;
+	repe(i,0,mx)
+	{
+		if(7 == i) continue;
+		NODE tmp = dfs(len-1,(s+i)%7,(c*10+i)%7,ismax&&i==mx);
+		LL p = i*z[len]%MOD;
+		cnt.n = (cnt.n+tmp.n)%MOD;
+		cnt.sum = (cnt.sum+tmp.sum+ p*tmp.n%MOD)%MOD;
+		cnt.qsum = (cnt.qsum+tmp.qsum+ p*p%MOD*tmp.n%MOD+2*p*tmp.sum%MOD)%MOD;
+	}
+	if(!ismax)
+	{
+		ans=cnt;
+		vis[len][s][c] = 1;
+	}
+	return cnt;
+}
+NODE sloved(LL n)
+{
+	int len = 0;
+	while(n)
+	{
+		bit[++len] = n%10;
+		n /= 10;
+	}
+	return dfs(len,0,0,1);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	clc(vis,0);
+	z[1] = 1;
+	rep(i,2,20) z[i] = (z[i-1]*10)%MOD;
+	while(t--)
+	{
+		LL x,y;
+		scanf("%lld %lld",&x, &y);
+		printf("%lld\n", (sloved(y).qsum-sloved(x-1).qsum+MOD)%MOD);
+	}
+	return 0;
+}

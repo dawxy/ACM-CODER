@@ -1,0 +1,229 @@
+/*EK*/
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define MAXN 20
+#define INF 0x3f3f3f3f
+struct E{
+	int from, to, cap, flow;
+	E(int a, int b, int c, int d){
+		from = a, to = b, cap = c, flow = d;
+	}
+};
+vector<E> edge;
+vector<int> g[MAXN];
+int a[MAXN], p[MAXN];
+
+void add_edge(int from, int to, int cap)
+{
+	edge.push_back(E(from,to,cap,0));
+	edge.push_back(E(to,from,0,0));
+	int num = edge.size();
+	g[from].push_back(num-2);
+	g[to].push_back(num-1);
+}
+int ek(int st, int ed)
+{
+	int ans = 0;
+	while(1)
+	{
+		memset(a,0,sizeof(a));
+		queue<int> q;
+		q.push(st);
+		a[st] = INF;
+		while(!q.empty())
+		{
+			int x = q.front();q.pop();
+			int len = g[x].size();
+			for(int i = 0; i < len; i++)
+			{
+				E& e = edge[g[x][i]];
+				if(!a[e.to] && e.cap > e.flow)
+				{
+					p[e.to] = g[x][i];
+					a[e.to] = min(a[x], e.cap-e.flow);
+					q.push(e.to);
+				}
+				if(a[ed]) break;
+			}
+		}
+		if(!a[ed]) break;
+		for(int u  = ed; u != st; u = edge[p[u]].from)
+		{
+			edge[p[u]].flow += a[ed];
+			edge[p[u]^1].flow -= a[ed];
+		}
+		ans += a[ed];
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m, a, b,c;
+		edge.clear();
+		scanf("%d %d%*c", &n ,&m);
+		for(int i = 1; i <= n; i++) g[i].clear();
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b, &c);
+			add_edge(a,b,c);
+		}
+		printf("Case %d: %d\n", ++count,ek(1,n));
+	}
+	return 0;
+}
+
+=====================================================================================
+/*ISAP*/
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <vector>
+#include <queue>
+using namespace std;
+#define MAXN 20
+#define INF 0x3f3f3f3f
+struct ISAP{
+    struct Edge{
+        int from, to, cap, flow;
+        Edge(int a, int b, int c, int d){
+            from = a, to = b, cap = c, flow = d;
+        }
+    };
+    int p[MAXN]/*可增广的上一条弧*/, num[MAXN]/*距离标号计数*/, d[MAXN]/*起点到i距离*/,cur[MAXN]/*当前弧下标*/;
+    int n, m, s, t;//节点数，边数，起点，终点
+    vector<int> g[MAXN];//邻接表
+    vector<Edge> edge;
+    bool vis[MAXN];
+    void init()
+    {
+        edge.clear();
+        for(int i = 0; i <= n; i++) g[i].clear();
+        memset(num,0,sizeof(num));
+        memset(cur,0,sizeof(cur));
+    }
+    void add_edge(int from, int to, int cap)
+    {
+        edge.push_back(Edge(from,to,cap,0));
+        edge.push_back(Edge(to,from,0,0));
+        int sum = edge.size();
+        g[from].push_back(sum-2);
+        g[to].push_back(sum-1);
+    }
+    int augment()
+    {
+        int x = t, a = INF;
+        while(x != s)
+        {
+            Edge& e = edge[p[x]];
+            a = min(a, e.cap-e.flow);
+            x = edge[p[x]].from;
+        }
+        x = t;
+        while(x != s)
+        {
+            edge[p[x]].flow += a;
+            edge[p[x]^1].flow -= a;
+            x = edge[p[x]].from;
+        }
+        return a;
+    }
+    bool bfs()
+    {
+        memset(vis,0,sizeof(vis));
+        queue<int> q;
+        q.push(t);
+        d[t] = 0;
+        vis[t] = 1;
+        while(!q.empty())
+        {
+            int x = q.front(); q.pop();
+            for(int i = 0; i < g[x].size(); i++)
+            {
+                Edge& e = edge[g[x][i]];
+                if(!vis[e.to])
+                {
+                    vis[e.to] = 1;
+                    d[e.to] = d[x]+1;
+                    q.push(e.to);
+                }
+            }
+        }
+        return vis[s];
+    }
+    int maxflow(int s, int t)
+    {
+        this->s = s, this->t = t;
+        int flow = 0;
+        bfs();
+        for(int i = 0; i < n; i++) num[d[i]]++;
+        int x = s;
+        while(d[s] < n)
+        {
+            if(x == t)
+            {
+                flow += augment();
+                x = s;
+            }
+            int ok = 0;
+            for(int i = cur[x]; i < g[x].size(); i++)
+            {
+                Edge& e = edge[g[x][i]];
+                if(e.cap > e.flow && d[x] == d[e.to]+1)
+                {
+                    ok = 1;
+                    p[e.to] = g[x][i];
+                    cur[x] = i;
+                    x = e.to;
+                    break;
+                }
+            }
+            if(!ok)
+            {
+                int sum = n-1;
+                for(int i = 0; i < g[x].size(); i++)
+                {
+                    Edge& e = edge[g[x][i]];
+                    if(e.cap > e.flow) sum = min(sum,d[e.to]);
+                }
+                if(--num[d[x]] == 0) return flow;//gap优化
+                num[d[x] = sum+1]++;
+                cur[x] = 0;
+                if(x != s) x = edge[p[x]].from;
+            }
+        }
+        return flow;
+    }
+}isap;
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int t,count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int a,b,c;
+        scanf("%d %d%*c", &isap.n, &isap.m);
+        isap.init();
+        for(int i = 0; i < isap.m; i++)
+        {
+            scanf("%d %d %d%*c", &a, &b, &c);
+            isap.add_edge(a,b,c);
+        }
+        printf("Case %d: %d\n", ++count, isap.maxflow(1,isap.n));
+    }
+    return 0;
+}

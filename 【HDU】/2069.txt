@@ -1,0 +1,30 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXC 260
+int a[5] = {50,25,10,5,1}, n, ans, dp[101][MAXC];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	dp[0][0] = 1;
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 1; j <= 100; j++)
+		{
+			for (int k = a[i]; k <= 250; k++)
+				dp[j][k] += dp[j-1][k-a[i]];
+		}
+	}
+	while (~scanf("%d%*c", &n))
+	{
+		ans = 0;
+		for (int i = 0; i <= 100; i++)
+			ans += dp[i][n];
+		printf("%d\n", ans);
+	}
+	return 0;
+}

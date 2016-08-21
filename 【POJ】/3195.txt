@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <stack>
+using namespace std;
+const int maxn = 10000;
+
+int t[maxn];
+
+bool solve(int n) {
+	int c[30000] = {0}, buf,i;
+	stack<int> s;
+	for (i = 0; i < n; i++)
+	{
+		if (t[i] < 0)
+		{
+			s.push(t[i]);
+			c[s.size()] += (-1)*t[i];
+		}
+		else
+		{
+			if ( (-1)*s.top() != t[i])
+				return false;
+			buf = s.top(), s.pop();
+			if (!s.empty() && (-1)*s.top() <= c[s.size()+1])
+				return false;
+			s.push(buf);
+			c[s.size()+1] = 0;
+			s.pop();
+		}
+	}
+	return true;
+}
+
+
+int main ()
+{
+	int ch = 12;
+	while(EOF != scanf ("%d", &t[0]))
+	{
+		int n = 1;
+		ch = getchar();
+		if (ch != '\n' && ch != EOF)
+		{
+			while(1)
+			{
+				scanf("%d", &t[n++]);
+				ch = getchar();
+				if (10 == ch || EOF == ch)
+					break;
+			}
+		}
+		if (n % 2 == 1)
+			puts(":-( Try again.");
+		else{
+			if (solve(n))
+				puts(":-) Matrioshka!");
+			else
+				puts(":-( Try again.");
+		}
+		if(EOF == ch)
+			break;
+	}
+	return 0;
+}

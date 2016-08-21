@@ -1,0 +1,107 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 210
+struct Edge{
+	int next,v;
+	Edge(int a = 0, int b = 0){next = a, v = b;}
+}edge[MAXN*MAXN*2];
+int head[MAXN], tol, col[MAXN], lin[MAXN], n, sum;
+bool vis[MAXN];
+
+void add_edge(int u, int v)
+{
+	edge[tol] = Edge(head[u],v);
+	head[u] = tol++;
+}
+bool prn(int u, bool color)
+{
+	col[u] = color;
+	sum++;
+	for(int i = head[u]; ~i; i = edge[i].next)
+	{
+		int v = edge[i].v;
+		if(-1 == col[v] && !prn(v,!color)) return false;
+		else if (col[v] == col[u]) return false;
+	}
+	return true;
+}
+bool dfs(int u)
+{
+	for (int i = head[u]; ~i; i = edge[i].next)
+	{
+		int v = edge[i].v;
+		if (!vis[v])
+		{
+			vis[v] = true;
+			if (-1 == lin[v] || dfs(lin[v]))
+			{
+				lin[v] = u;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int hungary()
+{
+	int ans = 0;
+	clc(lin,-1);
+	repe(i,1,n)
+	{
+		if(1 == col[i])
+		{
+			clc(vis,0);
+			if(dfs(i)) ans++;
+		}
+	}
+	return ans;
+}
+bool ok()
+{
+	repe(i,1,n)
+	{
+		if(~col[i]) continue;
+		if(!prn(i,0)) return false;
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int m;
+	while(~scanf("%d %d%*c",&n, &m))
+	{
+		int a,b;
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a ,&b);
+			add_edge(a,b), add_edge(b,a);
+		}
+		clc(col,-1);
+		if(!ok())
+		{
+			puts("No");
+			continue;
+		}
+		printf("%d\n", hungary());
+	}
+	return 0;
+}

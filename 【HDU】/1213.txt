@@ -1,0 +1,28 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1010
+int f[MAXN];
+
+int find(int x){return ~f[x]?f[x] = find(f[x]):x;}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m, a, b, cnt = 0;
+		scanf("%d %d%*c", &n, &m);
+		memset(f,-1,sizeof(f));
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d%*c", &a, &b);
+			int x = find(a), y = find(b);
+			if(x != y) f[x] = y, cnt++;
+		}
+		printf("%d\n", n-cnt);
+	}
+	return 0;
+}

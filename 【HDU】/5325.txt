@@ -1,0 +1,158 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500000+10, MAXOUT = 10000;
+char buf[MAXN/10], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;//EOF
+	do{
+		rnext();
+		if('-' == *ps) f = -1;
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;//EOF
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+char bufout[MAXOUT], outtmp[50],*pout = bufout, *pend = bufout+MAXOUT;
+inline void write()/*必须在程序结束时加 write()*/
+{
+	fwrite(bufout,sizeof(char),pout-bufout,stdout);
+	pout = bufout;
+}
+inline void out_char(char c){ *(pout++) = c;if(pout == pend) write();}
+inline void out_str(char *s)
+{
+	while(*s)
+	{
+		*(pout++) = *(s++);
+		if(pout == pend) write();
+	}
+}
+template <class T>
+inline void out_int(T x) {
+	if(!x)
+	{
+		out_char('0');
+		return;
+	}
+	if(x < 0) x = -x,out_char('-');
+	int len = 0;
+	while(x)
+	{
+		outtmp[len++] = x%10+48;
+		x /= 10;
+	}
+	outtmp[len] = 0;
+	for(int i = 0, j = len-1; i < j; i++,j--) swap(outtmp[i],outtmp[j]);
+	out_str(outtmp);
+}
+int a[MAXN];
+int head[MAXN],tol,nxt[MAXN],to[MAXN];
+
+void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int sum[MAXN];
+int dfs(int u)
+{
+	if(sum[u]) return sum[u];
+	sum[u] = 1;
+	for(int i = head[u]; ~i; i = nxt[i])
+		sum[u] += dfs(to[i]);
+	return sum[u];
+}
+stack<int> s;
+vector<int> q;
+bool vis[MAXN];
+int fa[MAXN];
+int dfs1(int u)
+{
+	while(!s.empty()) s.pop();
+	int sz = q.size();
+	rep(i,0,sz) vis[q[i]] = 0;
+	q.clear();
+	s.push(u);
+	while(!s.empty())
+	{
+		int u = s.top();
+		if(vis[u])//从儿子结点返回
+		{
+			s.pop();
+			sum[fa[u]] += sum[u];
+			continue;
+		}
+		/*第一次进入结点u*/
+		vis[u] = true;
+		q.push_back(u);
+		if(sum[u]) continue;
+		sum[u] = 1;
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			fa[v] = u;
+			s.push(v);
+		}
+	}
+	return sum[u];
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(in(n))
+	{
+		repe(i,1,n) in(a[i]);
+		clc(head,-1);
+		tol = 0;
+		rep(i,1,n)
+		{
+			int u,v;
+			in(u),in(v);
+			if(a[u] < a[v]) add_edge(u,v);
+			else add_edge(v,u);
+		}
+		clc(sum,0);
+		int ans = 0;
+		repe(i,1,n)
+		{
+			fa[i] = 0;
+			sum[0] = 0;
+			ans = max(ans,dfs1(i));
+		}
+		out_int(ans),out_char('\n');
+	}
+	write();
+	return 0;
+}

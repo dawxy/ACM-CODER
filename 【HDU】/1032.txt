@@ -1,0 +1,33 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int a,b;
+    while(~scanf ("%d %d%*c", &a, &b))
+	{
+        int i = a, j = b;
+        if (i > j)
+            i ^= j, j ^= i, i ^= j;
+        int max = -1, buf, t;
+        for (;i <= j; i++)
+		{
+			buf = i;
+			t = 1;
+            while(1 != buf)
+			{
+                if (buf&1)
+                    buf = 3*buf+1;
+				else
+					buf >>= 1;
+				t++;
+			}
+            if (t > max)
+				max = t;
+		}
+		printf ("%d %d %d\n", a,b,max);
+	}
+    return 0;
+}

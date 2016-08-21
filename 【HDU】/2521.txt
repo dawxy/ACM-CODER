@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#define MAXN 5000
+int sum[MAXN+1];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	for(int i = 1; i <= MAXN; i++)
+	{
+		for(int j = sqrt(i*1.0); j >= 1; j--)
+		{
+			if(0 == i%j) 
+			{
+				if(i/j != j)
+					sum[i] += 2;
+				else
+					sum[i]++;
+			}
+		}
+	}
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int a,b, maxn = 0, ans;
+		scanf("%d %d%*c", &a, &b);
+		for(int i = a; i <= b; i++)
+		{
+			if(maxn < sum[i])
+			{
+				maxn = sum[i];
+				ans = i;
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

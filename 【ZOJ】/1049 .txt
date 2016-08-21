@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <malloc.h>
+
+int main (void)
+{
+	int n, i;
+	int *z;
+	float *p;
+	float *q;
+	float *x1;
+	float *x2;
+
+	scanf ("%d", &n);
+
+	p = (float *)malloc(n * sizeof(float));
+	q = (float *)malloc(n * sizeof(float));
+	z = (int *)malloc(n * sizeof(int));
+	x1 = (float *)malloc(n * sizeof(float));
+	x2 = (float *)malloc(n * sizeof(float));
+
+	for (i = 0; i < n; i++)
+	{
+		scanf ("%f %f", &p[i], &q[i]);
+		x1[i] = 0.5*3.14*(q[i]*q[i]+p[i]*p[i])/50;
+		x2[i]= x1[i] - (int)(x1[i]);//x2是小数位
+		if (0 != x2[i])              //判断是不是整数
+			x2[i] = 1;           //进位
+		z[i] = (int)(x1[i]) + (int)x2[i];
+	}
+	for (i = 0; i < n; i++)
+	{
+		printf ("Property %d: This property will begin eroding in year %d.\n", i + 1, z[i]);
+	}
+	printf ("END OF OUTPUT.");
+
+	return 0;
+}

@@ -1,0 +1,52 @@
+#include <stdio.h>
+#define MAXN 25
+const int d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+int w, h, si, sj, ans;
+char g[MAXN][MAXN];
+
+void dfs(int, int);
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(1)
+	{
+		scanf ("%d %d%*c", &w, &h);
+		if (!w && !h)
+			break;
+		for (int i = 0;  i < h; i++ )
+		{
+			for (int j = 0; j < w; j++)
+			{
+				g[i][j] = getchar();
+				if ('@' == g[i][j])
+				{
+					si = i;
+					sj = j;
+				}
+			}
+			getchar();
+		}
+		ans = 0;
+		dfs(si, sj);
+		printf ("%d\n",ans);
+	}
+	return 0;
+}
+
+void dfs(int si, int sj)
+{
+	g[si][sj] = '#';
+	ans ++;
+	int ni, nj;
+	for (int i = 0; i < 4; i++)
+	{
+		ni = d[i][0]+si;
+		nj = d[i][1]+sj;
+		if (0 <= ni && h > ni && 0 <= nj && w > nj && '#' != g[ni][nj])
+		{
+			dfs(ni, nj);
+		}
+	}
+}

@@ -1,0 +1,58 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+bool vis[MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        clc(vis,0);
+        int n;
+        scanf("%d%*c", &n);
+        int a;
+        int mx = -1;
+        rep(i,0,n) scanf("%d%*c", &a), vis[a] = true, mx = max(mx,a);
+        int cnt = 0;
+        repe(i,1,n)
+        {
+            if(!vis[i])
+            {
+                if(cnt) putchar(' ');
+                printf("%d", i);
+                cnt++;
+                if(cnt == 2) break;
+            }
+        }
+        if(cnt < 2)
+        {
+            if(cnt == 1) printf(" %d",mx+1);
+            else
+            {
+                printf("%d %d",mx+1,mx+2);
+            }
+        }
+        printf("\n");
+    }
+    return 0;
+}

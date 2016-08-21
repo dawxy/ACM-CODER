@@ -1,0 +1,29 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+#define MAXN 10010
+double dp[MAXN];
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int c, n;
+    while(~scanf ("%d %d%*c", &c, &n) && c+n)
+    {
+        int w;
+        double v;
+        for (int i = 0; i <= c; i++)
+            dp[i] = 1;
+        for (int i = 0; i < n; i++)
+        {
+            scanf ("%d %lf%*c", &w, &v);
+            v = 1-v;
+            for (int j = c; j >= w; j--)
+                dp[j] = min(dp[j], dp[j-w]*v);
+        }
+        printf ("%.1lf%%\n", (1-dp[c])*100);
+    }
+    return 0;
+}

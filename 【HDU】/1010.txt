@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+const int MAXN = 10, MAXS = 50000, d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+int h, w, t, si, sj, ei, ej;
+char g[MAXN][MAXN];
+
+bool dfs(int ,int, int);
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(1)
+	{
+		scanf ("%d %d %d%*c", &h, &w, &t);
+		if (!h && !w && !t)
+			break;
+		int sum = 0;
+		memset(g,'X',sizeof(g));
+		for (int i = 1; i <= h; i++)
+		{
+			for (int j = 1; j <= w; j++)
+			{
+				g[i][j] = getchar();
+				if ('.' == g[i][j])
+					sum++;
+				else if ('S' == g[i][j])
+					si = i, sj = j;
+				else if ('D' == g[i][j])
+					ei = i, ej = j;
+			}
+			getchar();
+		}
+		if (sum+1 < t || (t-(abs(ei-si)+abs(ej-sj)))&1)
+		{
+			puts("NO");
+			continue;
+		}
+		g[si][sj] = 'X';
+		if (dfs(si, sj,0))
+			puts ("YES");
+		else
+			puts ("NO");
+	}
+	return 0;
+}
+
+bool dfs(int si, int sj, int dis)
+{
+	if (ei == si && ej == sj && dis == t)
+		return true;
+	int ni, nj;
+	for (int i = 0; i < 4; i++)
+	{
+		ni = d[i][0]+si;
+		nj = d[i][1]+sj;
+		if ('X' != g[ni][nj] && dis+1 <= t)
+		{
+			g[ni][nj] = 'X';
+			if (dfs(ni,nj,dis+1)) return true;
+			g[ni][nj] = '.';
+		}
+	}
+	return false;
+}

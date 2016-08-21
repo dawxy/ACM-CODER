@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 100000
+char m1[MAX];
+
+int main ()
+{
+	char buf[MAX];
+	while(NULL != gets(buf))
+	{
+		char *w;
+		int lenbuf, len1 = 1,ans = 0, f, e1[27], e2[27], used[27] = {0}, i;
+		for (i = 0; i < 26; i++)
+			e1[i] = e2[i] = i+1;
+		lenbuf = strlen(buf);
+		for (i = 0; i < lenbuf; i++)
+		{
+			if (' ' != buf[i])
+				m1[len1++] = buf[i];
+			if ('a' <= buf[i] && 'z' >= buf[i])
+				used[buf[i]-'a'] = 1;
+		}
+		m1[0] = '+';
+		m1[len1] = '\0';
+		w = m1;
+		while(NULL != (w = strstr(w, "++")))
+		{		
+			if ('a' <= w[2] && 'z' >= w[2])
+			{
+				e1[w[2]-'a'] += 1;
+				e2[w[2]-'a'] += 1;
+			}
+			else if ('a' <= w[-1] && 'z' >= w[-1])
+				e2[w[-1]-'a'] += 1;
+			else
+			{
+				w += 1;
+				continue;
+			}
+			w[0] = w[1] = 1;
+		}
+		w = m1;
+		while(NULL != (w = strstr(w, "--")))
+		{		
+			if ('a' <= w[2] && 'z' >= w[2])
+			{
+				e1[w[2]-'a'] -= 1;
+				e2[w[2]-'a'] -= 1;
+			}
+			else if ('a' <= w[-1] && 'z' >= w[-1])
+				e2[w[-1]-'a'] -= 1;
+			else
+			{
+				w += 1;
+				continue;
+			}
+			w[0] = w[1] = 1;
+		}
+
+		for (i = 0; i < len1;)
+		{
+			if (1 == m1[i])
+				i += 2;
+			else
+			{
+				if ('+' == m1[i])
+					f = 1;
+				else if ('-' == m1[i])
+					f = -1;
+				else
+					ans += e1[m1[i]-'a']*f;
+				i++;
+			}
+		}
+		printf ("Expression: %s\n", buf);
+		printf ("    value = %d\n", ans);
+		for (i = 0; i < 26; i++)
+		{
+			if(used[i])
+				printf ("    %c = %d\n", 'a'+i, e2[i]);
+		}
+	}
+
+	return 0;
+}

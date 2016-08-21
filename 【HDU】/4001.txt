@@ -1,0 +1,79 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+#define MAXN 1002
+#define max(a,b) (a>b?a:b)
+typedef long long LL;
+struct NODE{
+	LL a,b,c,d;
+}p[MAXN];
+vector <int> s[MAXN];
+int n;
+LL dp[MAXN];
+
+void init()
+{
+	for (int i = 0; i < n; i++)
+		s[i].clear();
+	memset(dp,-1,sizeof(dp));
+}
+LL dfs(int si)
+{
+	if (~dp[si]) return dp[si];
+	int len = s[si].size();
+	dp[si] = 0;
+	for(int i = 0; i < len; i++)
+		dp[si] = max(dp[si],dfs(s[si][i])+p[s[si][i]].c);
+	return dp[si];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d%*c", &n) && n)
+	{
+		init();
+		int len = 0;
+		for (int i = 0; i < n; i++)
+		{
+			scanf("%lld %lld %lld %lld%*c", &p[len].a, &p[len].b, &p[len].c, &p[len].d);
+			if (p[len].a < p[len].b)
+			{
+				p[len].a ^= p[len].b;
+				p[len].b ^= p[len].a;
+				p[len].a ^= p[len].b;
+			}
+			len++;
+			if (p[len-1].d) continue;
+			for(int j = len-2; j >= 0; j--)
+			{
+				if (!p[j].d && p[len-1].a == p[j].a && p[len-1].b == p[j].b)
+				{
+					p[j].c += p[len-1].c;
+					len--;
+					break;
+				}
+			}
+		}
+		for (int i = 0; i < len; i++)
+		{
+			for (int j = 0; j < len; j++)
+			{
+				if (i == j) continue;
+				if (0 == p[j].d && p[j].a >= p[i].a && p[j].b >= p[i].b)
+					s[i].push_back(j);
+				else if (1 == p[j].d && p[j].a >= p[i].a && p[j].b >= p[i].b && p[j].a*p[j].b > p[i].a*p[i].b)
+					s[i].push_back(j);
+				else if (2 == p[j].d && p[j].a > p[i].a && p[j].b > p[i].b)
+					s[i].push_back(j);
+			}
+		}
+		LL ans = 0;
+		for(int i = 0; i < n; i++)
+			ans = max(ans,dfs(i)+p[i].c);
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

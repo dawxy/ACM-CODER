@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <string.h>
+int g[501][501];
+int val[501], r[501];
+int k, m, n;
+
+bool dsf (int);
+
+int main ()
+{
+	while(EOF != scanf ("%d %d %d%*c", &k, &m, &n) && k)
+	{
+		int i, a, b, ans = 0;
+		memset(g, 0, sizeof(g));
+		memset(r, 0, sizeof(r));
+		for (i = 1; i <= k; i++)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			g[a][b] = 1;
+		}
+		for (i = 1; i <= m; i++)
+		{
+			memset(val, 0, sizeof(val));
+			if (dsf(i))
+				ans++;
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}
+
+bool dsf (int x)
+{
+	int i;
+	for (i = 1; i <= n; i++)
+	{
+		if (0 == val[i] && g[x][i])
+		{
+			val[i] = 1;
+			if (0 == r[i] || dsf(r[i]))
+			{
+				r[i] = x;
+				return true;
+			}
+		}
+	}
+	return false;
+}

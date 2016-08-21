@@ -1,0 +1,59 @@
+#include <stdio.h>
+//#define scanf scanf_s
+#define MAX 201
+struct G{
+	int sum, link[MAX], col;
+}g[MAX];
+int n, que[MAX*MAX+1];
+
+bool bfs();
+int main ()
+{
+	//FILE *f;
+	//freopen_s(&f, "e:\\1.txt","r",stdin);
+	while(1)
+	{
+		scanf ("%d%*c", &n);
+		if (0 == n)
+			break;
+		int m, a, b;
+		for (int i = 0; i < MAX; i++)
+			g[i].sum = g[i].col = 0;
+		scanf ("%d%*c", &m);
+		for (int i = 0; i < m; i++)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			g[a].link[g[a].sum++] = b;
+			g[b].link[g[b].sum++] = a;
+		}
+		if (bfs())
+			puts("BICOLORABLE.");
+		else
+			puts("NOT BICOLORABLE.");
+	}
+
+	return 0;
+}
+
+bool bfs()
+{
+	int front = -1, rear = 0, buf;
+	que[rear++] = 0;
+	g[0].col = 1;
+	while(rear-1 != front)
+	{
+		buf = que[++front];
+		for (int i = 0; i < g[buf].sum; i++)
+		{
+			int t = g[buf].link[i];
+			if (0 == g[t].col)
+			{
+				g[t].col = -g[buf].col;
+				que[rear++] = t;
+			}
+			else if (g[t].col == g[buf].col)
+					return false;
+		}
+	}
+	return true;
+}

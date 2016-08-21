@@ -1,0 +1,158 @@
+#include <stdio.h>
+int n, m[26][26];
+
+void move_a_onto_b (int *, int, int);
+void move_a_over_b (int *, int, int);
+void pile_a_onto_b (int *, int, int);
+void pile_a_over_b (int *, int, int);
+void traverse (int *);
+
+int main ()
+{
+	while(EOF != scanf("%d%*c", &n))
+	{
+		int c[26]= {0}, i, a, b;
+		char s1[7], s2[7];
+		for(i = 0; i < n; i++)
+		{
+			c[i] = 1;
+			m[i][0] = i;
+		}
+		while(1)
+		{
+			scanf ("%s%*c", s1);
+			if (s1[0] == 'q')
+				break;
+			scanf ("%d %s %d%*c", &a,s2,&b);
+			if ('m' == s1[0])
+			{
+				if ('o' == s2[3])
+					move_a_onto_b(c, a, b);
+				else
+					move_a_over_b(c, a, b);
+			}
+			else
+			{
+				if ('o' == s2[3])
+					pile_a_onto_b(c, a, b);
+				else
+					pile_a_over_b(c, a, b);
+			}
+		}
+		traverse(c);
+
+	}
+
+	return 0;
+}
+
+void search (int*c, int *si, int *sj, int a)
+{
+	int i, j;
+	for (i = 0; i < n; i++)
+	{
+		for (j = 0; j < c[i]; j++)
+		{
+			if (m[i][j] == a)
+			{
+				*si = i;
+				*sj = j;
+				return;
+			}
+		}
+	}
+}
+
+void move_a_onto_b (int *c, int a, int b)
+{
+	int j, ai, aj, bi, bj;
+	search(c, &ai, &aj, a);
+	search(c, &bi, &bj, b);
+	if (ai == bi)
+		return;
+	for (j = aj+1; j < c[ai]; j++)
+	{
+		m[m[ai][j]][0] = m[ai][j];
+		c[m[ai][j]] ++;
+	}
+	c[ai] = aj+1;
+	
+	for (j = bj+1; j < c[bi]; j++)
+	{
+		m[m[bi][j]][0] = m[bi][j];
+		c[m[bi][j]]++;
+	}
+	c[bi] = bj+1;
+
+	m[bi][bj+1] = m[ai][aj];
+	c[ai]--;
+	c[bi]++;
+}
+
+void move_a_over_b(int *c, int a, int b)
+{
+	int ai, aj, j, bi, bj;
+	search(c, &ai, &aj, a);
+	search(c, &bi, &bj, b);
+	if (ai == bi)
+		return;
+	for (j = aj+1; j < c[ai]; j++)
+	{
+		m[m[ai][j]][0] = m[ai][j];
+		c[m[ai][j]] ++;
+	}
+	c[ai] = aj+1;
+
+	m[bi][c[bi]] = m[ai][aj];
+	c[bi]++;
+	c[ai]--;
+}
+
+void pile_a_onto_b (int *c, int a, int b)
+{
+	int ai, aj, bi, bj, j;
+	search(c, &bi, &bj, b);
+	search(c, &ai, &aj, a);
+	if (ai == bi)
+		return;
+	for (j = bj+1; j < c[bi]; j++)
+	{
+		m[m[bi][j]][0] = m[bi][j];
+		c[m[bi][j]]++;
+	}
+	c[bi] = bj+1;
+	
+	for (j = aj; j < c[ai]; j++)
+	{
+		m[bi][++bj] = m[ai][j];
+		c[bi]++;
+	}
+	c[ai] = aj;
+}
+
+void pile_a_over_b (int *c, int a, int b)
+{
+	int ai, aj, bi, bj, j;
+	search(c, &ai, &aj, a);
+	search(c, &bi, &bj, b);
+	if (ai == bi)
+		return;
+	for (j = aj; j < c[ai]; j++)
+	{
+		m[bi][c[bi]++] = m[ai][j];
+	}
+	c[ai] = aj;
+}
+
+void traverse (int *c)
+{
+	for (int i = 0; i < n; i++)
+	{
+		printf ("%d:", i);
+		for (int j = 0; j < c[i]; j++)
+		{
+			printf (" %d", m[i][j]);
+		}
+		printf ("\n");
+	}
+}

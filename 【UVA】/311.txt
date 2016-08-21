@@ -1,0 +1,71 @@
+#include <stdio.h>
+int a[7];
+
+void sloved ();
+int main ()
+{
+    #ifdef SHY
+		freopen("e:\\1.txt","r",stdin);
+	#endif
+    while(1)
+    {
+        scanf ("%d %d %d %d %d %d%*c", &a[1],&a[2],&a[3],&a[4],&a[5],&a[6]);
+        if (!a[1] && !a[2] && !a[3] && !a[4] && !a[5] && !a[6])
+            break;
+        int ans = 0;
+        while(1)
+		{
+			if (!a[1] && !a[2] && !a[3] && !a[4] && !a[5] && !a[6])
+				break;
+            sloved();
+            ans++;
+		}
+        printf ("%d\n", ans);
+    }
+    return 0;
+}
+
+int min (int a, int b)
+{
+    if (a < b)
+		return a;
+	return b;
+}
+void sloved ()
+{
+	int s[7], c;
+    s[1] = 36, s[2] = 9, s[3] = 4, s[4] = 1, s[5] = 1, s[6] = 1;
+    for (int i = 6; i > 0; i--)
+	{
+        if (a[i] && s[i])
+		{
+			c = min(a[i],s[i]);
+            if (6 == i)
+                s[1] = s[2]=s[3]=s[4]=s[5] = 0;
+            else if(5 == i)
+			{
+				s[1] = 11;
+                s[2] = s[3] = s[4] = 0;
+			}
+			else if (4 == i)
+			{
+                s[2] = 5, s[1] = 20;
+                s[3] = 0;
+			}
+            else if (3 == i)
+			{
+				if (4 == c)
+					s[2] = s[1] = 0;
+                else if (3 == c)
+					s[2] = 1, s[1] = 5+4;
+				else if (2 == c)
+					s[2] = 3,s[1] = 6+12;
+				else if (1 == c)
+					s[2] = 5, s[1] = 7+20;
+			}
+            else if (2 == i)
+                s[1] -= 4*c;
+			a[i] -= c;
+		}
+	}
+}

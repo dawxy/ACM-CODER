@@ -1,0 +1,26 @@
+#include<stdio.h>
+
+double zuhe(int n,int m) //从n中选m，不排序
+{
+    double s = 1,i;
+    for(i = 0; i < m; i++)
+        s *= (n-i)/(i+1);
+    return s;
+}
+
+int main( )
+{
+    int n,m, i;
+    double s[20], sum;
+    s[1]=0;s[2]=1;
+    for(i = 3; i <= 13; i++)
+        s[i] = (i-1)*(s[i-1]+s[i-2]);  //错排公式，因为n最大取到25，所以只需计算到13
+    while(scanf("%d",&n)!=EOF && n!=0)
+    {
+        sum = 1;
+        for(i = (n+1)/2; i < n; i++)
+            sum += zuhe(n,i)*s[n-i];
+        printf("%.lf\n",sum);
+    }
+    return 0;
+}

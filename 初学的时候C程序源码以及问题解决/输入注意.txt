@@ -1,0 +1,3 @@
+ch = getchar()
+ch 必须为int类型 char型接受EOF会出错
+scanf 嵌套使用要注意换行

@@ -1,0 +1,68 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10,MAXM = 30;
+int a[MAXN],node[MAXN*MAXM][2],vis[MAXN*MAXM],cnt;
+
+void insert(int v, int add)
+{
+	int u = 0;
+	per(i,MAXM-1,0)
+	{
+		int p = (bool)(v&(1<<i));
+		if(-1 == node[u][p])
+			node[u][p] = ++cnt;
+		u = node[u][p];
+		vis[u] += add;
+	}
+}
+int query(int v)
+{
+	int ans = 0,u = 0;
+	per(i,MAXM-1,0)
+	{
+		int p = (bool)(v&(1<<i));
+		if(~node[u][p^1] && vis[node[u][p^1]])
+			u = node[u][p^1], ans = (ans<<1)+(p^1);
+		else if(~node[u][p] && vis[node[u][p]])
+			u = node[u][p], ans = (ans<<1)+p;
+		else
+			ans = ans<<1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d", &n);
+		cnt = 0;
+		clc(node,-1);
+		clc(vis,0);
+		rep(i,0,n) scanf("%d", &a[i]),insert(a[i],1);
+		int ans = 0;
+		rep(i,0,n)
+		{
+			rep(j,i+1,n)
+			{
+				insert(a[i],-1);
+				insert(a[j],-1);
+				ans = max(ans,(a[i]+a[j])^query(a[i]+a[j]));
+				insert(a[i],1);
+				insert(a[j],1);
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

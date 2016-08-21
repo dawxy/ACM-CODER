@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+
+bool ft_win(int a, int b)//返回1先取者必胜，0必输
+{
+	/*两个人如果都采用正确操作，那么面对非奇异局势，先拿者必胜；反之，则后拿者取胜。*/
+	/*a,b为两堆石子(a<=b)*/
+	if(a > b) swap(a,b);
+	int k = b-a;
+	int tmp = k*(sqrt(5.0)+1.0)/2.0;
+	return tmp != a;//先取者为奇异局势则必输，否则则必胜
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int a,b;
+	while(~scanf("%d %d%*c", &a, &b))
+	{
+		printf("%d\n", ft_win(a,b));
+	}
+	return 0;
+}

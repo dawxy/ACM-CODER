@@ -1,0 +1,64 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define id(x,y) (x+y|x!=y)
+const int INF = 0x3f3f3f3f, MAXN = 200000+10;
+int sum[MAXN<<1], p[MAXN],v[MAXN];
+
+inline void push_up(int x, int y, int m){
+	sum[id(x,y)] = sum[id(x,m)]+sum[id(m+1,y)];
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		sum[id(x,y)] = 1;
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+int query(int x, int y, int k)//查找第k个空位
+{
+	sum[id(x,y)]--;//顺便跟着路径减掉，也可以另外加一个函数修改
+	if(x == y) return x;
+	int m = (x+y)>>1;
+	if(sum[id(x,m)] >= k) return query(x,m,k);
+	return query(m+1,y,k-sum[id(x,m)]);
+}
+int ans[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n) scanf("%d %d%*c", &p[i], &v[i]);
+		bulid(0,n-1);
+		per(i,n-1,0)
+			ans[query(0,n-1,p[i]+1)] = v[i];
+		printf("%d", ans[0]);
+		rep(i,1,n) printf(" %d", ans[i]);
+		putchar('\n');
+	}
+	return 0;
+}

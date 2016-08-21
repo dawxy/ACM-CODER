@@ -1,0 +1,47 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1002
+#define MAXM 1002
+#define MAXK 32
+#define max(a,b) (a>b?a:b)
+int v[MAXN],w[MAXN],dp[MAXM][MAXK],a[MAXK],b[MAXK],p;
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d %d %d%*c", &n, &m, &p);
+		for(int i = 1; i <= n; i++)
+			scanf("%d%*c", &v[i]);
+		for(int i = 1; i <= n; i++)
+			scanf("%d%*c", &w[i]);
+		memset(dp,0,sizeof(dp));
+		memset(a,0,sizeof(a));
+		for(int i = 1; i <= n; i++)
+		{
+			for(int j = m; j >= w[i]; j--)
+			{
+				for(int k = 1; k <= p; k++)
+				{
+					a[k] = dp[j-w[i]][k]+v[i];
+					b[k] = dp[j][k];
+				}
+				int k = 1,p1 = 1,p2 = 1;
+				while(k <= p && (p1 <= p || p2 <= p))
+				{
+					if(a[p1] > b[p2]) dp[j][k] = a[p1++];
+					else dp[j][k] = b[p2++];
+					if(dp[j][k] != dp[j][k-1]) k++;
+				}
+			}
+		}
+		printf("%d\n", dp[m][p]);
+	}
+	return 0;
+}

@@ -1,0 +1,276 @@
+/*树套树*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <ctime>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10;
+struct NODE{
+    bool in;
+    int sum, v;
+    NODE *lc,*rc;
+    NODE(int a = 0){
+        in = sum = 1;
+        v = a;
+    }
+};
+NODE *rt[MAXN];
+NODE *null = new NODE(-1);
+int a[MAXN], num[MAXN], id[MAXN], n;
+ 
+inline int lowbit(int x){return x&-x;}
+inline bool cmp(int x, int y){
+    return a[x] < a[y];
+}
+void bulid(NODE *&u, int x, int y)
+{
+    if(x > y) return;
+    int m = (x+y)>>1;
+    u = new NODE(a[num[m]]);
+    u->lc = u->rc = null;
+    bulid(u->lc,x,m-1);
+    bulid(u->rc,m+1,y);
+    u->sum = u->lc->sum+u->rc->sum+1;
+}
+bool fd;
+int find_rk(NODE *u, int k, bool b)
+{
+    if(u == null)
+    {
+        fd = false;
+        return 0;
+    }
+    if(k == u->v)
+    {
+        fd = u->in;
+        return u->lc->sum+fd;
+    }
+    if(k < u->v) return find_rk(u->lc,k,b);
+    return find_rk(u->rc,k,b)+u->lc->sum+u->in;//注意已经点已经被删除的情况
+}
+LL query(int x, bool b, int v)//a[1～x]有多少个大于(a = true,否则是小于)v的数
+{
+    LL sum = 0;
+    while(x > 0)
+    {
+        fd = true;
+        int k = find_rk(rt[x],v,b);
+        if(b)
+        {
+            sum += rt[x]->sum-k;
+            //if(fd) sum++;
+        }
+        else
+        {
+            sum += k-1;
+            if(!fd) sum++;
+        }
+        x -= lowbit(x);
+    }
+    return sum;
+}
+void del(NODE *u, int v)//在u树删除v
+{
+    if(u->v == v)
+    {
+        u->sum--;
+        u->in = false;
+        return;
+    }
+    if(v < u->v) del(u->lc,v);
+    else del(u->rc,v);
+    u->sum = u->lc->sum + u->rc->sum+u->in;
+}
+void update(int x)//删除a[x]
+{
+    int v = a[x];
+    while(x <= n)
+    {
+        del(rt[x], v);
+        x += lowbit(x);
+    }
+}
+void pt(NODE *u)
+{
+    if(null == u) return;
+    pt(u->lc);
+    if(u->in)
+        printf("=%d=\n", u->v);
+    pt(u->rc);
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int m;
+    null->sum = 0;
+    while(~scanf("%d %d%*c", &n, &m))
+    {
+        LL sum = 0;
+        repe(i,1,n) scanf("%d%*c", &a[i]), id[a[i]] = i;
+        repe(i,1,n) 
+        {
+            int st = i-lowbit(i)+1;
+            repe(j,st,i) num[j-st] = j;
+            sort(num,num+lowbit(i),cmp);
+            bulid(rt[i], 0,lowbit(i)-1);
+            sum += query(i,1,a[i]);
+        }
+        while(m--)
+        {
+            printf("%lld\n", sum);
+            int v;
+            scanf("%d\n", &v);
+            update(id[v]);
+            LL b = query(id[v], 1,v);
+            //printf("b = %d\n", b);
+            LL c = query(n,0,v);
+            LL d = query(id[v],0,v);
+            sum -= b+(c-d);
+        }
+    }
+    return 0;
+}
+=================================================================
+/*分块*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10, SIZE = 500;
+int c[MAXN],n,a[MAXN],pos[MAXN];
+ 
+inline int lowbit(int x){
+    return x&-x;
+}
+int get_sum(int x)
+{
+    int sum = 0;
+    while(x > 0)
+    {
+        sum += c[x];
+        x -= lowbit(x);
+    }
+    return sum;
+}
+void add(int x)
+{
+    while(x <= n)
+    {
+        c[x]++;
+        x += lowbit(x);
+    }
+}
+int cnt, block[MAXN/SIZE+1][SIZE], bc[MAXN/SIZE+1];
+int query(int x, int y, int v, bool biger)//a[x~y]有几个比v(biger大，否则小)
+{
+    int bx = x/SIZE,by = y/SIZE, sum = 0;
+    if(bx == by)
+    {
+        if(biger)
+        {
+            repe(i,x,y)
+                if(~a[i] && a[i] > v) sum++;
+        }
+        else
+        {
+            repe(i,x,y)
+                if(~a[i] && a[i] < v) sum++;
+        }
+    }
+    else
+    {
+        if(biger)
+        {
+            per(i,(bx+1)*SIZE-1,x)
+                if(~a[i] && a[i] > v) sum++;
+            repe(i,by*SIZE,y)
+                if(~a[i] && a[i] > v) sum++;
+            rep(i,bx+1,by)
+                sum += bc[i]-(lower_bound(block[i],block[i]+bc[i],v)-block[i]);
+        }
+        else
+        {
+            per(i,(bx+1)*SIZE-1,x)
+                if(~a[i] && a[i] < v) sum++;
+            repe(i,by*SIZE,y)
+                if(~a[i] && a[i] < v) sum++;
+            rep(i,bx+1,by)
+                sum += lower_bound(block[i],block[i]+bc[i],v)-block[i];
+        }
+    }
+    return sum;
+}
+void del(int x)//删除a[x]
+{
+    int *b = block[x/SIZE], k = 0, mx = bc[x/SIZE];
+    while(b[k] != a[x]) k++;
+    b[k] = a[x] = -1;
+    for(int i = k; i < mx-1; i++)
+        swap(b[i],b[i+1]);
+    bc[x/SIZE]--;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int m;
+    while(~scanf("%d %d%*c", &n, &m))
+    {
+        clc(c,0);
+        int j = 0;
+        LL sum = 0;
+        cnt = 0;
+        clc(block,-1);
+        rep(i,0,n)
+        {
+            scanf("%d%*c", &a[i]);
+            pos[a[i]] = i;
+            sum += get_sum(n)-get_sum(a[i]);
+            add(a[i]);
+            block[cnt][j++] = a[i];
+            if(j == SIZE) cnt++,j = 0;
+        }
+        rep(i,0,cnt) sort(block[i],block[i]+SIZE),bc[i] = SIZE;
+        sort(block[cnt],block[cnt]+j);
+        bc[cnt] = j;
+        while(m--)
+        {
+            printf("%lld\n", sum);
+            int v;
+            scanf("%d%*c", &v);
+            del(pos[v]);
+            sum -= query(0,pos[v],v,1)+query(pos[v],n-1,v,0);
+        }
+    }
+    return 0;
+}?
+

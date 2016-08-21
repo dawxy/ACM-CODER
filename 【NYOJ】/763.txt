@@ -1,0 +1,73 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 10001
+#define max(a,b) (a>b?a:b)
+#define min(a,b) (a<b?a:b)
+int ans, ch, f,a[MAXN], d[MAXN], s[MAXN],e[MAXN];
+
+int in()
+{
+	if ((ch = getchar()) == '-') f = -1;
+	else f = 1;
+	while(ch < '0' || '9' < ch) ch = getchar();
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans*f;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	d[0] = -0x3f3f3f3f;
+	while(~scanf("%d%*c", &n))
+	{
+		int ans = 1, len = 0;
+		for (int i = 0; i < n; i++)
+			a[i] = in();
+		for (int i = 0; i < n; i++)
+		{
+			if (a[i] > d[len])
+				d[++len] = a[i];
+			else
+			{
+				int l = 1, r = len, mid;
+				while(l <= r)
+				{
+					mid = (l+r)>>1;
+					if (a[i] <= d[mid])
+						r = mid-1;
+					else
+						l = mid+1;
+				}
+				d[l] = a[i];
+			}
+			s[i] = len;
+		}
+		len = 0;
+		for (int i = n-1; i >= 0; i--)
+		{
+			if (a[i] > d[len])
+				d[++len] = a[i];
+			else
+			{
+				int l = 1, r = len, mid;
+				while(l <= r)
+				{
+					mid = (l+r)>>1;
+					if (a[i] <= d[mid])
+						r = mid-1;
+					else
+						l = mid+1;
+				}
+				d[l] = a[i];
+			}
+			e[i] = len;
+		}
+		for (int i = 0; i < n; i++)
+			ans = max(ans,(min(s[i],e[i])<<1)-1);
+		printf("%d\n", ans);
+	}
+	return 0;
+}

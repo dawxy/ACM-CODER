@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 100
+char a[MAXN][MAXN];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+	//freopen("e:\\out.txt","w",stdout);
+#endif
+	int n, count = 0;
+	char li,w;
+	while(EOF != scanf ("%d%*c%c%*c%c%*c", &n, &w, &li))
+	{
+		memset(a,' ',sizeof(a));
+		int l = 0,r = n-1, j;
+		bool is_w = true;
+		if (count++)
+			printf ("\n");
+		if (1 == n)
+		{
+			printf ("%c\n", w);
+			continue;
+		}
+		if ((n/2)&1)
+			li ^= w, w ^= li, li ^= w;
+		for (int i = 0; l <= r; i++)
+		{
+			for (j = l; j <= r; j++)
+			{
+				if (is_w)
+					a[i][j] = a[n-i-1][j] = w;
+				else
+					a[i][j] = a[n-i-1][j] = li;
+			}
+			for (j = l+1; j < r; j++)
+			{
+				if (is_w)
+					a[j][i] = a[j][n-i-1] = w;
+				else
+					a[j][i] = a[j][n-i-1] = li;
+			}
+			is_w = !is_w;
+			l++, r--;
+		}
+		a[0][0] = a[n-1][0] = a[0][n-1] = a[n-1][n-1] = ' ';
+		//a[0][n-1] = a[n-1][n-1] = 0;
+		for (int i = 0; i < n; i++)
+			a[i][n] = 0;
+		for (int i = 0; i < n; i++)
+			puts(a[i]);
+	}
+	return 0;
+}

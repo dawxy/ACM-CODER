@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+int v[MAXN], maxn, n,m, p;
+
+int sloved()
+{
+	int d[MAXN] = {0};
+	for(int i = 1; i <= n; i++)
+	{
+		if (i == p)
+			continue;
+		for(int j = m - 5; j >= 0; j--)
+		{
+			if(j >= v[i])
+				d[j] = max(d[j], d[j - v[i]] + v[i]);
+		}
+	}
+	return m-d[m-5]-maxn;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &n) && n)
+	{
+		maxn = -1;
+		for(int i = 1; i <= n; i++)
+		{
+			scanf("%d%*c", &v[i]);
+                        if (v[i] > maxn)
+			{
+                                maxn = v[i];
+                                p = i;
+			}
+		}
+		scanf("%d%*c", &m);
+		if (m >= 5)
+			printf ("%d\n", sloved());
+		else
+			printf("%d\n", m);
+	}
+	return 0;
+}

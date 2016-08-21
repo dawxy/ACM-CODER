@@ -1,0 +1,73 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 25+10;
+struct NODE{
+    int x[2],y[2];
+    NODE(int a = 0, int b = 0, int c = 0, int d = 0)
+    {
+        x[0] = min(a,c), y[0] = min(b,d), x[1] = max(a,c), y[1] = max(b,d);
+    }
+}heng[MAXN],shu[MAXN];
+int len1, len2;
+
+bool ok(int a, int b, int c)
+{
+	int xi = max(heng[a].x[0], heng[b].x[0]), xj = min(heng[a].x[1], heng[b].x[1]);
+	if(!(shu[c].x[0] >= xi && xj >= shu[c].x[0])) return false;
+	int yi = min(heng[a].y[0], heng[b].y[0]), yj = max(heng[a].y[0], heng[b].y[0]);
+	if(!(shu[c].y[0] <= yi && shu[c].y[1] >= yj)) return false;
+	return true;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t,count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n;
+        scanf("%d%*c", &n);
+        len1 = len2 = 0;
+        rep(i,0,n)
+        {
+            int a,b,c,d;
+            scanf("%d %d %d %d%*c", &a, &b, &c, &d);
+            if(b == d) heng[len1++] = NODE(a,b,c,d);
+            else shu[len2++] = NODE(a,b,c,d);
+        }
+        int ans = 0;
+		rep(i,0,len1)
+		{
+			rep(j,i+1,len1)
+			{
+				rep(k,0,len2)
+				{
+					if(!ok(i,j,k)) continue;
+					rep(l,k+1,len2)
+					{
+						if(ok(i,j,l)) ans++;
+					}
+				}
+			}
+		}
+        printf("Case #%d:\n%d\n", ++count,ans);
+    }
+    return 0;
+}

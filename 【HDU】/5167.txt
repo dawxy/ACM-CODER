@@ -1,0 +1,92 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 44, MAXM = 1000000000;
+const LL MOD = 1000007;
+LL fb[100];
+int t,mx;
+struct HASH{
+    int head[MOD], next[2371715+10], sum[2371715+10], cnt, node[2371715+10];
+    void clear(){
+        cnt = 0;
+        clc(head,-1);
+        clc(sum,0);
+    }
+    int hash(LL s){
+        return s%MOD;
+    }
+    void insert(LL s){
+        int id = hash(s);
+        int u = head[id];
+        while(~u){
+            if(s == node[u])
+            {
+                sum[u]++;
+                return;
+            }
+            u = next[u];
+        }
+        sum[cnt] = 1;
+        node[cnt] = s;
+        next[cnt] = head[id];
+        head[id] = cnt++;
+    }
+    int query(LL s){
+        int id = hash(s);
+        int u = head[id];
+        while(~u){
+            if(node[u] == s) return sum[u];
+            u = next[u];
+        }
+        return -1;
+    }
+}vis;
+
+
+void dfs(LL num)
+{
+	if(0 <= num && num <= MAXM)
+		vis.insert(num);
+	else return;
+	repe(i,0,MAXN)
+	{
+		LL to = num*fb[i];
+		if(-1 == vis.query(to))
+			dfs(to);
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+	//freopen("e:\\out.txt", "w", stdout);
+#endif
+	fb[0] = 0, fb[1] = 1;
+	repe(i,2,MAXN) fb[i] = fb[i-1]+fb[i-2];
+	vis.clear();
+	vis.insert(0);
+	dfs(1);
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		if(~vis.query(n)) puts("Yes");
+		else puts("No");
+	}
+	return 0;
+}

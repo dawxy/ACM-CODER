@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10;
+int a[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		rep(i,0,n) scanf("%d%*c", &a[i]);
+		int k = a[0];
+		rep(i,1,n) k ^= a[i];
+		if(k)//k为所有堆的异或值==0必输，!=0必胜
+		{
+			puts("Yes");
+			rep(i,0,n)
+			{
+				//tmp是除了第i堆以外的其他m-1堆的异或值
+				int tmp = k^a[i];
+				/*tmp也表示在第i堆取完若干个后变成奇异状态第i堆还剩下几个
+				同时tmp<a[i]才存在方案*/
+				if(tmp < a[i])
+				{
+					printf("%d %d\n", a[i], tmp);
+				}
+			}
+		}
+		else puts("No");
+	}
+	return 0;
+}

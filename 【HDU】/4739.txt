@@ -1,0 +1,123 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20+10;
+struct NODE{
+	int x, y;
+	bool operator<(const NODE &t) const{
+		if(x != t.x) return x < t.x;
+		return y < t.y;
+	}
+	bool operator!=(const NODE &t)const{
+		return !(x==t.x && y == t.y);
+	}
+};
+struct SQU{
+	NODE p[4];
+	bool operator<(const SQU&t) const{
+		rep(i,0,4) if(p[i] != t.p[i]) return p[i] < t.p[i];
+		return false;
+	}
+};
+int x[MAXN],y[MAXN];
+
+int a[4];
+bool cmp(int p, int q)
+{
+	if(x[p] != x[q]) return x[p] < x[q];
+	return y[p] < y[q];
+}
+bool ok(int aa, int b, int c, int d)
+{
+	a[0] = aa,a[1] = b,a[2] = c, a[3] = d;
+	sort(a,a+4,cmp);
+	rep(i,1,4)
+	{
+		if(x[a[i]] == x[a[i-1]] && y[a[i]] == y[a[i-1]])
+			return false;
+	}
+	set<int> fx,fy;
+	int cntx = 0,cnty = 0;
+	rep(i,0,4)
+	{
+		fx.insert(x[a[i]]);
+		fy.insert(y[a[i]]);
+	}
+	if(fx.size() != 2 || fy.size() != 2) return false;
+	auto it = fx.begin();
+	int tmp = *(it);it++;
+	int ans1 = (*it)-tmp;
+	it = fy.begin();
+	tmp = *(it);it++;
+	int ans2 = (*it)-tmp;
+	return ans1 == ans2;
+}
+int tol[MAXN];
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d", &n) && ~n)
+	{
+		map<NODE,int> cnt; 
+		clc(tol,0);
+		rep(i,0,n)
+		{
+			scanf("%d %d", &x[i], &y[i]);
+			cnt[NODE{x[i],y[i]}]++;
+		}
+		set<SQU> all;
+		rep(i,0,n)
+		{
+			rep(j,i+1,n)
+			{
+				rep(k,j+1,n)
+				{
+					rep(l,k+1,n)
+					{
+						if(ok(i,j,k,l))
+						{
+							NODE a = {x[i],y[i]},b = {x[j],y[j]},c = {x[k],y[k]},d = {x[l],y[l]};
+							SQU tmp = {a,b,c,d};
+							sort(tmp.p,tmp.p+4);
+							all.insert(tmp);
+						}
+					}
+				}
+			}
+		}
+		int ans = 0;
+		map<NODE,int> vis;
+		for(auto it = all.begin(); it != all.end(); it++)
+		{
+			int mi = INF;
+			rep(i,0,4)
+			{
+				int tmp = cnt[it->p[i]];
+				if(mi > tmp) mi = tmp;
+			}
+			rep(i,0,4)
+				cnt[it->p[i]] -= mi;
+			ans += mi;
+		}
+		printf("%d\n", ans*4);
+	}
+	return 0;
+}

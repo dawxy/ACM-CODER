@@ -1,0 +1,22 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    __int64 n;
+    while(~scanf ("%I64d%*c", &n) && n)
+	{
+		__int64 max = -1, a, sum = 0;
+        for (int i = 0; i < n; i++)
+		{
+            scanf ("%I64d%*c", &a);
+            sum += a;
+            if (a > max)
+				max = a;
+		}
+        printf ("%I64d\n", sum+max*(2009-n));
+	}
+    return 0;
+}

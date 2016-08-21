@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <malloc.h>
+
+void paixu (int *p, int n)
+{
+	int i, j, t;
+	for (i = 0; i < n-1;i++)
+	{
+		for (j = 0; j < n-1-i; j++)
+		{
+			if (p[j] < p[j+1])
+			{
+				t = p[j];
+				p[j] = p[j+1];
+				p[j+1] = t;
+			}
+		}
+	}
+}
+
+void main (void)
+{
+	int n, *p, i, sum;
+	double avg = 0;
+	while (EOF != scanf("%d ", &n))
+	{
+		sum = 0;
+		p = (int*) malloc (sizeof(int)*n);
+
+		for (i = 0; i <	n; i++)
+		{
+			if (n-1 == i)
+				scanf ("%d", &p[i]);
+			else
+				scanf ("%d ", &p[i]);
+		}
+
+		paixu (p, n);
+		for (i = 1; i < n-1; i++)
+		{
+			sum += p[i];
+		}
+		avg = (1.0*sum)/(n-2);
+		printf ("%.2lf\n", avg);
+	}
+}

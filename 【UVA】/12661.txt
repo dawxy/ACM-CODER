@@ -1,0 +1,86 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <queue>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 310
+struct NODE{
+	int dis,u;
+	NODE(int a, int b){ dis = a, u = b;}
+	bool operator <(const NODE& a)const{return dis > a.dis;}
+};
+struct Edge{
+	int from,to, a, b, cost;
+	Edge(int u, int v, int c, int d, int e){from = u, to = v, a = c, b = d, cost = e;}
+};
+vector<Edge> edge;
+vector<int> g[MAXN];
+int dp[MAXN];
+bool vis[MAXN];
+
+void add(int u, int v, int a, int b, int c)
+{
+	edge.push_back(Edge(u,v,a,b,c));
+	g[u].push_back(edge.size()-1);
+}
+void dijkstra(int st)
+{
+	priority_queue<NODE> q;
+	clc(dp,0x3f);
+	clc(vis,0);
+	dp[st] = 0;
+	q.push(NODE(0,st));
+	while(!q.empty())
+	{
+		NODE buf = q.top();q.pop();
+		if(vis[buf.u]) continue;
+		vis[buf.u] = true;
+		int sz = g[buf.u].size();
+		rep(i,0,sz)
+		{
+			Edge& e = edge[g[buf.u][i]];
+			int res = dp[buf.u]%(e.a+e.b);
+			if(res+e.cost <= e.a)//直接选择这条边
+			{
+				if(dp[e.to] > dp[buf.u]+e.cost)
+				{
+					dp[e.to] = dp[buf.u]+e.cost;
+					q.push(NODE(dp[e.to],e.to));
+				}
+			}
+			else
+			{
+				if(dp[e.to] > dp[buf.u]+e.cost+e.a+e.b-res)
+				{
+					dp[e.to] = dp[buf.u]+e.cost+e.a+e.b-res;
+					q.push(NODE(dp[e.to],e.to));
+				}
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,m,st,ed, count = 0;
+	while(~scanf("%d %d %d %d%*c", &n, &m, &st, &ed))
+	{
+		int u,v,a,b,c;
+		edge.clear();
+		repe(i,1,n) g[i].clear();
+		rep(i,0,m)
+		{
+			scanf("%d %d %d %d %d%*c", &u, &v, &a, &b, &c);
+			if(a < c) continue;
+			add(u,v,a,b,c);
+		}
+		dijkstra(st);
+		printf("Case %d: %d\n", ++count, dp[ed]);
+	}
+	return 0;
+}

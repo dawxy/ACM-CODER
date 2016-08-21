@@ -1,0 +1,13 @@
+#include <stdio.h>
+int main ()
+{
+	int n;
+	while (EOF != scanf("%d%*c", &n))
+	{
+		if (2 >= n)
+			printf ("Hrdv\n");
+		else
+			printf ("Yougth\n");
+	}
+	return 0;
+}

@@ -1,0 +1,75 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 102
+#define MAXC 171
+struct NODE{
+	int len, s[MAXC];
+}p[MAXN];
+int a[MAXN], dp[MAXN][MAXC][MAXC], v[MAXN][MAXC];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, m;
+	p[0].len = p[1].len = 1;
+	while (~scanf("%d %d%*c", &n, &m))
+	{
+		int buf, len = 0, ans = 0;
+		memset(dp,0,sizeof(dp));
+		memset(v,0,sizeof(v));
+		for (int i = 2; i <= n+1; i++)
+		{
+			a[i] = 0;
+			for (int j = 0; j < m; j++)
+			{
+				scanf("%d%*c", &buf);
+				buf = !buf;
+				a[i] = a[i]|(buf<<j);
+			}
+		}
+		for (int i = 2; i <= n + 1; i++)
+		{
+			p[i].len = 1;
+			for (int j = 1; j < (1 << m); j++)
+			{
+				if (j&a[i] || j&(j << 2)) continue;
+				p[i].s[p[i].len++] = j;
+			}
+		}
+		for (int i = 2; i <= n + 1; i++)
+		{
+			for (int j = 0; j < p[i].len; j++)
+			{
+				int x = p[i].s[j];
+				while (x)
+				{
+					if (x & 1) v[i][j] += 1;
+					x >>= 1;
+				}
+			}
+		}
+		for (int i = 2; i <= n + 1; i++)
+		{
+			for (int now = 0; now < p[i].len; now++)
+			{
+				for (int j = 0; j < p[i - 1].len; j++)
+				{
+					if (((p[i - 1].s[j] << 1)&p[i].s[now]) || ((p[i - 1].s[j] >> 1)&p[i].s[now]))
+						continue;
+					for (int k = 0; k < p[i - 2].len; k++)
+					{
+						if (p[i].s[now] & p[i - 2].s[k]) continue;
+						dp[i][now][j] = max(dp[i][now][j], dp[i-1][j][k]+v[i][now]);
+						ans = max(ans,dp[i][now][j]);
+					}
+				}
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

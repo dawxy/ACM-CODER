@@ -1,0 +1,149 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, MAXM = 5000+2000+10;
+int head[MAXN], tol, nxt[MAXM<<1], from[MAXM<<1], to[MAXM<<1], cap[MAXM<<1];
+
+inline void add_edge(int u, int v, int c)
+{
+	nxt[tol] = head[u], from[tol] = u, to[tol] = v, cap[tol] = c;
+	head[u] = tol++;
+	nxt[tol] = head[v], from[tol] = v, to[tol] = u, cap[tol] = 0;
+	head[v] = tol++;
+}
+int st,ed,d[MAXN];
+bool bfs()
+{
+	queue<int> q;
+	clc(d,-1);
+	q.push(st);
+	d[st] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(-1 == d[v] && cap[i])
+			{
+				d[v] = d[u]+1;
+				q.push(v);
+				if(~d[ed]) return true;
+			}
+		}
+	}
+	return false;
+}
+int stack[MAXN], cur[MAXN], top;
+int maxflow()
+{
+	int ans = 0;
+	while(bfs())
+	{
+		memcpy(cur,head,sizeof(head));
+		int u = st;
+		top = 0;
+		while(1)
+		{
+			if(u == ed)
+			{
+				int flow = INF;
+				int loc;
+				rep(i,0,top)
+				{
+					if(flow > cap[stack[i]])
+					{
+						flow  = cap[stack[i]];
+						loc = i;
+					}
+				}
+				rep(i,0,top)
+				{
+					cap[stack[i]] -= flow;
+					cap[stack[i]^1] += flow;
+				}
+				ans += flow;
+				top = loc;
+				u = from[stack[top]];
+			}
+			for(int i = cur[u]; ~i; cur[u] = i = nxt[i])
+				if(cap[i] && (d[u]+1 == d[to[i]])) break;
+			if(~cur[u])
+			{
+				stack[top++] = cur[u];
+				u = to[cur[u]];
+			}
+			else
+			{
+				if(!top) break;
+				d[u] = -1;
+				u = from[stack[--top]];
+			}
+		}
+	}
+	return ans;
+}
+vector<int> g[MAXN];
+int col[MAXN];
+
+void dfs(int u, int c)
+{
+	col[u] = c;
+	rep(i,0,g[u].size())
+	{
+		int v = g[u][i];
+		if(-1 == col[v])
+			dfs(v,!c);
+	}
+}
+struct Q{
+	int u,v;
+}p[5000+10];
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	scanf("%d %d%*c", &n, &m);
+	clc(head,-1);
+	tol = 0;
+	rep(i,0,m)
+	{
+		int u,v;
+		scanf("%d %d%*c", &u,&v);
+		p[i] = {u,v};
+		g[u].push_back(v);
+		g[v].push_back(u);
+	}
+	clc(col,-1);
+	repe(i,1,n)
+		if(-1 == col[i]) dfs(i,0);
+	st = 0, ed = n+1;
+	rep(i,0,m)
+	{
+		int u = p[i].u,v = p[i].v;
+		if(col[u]) add_edge(u,v,1);
+		else add_edge(v,u,1);
+	}
+	repe(i,1,n)
+	{
+		if(col[i]) add_edge(st,i,1);
+		else add_edge(i,ed,1);
+	}
+	printf("%d\n", maxflow());
+	return 0;
+}

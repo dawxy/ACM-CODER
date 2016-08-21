@@ -1,0 +1,140 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int MAXN = 1000+10, MAXM = 100000+10;
+const LL INF = 0x3f3f3f3f3f3f3f3f;
+typedef LL type;
+struct Dinic{
+    struct Edge{
+        int next,u,v;
+		type cap;//cap是剩余流量
+    }edge[MAXM<<1];
+    int head[MAXN], tol, s,t,d[MAXN];
+    void init()
+    {
+        clc(head,-1);
+        tol = 0;
+    }
+    void add_edge(int u, int v, type cap, type cap2 = 0)
+    {
+        Edge e1 = {head[u],u,v,cap};
+        edge[tol] = e1;
+        head[u] = tol++;
+        Edge e2 = {head[v],v,u,cap2};//无向图把这里的cap2=cap可以只建一条边(add_edge一次)
+        edge[tol] = e2;
+        head[v] = tol++;
+    }
+    bool bfs()
+    {
+        clc(d,-1);
+        queue<int> q;
+        q.push(s);
+        d[s] = 0;
+        while(!q.empty())
+        {
+            int u = q.front();q.pop();
+            for(int i = head[u]; ~i; i = edge[i].next)
+            {
+                int v = edge[i].v;
+                if(-1 == d[v] && edge[i].cap)
+                {
+                    d[v] = d[u]+1;
+                    q.push(v);
+                    if(~d[t]) return true;
+                }
+            }
+        }
+        return false;
+    }
+    int stack[MAXN],cur[MAXN],top;
+    type maxflow(int s, int t)
+    {
+        this->s = s, this->t = t;
+        type ans = 0;
+        while(bfs())
+        {
+            memcpy(cur,head,sizeof(head));
+            int u = s;
+            top = 0;
+            while(1)
+            {
+                if(u == t)
+                {
+                    type flow = INF;
+					int loc;//loc 表示 stack 中 cap 最小的边
+                    rep(i,0,top)
+                    {
+                        if(flow > edge[stack[i]].cap)
+                        {
+                            flow = edge[stack[i]].cap;
+                            loc = i;
+                        }
+                    }
+                    rep(i,0,top)
+                    {
+                        edge[stack[i]].cap -= flow;
+                        edge[stack[i]^1].cap += flow;
+                    }
+                    ans += flow;
+                    top = loc;
+                    u = edge[stack[top]].u;
+                }
+                for(int i = cur[u]; ~i; cur[u] = i = edge[i].next) //cur[u] 表示u所在能增广的边的下标
+                    if(edge[i].cap && (d[u]+1 == d[edge[i].v])) break;
+                if(~cur[u])
+                {
+                    stack[top++] = cur[u];
+                    u = edge[cur[u]].v;
+                }
+                else
+                {
+                    if(!top) break;
+                    d[u] = -1;
+                    u = edge[stack[--top]].u;
+                }
+            }
+        }
+        return ans;
+    }
+}dinic;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d %d%*c", &n, &m);
+		dinic.init();
+		rep(i,0,m)
+		{
+			int a,b,d;
+			LL c;
+			scanf("%d %d %I64d %d%*c", &a, &b, &c, &d);
+			c = c*(m+1)+1;
+			if(d) dinic.add_edge(a,b,c,c);
+			else dinic.add_edge(a,b,c);
+		}
+		LL flow = dinic.maxflow(0,n-1);
+		printf("Case %d: %I64d\n", ++count, flow%(m+1));
+	}
+	return 0;
+}

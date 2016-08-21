@@ -1,0 +1,159 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define id(x,y) ((x)+(y)|(x)!=(y))
+const int INF = 0x3f3f3f3f, MAXN = 40000+10, MOD = 1000007;
+struct HASH{
+	int head[MOD], next[MAXN], sum[MAXN], cnt, node[MAXN];
+	void clear(){
+		cnt = 0;
+		clc(head,-1);
+		clc(sum,0);
+	}
+	int hash(int s){
+		return s%MOD;
+	}
+	void insert(int s){
+		int id = hash(s);
+		int u = head[id];
+		while(~u){
+			if(s == node[u])
+			{
+				sum[u]++;
+				return;
+			}
+			u = next[u];
+		}
+		sum[cnt] = 1;
+		node[cnt] = s;
+		next[cnt] = head[id];
+		head[id] = cnt++;
+	}
+	int find(int s){
+		int id = hash(s);
+		int u = head[id];
+		while(~u){
+			if(node[u] == s) return sum[u];
+			u = next[u];
+		}
+		return 0;
+	}
+}use;
+int col[MAXN<<1];//-1代表没颜色，0混合色，>0单一颜色
+int set[MAXN<<1], cnt;//set-lazy标记
+int a[MAXN],b[MAXN], s[MAXN<<1];
+
+void push_up(int x, int y, int m)
+{
+	int u = id(x,y), l = id(x,m), r = id(m+1,y);
+	if(col[l] == col[r]) col[u] = col[l];
+	else col[u] = 0;
+}
+void push_down(int x, int y, int m)
+{
+	int u = id(x,y), l = id(x,m), r = id(m+1,y);
+	if(~set[u])
+	{
+		col[l] = col[r] = set[u];
+		set[l] = set[r] = set[u];
+		set[u] = -1;
+	}
+}
+int ql,qr,v;
+void update(int x, int y)
+{
+	if(ql <= x && y <= qr)
+	{
+		col[id(x,y)] = v,set[id(x,y)] = v;
+		return;
+	}
+	int m = (x+y)>>1;
+	push_down(x,y,m);
+	if(ql <= m) update(x,m);
+	if(qr > m) update(m+1,y);
+	push_up(x,y,m);
+}
+bool vis[MAXN];
+void query(int x, int y)
+{
+	int u = id(x,y);
+	if(-1 == col[u]) return;
+	if(col[u] > 0)
+	{
+		vis[col[u]] = true;
+		return;
+	}
+	int m = (x+y)>>1;
+	push_down(x,y,m);
+	query(x,m);
+	query(m+1,y);
+}
+void add_num(int w)
+{
+	if(!use.find(w))
+	{
+		use.insert(w);
+		s[cnt++] = w;
+	}
+}
+int sum[MAXN<<1];
+int get_id(int w)
+{
+	int id = lower_bound(s,s+cnt,w)-s;
+	return id+sum[id];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		clc(col,-1);
+		clc(set,-1);
+		use.clear();
+		cnt = 0;
+		repe(i,1,n)
+		{
+			scanf("%d %d%*c", &a[i], &b[i]);
+			add_num(a[i]), add_num(b[i]);
+		}
+		sort(s,s+cnt);
+		rep(i,1,cnt)
+		{
+			if(s[i]-s[i-1] > 1) sum[i] = sum[i-1]+1;
+			else sum[i] = sum[i-1];
+		}
+		int mx = cnt+sum[cnt-1];
+		repe(i,1,n)
+		{
+			ql = get_id(a[i]), qr = get_id(b[i]);
+			v = i;
+			update(0,mx-1);
+		}
+		clc(vis,0);
+		query(0,mx-1);
+		int ans = 0;
+		repe(i,1,n) if(vis[i]) ans++;
+		printf("%d\n", ans);
+	}
+	return 0;
+}

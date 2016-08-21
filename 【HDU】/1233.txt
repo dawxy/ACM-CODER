@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 5000
+int u[MAXN], v[MAXN], w[MAXN], r[MAXN], p[100];
+
+inline bool cmp(const int a, const int b){ return w[a] < w[b]; }
+int find(int x)
+{
+	return p[x] == x? x: p[x] = find(p[x]);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int m = n*(n-1)/2, ans = 0;
+		for(int i = 1; i <= n; i++) p[i] = i;
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d%*c", &u[i], &v[i], &w[i]);
+			r[i] = i;
+		}
+		sort(r,r+m,cmp);
+		for(int i = 0; i < m; i++)
+		{
+			int e = r[i], x = find(u[e]), y = find(v[e]);
+			if(x != y)
+			{
+				ans += w[e];
+				p[x] = y;
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

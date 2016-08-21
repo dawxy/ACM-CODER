@@ -1,0 +1,49 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int ans[MAXN];
+
+bool ok(int x)
+{
+	bool vis[10] = {0};
+	while(x)
+	{
+		if(vis[x%10]) return false;
+		vis[x%10] = 1;
+		x /= 10;
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	repe(i,1,100000)
+		ans[i] = ans[i-1]+ok(i);
+	while(t--)
+	{
+		int x,y;
+		scanf("%d %d", &x, &y);
+		printf("%d\n", ans[y]-ans[x-1]);
+	}
+	return 0;
+}

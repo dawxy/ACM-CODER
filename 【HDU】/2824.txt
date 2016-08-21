@@ -1,0 +1,35 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#define MAXN 3000000
+int phi[MAXN+1];
+
+void get_phi()
+{
+	phi[1] = 1;
+	for(int i = 2; i <= MAXN; i++)
+	{
+		if(phi[i]) continue;
+		for(int j = i; j <= MAXN; j += i)
+		{
+			if(!phi[j]) phi[j] = j;
+			phi[j] -= phi[j]/i;
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int a,b;
+	get_phi();
+	while(~scanf("%d %d%*c", &a, &b))
+	{
+		long long ans = 0;
+		for(int i = a; i <= b; i++)
+			ans += phi[i];
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

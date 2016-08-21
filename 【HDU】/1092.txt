@@ -1,0 +1,17 @@
+#include <stdio.h>
+
+int main ()
+{
+    int a, n;
+    while(~scanf ("%d%*c", &n) && n)
+	{
+		int ans = 0;
+        for (int i = 0; i < n; i++)
+		{
+			scanf ("%d%*c", &a);
+            ans += a;
+		}
+        printf ("%d\n",ans);
+	}
+    return 0;
+}

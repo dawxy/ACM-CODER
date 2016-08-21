@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <set>
+using namespace std;
+const int MAX = 5, MAXS = 5000000;
+const char ed[MAX][MAX] = {{1,1,1,1,1},{0,1,1,1,1},{0,0,2,1,1},{0,0,0,0,1},{0,0,0,0,0}};
+const int d[8][2] = {{-1,-2},{-2,-1},{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2}};
+struct QUE{
+	char s[MAX][MAX], zi, zj; 
+	int dis;
+}que[MAXS], st;
+set <int> vis;
+
+int bfs();
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		char c;
+		for (int i = 0; i < MAX;i++)
+		{
+			for (int j = 0; j < MAX;j++)
+			{
+				c = getchar();
+				if (' ' == c)
+				{
+					st.zi = i;
+					st.zj = j;
+					st.s[i][j] = 2;
+				}
+				else
+					st.s[i][j] = c-'0';
+			}
+			getchar();
+		}
+		vis.clear();
+		int ans = bfs();
+		if (-1 == ans)
+			printf ("Unsolvable in less than 11 move(s).\n");
+		else
+			printf ("Solvable in %d move(s).\n",ans);
+	}
+	return 0;
+}
+
+bool is_ans(QUE *a)
+{
+	for (int i = 0; i < MAX;i++)
+	{
+		for (int j = 0; j < MAX;j++)
+		{
+			if (ed[i][j] != a->s[i][j])
+				return false;
+		}
+	}
+	return true;
+}
+void cpy(QUE *a, QUE*b)
+{
+	for (int i = 0; i < MAX;i++)
+		for (int j = 0; j < MAX; j++)
+			a->s[i][j] = b->s[i][j];
+}
+bool try_insert(QUE *a)
+{
+	int code  = 0;
+	for (int i = 0; i < 25; i++)
+		code += code*2+a->s[i/5][i%5];
+	code = (code<<1)+1;
+	if (vis.count(code))
+		return false;
+	vis.insert(code);
+	return true;
+}
+int bfs()
+{
+	int front = 0, rear = 1;
+	QUE buf ,val;
+	st.dis = 0;
+	que[rear++] = st;
+	while(1 != rear-front)
+	{
+		buf = que[++front];
+		if (buf.dis > 10)
+			return -1;
+		if (is_ans(&buf))
+			return buf.dis;
+		for (int i = 0; i < 8; i++)
+		{
+			val.zi = buf.zi+d[i][0];
+			val.zj = buf.zj+d[i][1];
+			if (0 <= val.zi && MAX > val.zi && 0 <= val.zj && MAX > val.zj)
+			{
+				cpy(&val, &buf);
+				val.s[buf.zi][buf.zj] = buf.s[val.zi][val.zj];
+				val.s[val.zi][val.zj] = 2;
+				if (try_insert(&val))
+				{
+					val.dis = buf.dis+1;
+					que[rear++] = val;
+				}
+			}
+		}
+	}
+	return -1;
+}

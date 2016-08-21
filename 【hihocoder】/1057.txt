@@ -1,0 +1,74 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20000+10;
+char name[MAXN][300];
+int ti[MAXN],op[MAXN],cost[MAXN],n,tol;
+map<string,int> num;
+map<int,string> fun;
+struct NODE{
+	int id,num;
+};
+stack<NODE> s;
+
+int get_id(int p)
+{
+	if(num.find(name[p]) == num.end())
+	{
+		num[name[p]] = tol++;
+		fun[tol-1] = name[p];
+		return tol-1;
+	}
+	return num[name[p]];
+}
+bool sloved()
+{
+	clc(cost,-1);
+	tol = 0;
+	int cnt = 0;
+	rep(i,0,n)
+	{
+		int id = get_id(i);
+		if(0 == op[i])
+		{
+			//if()
+			s.push(NODE{id,i});
+		}
+		else
+		{
+			if(s.top().id != id) return false;
+			cost[id] = ti[i]-ti[s.top().num];
+			if(cost[id] < 0) return false;
+			s.pop();
+			cnt++;
+		}
+	}
+	if(tol != cnt) return false;
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	scanf("%d", &n);
+	char str[10];
+	rep(i,0,n)
+	{
+		int h,m,s;
+		scanf("%s %d:%d:%d %s", name[i],&h,&m,&s,str);
+		ti[i] = h*3600+m*60+s;
+		if('S' == str[0]) op[i] = 0;
+		else op[i] = 1;
+	}
+	if(!sloved()) puts("Incorrect performance log");
+	else
+	{
+		rep(i,0,tol) printf("%s %02d:%02d:%02d\n", fun[i].c_str(),cost[i]/3600,cost[i]%3600/60,cost[i]%60);
+	}
+	return 0;
+}

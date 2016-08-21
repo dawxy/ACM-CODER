@@ -1,0 +1,83 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef __int64 LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 100010
+#define lc u<<1
+#define rc u<<1|1
+LL a[MAXN], sum[MAXN<<2];
+
+inline void push_up(int u)
+{
+    sum[u] = sum[lc]+sum[rc];
+}
+void bulid(int u, int x, int y)
+{
+    if(x == y)
+    {
+        sum[u] = a[x];
+        return;
+    }
+    int m = (x+y)>>1;
+    bulid(lc,x,m);
+    bulid(rc,m+1,y);
+    push_up(u);
+}
+int ql,qr;
+void update(int u, int x, int y)//这个是O(n)复杂度,由于任何数最多开6次方就等于1，所以总的复杂度为7N
+{
+    if(x == y)
+    {
+        sum[u] = sqrt((double)sum[u]);
+        return;
+    }
+    int m = (x+y)>>1;
+    if(ql <= m && sum[lc] > m-x+1) update(lc,x,m);
+    if(qr > m && sum[rc] > y-m) update(rc,m+1,y);
+    push_up(u);
+}
+LL query(int u, int x, int y)
+{
+    if(ql <= x && y <= qr) return sum[u];
+    int m = (x+y)>>1;
+    LL ans = 0;
+    if(ql <= m) ans += query(lc,x,m);
+    if(qr > m) ans += query(rc,m+1,y);
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int n, count = 0;
+    while(~scanf("%d%*c", &n))
+    {
+        repe(i,1,n) scanf("%I64d%*c", &a[i]);
+        bulid(1,1,n);
+        int q, c;
+        scanf("%d%*c", &q);
+        printf("Case #%d:\n", ++count);
+        rep(i,0,q)
+        {
+            scanf("%d %d %d%*c", &c, &ql, &qr);
+            if(ql > qr) swap(ql,qr);
+            if(c) printf("%I64d\n",query(1,1,n));
+            else update(1,1,n);
+        }
+        putchar('\n');
+    }
+    return 0;
+}

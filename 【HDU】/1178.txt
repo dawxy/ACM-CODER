@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    double n, ans;
+    while(~scanf ("%lf%*c", &n) && n)
+	{
+		ans = (n*(n+1)/2+(n*(n+1)*(2*n+1))/6)/2;
+        int sum = 0;
+        while(ans/10 >= 1)
+		{
+            ans *= 0.1;
+            sum++;
+		}
+        printf ("%.2lfE%d\n", ans,sum);
+	}
+    return 0;
+}

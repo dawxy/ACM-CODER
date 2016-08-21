@@ -1,0 +1,93 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,a,n) for(int i = n; i >= 1; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+typedef long long LL;
+const int MAXN = 150 + 10, d[4][2] = { {0,-1},{0,1},{1,0},{-1,0} };
+char a[MAXN][MAXN];
+bool vis[MAXN][MAXN];
+int n, m;
+double sum;
+
+bool is_num(char c)
+{
+    return '0' <= c && c <= '9';
+}
+bool is_op(char c)
+{
+    return '+' == c || '-' == c || '*' == c || '/' == c;
+}
+bool equal(double x, double y)
+{
+    return fabs(x-y) < 1e-8;
+}
+bool dfs(int x, int y, char op, double now)
+{
+    if (equal(now, sum)) return true;
+    rep(i, 0, 4)
+    {
+        int nx = x+d[i][0], ny = y+d[i][1];
+        if (0 <= nx && nx < n && 0 <= ny && ny < m && !vis[nx][ny] && '#' != a[nx][ny])
+        {
+            if (op)
+            {
+                double num = a[nx][ny] - '0', nxt;
+                if ('+' == op) nxt = now + num;
+                else if ('-' == op) nxt = now - num;
+                else if ('*' == op) nxt = now * num;
+                else if ('/' == op)
+                {
+                    if (equal(0, num)) continue;
+                    nxt = now / num;
+                }
+                vis[nx][ny] = true;
+                if (dfs(nx, ny, 0, nxt)) return true;
+                vis[nx][ny] = false;
+            }
+            else
+            {
+                if (dfs(nx, ny, a[nx][ny], now)) return true;
+            }
+        }
+    }
+    return false;
+}
+bool sloved()
+{
+    clc(vis, 0);
+    rep(i, 0, n)
+    {
+        rep(j, 0, m)
+        {
+            if (is_num(a[i][j]))
+            {
+                vis[i][j] = true;
+                if (dfs(i,j,0,a[i][j]-'0')) return true;
+                vis[i][j] = false;
+            }
+        }
+    }
+    return false;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d://1.txt","r",stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while (t--)
+    {
+        scanf("%d%d%lf", &n,&m,&sum);
+        rep(i, 0, n)
+        {
+            scanf("%s", a[i]);
+        }
+        if (sloved()) puts("Possible");
+        else puts("Impossible");
+    }
+    return 0;
+}

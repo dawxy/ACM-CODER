@@ -1,0 +1,36 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1002
+#define max(a,b) (a>b?a:b)
+int ans, ch, dp[MAXN][MAXN];
+
+int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int h = in(), w = in(), x = in(), y = in(), ans = 0;
+		for (int i = 1; i <= h; i++)
+		{
+			for (int j = 1; j <= w; j++)
+			{
+				dp[i][j] = in()+dp[i-1][j]+dp[i][j-1]-dp[i-1][j-1];
+				if (i >= x && j >= y)
+					ans = max(ans,dp[i][j]-dp[i-x][j]-dp[i][j-y]+dp[i-x][j-y]);
+			}
+		}
+		printf("%d\n",ans);
+	}
+	return 0;
+}

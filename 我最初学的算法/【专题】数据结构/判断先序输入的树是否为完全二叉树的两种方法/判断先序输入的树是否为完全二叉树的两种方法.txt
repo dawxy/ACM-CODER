@@ -1,0 +1,127 @@
+//判断先序输入的树是否为完全二叉树的两种方法
+#include <stdio.h>
+#include <malloc.h>
+#include <queue>
+#define scanf scanf_s
+using namespace std;
+typedef struct NODE{
+	int data;
+	NODE *lchild, *rchild;
+}node, *pnode;
+int maxlev = 0;
+
+void creat_dinarytree(pnode *, int lev);//先序输入二叉树
+void traverse(pnode, int *);//把树存入数组
+bool is_complete_binary_tree1(pnode);//转换为顺序储存判断
+bool is_complete_binary_tree2(pnode);//二叉层次遍历判断
+
+int main ()
+{
+	pnode pt;
+	creat_dinarytree (&pt, 1);
+	if (is_complete_binary_tree2 (pt))
+		printf ("YES\n");
+	else
+		printf ("NO\n");
+	return 0;
+}
+
+void creat_dinarytree(pnode * pt, int lev)
+{
+	int a;
+	scanf ("%d", &a);
+	if (0 == a)
+	{
+		*pt = NULL;
+		return;
+	}
+	if (lev > maxlev)
+		maxlev = lev;
+	*pt = (pnode)malloc(sizeof(node));
+	(*pt)->data = a;
+	creat_dinarytree (&((*pt)->lchild), lev+1);
+	creat_dinarytree (&((*pt)->rchild), lev+1);
+}
+
+void visit (pnode p, int *a, int s)
+{
+	if (p->lchild)
+		a[s*2] = p->lchild->data;
+	if (p->rchild)
+		a[s*2+1] = p->rchild->data;
+}
+
+void traverse(pnode pt, int *a)
+{
+	int s = 1;
+	queue <pnode> que;
+	pnode p;
+	que.push (pt);
+	a[1] = pt->data;
+	while (que.size())
+	{
+		p = que.front();
+		visit (p, a, s);
+		que.pop();
+		s++;
+		if (p->lchild)
+			que.push(p->lchild);
+		if (p->rchild)
+			que.push(p->rchild);
+	}
+}
+
+bool is_complete_binary_tree1(pnode pt)
+{
+	int size = 1, i;
+	bool in = false;
+	for (i = 1; i <= maxlev; i++)
+		size *= 2;
+	int *a = (int *)malloc(sizeof(int)*(size+1));
+	for (i = 1; i <= size; i++)
+		a[i] = 0;
+	traverse (pt, a);
+	for (i = 1; i <= size; i++)
+	{
+		if (a[i] == 0)
+			in = true;
+		else
+			if (in)
+				return false;
+	}
+	return true;
+}
+
+bool is_complete_binary_tree2(pnode pt)
+{
+	queue <pnode> que;
+	pnode p;
+	bool f = true;
+	que.push (pt);
+	while (que.size() && f)
+	{
+		p = que.front(), que.pop();
+
+		if (p->lchild)
+		{
+			que.push (p->lchild);
+			if (p->rchild)
+				que.push(p->rchild);
+			else
+				f = false;
+		}
+		else
+		{
+			f = false;
+			if (p->rchild) return false;
+		}
+	}
+
+	while (que.size())//到这个循环的都是叶子节点 或者发现有节点只有左儿子没有右儿子
+	{                 //只需要判断出现两种情况的当前这层 下面的层不需要判断
+		p = que.front(), que.pop();
+		if (p->lchild || p->rchild)//这里不需要遍历儿子节点只是要判断已有的节点没有有儿子节点
+			return false;          //一旦有儿子节点就不是完全二叉树
+	}
+	return true;
+}

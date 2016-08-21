@@ -1,0 +1,112 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <functional>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, MAXM = 500*500*2+10;
+char mp[MAXN][MAXN];
+int n;
+
+inline int get_id(const char op, const int x)
+{
+	if('C' == op) return x;
+	return x+n;
+}
+int head[MAXN], tol, nxt[MAXM], to[MAXM];
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int in[MAXN], ans[MAXN];
+struct cmp
+{
+	bool operator () (const int x, const int y)
+	{
+		return x > y;
+	}
+};
+int ft[MAXN];
+int topo(int cnt)
+{
+	int p = 0, c = 1;
+	clc(ft,0);
+	priority_queue<int,vector<int>,cmp> q;
+	rep(i,0,cnt) if(!in[i]) q.push(i),ft[i] = 1;
+	while(!q.empty())
+	{
+		if(q.size() > 1) c = 0;
+		int u = q.top();q.pop();
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(!--in[v]) q.push(v);
+		}
+		ans[p++] = u;
+	}
+	if(p < cnt) return -1;
+	return c;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+	//freopen("d:\\out.txt", "w", stdout);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d%*c", &n);
+		rep(i,0,n)
+			scanf("%s", mp[i]);
+		clc(head,-1);
+		tol = 0;
+		clc(in,0);
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+			{
+				if('O' == mp[i][j])
+				{
+					add_edge(get_id('R',i), get_id('C',j));
+					in[get_id('C',j)]++;
+				}
+				else
+				{
+					add_edge(get_id('C',j), get_id('R',i));
+					in[get_id('R',i)]++;
+				}
+			}
+		}
+		bool out = false;
+		if(-1 == topo(n<<1)) puts("No solution");
+		else
+		{
+			rep(i,0,n<<1)
+			{
+				if(ft[ans[i]]) continue;
+				if(out) putchar(' ');
+				if(ans[i] >= n) printf("R%d",ans[i]-n+1);
+				else printf("C%d",ans[i]+1);
+				out = true;
+			}
+			putchar('\n');
+		}
+	}
+	return 0;
+}

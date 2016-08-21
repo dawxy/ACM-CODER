@@ -1,0 +1,27 @@
+#include <stdio.h>
+
+int main ()
+{
+	while (1)
+	{
+		int n, k;
+		bool in = false;
+		scanf ("%d %d%*c", &n, &k);
+		if (0 == n && 0 == k)
+			break;	
+		for (int i = 1;i <= n/2; i++)
+		{
+			if (i*(n-i) == k)
+			{
+				in = true;
+				break;
+			}
+		}
+		if (in)
+			printf ("YES\n");
+		else
+			printf ("NO\n");
+	}
+
+	return 0;
+}

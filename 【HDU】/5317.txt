@@ -1,0 +1,198 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000000+10, MAXNUM = 1000000,MAXOUT = MAXN/10;
+char buf[MAXN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+    if(++ps == pe)
+        pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+    if(ps == pe) return false;//EOF
+    do{
+        rnext();
+		if('-' == *ps) f = -1;
+    }while(!isdigit(*ps) && ps != pe);
+    if(ps == pe) return false;//EOF
+    do
+    {
+        ans = (ans<<1)+(ans<<3)+*ps-48;
+        rnext();
+    }while(isdigit(*ps) && ps != pe);
+	ans *= f;
+    return true;
+}
+char bufout[MAXOUT], outtmp[50],*pout = bufout, *pend = bufout+MAXOUT;
+inline void write()/*必须在程序结束时加 write()*/
+{
+	fwrite(bufout,1,pout-bufout,stdout);
+	pout = bufout;
+}
+inline void out_char(char c){ *(pout++) = c;if(pout == pend) write();}
+inline void out_str(char *s)
+{
+	while(*s)
+	{
+		*(pout++) = *(s++);
+		if(pout == pend) write();
+	}
+}
+template <class T>
+inline void out_int(T x) {
+	if(!x)
+	{
+		out_char('0');
+		return;
+	}
+	if(x < 0) x = -x,out_char('-');
+	int len = 0;
+	while(x)
+	{
+		outtmp[len++] = x%10+48;
+		x /= 10;
+	}
+	outtmp[len] = 0;
+	for(int i = 0, j = len-1; i < j; i++,j--) swap(outtmp[i],outtmp[j]);
+	out_str(outtmp);
+}
+int prime[MAXN+10];
+bool isprime[MAXN+10];
+
+void get_prime()
+{
+	memset(isprime,1,sizeof(isprime));
+	int len = sqrt(MAXNUM+0.5);
+	repe(i,2,len)
+	{
+		if(!isprime[i]) continue;
+		for(int j = i*i; j <= MAXNUM; j += i) isprime[j] = false;
+	}
+}
+void getprime()
+{
+	clc(prime,0);
+	for (int i = 2; i <= MAXNUM; i++)
+	{
+		if (!prime[i])prime[++prime[0]] = i;
+		for (int j = 1; j <= prime[0] && prime[j] <= MAXNUM/i; j++)
+		{
+			prime[prime[j]*i] = 1;
+			if (i%prime[j] == 0) break;
+		}
+	}
+}
+int kind(int x)
+{
+	if(isprime[x]) return 1;
+	int ans = 0;
+	repe(j,1,prime[0])
+	{
+		bool in = false;
+		while(x && 0 == x%prime[j])
+			x /= prime[j], in = true;
+		ans += in;
+		if(isprime[x])
+		{
+			if(x > 1 && x != prime[j])
+				ans++;
+			break;
+		}
+	}
+	return ans;
+}
+int f[MAXN];
+
+short sum[MAXN<<1][7];
+inline int id(int x, int y){return x+y|x!=y;}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		sum[id(x,y)][f[x]-1] = 1;
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	int u = id(x,y),l = id(x,m),r = id(m+1,y);
+	rep(i,0,7)
+	{
+		sum[u][i] = sum[l][i]+sum[r][i];
+		if(sum[u][i] >= 2) sum[u][i] = 2;
+	}
+}
+int cnt[7];
+void query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr)
+	{
+		int u = id(x,y);
+		rep(i,0,7) cnt[i] += sum[u][i];
+		return;
+	}
+	int m = (x+y)>>1;
+	if(ql <= m) query(x,m,ql,qr);
+	if(qr > m) query(m+1,y,ql,qr);
+}
+int gcd(int a, int b)
+{
+	while(b){
+		a %= b;
+		if(a < b) swap(a,b);
+	}
+	return a;
+}
+int get_ans()
+{
+	per(i,6,0) if(cnt[i] >= 2) return i+1;
+	vector<int> tmp;
+	rep(i,0,7) if(cnt[i]) tmp.push_back(i+1);
+	int mx = 1;
+	rep(i,0,tmp.size())
+	{
+		rep(j,i+1,tmp.size())
+			mx = max(mx,gcd(tmp[i],tmp[j]));
+	}
+	return mx;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	get_prime();
+	getprime();
+	repe(i,2,MAXNUM) f[i] = kind(i);
+	bulid(2,MAXNUM);
+	int t;
+	in(t);
+	while(t--)
+	{
+		int x,y;
+		in(x);in(y);
+		clc(cnt,0);
+		query(2,MAXNUM,x,y);
+		out_int(get_ans());
+		out_char('\n');
+	}
+	write();
+	return 0;
+}

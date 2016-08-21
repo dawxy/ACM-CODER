@@ -1,0 +1,95 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int MAXN = 1000+10;
+const double INF = 1e14;
+double cost[MAXN][MAXN], low[MAXN];//cost[][]边权,low[]->DP的记录当前点到其他所有点的距离
+double mx[MAXN][MAXN];//mx[u][v]表示唯一路径u到v上的最大边权(用来替换)
+bool vis[MAXN], intree[MAXN][MAXN];
+int f[MAXN], n;//f[]记录路径,上一个结点
+struct NODE{
+	int x,y;
+	double a;
+}p[MAXN];
+
+double prim()
+{
+	double ans = 0;
+	clc(vis,0);
+	clc(intree,0);
+	clc(mx,0);
+	vis[0] = true;//从结点0开始找
+	low[0] = 0;
+	rep(i,1,n) low[i] = cost[0][i],f[i] = 0;
+	rep(i,1,n)
+	{
+		double mi = INF;
+		int p = -1;
+		rep(j,0,n)
+		{
+			if(!vis[j] && low[j] < mi) mi = low[j],p = j;
+		}
+		if(-1 == p) continue;//图不连通
+		ans += mi;
+		vis[p] = true;
+		intree[f[p]][p] = intree[p][f[p]] = true;
+		rep(j,0,n)
+		{
+			if(vis[j] && j != p) mx[j][p] = mx[p][j] = max(mx[j][f[p]], low[p]);
+			if(!vis[j] && low[j] > cost[p][j]) low[j] = cost[p][j], f[j] = p;
+		}
+	}
+	/*到这里为止的ans是最小生成树,下面是枚举替换边(枚举不在最小生成树中的边uv替换掉mx[u][v]的最小值)*/
+	double ret = -1;
+	rep(i,0,n)
+	{
+		rep(j,0,n)
+		{
+			if(i == j) continue;
+			if(intree[i][j])//在最小生成树中的边
+				ret = max(ret,(p[i].a+p[j].a)/(ans-cost[i][j]));
+			else
+				ret = max(ret,(p[i].a+p[j].a)/(ans-mx[i][j]));
+		}
+	}
+	return ret;
+}
+inline double dis(int a, int b)
+{
+	return sqrt((double)(p[a].x-p[b].x)*(p[a].x-p[b].x)+(p[a].y-p[b].y)*(p[a].y-p[b].y));
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d%*c", &n);
+		rep(i,0,n)
+			scanf("%d %d %lf%*c", &p[i].x, &p[i].y, &p[i].a);
+		rep(i,0,n)
+		{
+			rep(j,i+1,n)
+				cost[i][j] = cost[j][i] = dis(i,j);
+		}
+		printf("%.2lf\n", prim());
+	}
+	return 0;
+}

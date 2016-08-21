@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define MAXV 2510
+
+int main ()
+{
+    int c, n;
+    while(~scanf ("%d%*c%d%*c", &c, &n))
+    {
+        int v, l, r, ans = 0, len = 0, maxv = 0;
+        bool dp[MAXN][MAXV] = {0};//dp[i][j]表示在重量为i，面值为j的组合是否存在
+        dp[0][0] = true;
+        for (int i = 0; i < n; i++)//硬币数
+        {
+            scanf ("%d %d %d%*c", &v, &l, &r);
+            for (int j = l; j <= r; j++)//把硬币分解为重量为l~r的硬币
+            {
+                for (int k = j; k <= c; k++)//完全背包 枚举重量
+                {
+                    for (int m = 0; m <= maxv; m++)//完全背包枚举面值，因为最大面值不确定，所以需要更改
+                    {
+                        if (dp[k-j][m])//确保是恰好装满当前背包大小k
+                        {
+                            dp[k][m+v] = true;//m+v是放入当前硬币之后的价值
+                            maxv = max(maxv,m+v);
+                        }
+                    }
+                }
+            }
+        }
+        //统计当总重量为c(也就是恰好装满背包)时出现的所有不同的面值数
+        for (int i = 0; i <= maxv; i++)
+        {
+            if (dp[c][i])
+                ans++;
+        }
+        printf ("%d\n",  ans);
+    }
+    return 0;
+}

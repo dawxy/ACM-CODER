@@ -1,0 +1,137 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10;
+int g[MAXN][MAXN];//二分图描述,纵坐标为左边，横坐标为右边，这里下标从1开始的
+struct KM{
+	struct NODE{
+		int to,w;
+		NODE(int a, int b){
+			to = a, w = b;
+		}
+	};
+	int nx,ny;//两边的点数
+	int linker[MAXN],lx[MAXN],ly[MAXN];//y中各点匹配状态，x,y中的点标号
+	int slack[MAXN];
+	bool visx[MAXN],visy[MAXN];
+	bool dfs(int x)
+	{
+		visx[x] = true;
+		repe(y,1,ny)
+		{
+			if(visy[y]) continue;
+			int tmp = lx[x]+ly[y]-g[x][y];
+			if(!tmp)
+			{
+				visy[y] = true;
+				if(-1 == linker[y] || dfs(linker[y]))
+				{
+					linker[y] = x;
+					return true;
+				}
+			}
+			else if(slack[y] > tmp)
+				slack[y] = tmp;
+		}
+		return false;
+	}
+	int max_km(int nx, int ny)//传入两边点数
+	{
+		this->nx = nx, this->ny = ny;
+		clc(linker,-1);
+		clc(ly,0);
+		repe(i,1,nx)
+		{
+			lx[i] = -INF;
+			repe(j,1,ny)
+				if(g[i][j] > lx[i]) 
+					lx[i] = g[i][j];
+		}
+		repe(x,1,nx)
+		{
+			clc(slack,0x3f);
+			while(1)
+			{
+				clc(visx,0);
+				clc(visy,0);
+				if(dfs(x))break;
+				int d = INF;
+				repe(i,1,ny)
+				{
+					if(!visy[i] && d > slack[i])
+						d = slack[i];
+				}
+				repe(i,1,nx) if(visx[i]) lx[i] -= d;
+				repe(i,1,ny)
+				{
+					if(visy[i]) ly[i] += d;
+					else slack[i] -= d;
+				}
+			}
+		}
+		//最后统计最大值，加负号就是最小值，然后要把所有g[][]*-1
+		int ans = 0;
+		repe(i,1,ny)
+		{
+			//如果求最小值就是-INF，最大值才是INF
+			//if(INF == g[linker[i]][i]) return -INF;//不存在完美匹配
+			if(linker[i] == i) ans += (g[linker[i]][i]-1)/nx;
+			else ans += g[linker[i]][i]/nx;
+		}
+		return ans;
+	}
+}km;
+int v[MAXN], h[MAXN], p[MAXN], a[MAXN], b[MAXN];
+
+inline int get_cost(int x, int y)
+{
+	if(p[y]/a[x]+(bool)(p[y]%a[x]) <= h[x]/b[y]+(bool)(h[x]%b[y])) return v[x];
+	return -v[x];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		repe(i,1,n) scanf("%d%*c", &v[i]);
+		repe(i,1,n) scanf("%d%*c", &h[i]);
+		repe(i,1,n) scanf("%d%*c", &p[i]);
+		repe(i,1,n) scanf("%d%*c", &a[i]);
+		repe(i,1,n) scanf("%d%*c", &b[i]);
+		repe(i,1,n)
+		{
+			repe(j,1,n)
+			{
+				g[i][j] = get_cost(i,j)*n;
+				if(i == j) g[i][j]++;
+			}
+		}
+		int ans = km.max_km(n,n);
+		if(ans > 0)
+		{
+			printf("%d ", ans);
+			int sum = 0;
+			repe(i,1,n) if(km.linker[i] == i) sum++;
+			printf("%.3lf%%\n", sum*1.0/n*100.0);
+		}
+		else puts("Oh, I lose my dear seaco!");
+	}
+	return 0;
+}

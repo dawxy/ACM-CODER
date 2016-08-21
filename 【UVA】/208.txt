@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAX 30
+bool g[MAX][MAX], vis[MAX];
+int ed, n, ans[MAX],f[MAX], sum, lenf;
+
+void find_dfs(int u)//寻找所有与终点连通的节点加入f
+{
+	vis[u] = true;
+	f[lenf++] = u;
+	for (int i = 1; i <= n; i++)
+	{
+		if (g[u][i] && !vis[i])
+			find_dfs(i);
+	}
+}
+void dfs(int p, int u)
+{
+	if (u == ed)
+	{
+		printf ("1");
+		for (int i = 0; i < p; i++)
+			printf (" %d", ans[i]);
+		printf ("\n");
+		sum++;
+		return;
+	}
+	for (int i = 0; i < lenf; i++)
+	{
+		if (g[u][f[i]] && ! vis[f[i]])
+		{
+			vis[f[i]] = true;
+			ans[p] = f[i];
+			dfs(p+1, f[i]);
+			vis[f[i]] = false;
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t = 0;
+	while(EOF != scanf ("%d%*c", &ed))
+	{
+		int a, b;
+		memset(g,false,sizeof(g));
+		n = -1;
+		while(1)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			if (0 == a && 0 == b)
+				break;
+			g[a][b] = g[b][a] = true;
+			if (a > n)
+				n = a;
+			if (b > n)
+				n = b;
+		}
+		sum = lenf = 0;
+		find_dfs(ed);
+		sort(f, f+lenf);
+		memset(vis,false,sizeof(vis));
+		printf ("CASE %d:\n", ++t);
+		vis[1] = true;
+		dfs(0, 1);
+		vis[1] = false;
+		printf ("There are %d routes from the firestation to streetcorner %d.\n",sum, ed);
+	}
+
+	return 0;
+}

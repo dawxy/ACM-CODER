@@ -1,0 +1,23 @@
+#include <stdio.h>
+const char d[14][20] = {"go out","decorate","decorate","stay at home","go to movies","meet friends","go to KTV","visit teachers","stay at home",
+"buy food","buy clothes","stay at home","go home","take test"};
+const char f[7][20] = {"","be in the park","stay at home","visit relative","visit relative","stay at home","prepare dinner"};
+
+int main ()
+{
+	#ifdef SHY
+		freopen("e:\\1.txt", "r", stdin);
+	#endif
+	int t;
+	scanf ("%d%*c",&t);
+	while(t--)
+	{
+		int n;
+        scanf ("%d%*c", &n);
+        if (n >=0 )
+			printf ("Samuel will %s.\n", d[n]);
+		else
+			printf ("Samuel will %s.\n", f[-n]);
+	}
+    return 0;
+}

@@ -1,0 +1,100 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, MAXM = 5000*2+10;
+int head[MAXN], tol, nxt[MAXM], to[MAXM];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int col[MAXN];
+void dfs(int u, int c)
+{
+	col[u] = c;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(-1 == col[v]) dfs(v,!c);
+	}
+}
+int lin[MAXN], cnt, id[MAXN];
+bool vis[MAXN];
+bool dfs(int u)
+{
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(!vis[v])
+		{
+			vis[v] = true;
+			if(-1 == lin[v] || dfs(lin[v]))
+			{
+				lin[v] = u;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int hungary()
+{
+	int ans = 0;
+	clc(lin,-1);
+	rep(i,0,cnt)
+	{
+		clc(vis,0);
+		if(dfs(id[i])) ans++;
+	}
+	return ans;
+}
+struct Q{
+	int u,v;
+}q[5000+10];
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	scanf("%d %d%*c", &n, &m);
+	clc(head,-1);
+	tol = 0;
+	rep(i,0,m)
+	{
+		int u,v;
+		scanf("%d %d%*c", &u, &v);
+		q[i] = {u,v};
+		add_edge(u,v);
+		add_edge(v,u);
+	}
+	clc(col,-1);
+	repe(i,1,n) if(-1 == col[i]) dfs(i,0);
+	clc(head,-1);
+	tol = 0;
+	repe(i,1,n) if(col[i]) id[cnt++] = i;
+	rep(i,0,m)
+	{
+		int u = q[i].u, v = q[i].v;
+		if(col[u]) add_edge(u,v);
+		else add_edge(v,u);
+	}
+	int ans = hungary();
+	printf("%d\n%d\n", ans, n-ans);
+	return 0;
+}

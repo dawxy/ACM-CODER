@@ -1,0 +1,156 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200*200+10, MAXM = 200*200*4+200*4+10;
+const int f[4][2]={{-1,0},{1,0},{0,-1},{0,1}};
+struct Edge{
+	int next,to, cost;
+	Edge(int a = 0, int b = 0, int c = 0){
+		next = a, to = b, cost = c;
+	}
+}edge[MAXM];
+int tol,head[MAXN], mp[210][210],m, dis[MAXN], p[14],cost[14][14], dp[1<<14][14];
+/*dp[i][j]表示状态i，当前在点j上时的最短路*/
+bool inq[MAXN];
+
+void add_edge(int u, int v, int cost)
+{
+	edge[tol] = Edge(head[u],v,cost);
+	head[u] = tol++;
+}
+inline int id(int x, int y){
+	return x*m+y;
+}
+void spfa(int s)
+{
+	queue<int> q;
+	clc(inq,0);
+	clc(dis,0x3f);
+	q.push(s);
+	inq[s] = true;
+	dis[s] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		inq[u] = false;
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].to, cost = edge[i].cost;
+			if(INF != dis[u] && dis[v] > dis[u]+cost)
+			{
+				dis[v] = dis[u]+cost;
+				if(!inq[v])
+				{
+					q.push(v);
+					inq[v] = true;
+				}
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d %d%*c", &n, &m);
+		rep(i,0,n)
+		{
+			rep(j,0,m)
+				scanf("%d%*c", &mp[i][j]);
+		}
+		/*建图*/
+		int st = n*m, ed = n*m+1;
+		tol = 0;
+		clc(head,-1);
+		rep(i,0,n)
+		{
+			rep(j,0,m)
+			{
+				if(mp[i][j] < 0) continue;
+				rep(k,0,4)
+				{
+					int ni = i+f[k][0], nj = j+f[k][1];
+					if(0 <= ni && n > ni && 0 <= nj && m > nj && mp[ni][nj] >= 0)
+						add_edge(id(i,j),id(ni,nj),mp[ni][nj]);
+				}
+				if(0 == i || n-1 == i || 0 == j || m-1 == j)
+				{
+					add_edge(st,id(i,j),mp[i][j]);
+					add_edge(id(i,j),ed,0);
+				}
+			}
+		}
+		/*找起点以及各个宝物的最短路*/
+		int np,x,y;
+		bool ok = true;
+		scanf("%d%*c", &np);
+		p[np] = st,p[np+1] = ed;
+		rep(i,0,np)
+		{
+			scanf("%d %d%*c", &x, &y);
+			p[i] = id(x,y);
+		}
+		repe(i,0,np)
+		{
+			spfa(p[i]);
+			repe(j,0,np+1)
+			{
+				if(i == j || p[j] == st) continue;
+				cost[i][j] = dis[p[j]];
+				if(INF == cost[i][j])
+				{
+					ok = false;
+					break;
+				}
+			}
+			if(!ok) break;
+		}
+		if(!ok)
+		{
+			puts("0");
+			continue;
+		}
+		/*TSP*/
+		int mxn = (1<<np)-1;
+		clc(dp,0x3f);
+		clc(dp[0],0);
+		rep(i,0,np) dp[1<<i][i] = cost[np][i];
+		repe(i,1,mxn)
+		{
+			rep(j,0,np)//当前在点j
+			{
+				if(0 == (1<<j)&i || dp[i][j] != INF) continue;
+				rep(k,0,np)//来自上一个点k
+				{
+					if((1<<k)&i && j != k)
+						dp[i][j] = min(dp[i][j], dp[i^(1<<j)][k]+cost[k][j]);
+				}
+			}
+		}
+		int ans = INF;
+		rep(i,0,np) ans = min(ans,dp[mxn][i]+cost[i][np+1]);
+		if(INF == ans) puts("0");
+		else printf("%d\n", ans);
+	}
+	return 0;
+}

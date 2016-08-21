@@ -1,0 +1,37 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+#define MAXN 10010
+
+int main ()
+{
+    int c, n;
+    while(~scanf ("%d %d%*c", &c, &n))
+    {
+        int w, v, num, dp[MAXN] = {0};
+        for (int i = 0; i < n; i++)
+        {
+            scanf ("%d %d %d%*c", &w, &v, &num);
+            if (num*w >= c)
+            {
+                for (int j = w; j  <= c; j++)
+                    dp[j] = max(dp[j], dp[j-w]+v);
+                continue;
+            }
+            for (int j = 1; j <= num; num-= j, j <<= 1)
+            {
+                int wg = j*w, val = j*v;
+                for (int k = c; k >= wg; k--)
+                    dp[k] = max(dp[k], dp[k-wg]+val);
+            }
+            if (num > 0)
+            {
+                int wg = num*w, val = num*v;
+                for (int k = c; k >= wg; k--)
+                    dp[k] = max(dp[k], dp[k-wg]+val);
+            }
+        }
+        printf ("%d\n", dp[c]);
+    }
+    return 0;
+}

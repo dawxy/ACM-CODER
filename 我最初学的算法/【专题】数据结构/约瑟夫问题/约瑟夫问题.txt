@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <malloc.h>
+
+typedef struct NODE {
+	int num;
+	NODE *next;
+}node, *pnode;
+
+pnode init_looplist();//建立1~41循环链表
+void thekill (pnode);//自杀顺序输出
+
+int main ()
+{
+	pnode ph = init_looplist();
+	thekill (ph);
+}
+
+pnode init_looplist()
+{
+	pnode ph = (pnode)malloc(sizeof(node)), p, plast;
+	plast = ph;
+	for (int i = 1; i <= 41; i++)
+	{
+		p = (pnode)malloc (sizeof(node));
+		p->num = i;
+		plast->next = p;
+		plast = p;
+	}
+	plast->next = ph->next;
+	free(ph);
+	return plast->next;
+}
+
+void thekill (pnode ph)
+{
+	pnode p = ph, buf;
+	while (p->next != p)
+	{
+		p = p->next;
+		printf ("%d->", p->next->num);
+		buf = p->next;
+		p->next = buf->next;
+		free(buf);
+		p = p->next;
+	}
+	printf ("%d", p->num);
+}

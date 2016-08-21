@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n, t = 0;
+    while(1)
+	{
+        scanf ("%d%*c", &n);
+        if (n < 0)
+			break;
+        int sum = 0, a;
+        for (int i = 0; i < n; i++)
+		{
+            scanf ("%d%*c", &a);
+            sum += a;
+		}
+        printf ("Sum of #%d is %d\n", ++t, sum);
+	}
+    return 0;
+}

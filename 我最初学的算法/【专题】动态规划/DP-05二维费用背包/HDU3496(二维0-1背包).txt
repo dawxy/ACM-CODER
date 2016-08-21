@@ -1,0 +1,42 @@
+/*
+从n部电影中选择能在L分钟内看完的最大价值的电影(都是刚好n部和刚好L分钟)
+*/
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+int d[MAXN][MAXN];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+        while(t--)
+	{
+                int n, m, l, time, val;
+                scanf ("%d %d %d%*c", &n, &m, &l);
+                memset(d,-0x3f,sizeof(d));//求的是恰好，所以初始化为-INF
+                //时间为0时可以确定价值为0
+                for (int i = 0; i <= l; i++)
+			d[i][0] = 0;
+		//二维0-1背包
+                for (int i = 0; i < n; i++)
+		{
+			scanf ("%d %d%*c", &time, &val);
+                        for (int j = l; j >= time; j--)//time是每部电影花费的时间
+                        {
+                                for (int k = m; k >= 1; k--)//电影数量，每个费用1，最多m个
+                                        d[j][k] = max(d[j][k], d[j-time][k-1]+val);
+                        }
+		}
+                if (d[l][m] < 0)
+			puts("0");
+                else
+			printf ("%d\n", d[l][m]);
+	}
+        return 0;
+}

@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 202
+char buf[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n;
+    while(EOF != scanf ("%d%*c", &n) && n)
+	{
+		gets(buf);
+        int len = strlen(buf);
+        int h = len/n;
+        for (int i = 0; i < n; i++)
+		{
+            for (int j = i, k = 0; j < len && k < h; k++)
+			{
+				printf ("%c", buf[j]);
+				if (k&1)
+					j += 1+i*2;
+				else
+					j += n*2-1-i*2;
+			}
+		}
+		printf ("\n");
+	}
+	return 0;
+}

@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 505
+int a[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+		freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int n;
+        scanf("%d%*c", &n);
+        for (int i = 0; i < n; i++)
+			scanf ("%d%*c", &a[i]);
+		sort(a,a+n);
+        int p = a[n/2], ans = 0;
+        for (int i = 0; i < n; i++)
+		{
+			if (i != (n/2))
+                ans += abs(a[i]-p);
+		}
+        printf ("%d\n", ans);
+	}
+    return 0;
+}

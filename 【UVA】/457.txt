@@ -1,0 +1,57 @@
+#include <stdio.h>
+
+void printf_m(const int *);
+void copy_atob(int *, int *);
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int a[10], i, j, m[42] = {0}, buf[42];
+		getchar ();
+		for (i = 0; i < 10; i++)
+			scanf ("%d%*c", &a[i]);
+		copy_atob(m,buf);
+		m[20] = 1;
+		for (i = 0; i < 50; i++)
+		{
+			printf_m(m);
+			for (j = 1; j < 41; j++)
+			{
+				buf[j] = a[m[j]+m[j-1]+m[j+1]];
+			}
+			copy_atob(buf,m);
+		}
+		if (t)
+			printf ("\n");
+	}
+
+	return 0;
+}
+
+void printf_m(const int *m)
+{
+	char c;
+	for (int i = 1; i < 41; i++)
+	{
+		switch(m[i])
+		{
+		case 0:c = ' ';break;
+		case 1:c = '.';break;
+		case 2:c = 'x';break;
+		case 3:c = 'W';break;
+		}
+		printf ("%c", c);
+	}
+	printf ("\n");
+}
+
+void copy_atob(int *a, int *b)
+{
+	for (int i = 0; i < 42; i++)
+	{
+		b[i] = a[i];
+	}
+}

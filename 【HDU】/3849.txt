@@ -1,0 +1,107 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 10010
+struct Edge{
+    int from, to;
+    Edge(int a, int b){from = a, to = b;}
+};
+vector<Edge> edge;
+vector<int> g[MAXN];
+int n,m,clock, pre[MAXN],low[MAXN];
+
+map<string,int> num;
+char name[MAXN][30];
+vector<int> ans;
+
+int find_num(char *c)
+{
+    if(num.find(c) == num.end())
+    {
+        int s = num.size();
+        strcpy(name[s],c);
+        num[c] = s;
+        return s;
+    }
+    return num[c];
+}
+void add_edge(int a, int b)
+{
+    edge.push_back(Edge(a,b));
+    edge.push_back(Edge(b,a));
+    int sz = edge.size();
+    g[a].push_back(sz-2);
+    g[b].push_back(sz-1);
+}
+void dfs(int u, int fa)
+{
+    low[u] = pre[u] = ++clock;
+    int sz = g[u].size();
+    rep(i,0,sz)
+    {
+        int v = edge[g[u][i]].to;
+        if(v == fa)continue;
+        if(!pre[v])
+        {
+            dfs(v,u);
+            low[u] = min(low[u],low[v]);
+            if(low[v] > pre[u])
+                ans.push_back(g[u][i]);
+        }
+        else if(pre[v] < pre[u]) low[u] = min(low[u],pre[v]);
+    }
+}
+int sloved()
+{
+    clc(pre,0);
+    clock = 0;
+    dfs(0,-1);
+    if(clock != n) return -1;//原图不连通
+    return ans.size();
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        char ca[30], cb[30];
+        scanf("%d %d%*c", &n, &m);
+        edge.clear();
+        ans.clear();
+        num.clear();
+        rep(i,0,n) g[i].clear();
+        rep(i,0,m)
+        {
+            scanf("%s %s%*c", ca, cb);
+            int a = find_num(ca), b = find_num(cb);
+            add_edge(a,b);
+        }
+        int sum = sloved();
+        if(-1 == sum)
+        {
+            puts("0");
+            continue;
+        }
+        sort(ans.begin(), ans.end());
+        printf("%d\n", sum);
+        rep(i,0,sum)
+        {
+            int v = ans[i];
+            v = v/2*2;
+            printf("%s %s\n", name[edge[v].from], name[edge[v].to]);
+        }
+    }
+    return 0;
+}

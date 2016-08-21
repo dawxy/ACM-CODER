@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXC 50010
+#define MAXN 2010
+struct NODE{
+        int v, w;
+}p[MAXN];
+int d[MAXC];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+                int n, c, v, w, len = 0;
+                scanf ("%d %d%*c", &n, &c);
+                for (int i = 0; i < n; i++)
+		{
+			scanf ("%d %d%*c", &p[len].w, &p[len].v);
+                        if (p[len].w <= c)
+                                len++;
+		}
+                memset(d,-0x3f,sizeof(d));
+		d[0] = 0;
+                for (int i = 0; i < len; i++)
+		{
+                        for (int j = p[i].w; j <= c; j++)
+				d[j] = max(d[j],d[j-p[i].w]+p[i].v);
+		}
+                if (0 > d[c])
+			puts("NO");
+		else
+			printf ("%d\n", d[c]);
+	}
+        return 0;
+}

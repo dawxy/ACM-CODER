@@ -1,0 +1,30 @@
+#include <cstdio>
+#include <cstring>
+
+int gcd(int a, int b)
+{
+    while(b)
+    {
+        a %= b;
+        if(a < b) a ^= b, b ^= a, a ^= b;
+    }
+    return a;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int a,b,c,d,g;
+        scanf("%d %d %d %d%*c", &a, &b, &c, &d);
+        g = b/gcd(b,d)*d;
+        a = a*g/b+c*g/d;
+        b = gcd(a,g);
+        printf("%d %d\n", a/b,g/b);
+    }
+    return 0;
+}

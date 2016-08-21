@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 101
+int n, max, ans[MAX];
+bool g[MAX][MAX], vis[MAX];
+
+bool canblack(int u)
+{
+	for (int i = 1; i <= n; i++)
+	{
+		if (g[u][i] && vis[i])
+			return false;
+	}
+	return true;
+}
+void dfs(int p, int sum)
+{
+	if (max >= sum+n-p+1)
+		return;
+	if (p == n+1)
+	{
+		if (sum > max)
+		{
+			for (int i = 1; i <= n; i++)
+				ans[i] = vis[i];
+			max = sum;
+		}
+		return;
+	}
+	if (canblack(p))
+	{
+		vis[p] = 1;
+		dfs(p+1, sum+1);
+		vis[p] = 0;
+	}
+	dfs(p+1, sum);
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int k, a, b;
+		scanf ("%d %d%*c", &n, &k);
+		memset(g,false,sizeof(g));
+		memset(vis,0,sizeof(vis));
+		while(k--)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			g[a][b] = g[b][a] = true;
+		}
+		max = 0;
+		dfs(1, 0);
+		printf ("%d\n", max);
+		int count = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			if (ans[i])
+			{
+				if (count)
+					printf (" ");
+				printf ("%d", i);
+				count++;
+			}
+		}
+		printf ("\n");
+	}
+	return 0;
+}

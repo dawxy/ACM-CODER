@@ -1,0 +1,81 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10, MAXM = 40000*2+10;
+int head[MAXN], tol, to[MAXM], nxt[MAXM];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int vis[MAXN], cnt;
+bool dfs(int u, int c)
+{
+	vis[u] = c;
+	cnt++;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(-1 == vis[v])
+		{
+			if(!dfs(v,!c)) return false;
+		}
+		else if(c == vis[v]) return false;
+	}
+	return true;
+}
+int n;
+bool ok()
+{
+	clc(vis,-1);
+	cnt = 0;
+	repe(i,1,n)
+	{
+		if(-1 == vis[i])
+		{
+			if(!dfs(i,0))
+				return false;
+		}
+	}
+	return cnt == n;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		clc(head,-1);
+		tol = 0;
+		int m;
+		scanf("%d %d%*c", &n, &m);
+		rep(i,0,m)
+		{
+			int u,v;
+			scanf("%d %d%*c", &u, &v);
+			add_edge(u,v);
+			add_edge(v,u);
+		}
+		if(ok()) puts("Correct");
+		else puts("Wrong");
+	}
+	return 0;
+}

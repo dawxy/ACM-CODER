@@ -1,0 +1,25 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int n, i, j;
+		scanf ("%d%*c", &n);
+		for (i = 1; i <= n; i++)
+		{
+			for (j = i; j <= 9; j++)
+			{
+				printf ("%d*%d=%d", i, j, i*j);
+				if (9 != j)
+					printf (" ");
+			}
+			printf ("\n");
+		}
+
+	}
+
+	return 0;
+}

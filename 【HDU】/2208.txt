@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 20
+int f[MAXN],n, m;
+bool love[MAXN][MAXN], have;
+
+bool ok(int a, int p)
+{
+	for(int i = a; i < p; i++)
+	{
+		if(f[i] == a && !love[i][p])
+			return false;
+	}
+	return true;
+}
+void dfs(int si, int cnt)
+{
+	if(have) return;
+	if(cnt > m) return;
+	if(si == n)
+	{
+		have = true;
+		return;
+	}
+	for(int i = 0; i < si; i++)
+	{
+		if(f[i] != i) continue;
+		if(ok(i,si))
+		{
+			f[si] = i;
+			dfs(si+1,cnt);
+			f[si] = si;
+		}
+	}
+	dfs(si+1,cnt+1);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		for(int i = 0; i <= 10; i++) f[i] = i;
+		memset(love,0,sizeof(love));
+		have = false;
+		for(int i = 0; i < n; i++)
+		{
+			int k,b;
+			scanf("%d%*c", &k);
+			for(int j = 0; j < k; j++)
+			{
+				scanf("%d%*c", &b);
+				love[i][b] = true;
+			}
+		}
+		dfs(0,0);
+		if(have) puts("YES");
+		else puts("NO");
+	}
+	return 0;
+}

@@ -1,0 +1,74 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500000+10,MAXM = MAXN*2;
+int n,k,fa[MAXN];
+int head[MAXN],nxt[MAXM],to[MAXM],tol;
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int sum[MAXN][11];
+void dfs(int u)
+{
+	sum[u][0] = 1;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v == fa[u]) continue;
+		dfs(v);
+		repe(j,1,k)
+		{
+			sum[u][j] += sum[v][j-1];
+		}
+	}
+	//repe(j,1,k) sum[u][j] = sum[u][j]+sum[u][j-1];
+}
+int ans[MAXN];
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		LL a,b;
+		scanf("%d%d%lld%lld", &n,&k,&a,&b);
+		tol = 0;
+		clc(head,-1);
+		repe(i,2,n)
+		{
+			fa[i] = (a*i+b)%(i-1)+1;
+			add_edge(i,fa[i]);
+			add_edge(fa[i],i);
+		}
+		clc(sum,0);
+		dfs(1);
+		repe(i,1,n) repe(j,1,k) sum[i][j] = sum[i][j-1]+sum[i][j];
+		repe(i,1,n)
+		{
+			int f = fa[i],cnt = 1,la = i;
+			ans[i] = sum[i][k];
+			while(cnt <= k && f)
+			{
+				ans[i] += sum[f][k-cnt];
+				if(cnt < k) ans[i] -= sum[la][k-cnt-1];
+				la = f;
+				f = fa[f];
+				cnt++;
+			}
+		}
+		int ret = 0;
+		repe(i,1,n) ret ^= ans[i];
+		printf("%d\n", ret);
+	}
+	return 0;
+}

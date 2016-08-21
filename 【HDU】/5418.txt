@@ -1,0 +1,78 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 16+10;
+
+int dis[MAXN][MAXN];
+void floyd(int n)
+{
+    rep(i,0,n) dis[i][i] = 0;
+    rep(k,0,n)
+    {
+        rep(i,0,n)
+        {
+            rep(j,0,n)
+            {
+                dis[i][j] = min(dis[i][j], dis[i][k] + dis[k][j]);
+            }
+        }
+    }
+}
+int dp[1<<16][20];
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        int n,m;
+        scanf("%d %d", &n, &m);
+        clc(dis,0x3f);
+        rep(i,0,m)
+        {
+            int u,v,c;
+            scanf("%d %d %d", &u, &v, &c);
+            u--,v--;
+            dis[u][v] = dis[v][u] = min(dis[u][v],c);
+        }
+        floyd(n);
+        int ALL = (1<<n)-1;
+        clc(dp,0x3f);
+        clc(dp[0],0);
+        dp[1][0] = 0;
+        repe(i,2,ALL)
+        {
+            rep(j,0,n)
+            {
+                if(0 == ((1<<j)&i)) continue;
+                rep(k,0,n)
+                {
+                    if((1<<k)&i && j != k)
+                        dp[i][j] = min(dp[i][j], dp[i^(1<<j)][k]+dis[k][j]);
+                }
+            }
+        }
+        int ans = INF;
+        rep(i,0,n) ans = min(ans,dp[ALL][i]+dis[i][0]);
+        printf("%d\n", ans);
+    }
+    return 0;
+}

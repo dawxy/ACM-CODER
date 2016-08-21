@@ -1,0 +1,104 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MOD = 1000007, MAXN = 100000*12+10;
+struct NODE{
+	int a[6];
+}node[MAXN];
+struct HASH{
+	int head[MOD], next[MAXN], cnt;
+	void clear()
+	{
+		cnt = 0;
+		clc(head,-1);
+	}
+	int hash(const NODE &s)
+	{
+		int ans = 0;
+		rep(i,0,6)
+			ans += s.a[i];
+		return ans%MOD;
+	}
+	bool insert(NODE &s)
+	{
+		int id = hash(s);
+		int u = head[id];
+		while(~u)
+		{
+			if(!memcmp(s.a, node[u].a,sizeof(int)*6)) return false;
+			u = next[u];
+		}
+		node[cnt] = s;
+		next[cnt] = head[id];
+		head[id] = cnt++;
+		return true;
+	}
+}hash_set;
+
+void mov(NODE &p)
+{
+	int st = p.a[0];
+	rep(i,0,5)
+		p.a[i] = p.a[i+1];
+	p.a[5] = st;
+}
+bool update(NODE &buf)
+{
+	rep(i,0,6)
+	{
+		if(!hash_set.insert(buf)) return false;
+		mov(buf);
+	}
+	for(int i = 0, j = 5; i < j; i++, j--)
+	{
+		buf.a[i] ^= buf.a[j];
+		buf.a[j] ^= buf.a[i];
+		buf.a[i] ^= buf.a[j];
+	}
+	rep(i,0,6)
+	{
+		if(!hash_set.insert(buf)) return false;
+		mov(buf);
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		hash_set.clear();
+		bool ok = true;
+		NODE buf;
+		rep(i,0,n)
+		{ 
+			rep(j,0,6)
+				scanf("%d%*c", &buf.a[j]);
+			if(!ok) continue;
+			if(!update(buf)) ok = false;
+		}
+		if(ok) puts("No two snowflakes are alike.");
+		else puts("Twin snowflakes found.");
+	}
+	return 0;
+}

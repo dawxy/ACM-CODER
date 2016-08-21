@@ -1,0 +1,78 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000000+10,MAXNUM = 1000000;
+int prime[MAXN],isprime[MAXN];
+int p[MAXN][7],plen[MAXN];
+
+void get_prime()
+{
+	clc(isprime,1);isprime[1] = false;
+	int len = sqrt(MAXNUM+0.5);
+	repe(i,2,len)
+	{
+		if(!isprime[i]) continue;
+		for(int j = i*i; j <= MAXNUM; j += i) isprime[j] = false;
+	}
+}
+void get_dqf()
+{
+	int len = sqrt(MAXNUM+0.5);
+	repe(i,2,MAXNUM)
+	{
+		if(prime[i]) continue;
+		for(int j = i; j <= MAXNUM; j += i) prime[j] = 1,p[j][plen[j]++] = i;
+	}
+}
+bool ok(int n, int a, int b)
+{
+	rep(i,0,plen[a])
+	{
+		rep(j,0,plen[n])
+			if(p[a][i] == p[n][j]) return false;
+	}
+	rep(i,0,plen[b])
+	{
+		rep(j,0,plen[n])
+			if(p[b][i] == p[n][j]) return false;
+	}
+	return true;
+}
+LL get_max(int n)
+{
+	LL ans = (LL)n*(n-1);
+	per(i,n-2,1)
+	{
+		if(ok(i,n,n-1)) return ans*i;
+	}
+	return -1;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	get_dqf();
+	get_prime();
+	int n;
+	while(~scanf("%d", &n))
+	{
+		if(n < 3)
+		{
+			printf("%d\n", n);
+			continue;
+		}
+		LL ans = 0;
+		per(i,n,3)
+		{
+			ans = max(ans,get_max(i));
+			if(isprime[i]) break;
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

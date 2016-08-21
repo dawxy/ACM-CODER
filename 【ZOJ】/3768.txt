@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <map>
+using namespace std;
+map<int, int> vis;
+int ans[20000], n;
+
+void sloved();
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    //freopen("e:\\out.txt","w",stdout);
+    #endif
+    vis.clear();
+    for (int i = 1, a = 1; a <= 123456789; )
+	{
+        ans[i] = a;
+        vis[a] = i;
+        a += ++i;
+	}
+	int t;
+	scanf ("%d%*c", &t);
+    while(t--)
+	{
+        scanf ("%d%*c", &n);
+        if (vis[n])
+		{
+			printf ("%d\n", vis[n]);
+			continue;
+		}
+		sloved();
+	}
+    return 0;
+}
+
+void sloved()
+{
+    int e = 0;
+    while(ans[e] < n) e++;
+    for (int i = 1; i <= e; i++)
+	{
+        if (vis[n-ans[i]])
+		{
+			printf ("%d %d\n",i, vis[n-ans[i]]);
+			return;
+		}
+	}
+    for (int i = 1; i <=e ;i++)
+	{
+        for (int j = e; j >= 1; j--)
+		{
+            int a = n-ans[i]-ans[j];
+            if (vis[a])
+            {
+                printf ("%d %d %d\n", i, j, vis[a]);
+                return;
+            }
+		}
+	}
+}

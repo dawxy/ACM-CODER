@@ -1,0 +1,43 @@
+/*此方法可以求出宽度小于32的所有可能性*/
+#include <cstdio>
+#include <cstring>
+struct NODE{
+	int now, last;
+}p[13];
+int dp[31][8], sum;
+
+void dfs(int now ,int last, int s)//生成出所有可能的两行状态
+{
+	if(s == 3)
+	{
+		p[sum].now = now;
+		p[sum++].last = last;
+		return;
+	}
+	if(s+1 <= 3)
+	{
+		dfs(now<<1, last<<1|1,s+1);//不放
+		dfs(now<<1|1,last<<1,s+1);//竖放
+	}
+	if(s+2 <= 3)
+		dfs(now<<2|3, last<<2|3, s+2);//横放
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	dp[0][7] = 1;
+	dfs(0,0,0);
+	for(int i = 1; i <= 30; i++)
+	{
+		for(int j = 0; j < sum; j++)
+			dp[i][p[j].now] += dp[i-1][p[j].last];
+	}
+	int n;
+	while(~scanf("%d%*c", &n) && ~n)
+	{
+		printf("%d\n", dp[n][7]);
+	}
+	return 0;
+}

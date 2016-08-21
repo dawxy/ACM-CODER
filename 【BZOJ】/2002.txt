@@ -1,0 +1,247 @@
+/*分块*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10, SIZE = 500, BLOCK = MAXN/SIZE+10,MAXIN = 100000, MAXOUT = 10000;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+char bufout[MAXOUT], outtmp[50],*pout = bufout, *pend = bufout+MAXOUT;
+inline void write(){ fwrite(bufout,sizeof(char),pout-bufout,stdout);pout = bufout;}/*必须在程序结束时加 write()*/
+inline void out_char(char c){ *(pout++) = c;if(pout == pend) write();}
+inline void out_str(char *s)
+{
+	while(*s){ *(pout++) = *(s++); if(pout == pend) write(); }
+}
+template <class T>
+inline void out_int(T x) {
+	if(!x){ out_char('0');return;}
+	if(x < 0) x = -x,out_char('-');
+	int len = 0;
+	while(x){ outtmp[len++] = x%10+48; x /= 10;}
+	outtmp[len] = 0;
+	for(int i = 0, j = len-1; i < j; i++,j--) swap(outtmp[i],outtmp[j]);
+	out_str(outtmp);
+}
+int a[MAXN],n;
+int cost[BLOCK][SIZE],nxt[BLOCK][SIZE],sn;
+
+int query(int x)
+{
+	int ans = 0,i = x/SIZE, j = x%SIZE;
+	while(1)
+	{
+		ans += cost[i][j];
+		int tmp = nxt[i][j];
+		if(tmp >= n) break;
+		i = tmp/SIZE;
+		j = tmp%SIZE;
+	}
+	return ans;
+}
+void update(int x, int v)
+{
+	int i = x/SIZE, st = i*SIZE,ed = min(n-1,(i+1)*SIZE-1);
+	a[x] = v;
+	per(j,ed,st)
+	{
+		if(a[j]+j > ed) cost[i][j%SIZE] = 1,nxt[i][j%SIZE] = a[j]+j;
+		else cost[i][j%SIZE] = cost[i][j%SIZE+a[j]]+1, nxt[i][j%SIZE] = nxt[i][j%SIZE+a[j]];
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	while(in(n))
+	{
+		rep(i,0,n) in(a[i]);
+		sn = n/SIZE+(bool)(n%SIZE);
+		rep(i,0,sn)
+		{
+			int ed = min(n-1,(i+1)*SIZE-1), st = i*SIZE;
+			per(j,ed,st)
+			{
+				if(a[j]+j > ed) cost[i][j%SIZE] = 1,nxt[i][j%SIZE] = a[j]+j;
+				else cost[i][j%SIZE] = cost[i][j%SIZE+a[j]]+1, nxt[i][j%SIZE] = nxt[i][j%SIZE+a[j]];
+			}
+		}
+		int q;
+		in(q);
+		while(q--)
+		{
+			int op,x;
+			in(op),in(x);
+			if(1 == op) out_int(query(x)),out_char('\n');
+			else
+			{
+				int v;
+				in(v);
+				update(x,v);
+			}
+		}
+	}
+	write();
+	return 0;
+}
+======================================================================
+/*LCT*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10, MAXIN = 10000, MAXOUT = 10000;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+char bufout[MAXOUT], outtmp[50],*pout = bufout, *pend = bufout+MAXOUT;
+inline void write(){ fwrite(bufout,sizeof(char),pout-bufout,stdout);pout = bufout;}/*必须在程序结束时加 write()*/
+inline void out_char(char c){ *(pout++) = c;if(pout == pend) write();}
+inline void out_str(char *s)
+{
+	while(*s){ *(pout++) = *(s++); if(pout == pend) write(); }
+}
+template <class T>
+inline void out_int(T x) {
+	if(!x){ out_char('0');return;}
+	if(x < 0) x = -x,out_char('-');
+	int len = 0;
+	while(x){ outtmp[len++] = x%10+48; x /= 10;}
+	outtmp[len] = 0;
+	for(int i = 0, j = len-1; i < j; i++,j--) swap(outtmp[i],outtmp[j]);
+	out_str(outtmp);
+}
+int par[MAXN],ch[MAXN][2],fa[MAXN],sum[MAXN];
+
+void init()
+{
+	clc(par,0);
+	clc(ch,0);
+	clc(fa,0);
+	clc(sum,0);
+}
+inline int chd(int u){return ch[fa[u]][1]==u;}
+inline void setch(int f, int u, int d){ch[f][d] = u;fa[u] = f;}
+inline void push_up(int u)
+{
+	sum[u] = sum[ch[u][0]]+sum[ch[u][1]]+1;
+}
+inline void rot(int u)
+{
+	int d = chd(u), y = fa[u];
+	setch(fa[y],u,chd(y));
+	setch(y,ch[u][d^1],d);
+	setch(u,y,d^1);
+	push_up(y);push_up(u);
+}
+void splay(int u)
+{
+	int rt = u;
+	while(fa[rt]) rt = fa[rt];
+	if(rt == u) return;
+	par[u] = par[rt];par[rt] = 0;
+	while(fa[u])
+	{
+		if(fa[fa[u]] && chd(u) == chd(fa[u])) rot(fa[u]);
+		rot(u);
+	}
+}
+void expose(int u)
+{
+	for(int now = u,la = 0;now;la = now,now = par[now])
+	{
+		splay(now);
+		par[ch[now][1]] = now;fa[ch[now][1]] = par[la] = 0;
+		setch(now,la,1);
+		push_up(now);
+	}
+	splay(u);
+}
+void cut(int u)
+{
+	expose(u);
+	par[ch[u][0]] = par[u] = fa[ch[u][0]] = 0;
+	ch[u][0] = 0;
+	push_up(u);
+}
+void link(int u, int v)
+{
+	cut(u);
+	par[u] = v;
+}
+int query(int x, int y)
+{
+	expose(x);
+	for(int now = y,la = 0;now; la = now,now = par[now])
+	{
+		splay(now);
+		if(!fa[now]) return sum[ch[now][1]]+sum[la]+1;
+		par[ch[now][1]] = now;fa[ch[now][1]] = par[la] = 0;
+		setch(now,la,1);
+		push_up(now);
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(in(n))
+	{
+		int v;
+		init();
+		repe(i,1,n) in(v), par[i] = (i+v>n+1)?(n+1):(i+v);
+		int q;
+		in(q);
+		while(q--)
+		{
+			int op,x,y;
+			in(op),in(x);
+			x++;
+			if(1 == op) out_int(query(x,n+1)-1),out_char('\n');
+			else
+			{
+				in(y);
+				int v = (x+y>n+1)?(n+1):(x+y);
+				link(x,v);
+			}
+		}
+	}
+	write();
+	return 0;
+}

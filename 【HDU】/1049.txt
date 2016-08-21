@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <math.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int l, a,b;
+    while(~scanf ("%d %d %d%*c", &l, &a, &b) && l)
+    {
+        int ans = ceil((l-a)/(double)(a-b))*2+1;
+        printf ("%d\n", ans);
+    }
+    return 0;
+}

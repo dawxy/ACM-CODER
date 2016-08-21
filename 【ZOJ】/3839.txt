@@ -1,0 +1,118 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+const char e[8][8]={
+		{'*','*','*','*','*','*','*','*'},
+		{'*','*','*',' ',' ','*','*','*'},
+		{'*','*','*',' ',' ','*','*','*'},
+		{'*','*','*',' ',' ','*','*','*'},
+		{'*',' ','*','*','*','*',' ','*'},
+		{'*',' ','*',' ',' ','*',' ','*'},
+		{'*',' ','*',' ',' ','*',' ','*'},
+		{'*','*','*','*','*','*','*','*'},
+};
+char a[11][2050][2050];
+char buf[2050][2050];
+
+void set_nbsp(int num, int n)
+{
+	rep(i,0,n)
+	{
+		rep(j,0,n)
+			a[num][i][j] = ' ';
+	}
+}
+void pt(int num,int n)
+{
+	rep(i,0,n)
+	{
+		rep(j,0,n) putchar(a[num][i][j]);
+		putchar('\n');
+	}
+}
+void fanzhuan(int num, int n)
+{
+	rep(i,0,n)
+	{
+		rep(j,0,n)
+			buf[n-i-1][j] = a[num][i][j];
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+	freopen("e:\\out.txt","w",stdout);
+#endif
+	int st = 1;
+	rep(i,0,8)
+		rep(j,0,8) a[3][i][j] = e[i][j];
+	repe(i,4,10)
+	{
+		int n = pow(2,i);
+		rep(j,0,n) set_nbsp(i, n);
+		//边框
+		rep(k,0,n)
+		{
+			a[i][0][k] = a[i][n-1][k] = '*';
+			a[i][k][0] = a[i][k][n-1] = '*';
+		}
+		//上半部
+		st <<= 1;
+		int add = st<<1;
+		//列
+		rep(k,st,st+st*2)
+		{
+			a[i][st][k] = a[i][st+st*2][k] = '*';
+			a[i][st][k+add*2] = a[i][st+st*2][k+add*2] = '*';
+		}
+		//行
+		repe(j,st,st+st*2)
+		{
+			a[i][j][st] = a[i][j][st+st*2-1] = '*';
+			a[i][j][st+add*2] = a[i][j][st+st*2-1+add*2] = '*';
+		}
+		//下半部分
+		int x = n/2,y = add;
+		fanzhuan(i-1,pow(2,i-1));
+		/*for(int i = 0; i < n/2; i++)
+		{
+			for(int j = 0; j < n/2; j++) putchar(buf[i][j]);
+			putchar('\n');
+		}*/
+		rep(j,0,n)
+		{
+			rep(k,0,n/2)
+			{
+				a[i][j+x][k+y] = buf[j][k];
+			}
+		}
+		//pt(i,n);
+	}
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int num = 0, buf = n;
+		while(buf)
+			num++, buf>>=1;
+		pt(num-1,n);
+		putchar('\n');
+	}
+	return 0;
+}
+

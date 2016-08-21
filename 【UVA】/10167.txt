@@ -1,0 +1,60 @@
+#include <stdio.h>
+//#define scanf scanf_s
+#define MAX 101
+struct P{
+	int x, y;
+}p[MAX];
+
+int main ()
+{
+	//FILE *f;
+	//freopen_s(&f,"e:\\out.txt", "w",stdout);
+	while(1)
+	{
+		int n, len = 0;
+		scanf ("%d%*c", &n);
+		if (0 == n)
+			break;
+		int a, b;
+		bool find = false;
+		for (int i = 0; i < 2*n; i++)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			if (10000 >= a*a+b*b)
+				p[len].x = a, p[len++].y = b;
+		}
+		for (int i = -100; i <= 100; i++)
+		{
+			for (int j = -100; j <= 100; j++)
+			{
+				int s1 = 0, s2 = 0;
+				bool end = false;
+				for (int k = 0; k < len; k++)
+				{
+					if (0 == i*p[k].x + j*p[k].y)
+					{
+						end = true;
+						break;
+					}
+					else if (0 < i*p[k].x + j*p[k].y)
+						s1++;
+					else if (0 > i*p[k].x + j*p[k].y)
+						s2++;
+				}
+				if (end)
+					continue;
+				if (s1 == s2)
+				{
+					find = true;
+					printf ("%d %d\n", i, j);
+					break;
+				}
+			}
+			if (find)
+				break;
+		}
+
+	}
+
+	return 0;
+}

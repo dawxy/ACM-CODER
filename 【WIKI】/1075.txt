@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+int a[MAXN], b[MAXN];
+
+int main ()
+{
+    int n;
+    while(~scanf ("%d%*c", &n))
+    {
+        for (int i = 0; i < n; i++)
+            scanf ("%d%*c", &a[i]);
+        sort(a,a+n);
+        int len = 0;
+        b[len] = a[0];
+        for (int i = 1; i < n; i++)
+        {
+            if (b[len] != a[i])
+                b[++len] = a[i];
+        }
+        printf ("%d\n%d", len+1, b[0]);
+        for (int i = 1; i <= len; i++)
+            printf (" %d", b[i]);
+        printf ("\n");
+    }
+    return 0;
+}
+

@@ -1,0 +1,13 @@
+#include <stdio.h>
+
+#define PI 3.1415927
+void main (void)
+{
+    double r, v;
+    while (EOF != scanf ("%lf", &r))
+    {
+        getchar();
+        v = 4.0/3.0 *PI*r*r*r;
+        printf ("%.3lf\n", v);
+    }
+}

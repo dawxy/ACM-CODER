@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+struct NODE{
+    char name[20];
+    int a, b, cost;
+}p[MAXN];
+int st, ed;
+
+void sloved(int);
+bool cmp(const NODE a, const NODE b)
+{
+    if (a.cost == b.cost)
+        return strcmp(a.name, b.name) < 0;
+    return a.cost < b.cost;
+}
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t, count = 0;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		int n, i, j;
+        scanf ("%d %d %d%*c", &st, &ed, &n);
+        char buf[200];
+        for (i = 0; i < n; i++)
+		{
+            gets(buf);
+            for (j= 0; ':' != buf[j]; j++)
+                p[i].name[j] = buf[j];
+            p[i].name[j] = 0;
+            sscanf (buf+j+1,"%d%*c%d",&p[i].a, &p[i].b);
+		}
+
+		for (i = 0; i < n; i++)
+            sloved(i);
+        sort(p,p+n,cmp);
+        printf ("Case %d\n", ++count);
+        for (i = 0; i < n; i++)
+            printf ("%s %d\n", p[i].name,p[i].cost);
+	}
+    return 0;
+}
+
+void sloved(int s)
+{
+	int cost = 0, now = st, buf = st-(st+1)/2;
+	while(p[s].b < p[s].a*buf && buf >= ed)
+	{
+        cost += p[s].b;
+        now = buf;
+        buf = now-(now+1)/2;
+	}
+    cost += (now-ed)*p[s].a;
+    p[s].cost = cost;
+}

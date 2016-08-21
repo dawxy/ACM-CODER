@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 10
+char c[MAXN], d[MAXN];
+int a, b, k;
+
+void daozhi(char *v, int len)
+{
+    for (int i = 0, j = len-1; i < j;i++, j--)
+	{
+        v[i] ^= v[j];
+        v[j] ^= v[i];
+        v[i] ^= v[j];
+	}
+}
+bool is_fu()
+{
+	memset(c,'0',sizeof(c));
+	memset(d,'0',sizeof(d));
+    sprintf (c,"%d", a);
+    sprintf (d,"%d",b);
+	int lenc = strlen(c), lend = strlen(d), len;
+    len = lenc>lend ? lenc:lend;
+    daozhi(c,lenc);
+    daozhi(d,lend);
+    c[lenc] = '0', d[lend] = '0';
+    for (int i = 0; i < k; i++)
+	{
+		if (c[i] != d[i])
+			return false;
+	}
+    return true;
+}
+int main ()
+{
+	#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+	#endif
+    while(1)
+	{
+        scanf ("%d %d %d%*c", &a,&b,&k);
+        if (!a && !b)
+			break;
+        if (is_fu())
+			puts("-1");
+		else
+			printf ("%d\n", a+b);
+	}
+    return 0;
+}

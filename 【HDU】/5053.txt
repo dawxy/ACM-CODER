@@ -1,0 +1,25 @@
+#include <cstdio>
+#include <vector>
+#include <string>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int a,b;
+		scanf("%d %d%*c", &a, &b);
+		__int64 ans = 0;
+		for(__int64 i = a; i <= b; i++)
+			ans += i*i*i;
+		printf("Case #%d: %I64d\n", ++count,ans);
+	}
+	return 0;
+}

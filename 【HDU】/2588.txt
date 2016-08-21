@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+
+int phi(int n)
+{
+	int ans = n, m = sqrt(n+0.5);
+	for(int i = 2; i <= m; i++)
+	{
+		if(0 == n%i)
+		{
+			ans -= ans/i;
+			while(0 == n%i) n /= i;
+		}
+	}
+	if(n > 1) ans -= ans/n;
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m, ans = 0;
+		scanf("%d %d%*c", &n, &m);
+		int len = sqrt(n+0.5);
+		for(int i = 1; i <= len; i++)
+		{
+			if(n%i) continue;
+			if(i >= m && i != len) ans += phi(n/i);
+			if(n/i >= m) ans += phi(i);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

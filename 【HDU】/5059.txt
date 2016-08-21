@@ -1,0 +1,55 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <queue>
+#include <map>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,a,n) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 110
+typedef long long LL;
+char c[MAXN];
+int n;
+LL a,b;
+
+bool is_num(char ch)
+{
+    if('0' <= ch && '9' >= ch)
+        return true;
+    return false;
+}
+bool sloved()
+{
+    int f = 1, len = n;
+    if('-' == c[0]) f = -1, len--;
+    else if(!is_num(c[0])) return false;
+    if('0' == c[n-len] && len > 1) return false;
+    rep(i,1,n)
+    {
+        if(!is_num(c[i]))
+            return false;
+    }
+    if(len > 10) return false;
+    LL ans;
+    sscanf(c,"%I64d",&ans);
+    if(ans == 0 && -1 == f) return false;
+    if(a <= ans && b >= ans) return true;
+    return false;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    while(gets(c))
+    {
+        n = strlen(c);
+        scanf("%I64d %I64d%*c", &a, &b);
+        if(sloved()) puts("YES");
+        else puts("NO");
+    }
+    return 0;
+}

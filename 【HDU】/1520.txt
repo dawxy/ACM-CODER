@@ -1,0 +1,48 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define MAXN 6005
+vector <int> s[MAXN];//记录每个结点的所有儿子结点
+int f[MAXN], dp[MAXN][2], val[MAXN];
+
+void dfs(int root)
+{
+    dp[root][1] = val[root];
+    for (int i = 0; i < s[root].size(); i++)//先把所有儿子节点的值算出来
+        dfs(s[root][i]);
+    for (int i = 0; i < s[root].size(); i++)//然后再计算当前节点选择和不选择的最大值
+    {
+        int j = s[root][i];
+        dp[root][0] += max(dp[j][0], dp[j][1]);
+        dp[root][1] += dp[j][0];
+    }
+}
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int n;
+    while(~scanf ("%d%*c", &n))
+    {
+        int a, b;
+        for (int i = 1; i <= n; i++)
+        {
+            scanf ("%d%*c", &val[i]);
+            s[i].clear();
+        }
+        memset(dp,0,sizeof(dp));
+        memset(f,-1,sizeof(f));
+        while(~scanf ("%d %d%*c", &a, &b) && a+b)
+        {
+            s[b].push_back(a);
+            f[a] = b;
+        }
+        for (a = 1; a <= n && f[a] != -1; a++);//找到根节点
+        dfs(a);
+        printf ("%d\n", max(dp[a][1],dp[a][0]));
+    }
+    return 0;
+}

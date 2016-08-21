@@ -1,0 +1,95 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXM 3010
+#define MAXN 105
+#define MAXW 55
+#define INF 0x3f3f3f3f
+const int c[10] = { 6, 2, 5, 5, 4, 5, 6, 3, 7, 6 };
+int dp[MAXW][MAXM], y[10][MAXW][MAXM], ans[MAXW], sw, n, m;
+//dp[i][j]表示除以m余j的i位数最少需要多少火柴,y[i][j][k]表示整数(i*(j^10))%k的值
+
+void sloved()
+{
+	memset(ans,-1,sizeof(ans));
+	int sum = 0, v = 0;
+	for (int i = sw; i >= 1; i--)
+	{
+		for (int j = 9; j >= 0; j--)
+		{
+			if (sw == i && !j) continue;
+			int buf = (m-y[j][i-1][m]-v+m)%m;
+			if (sum + dp[i-1][buf] + c[j] <= n)
+			{
+				ans[i] = j;
+				sum += c[j];
+				v = (v+y[j][i-1][m])%m;
+				break;
+			}
+		}
+		if (-1 == ans[i])
+		{
+			if (n >= 6) puts("0");
+			else puts("-1");
+			return;
+		}
+	}
+	for (int i = sw; i >= 1; i--)
+		printf("%d", ans[i]);
+	puts("");
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int count = 0;
+	for (int i = 1; i <= 9; i++)
+	{
+		for (int k = 1; k <= 3000; k++)
+		{
+			int s = i;
+			y[i][0][k] = i%k;
+			for (int j = 1; j <= 50; j++)
+			{
+				s = s*10%k;
+				y[i][j][k] = s;
+			}
+		}
+	}
+	while (~scanf("%d%*c", &n) && n)
+	{
+		scanf("%d%*c", &m);
+		memset(dp, 0x3f, sizeof(dp));
+		dp[0][0] = 0;
+		int w = n>>1;
+		for (int i = 0; i < w; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				if (INF == dp[i][j]) continue;
+				for (int k = 0; k <= 9; k++)
+				{
+					if (dp[i][j]+c[k] <= n)
+						dp[i+1][(j*10+k)%m] = min(dp[i+1][(j*10+k)%m], dp[i][j]+c[k]);
+				}
+			}
+		}
+		sw = -1;
+		for (int i = w; i >= 1; i--)
+		{
+			if (INF != dp[i][0])
+			{
+				sw = i;
+				break;
+			}
+		}
+		printf("Case %d: ", ++count);
+		if (-1 == sw)
+			puts("-1");
+		else
+			sloved();
+	}
+	return 0;
+}

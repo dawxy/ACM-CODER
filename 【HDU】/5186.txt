@@ -1,0 +1,90 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 2000+10;
+int B;
+
+void fz(char *a)
+{
+    int len = strlen(a);
+    for(int i = 0, j = len-1; i < j; i++, j--)
+        swap(a[i],a[j]);
+}
+int to_num(char c)
+{
+    if('0' <= c  && c <= '9') return c-'0';
+    return c-'a'+10;
+}
+char to_char(int a)
+{
+    if(0 <= a && a <= 9) return a+'0';
+    return a+'a'-10;
+}
+void add(char *a, char *b)
+{
+    int lena = strlen(a), lenb = strlen(b), len = max(lena,lenb);
+    fz(a), fz(b);
+    rep(i,0,len)
+    {
+        int v = 0;
+        if(i < lena) v += to_num(a[i]);
+        if(i < lenb) v += to_num(b[i]);
+        if(v >= B) v %= B;
+        a[i] = to_char(v);
+    }
+    a[len] = 0;
+    fz(a);
+}
+void del_zero(char *a)
+{
+    int p = 0, len = strlen(a);
+    while(p < len)
+    {
+        if('0' == a[p]) p++;
+        else break;
+    }
+    if(p >= len)
+    {
+        a[0] = '0';
+        a[1] = 0;
+        return;
+    }
+    for(int i = p; i <= len; i++)
+        a[i-p] = a[i];
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int n;
+    while(~scanf("%d %d%*c",&n, &B))
+    {
+        char a[MAXN]={0};
+        a[0] = '0';
+        rep(i,0,n)
+        {
+            char b[MAXN];
+            scanf("%s", b);
+            del_zero(b);
+            add(a,b);
+        }
+        del_zero(a);
+        puts(a);
+    }
+    return 0;
+}

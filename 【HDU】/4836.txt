@@ -1,0 +1,123 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10, MAXM = MAXN*2+10;
+int head[MAXN],tol,nxt[MAXM],to[MAXM];
+inline void add_edge(int u, int v)
+{
+    nxt[tol] = head[u], to[tol] = v;
+    head[u] = tol++;
+}
+int v[MAXN],a[MAXN<<1],st[MAXN],ed[MAXN],fa[MAXN],cnt;
+void dfs(int u)
+{
+    st[u] = ++cnt;a[cnt] = v[u];
+    for(int i = head[u]; ~i; i = nxt[i])
+    {
+        int v = to[i];
+        if(v == fa[u]) continue;
+        fa[v] = u;
+        dfs(v);
+    }
+    ed[u] = ++cnt;a[cnt] = v[u];
+}
+int sum[MAXN<<2];
+inline int id(int x, int y){return x+y|x!=y;}
+inline void push_up(int x, int y, int m)
+{
+    sum[id(x,y)] = sum[id(x,m)]+sum[id(m+1,y)];
+}
+void bulid(int x, int y)
+{
+    if(x == y)
+    {
+        sum[id(x,y)] = a[x];
+        return;
+    }
+    int m = (x+y)>>1;
+    bulid(x,m);
+    bulid(m+1,y);
+    push_up(x,y,m);
+}
+void update(int x, int y, int p, int v)
+{
+    if(x == y)
+    {
+        sum[id(x,y)] = v;
+        return;
+    }
+    int m = (x+y)>>1;
+    if(p <= m) update(x,m,p,v);
+    else update(m+1,y,p,v);
+    push_up(x,y,m);
+}
+int query(int x, int y, int ql, int qr)
+{
+    if(ql <= x && y <= qr) return sum[id(x,y)];
+    int m = (x+y)>>1,ans = 0;
+    if(ql <= m) ans += query(x,m,ql,qr);
+    if(qr > m) ans += query(m+1,y,ql,qr);
+    return ans;
+}
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t,count = 0;
+    scanf("%d", &t);
+    while(t--)
+    {
+        int n;
+        scanf("%d", &n);
+        clc(head,-1);tol = cnt = 0;
+        rep(i,1,n)
+        {
+            int u,v;
+            scanf("%d %d", &u,&v);
+            add_edge(u,v);
+            add_edge(v,u);
+        }
+        repe(i,1,n) scanf("%d", &v[i]);
+        dfs(1);
+        bulid(1,cnt);
+        printf("Case #%d:\n",++count);
+        int q,rt = 1;
+        scanf("%d", &q);
+        char op[10];
+        while(q--)
+        {
+            int x;
+            scanf("%s %d", op, &x);
+            if('C' == op[0])
+            {
+                int v;
+                scanf("%d",&v);
+                update(1,cnt,st[x],v);
+                update(1,cnt,ed[x],v);
+            }
+            else if('R' == op[0]) rt = x;
+            else
+            {
+                if(rt == x)
+                {
+                    printf("%d\n", sum[id(1,cnt)]>>1);
+                    continue;
+                }
+                if(st[rt] > st[x] && ed[rt] < ed[x])
+                {
+                    int u = rt;
+                    while(fa[u] != x) u = fa[u];
+                    printf("%d\n", sum[id(1,cnt)]/2-query(1,cnt,st[u],ed[u])/2);
+                }
+                else printf("%d\n", query(1,cnt,st[x],ed[x])>>1);
+            }
+        }
+    }
+    return 0;
+}

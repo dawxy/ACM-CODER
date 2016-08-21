@@ -1,0 +1,48 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10;
+const LL MOD = 1e9+7;
+char op[MAXN];
+LL dp[MAXN][MAXN],fac[MAXN],c[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	fac[0] = fac[1] = 1;
+	repe(i,2,100) fac[i] = fac[i-1]*i%MOD;
+	repe(i,0,100) c[i][0] = 1;
+	repe(i,1,100)
+	{
+		repe(j,1,i) c[i][j] = (c[i-1][j]+c[i-1][j-1])%MOD; 
+	}
+	int n;
+	while(~scanf("%d", &n))
+	{
+		clc(dp,0);
+		rep(i,0,n) scanf("%I64d", &dp[i][i]);
+		scanf("%s", op);
+		LL tmp;
+		per(i,n-2,0)
+		{
+			rep(j,i+1,n)
+			{
+				rep(k,i,j)
+				{
+					if('*' == op[k]) tmp = dp[i][k]*dp[k+1][j]%MOD;
+					else if('+' == op[k]) tmp = (dp[i][k]*fac[j-k-1]+dp[k+1][j]*fac[k-i])%MOD;
+					else tmp = (dp[i][k]*fac[j-k-1]-dp[k+1][j]*fac[k-i])%MOD;
+					dp[i][j] = (dp[i][j]+tmp*c[j-i-1][k-i])%MOD;
+				}
+			}
+		}
+		printf("%I64d\n", (dp[0][n-1]+MOD)%MOD);
+	}
+	return 0;
+}

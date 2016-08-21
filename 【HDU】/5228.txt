@@ -1,0 +1,88 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+struct Card{
+	char col;
+	int num;
+	bool operator==(const Card&t)const{
+		return col == t.col && num == t.num;
+	}
+};
+struct S{
+	Card c[5];
+};
+vector<S> ans;
+
+void find_all()
+{
+	rep(i,0,4)
+	{
+		char col = i+'A';
+		rep(st,1,11)
+		{
+			S tmp;
+			rep(k,0,5)
+			{
+				tmp.c[k].col = col;
+				tmp.c[k].num = st+k;
+				if(tmp.c[k].num == 14) tmp.c[k].num = 1;
+			}
+			ans.push_back(tmp);
+		}
+	}
+}
+bool ok(const Card& a, const S& b)
+{
+	rep(i,0,5)
+	{
+		if(a == b.c[i]) return true;
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	find_all();
+	while(t--)
+	{
+		S st;
+		rep(i,0,5)
+		{
+			st.c[i].col = getchar();
+			scanf("%d%*c", &st.c[i].num);
+		}
+		int mi = INF;
+		rep(i,0,40)
+		{
+			int cnt = 0;
+			S &now = ans[i];
+			rep(j,0,5)
+			{
+				if(ok(st.c[j],now)) continue;
+				cnt++;
+			}
+			mi = min(mi,cnt);
+		}
+		printf("%d\n",mi);
+	}
+	return 0;
+}

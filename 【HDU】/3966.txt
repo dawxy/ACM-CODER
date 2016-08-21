@@ -1,0 +1,168 @@
+#pragma comment(linker, "/STACK:1024000000,1024000000") 
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50000+10, MAXM = 50000*2+10;
+int head[MAXN], tol, nxt[MAXM], to[MAXM];
+
+inline void add_edge(int u, int v)
+{
+    nxt[tol] = head[u], to[tol] = v;
+    head[u] = tol++;
+}
+int dep[MAXN],fa[MAXN], sz[MAXN], son[MAXN];
+void dfs1(int u)
+{
+    int num = 0;
+    sz[u] = 1;
+    for(int i = head[u]; ~i; i = nxt[i])
+    {
+        int v = to[i];
+        if(v == fa[u]) continue;
+        dep[v] = dep[u]+1;fa[v] = u;
+        dfs1(v);
+        sz[u] += sz[v];
+        if(num < sz[v]) num = sz[v], son[u] = v;
+    }
+}
+int top[MAXN], tree[MAXN], pre[MAXN], cnt;
+void dfs2(int u, int num)
+{
+    tree[u] = cnt, pre[cnt++] = u, top[u] = num;
+    if(-1 == son[u]) return;
+    dfs2(son[u],num);
+    for(int i = head[u]; ~i;i = nxt[i])
+    {
+        int v = to[i];
+        if(v != fa[u] && son[u] != v) dfs2(v,v);
+    }
+}
+int add[MAXN<<1], a[MAXN];
+inline int id(int x, int y){return x+y|x!=y;}
+void bulid(int x, int y)
+{
+    if(x == y)
+    {
+        add[id(x,y)] = a[pre[x]];
+        return;
+    }
+    int m = (x+y)>>1;
+    bulid(x,m);
+    bulid(m+1,y);
+}
+void init(int rt)
+{
+    clc(son,-1);
+    dep[rt] = 0, fa[rt] = -1;
+    dfs1(rt);
+    cnt = 0;
+    dfs2(rt,rt);
+    clc(add,0);
+    bulid(0,cnt-1);
+}
+void push_down(int x, int y, int m)
+{
+    int u = id(x,y);
+    if(add[u])
+    {
+        int l = id(x,m), r = id(m+1,y);
+        add[l] += add[u];add[r] += add[u];
+        add[u] = 0;
+    }
+}
+void update(int x, int y, int ql, int qr, int v)
+{
+    if(ql <= x && y <= qr)
+    {
+        add[id(x,y)] += v;
+        return;
+    }
+    int m = (x+y)>>1;
+    push_down(x,y,m);
+    if(ql <= m) update(x,m,ql,qr,v);
+    if(qr > m) update(m+1,y,ql,qr,v);
+}
+int query(int x, int y, int p)
+{
+    if(x == y) return add[id(x,y)];
+    int m = (x+y)>>1;
+    push_down(x,y,m);
+    if(p <= m) return query(x,m,p);
+    return query(m+1,y,p);
+}
+void tcp_update(int x, int y, int v)
+{
+    int f1 = top[x], f2 = top[y];
+    while(f1 != f2)
+    {
+        if(dep[f1] < dep[f2]) swap(f1,f2), swap(x,y);
+        update(0,cnt-1,tree[f1],tree[x],v);
+        x = fa[f1], f1 = top[x];
+    }
+    x = tree[x], y = tree[y];
+    if(x > y) swap(x,y);
+    update(0,cnt-1,x,y,v);
+}
+int tcp_query(int x)
+{
+    return query(0,cnt-1,tree[x]);
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int n,m,q;
+    while(~scanf("%d %d %d%*c", &n, &m, &q))
+    {
+        clc(head,-1);
+        tol = 0;
+        repe(i,1,n) scanf("%d%*c", &a[i]);
+        rep(i,0,m)
+        {
+            int u,v;
+            scanf("%d %d%*c", &u, &v);
+            add_edge(u,v);
+            add_edge(v,u);
+        }
+        init(1);
+        char op[10];
+        while(q--)
+        {
+            scanf("%s",op);
+            if('I' == op[0])
+            {
+                int x,y,v;
+                scanf("%d %d %d%*c", &x, &y, &v);
+                tcp_update(x,y,v);
+            }
+            else if('D' == op[0])
+            {
+                int x,y,v;
+                scanf("%d %d %d%*c", &x, &y, &v);
+                tcp_update(x,y,-v);
+            }
+            else
+            {
+                int x;
+                scanf("%d%*c", &x);
+                printf("%d\n", tcp_query(x));
+            }
+        }
+    }
+    return 0;
+}

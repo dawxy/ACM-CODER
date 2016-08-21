@@ -1,0 +1,50 @@
+#include <stdio.h>
+#define MAXN 6
+int n, a[MAXN] ,ans;
+
+bool isanswer()
+{
+	for (int i = 1; i < n; i++)
+	{
+		if (a[i-1] > a[i])
+			return false;
+	}
+	return true;
+}
+
+void dfs()
+{
+	if (isanswer())
+		ans++;
+	for (int i = 1; i < n; i++)
+	{
+		if (a[i-1] > a[i])
+		{
+			a[i] ^= a[i-1];
+			a[i-1] ^= a[i];
+			a[i] ^= a[i-1];
+			dfs();
+			a[i] ^= a[i-1];
+			a[i-1] ^= a[i];
+			a[i] ^= a[i-1];
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t = 0;
+	while(EOF != scanf ("%d%*c", &n) && n)
+	{
+		for (int i = 0; i < n; i++)
+			scanf ("%d%*c", &a[i]);
+		ans = 0;
+		if (!isanswer())
+			dfs();
+		printf ("There are %d swap maps for input data set %d.\n", ans, ++t);
+	}
+
+	return 0;
+}

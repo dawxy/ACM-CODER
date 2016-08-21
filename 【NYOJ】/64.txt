@@ -1,0 +1,19 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int n, m, j;
+		scanf ("%d %d%*c", &n, &m);
+		j = (4*n-m)/2;
+		if (j > n || j < 0 || 1 == (4*n-m)%2)
+			printf ("No answer\n");
+		else
+			printf ("%d %d\n", j, n-j);
+	}
+
+	return 0;
+}

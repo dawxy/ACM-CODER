@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 10010
+int a[MAXN], n;
+
+bool cmp(const int a, const int b)
+{
+	return a > b;
+}
+bool is_tu()
+{
+	for(int i = 0; i < n-1; i++)
+	{
+		sort(a + i, a + n, cmp);
+		if (i+a[i] >= n)
+			return false;
+		for(int j = i + 1; j <= i+a[i]; j++)
+		{
+			a[j]--;
+			if(a[j] < 0)
+				return false;
+		}
+	}
+    if (a[n-1])
+		return false;
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(EOF != scanf("%d%*c", &n) && n)
+	{
+		int sum = 0;
+		bool can = true;
+		for(int i = 0;  i < n; i++)
+		{
+			scanf("%d%*c", &a[i]);
+			sum += a[i];
+            if (a[i] >= n)
+                can = false;
+		}
+		if(!sum || (!(sum&1) && can && is_tu()))
+			puts("Possible");
+		else
+			puts("Not possible");
+	}
+	return 0;
+}

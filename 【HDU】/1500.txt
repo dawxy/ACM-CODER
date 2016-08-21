@@ -1,0 +1,32 @@
+#include <cstdio>
+#include <cstring>
+#define MAXM 5005
+#define min(a,b) (a<b?a:b)
+int dp[2][MAXM], a[MAXM];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n, m;
+		scanf("%d %d%*c", &n, &m);
+		n += 8;
+		for(int i = m; i >= 1; i--)
+			scanf("%d%*c", &a[i]);
+		memset(dp,0,sizeof(dp));
+		int s = 1;
+		for(int i = 1; i <= n; i++)
+		{
+			dp[s^=1][3*i] = dp[s^1][i*3-2]+(a[3*i]-a[3*i-1])*(a[3*i]-a[3*i-1]);
+			for(int j = 3*i+1; j <= m; j++)
+				dp[s][j] = min(dp[s][j-1],dp[s^1][j-2]+(a[j]-a[j-1])*(a[j]-a[j-1]));
+		}
+		printf("%d\n", dp[s][m]);
+	}
+	return 0;
+}

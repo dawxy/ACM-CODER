@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXS 31267
+const int d[10] = {0,9,99,999,9999,99999,999999,9999999,99999999,999999999};
+int s[MAXS+2],  w[MAXS+2] = {0}, n;
+
+int find_p();
+int jiwei(int);
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+	//freopen("e:\\out.txt","w",stdout);
+#endif
+	for (int i = 1; i <= MAXS; i++)
+	{
+		s[i] = s[i-1]+i;
+		w[i] = w[i-1]+i;
+		int m = jiwei(i);
+		n = i;
+		for (int j = m; j > 1; j--)
+		{
+			w[i] += (n-d[j-1])*(j-1);
+			n = d[j-1];
+		}
+	}
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		scanf ("%d%*c", &n);
+		int i, j;
+		int p = find_p(), out = n-w[p];//p是n所在段位,out是在w[p]段位往后几位就是答案
+		for (i = 1, j = 1; i < out; )
+		{
+			i += jiwei(++j);
+		}
+		for (i -= out; i >= 1 && j/10; i--)
+			j /= 10;
+		printf ("%d\n", j%10);
+	}
+	return 0;
+}
+
+int find_p()//找到n所在w段位(每个段位从1~s[i])
+{
+	int l = 1, r = MAXS, mid;
+	while(l < r)
+	{
+		mid = l+(r-l)/2;
+		if (n == w[mid])
+			return mid;
+		if (n > w[mid])
+			l = mid+1;
+		else
+			r = mid-1;
+	}
+	if (n - w[l] > 0)
+		return l;
+	return l-1;
+}
+
+int jiwei(int s)
+{
+	char c[20];
+	sprintf (c, "%d", s);
+	return strlen(c);
+}

@@ -1,0 +1,81 @@
+#include<cstdio>
+#include<cstring>
+#include<string>
+#include<vector>
+#define max(a,b) (a>b?a:b)
+#define MAXW 1002
+using namespace std;
+
+struct BigInteger {
+	static const int BASE = 100000000;//每一个s[i]保存的最大整数
+	static const int WIDTH = 8;//每一个s[i]的最大位数
+	vector<int> s;
+	BigInteger operator = (const string& ch) // 重新定义'='赋值运算符
+	{
+		s.clear();
+		string str = ch;
+		while ('0' == str[0]) str.erase(str.begin());//删除前面的0
+		int x, len = (str.length() - 1) / WIDTH + 1;
+		for (int i = 0; i < len; i++) {
+			int end = str.length() - i*WIDTH;
+			int start = max(0, end - WIDTH);
+			sscanf(str.substr(start, end - start).c_str(), "%d", &x);
+			s.push_back(x);
+		}
+		return *this;
+	}
+	//重新定义加法
+	BigInteger operator + (const BigInteger& b) const
+	{
+		BigInteger c;
+		c.s.clear();
+		for (int i = 0, g = 0;; i++) {
+			if (1 >= g && i >= s.size() && i >= b.s.size()) break;
+			int x = g;
+			if (i < s.size()) x += s[i];
+			if (i < b.s.size()) x += b.s[i];
+			c.s.push_back(x % BASE);
+			g = x / BASE;
+		}
+		return c;
+	}
+};
+
+BigInteger in()
+{
+	char c[MAXW];
+	scanf("%s%*c", c);
+	BigInteger ans;
+	ans = c;
+	return ans;
+}
+void out(BigInteger a)
+{
+	printf("%d", a.s.back());
+	for (int i = a.s.size() - 2; i >= 0; i--) {
+		char buf[20];
+		sprintf(buf, "%08d", a.s[i]);
+		for (int j = 0; j < strlen(buf); j++) putchar(buf[j]);
+	}
+}
+int main() {
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while (t--)
+	{
+		BigInteger a = in(), b = in();
+		printf("Case %d:\n", ++count);
+		out(a);
+		printf(" + ");
+		out(b);
+		printf(" = ");
+		out(a + b);
+		putchar('\n');
+		if (t)
+			putchar('\n');
+	}
+	return 0;
+}

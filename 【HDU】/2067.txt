@@ -1,0 +1,51 @@
+//Catalan（卡特兰数列）
+//递推公式:h(n) = h(0)*h(n-1) + h(1)*h(n-2)+...+h(n-1)*h(0);
+#include <stdio.h>
+
+int main ()
+{
+	int i, j, t = 0;
+	__int64 cata[37] = {1,1};
+	for (i = 2; i < 37; i++)
+	{
+		cata[i] = 0;
+		for (j = 0; j < i; j++)
+			cata[i] += cata[j]*cata[i-j];
+	}
+	while (1)
+	{
+		t++;
+		int n;
+		scanf ("%d%*c",&n);
+		if (-1 == n)
+			break;
+		printf ("%d %d %I64d\n", t, n, cata[n+1]*2);
+	}
+
+	return 0;
+}
+======================================================================
+/*DP*/
+#include <cstdio>
+#define MAXN 40
+__int64 dp[MAXN][MAXN];
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n, count = 0;
+    while(~scanf ("%d%*c", &n) && -1 != n)
+    {
+        dp[0][1] = 1;
+        n++;
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = i; j <= n; j++)
+                dp[i][j] = dp[i-1][j]+dp[i][j-1];
+        }
+        printf ("%d %d %I64d\n", ++count, n-1, dp[n][n]*2);
+    }
+    return 0;
+}

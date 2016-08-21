@@ -1,0 +1,115 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 40000+10;
+struct NODE{
+	int l,r,h,v;
+	bool operator<(const NODE&t)const{
+		return h < t.h;
+	}
+}p[MAXN];
+int tol, cnt;
+
+int sum[MAXN<<1], cov[MAXN<<1], lz[MAXN<<1],lc[MAXN<<1],rc[MAXN<<1],num[MAXN<<1];
+void init()
+{
+	clc(sum,0);
+	clc(cov,0);
+	clc(num,0);
+	clc(lc,0);
+	clc(rc,0);
+	clc(lz,0);
+}
+inline int id(int x, int y){return x+y|x!=y;}
+void push_down(int x, int y, int m)
+{
+	int u = id(x,y);
+	if(lz[u])
+	{
+		int l = id(x,m), r = id(m+1,y);
+		cov[l] += lz[u], cov[r] += lz[u];
+		lz[l] += cov[u], lz[r] += lz[u];
+		lz[u] = 0;
+		if(cov[l]) lc[l] = rc[l] = 1;
+		else lc[l] = rc[l] = 0;
+		if(cov[r]) lc[r] = rc[r] = 1;
+		else lc[r] = rc[r] = 0;
+	}
+}
+void push_up(int x, int y, int m)
+{
+	int u = id(x,y);
+	if(cov[u]) sum[u] = y+1-x, num[u] = 1, lc[u] = rc[u] = 1;
+	else if(x == y) sum[u] = num[u] = lc[u] = rc[u] = 0;
+	else
+	{ 
+		int l = id(x,m), r = id(m+1,y);
+		sum[u] = sum[l]+sum[r];
+		lc[u] = lc[l], rc[u] = rc[r];
+		num[u] = num[l]+num[r];
+		if(rc[l] && lc[r]) num[u]--;
+	}
+}
+void update(int x, int y, int ql, int qr, int v)
+{
+	int m = (x+y)>>1;
+	if(ql <= x && y <= qr)
+	{
+		cov[id(x,y)] += v;
+		push_up(x,y,m);
+		return;
+	}
+	//push_down(x,y,m);
+	if(ql <= m) update(x,m,ql,qr,v);
+	if(qr > m) update(m+1,y,ql,qr,v);
+	push_up(x,y,m);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		cnt = tol = 0;
+		rep(i,0,n)
+		{
+			int x1,y1,x2,y2;
+			scanf("%d %d %d %d%*c", &x1, &y1, &x2,&y2);
+			x1 += 10000, y1 += 10000, x2 += 10000, y2 += 10000;
+			cnt = max(cnt,x2);
+			NODE a = {x1,x2,y1,1};
+			p[tol++] = a;
+			NODE b = {x1,x2,y2,-1};
+			p[tol++] = b;
+		}
+		sort(p,p+tol);
+		init();
+		int ans = 0, lsum = 0;
+		rep(i,0,tol)
+		{
+			update(0,cnt-1,p[i].l,p[i].r-1,p[i].v);
+			if(i < tol-1)
+				ans += abs(sum[id(0,cnt-1)]-lsum)+2*(p[i+1].h-p[i].h)*num[id(0,cnt-1)];
+			else ans += lsum;
+			lsum = sum[id(0,cnt-1)];
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXM = 100000;
+const LL MOD = 1000000007;
+char buf[MAXN*2], *ps = buf, *pe = buf+1;
+inline void rnext(){
+    if(++ps == pe)
+        pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+    int ans = 0;
+    if(ps == pe) return -1;
+    do{
+        rnext();
+    }while(!isdigit(*ps) && ps != pe);
+    if(ps == pe) return -1;
+    do
+    {
+        ans = (ans<<1)+(ans<<3)+*ps-48;
+        rnext();
+    }while(isdigit(*ps) && ps != pe);
+    return ans;
+}
+int a[MAXN], x[MAXN],y[MAXN], vis[10000+10];
+int head[10000+10], tol,nxt[MAXM],to[MAXM];
+
+void add_edge(int u, int v)
+{
+    nxt[tol] = head[u], to[tol] = v;
+    head[u] = tol++;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    clc(head,-1);
+    tol = 0;
+    repe(i,1,10000)
+    {
+        int mx = sqrt(i)+1;
+        repe(j,1,mx)
+        {
+            if(i%j == 0)
+                add_edge(i,j), add_edge(i,i/j);
+        }
+    }
+    int n;
+    while(~(n = in()))
+    {
+        repe(i,1,n) a[i] = in();
+        clc(vis,-1);
+        repe(i,1,n)
+        {
+            x[i] = 0;
+            for(int j = head[a[i]]; ~j; j = nxt[j])
+            {
+                int v = to[j];
+                if(~vis[v])
+                    x[i] = max(x[i],vis[v]);
+            }
+            vis[a[i]] = i;
+        }
+        clc(vis,-1);
+        per(i,n,1)
+        {
+            y[i] = n+1;
+            for(int j = head[a[i]]; ~j; j = nxt[j])
+            {
+                int v = to[j];
+                if(~vis[v])
+                    y[i] = min(y[i],vis[v]);
+            }
+            vis[a[i]] = i;
+        }
+        int ans = 0;
+        repe(i,1,n)
+        {
+            LL tmp = (i-(LL)x[i])*((LL)y[i]-i)%MOD;
+            ans = (ans+tmp)%MOD;
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

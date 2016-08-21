@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int x[MAXN],y[MAXN],sum[MAXN], w[MAXN],z[MAXN], dp[MAXN];
+deque<int> q;
+
+inline int get_dis(int a, int b){
+	return abs(x[a]-x[b])+abs(y[a]-y[b]);
+}
+inline int f(int j){
+	return dp[j]-sum[j+1]+z[j+1];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int c,n;
+		scanf("%d%*c%d%*c",&c, &n);
+		repe(i,1,n)
+		{
+			int ww;
+			scanf("%d %d %d%*c", &x[i], &y[i], &ww);
+			z[i] = x[i]+y[i];
+			sum[i] = sum[i-1]+get_dis(i,i-1);
+			w[i] = w[i-1]+ww;
+		}
+		q.clear();
+		q.push_back(0);
+		repe(i,1,n)
+		{
+			while(!q.empty() && w[i]-w[q[0]] > c) q.pop_front();
+			if(1 == i) dp[i] = sum[i]+z[i];
+			else dp[i] = f(q[0])+sum[i]+z[i];
+			while(!q.empty() && f(i) <= f(q[q.size()-1])) q.pop_back();
+			q.push_back(i);
+		}
+		printf("%d\n", dp[n]);
+		if(t) putchar('\n');
+	}
+	return 0;
+}

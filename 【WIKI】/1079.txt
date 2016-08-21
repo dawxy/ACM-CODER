@@ -1,0 +1,79 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 100
+int n, num[MAXN], dis[MAXN][MAXN];
+char name[MAXN];
+
+int find(char c)
+{
+	if(!num[c-'A'])
+	{
+		num[c-'A'] = ++n;
+		name[n] = c;
+		return n;
+	}
+	return num[c-'A'];
+}
+char in()
+{
+	int ch;
+	while((ch = getchar()) == ' ' || '\n' == ch);
+	return ch;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int m;
+	scanf("%d%*c", &m);
+	clc(dis,0x3f);
+	clc(num,0);
+	num['Z'-'A'] = 1;
+	name[1] = 'Z';
+	n = 1;
+	int c;
+	char a,b;
+	while(m--)
+	{
+		a = in(), b = in();
+		scanf("%d%*c", &c);
+		int u = find(a), v = find(b);
+		if(dis[u][v] > c)
+			dis[u][v] = dis[v][u] = c;
+	}
+	repe(i,1,n) dis[i][i] = 0;
+	repe(k,1,n)
+	{
+		repe(i,1,n)
+		{
+			repe(j,1,n)
+				dis[i][j] = min(dis[i][j], dis[i][k]+dis[k][j]);
+		}
+	}
+	int mi = INF, id;
+	repe(i,2,n)
+	{
+		if(name[i] >= 'a') continue;
+		if(mi > dis[1][i])
+			mi = dis[1][i], id = i;
+		if(mi > dis[i][1])
+			mi = dis[i][1], id = i;
+	}
+	printf("%c %d\n", name[id],mi);
+	return 0;
+}

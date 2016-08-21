@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 110
+#define max(a,b) (a>b?a:b)
+int x[MAXN], dp[MAXN][MAXN];
+//dp[i][j]表示跳了i次之后当前呆在j时吃掉的最多的虫子数量
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n, a, b, m;
+		scanf("%d %d %d %d%*c", &n, &a, &b, &m);
+		for(int i = 0; i < n; i++)
+			scanf("%d%*c", &x[i]);
+		memset(dp,0,sizeof(dp));
+		for(int i = 1; i <= m; i++)
+		{
+			for(int j = 1; j < n; j++)
+			{
+				for(int k = a; k <= b; k++)
+				{
+					if(j-k>=0)
+						dp[i][j] = max(dp[i][j],dp[i-1][j-k]+x[j]);
+				}
+			}
+		}
+		int ans = -1;
+		for(int i = 1; i < n; i++)
+			ans = max(ans,dp[m][i]);
+		printf("%d\n", ans+x[0]);
+	}
+	return 0;
+}

@@ -1,0 +1,48 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#define MAXN 65535
+int prime[MAXN+1];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	for(int i = 2; i <= MAXN; i++)
+	{
+		if(!prime[i]) prime[++prime[0]] = i;
+		for(int j = 1;j <= prime[0] && prime[j] <= MAXN/i; j++)
+		{
+			prime[prime[j]*i] = 1;
+			if(0 == i%prime[j]) break;
+		}
+	}
+	while(~scanf("%d%*c", &n))
+	{
+		for(int i = 1; prime[i] <= n; i++)
+		{
+			if(0 == n%prime[i])
+			{
+				n /= prime[i];
+				printf("%d",prime[i]);
+				break;
+			}
+		}
+		while(n != 1)
+		{
+			for(int i = 1; prime[i] <= n; i++)
+			{
+				if(0 == n%prime[i])
+				{
+					n /= prime[i];
+					printf("*%d",prime[i]);
+					break;
+				}
+			}
+		}
+		putchar('\n');
+	}
+	return 0;
+}

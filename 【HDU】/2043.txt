@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <string.h>
+
+void main ()
+{
+	int m;
+	scanf ("%d", &m);
+	getchar ();
+
+	while (m--)
+	{
+		char a[51];
+		int i, n, count1 = 0, count2 = 0, count3 = 0, count4 = 0, count;
+		gets(a);
+		n = strlen(a);
+		if(16 < n || 8 > n)
+		{
+			printf ("NO\n");
+			continue;
+		}
+
+		for (i = 0; i < n; i++)
+		{
+			if ('A' <= a[i] && 'Z' >= a[i])
+				count1 = 1;
+			else
+				if ('a' <= a[i] && 'z' >= a[i])
+					count2 = 1;
+				else
+					if ('0' <= a[i] && '9' >= a[i])
+						count3 = 1;
+					else
+						if ('~'==a[i] || '!'==a[i] || '@'==a[i] || '#'==a[i] || '$'==a[i] || '%'==a[i] || '^'==a[i])
+							count4 = 1;
+		}
+
+		count = count1 + count2 + count3 + count4;
+		if (3 <= count)
+			printf ("YES\n");
+		else
+			printf ("NO\n");
+
+	}
+}

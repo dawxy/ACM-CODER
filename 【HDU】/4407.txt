@@ -1,0 +1,134 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+
+int gcd(int a, int b)
+{
+	while(b)
+	{
+		a %= b;
+		if(a < b) swap(a,b);
+	}
+	return a;
+}
+int count(int x, int i)
+{
+	int cnt = 0;
+	for(int j = i; j <= x; j += i)
+		cnt++;
+	return cnt;
+}
+vector<int> p;
+void get_p(int n)
+{
+	int m = sqrt(n+0.5);
+	p.clear();
+	for(int i = 2; i <= m; i++)
+	{
+		if(n % i == 0)
+		{
+			p.push_back(i);
+			while(n % i == 0)
+				n /= i;
+		}
+	}
+	if(n > 1) p.push_back(n);
+}
+inline LL count(LL x, LL y, LL v)
+{
+	LL n = y/v-(x-1)/v,a = ((x-1)/v+1)*v;
+	if(a > y) return 0;
+	return n*a+n*(n-1)*v/2;
+}
+LL sloved(LL x, LL y, int c)
+{
+	get_p(c);
+	int sz = p.size(),all = 1<<sz;
+	LL ans = 0;
+	rep(s,1,all)
+	{
+		int bit = 0,tmp = 1;
+		rep(i,0,sz)
+		{
+			if(s&(1<<i))
+			{
+				bit++;
+				tmp *= p[i];
+			}
+		}
+		if(bit&1) ans += count(x,y,tmp);
+		else ans -= count(x,y,tmp);
+	}
+	return (x+y)*(y-x+1)/2-ans;
+}
+int u[MAXN],v[MAXN],cnt;
+
+LL query(int x, int y, int c)
+{
+	LL ans = sloved(x,y,c);
+	rep(i,0,cnt)
+	{
+		if(x <= u[i] && u[i] <= y)
+		{
+			if(1 == gcd(u[i],c) && 1 != gcd(v[i],c))
+				ans -= u[i];
+			else if(1 == gcd(u[i],c) && 1 == gcd(v[i],c))
+				ans -= u[i],ans += v[i];
+			else if(1 != gcd(u[i],c) && 1 == gcd(v[i],c))
+				ans += v[i];
+		}
+	}
+	return ans;
+}
+void update(int x, int y)
+{
+	rep(i,0,cnt)
+	{
+		if(u[i] == x)
+		{
+			v[i] = y;
+			return;
+		}
+	}
+	u[cnt] = x;v[cnt++] = y;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	/*int x = 12341,y = 354574,c = 2*3*5*7*11*13;
+	//n--;
+	//x= 156;
+	cnt = 0;
+	count(5,12,2);
+	repe(i,x,y) if(1 == gcd(i,c)) cnt++;
+	printf("%d %d\n", cnt,sloved(x,y,c));*/
+
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n,q;
+		scanf("%d %d", &n, &q);
+		cnt = 0;
+		while(q--)
+		{
+			int op,x,y;
+			scanf("%d %d %d", &op, &x, &y);
+			if(1 == op)
+			{
+				int v;
+				scanf("%d", &v);
+				printf("%I64d\n", query(x,y,v));
+			}
+			else update(x,y);
+		}
+	}
+	return 0;
+}

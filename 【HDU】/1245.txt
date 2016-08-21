@@ -1,0 +1,117 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <algorithm>
+#include <vector>
+using namespace std;
+#define MAXN 110
+#define INF 0x3f3f3f3f
+int x[MAXN], y[MAXN], sum[MAXN][MAXN], n, d;
+double dp[MAXN][MAXN];
+vector<int> st, ed;
+
+inline double get_dis(int a, int b){
+	return sqrt((double)(x[a]-x[b])*(x[a]-x[b])+(y[a]-y[b])*(y[a]-y[b]));
+}
+bool ok(int a)
+{
+	if(x[a]+d >= 50 || x[a]-d <= -50) return true;
+	if(y[a]+d >= 50 || y[a]-d <= -50) return true;
+	return false;
+}
+inline int mindis(int a)
+{
+	return min(abs(abs(x[a])-50),abs(abs(y[a])-50));
+}
+void floyd()
+{
+	for(int k = 0; k <= n; k++)
+	{
+		for(int i = 0; i <= n; i++)
+		{
+			for(int j = 0; j <= n; j++)
+			{
+				if(dp[i][j] > dp[i][k]+dp[k][j])
+				{
+					dp[i][j] = dp[i][k]+dp[k][j];
+					sum[i][j] = sum[i][k]+sum[k][j];
+				}
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &d))
+	{
+		int cnt = 1;
+		double buf;
+		st.clear();
+		ed.clear();
+		for(int i = 1; i <= n; i++)
+		{
+			scanf("%d %d%*c", &x[cnt], &y[cnt]);
+			buf = get_dis(0,cnt);
+			if(buf < 7.5 || fabs(buf-7.5) < 1e-9) continue;
+			if(abs(x[cnt]) > 50 && abs(y[cnt]) > 50) continue;
+			cnt++;
+		}
+		if(0 == n)
+		{
+			if(d*10 >= 425)
+				puts("42.5 1");
+			else puts("can't be saved");
+			continue;
+		}
+		if(d*10 >= 425)
+		{
+			puts("42.5 1");
+			continue;
+		}
+		n = cnt;
+		for(int i = 0; i <= n; i++)
+		{
+			for(int j = 0; j <= n; j++)
+			{
+				sum[i][j] = 0;
+				dp[i][j] = INF;
+			}
+		}
+		for(int i = 1; i < n; i++)//除了起点终点任意两点之间的距离
+		{
+			dp[i][i] = 0;
+			for(int j = i+1; j < n; j++)
+			{
+				buf = get_dis(i,j);
+				sum[i][j] = sum[j][i] = 1;
+				if(buf < d || fabs(buf-d) < 1e-9)
+					dp[i][j] = dp[j][i] = buf;
+				else
+					dp[i][j] = dp[j][i] = INF, sum[i][j] = sum[j][i] = 0;
+			}
+		}
+		for(int i = 1; i < n; i++)
+		{
+			buf = get_dis(0,i)-7.5;
+			if(buf < d || fabs(buf-d) < 1e-9)
+			{
+				st.push_back(i);
+				sum[0][i] = sum[i][0] = 1;
+				dp[0][i] = dp[i][0] = buf;
+			}
+			if(ok(i))
+			{
+				ed.push_back(i);
+				sum[n][i] = sum[i][n] = 1;
+				dp[n][i] = dp[i][n] = mindis(i);
+			}
+		}
+		floyd();
+		if(fabs(dp[0][n]-INF) < 1e-9) puts("can't be saved");
+		else printf("%.2lf %d\n", dp[0][n], sum[0][n]);
+	}
+	return 0;
+}

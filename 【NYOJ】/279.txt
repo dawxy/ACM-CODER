@@ -1,0 +1,28 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 501
+#define MAXM 7
+int dp[MAXN][MAXM];//dp[j][k]使用k个前i个数之和为j的方法数
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	dp[0][0] = 1;
+	for (int i = 1; i <= 500; i++)
+	{
+		for (int j = i; j <= 500; j++)
+		{
+			for (int k = 1; k <= 6; k++)
+				dp[j][k] += dp[j-i][k-1];
+		}
+	}
+	int n, m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		printf("%d\n", dp[n][m]);
+	}
+	return 0;
+}

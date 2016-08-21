@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <string.h>
+
+bool is_win(char *, int);
+
+int main ()
+{
+	while (1)
+	{
+		int n, len, j, in;
+		char a[100], buf;
+		scanf ("%d%*c", &n);
+		if (-1 == n)
+			break;
+		gets(a);
+		len = strlen(a);
+		for (j = 0;'\n' != (buf = getchar()) && j < 7;)
+		{
+			in = 0;
+			for (int i = 0; i < len; i++)
+			{
+				if (buf == a[i])
+				{
+					a[i] = ' ';
+					in = 1;
+				}
+			}
+			if (!in)
+				j++;
+		}
+		if ('\n' != buf)
+		{
+			while ('\n' != getchar());
+		}
+		printf ("Round %d\n", n);
+		if (is_win(a, len))
+			printf ("You win.\n");			
+		else
+			if (j < 7)
+				printf ("You chickened out.\n");
+			else
+				printf ("You lose.\n");
+	}
+}
+
+bool is_win(char *a, int len)
+{
+	for (int i = 0; i < len; i++)
+	{
+		if (' ' != a[i])
+			return false;
+	}
+	return true;
+}

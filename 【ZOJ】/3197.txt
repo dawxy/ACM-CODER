@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+struct NODE{
+	int st, ed;
+}p[5010];
+
+bool cmp(NODE a, NODE b)
+{
+	return a.st < b.st;
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n,i;
+		scanf ("%d%*c", &n);
+		for (i = 0; i < n; i++)
+			scanf ("%d %d%*c", &p[i].st, &p[i].ed);
+		sort(p,p+n,cmp);
+		int start = p[0].st, end = p[0].ed, j, ans = 1;
+		i = 1;
+		while(i < n && start == p[i].st)
+		{
+			if (end < p[i].ed)
+				end = p[i].ed;
+			i++;
+		}
+		while(end != n)
+		{
+			j = p[i].ed;
+			start = end+1;
+			i++;
+			while(i < n && p[i].st <= start)
+			{
+				if (j < p[i].ed)
+					j = p[i].ed;
+				i++;
+			}
+			if (j > end)
+			{
+				end = j;
+				ans++;
+			}
+		}
+		printf ("%d\n", ans);
+	}
+	return 0;
+}

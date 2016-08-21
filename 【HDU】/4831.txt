@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 2505
+#define max(a,b) (a>b?a:b)
+typedef long long LL;
+struct NODE{
+    int st, ed, r;
+}p[MAXN];
+int n,m, dp[MAXN], d[MAXN], e[MAXN];
+//dp[i]表示第i个理财产品之后可以获得的最大的收益(interest_rates)和
+
+inline bool cmp(const NODE& a, const NODE& b){ return a.st < b.st; }
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t, count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        scanf("%d %d%*c", &n, &m);
+        for(int i = 0; i < n; i++)
+            scanf("%d %d%*c", &d[i], &e[i]);
+        for(int i = 0; i < m; i++)
+            scanf("%d %d %d%*c", &p[i].st, &p[i].ed, &p[i].r);
+        sort(p,p+m,cmp);
+		memset(dp,0,sizeof(dp));
+		for(int i = m-1; i >= 0; i--)
+		{
+			for(int j = i+1; j < m; j++)
+			{
+				if(p[i].ed <= p[j].st)
+					dp[i] = max(dp[i],dp[j]);
+			}
+			dp[i] += p[i].r;
+		}
+		LL ans = 0;
+		for(int i = 0; i < n; i++)//计算每个收入点之后的总收益和
+		{
+			int b = 0;
+			for(int j = 0; j < m; j++)
+			{
+				if(d[i] <= p[j].st)
+					b = max(b,dp[j]);
+			}
+			ans += (LL)b*e[i];
+		}
+        printf("Case #%d:\n%.2lf\n", ++count,ans/100.0);
+    }
+    return 0;
+}

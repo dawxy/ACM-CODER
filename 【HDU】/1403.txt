@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000*2+10;
+struct DA{
+	int s[MAXN];
+	int sa[MAXN],t[MAXN], t2[MAXN], c[MAXN],n;
+	void bulid_sa(int m)
+	{
+		int *x = t, *y = t2,p;
+		memset(c,0,sizeof(int)*m);
+		rep(i,0,n) c[x[i] = s[i]]++;
+		rep(i,1,m) c[i] += c[i-1];
+		per(i,n-1,0) sa[--c[x[i]]] = i;
+		for(int k = 1; k <= n; k <<= 1, m = p)
+		{
+			p = 0;
+			rep(i,n-k,n) y[p++] = i;
+			rep(i,0,n) if(sa[i] >= k) y[p++] = sa[i]-k;
+			memset(c,0,sizeof(int)*m);
+			rep(i,0,n) c[x[y[i]]]++;
+			rep(i,1,m) c[i] += c[i-1];
+			per(i,n-1,0) sa[--c[x[y[i]]]] = y[i];
+			swap(x,y);
+			p = 1;x[sa[0]] = 0;
+			rep(i,1,n) x[sa[i]] = y[sa[i-1]]==y[sa[i]]&&y[sa[i-1]+k] == y[sa[i]+k]?p-1:p++;
+			if(p>=n) break;
+		}
+	}
+	int rank[MAXN], height[MAXN];
+	void get_height()
+	{
+		int k = 0;
+		rep(i,0,n) rank[sa[i]] = i;
+		rep(i,0,n)
+		{
+			if(k) k--;
+			int j = sa[rank[i]-1];
+			while(s[i+k] == s[j+k]) k++;
+			height[rank[i]] = k;
+		}
+	}
+	void add(int ch)
+	{
+		s[n++] = ch-'a'+1;
+	}
+}da;
+char a[MAXN],b[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%s%s", a,b))
+	{
+		da.n = 0;
+		char *p = a;
+		while(*p)
+		{
+			da.add(*p);
+			p++;
+		}
+		da.add(26+'a');
+		int len = da.n;
+		p = b;
+		while(*p)
+		{
+			da.add(*p);
+			p++;
+		}
+		//da.add(27+'a');
+		da.add('a'-1);
+		da.bulid_sa(28);
+		da.get_height();
+		int ans = 0;
+		repe(i,2,da.n)
+		{
+			if((da.sa[i] < len && da.sa[i-1] >= len) || (da.sa[i] >= len && da.sa[i-1] < len))
+			{
+				ans = max(ans,da.height[i]);
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

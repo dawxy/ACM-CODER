@@ -1,0 +1,47 @@
+#include <stdio.h>
+#define MAX 10003
+int s1[MAX], s2[MAX], len, ans, min;
+
+void sloved(int *,int,int,int,int,int);
+
+int main ()
+{
+	char c;
+	while(EOF != scanf("%d%c", &s1[0], &c))
+	{
+		int i, m[MAX] = {0};
+		min = 9999999;
+		m[s1[0]] = 0;
+		len = 1;
+		while ('\n' != c)
+		{
+			scanf ("%d%c", &s1[len++], &c);
+			m[s1[len-1]] = len-1;
+		}
+		for (i = 0; i < len; i++)
+			scanf ("%d%*c", &s2[i]);
+		sloved(m, 0,len-1,0,len-1,0);
+		printf ("%d\n", ans);
+	}
+	
+	return 0;
+}
+
+void sloved(int *m, int l, int r, int p, int q, int sum)
+{
+	if (l > r)
+		return;
+	if (l == r)
+	{
+		sum += s1[l];
+		if (min > sum || (min == sum && s1[l] < ans))
+		{
+			ans = s1[l];
+			min = sum;
+		}
+		return;
+	}
+	int k = m[s2[q]];
+	sloved(m, l, k-1, p, p+k-l-1, sum+s2[q]);
+	sloved(m, k+1, r, p+k-l, q-1, sum+s2[q]);
+}

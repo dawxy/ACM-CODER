@@ -1,0 +1,41 @@
+#include <stdio.h>
+
+int a[501];
+
+int the_dis (int, int);
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int n, i, min = 99999999, buf;
+		scanf ("%d%*c", &n);
+		for (i = 0; i < n; i++)
+			scanf ("%d%*c", &a[i]);
+
+		for (i = 0; i < n; i++)
+		{
+			buf = the_dis (n, a[i]);
+			if (min > buf)
+				min = buf;
+		}
+		printf ("%d\n", min);
+	}
+
+	return 0;
+}
+
+int the_dis (int n, int s)
+{
+	int i, sum = 0, buf;
+	for (i = 0; i < n; i++)
+	{
+		buf = a[i]-s;
+		if (buf < 0)
+			buf *= -1;
+		sum += buf;
+	}
+	return sum;
+}

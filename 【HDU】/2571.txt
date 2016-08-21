@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXH 22
+#define MAXW 1010
+int h, w, a[MAXH][MAXW], dp[MAXH][MAXW];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	memset(dp[0],-0x3f,sizeof(dp[0]));
+	for (int i = 1; i < MAXH; i++)
+		dp[i][0] = -0x3f3f3f3f;
+	dp[1][0] = dp[0][1] = 0;
+	while (t--)
+	{
+		scanf("%d %d%*c", &h, &w);
+		for (int i = 1; i <= h; i++)
+		{
+			for (int j = 1; j <= w; j++)
+				scanf("%d%*c", &a[i][j]);
+		}
+		for (int i = 1; i <= h; i++)
+		{
+			for (int j = 1; j <= w; j++)
+			{
+				dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+				for (int k = j>>1; k >= 1; k--)
+				{
+					if (0 == j%k)
+						dp[i][j] = max(dp[i][j], dp[i][k]);
+				}
+				dp[i][j] += a[i][j];
+			}
+		}
+		printf("%d\n", dp[h][w]);
+	}
+	return 0;
+}

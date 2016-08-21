@@ -1,0 +1,43 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+#define MAXN 360
+#define MAXM 130
+#define MAXV 42
+#define ans(i,j,k,l) num[1]-i+(num[2]-j)*2+(num[3]-k)*3+(num[4]-l)*4
+int a[MAXN],dp[MAXV][MAXV][MAXV][MAXV] = {0};
+
+int main ()
+{
+    int n, m;
+    while(~scanf ("%d %d%*c", &n, &m))
+    {
+        int s, num[5] = {0};
+        for(int i = 0; i < n; i++)
+            scanf ("%d%*c", &a[i]);
+        for (int i = 0; i < m; i++)
+        {
+            scanf ("%d%*c", &s);
+            num[s]++;
+        }
+        dp[num[1]][num[2]][num[3]][num[4]] = a[0];
+        for (int i = num[1]; i >= 0; i--)
+        {
+            for (int j = num[2]; j >= 0; j--)
+            {
+                for (int k = num[3]; k >= 0; k--)
+                {
+                    for (int l = num[4]; l >= 0; l--)
+                    {
+                        dp[i][j][k][l] = max(dp[i][j][k][l], dp[i+1][j][k][l]+a[ans(i,j,k,l)]);
+                        dp[i][j][k][l] = max(dp[i][j][k][l], dp[i][j+1][k][l]+a[ans(i,j,k,l)]);
+                        dp[i][j][k][l] = max(dp[i][j][k][l], dp[i][j][k+1][l]+a[ans(i,j,k,l)]);
+                        dp[i][j][k][l] = max(dp[i][j][k][l], dp[i][j][k][l+1]+a[ans(i,j,k,l)]);
+                    }
+                }
+            }
+        }
+        printf ("%d\n", dp[0][0][0][0]);
+    }
+    return 0;
+}

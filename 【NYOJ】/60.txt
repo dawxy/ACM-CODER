@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <string.h>
+
+int jangjin (int, int, char, char, int);
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		char name[21], ganbu, xibu, maxname[21];
+		int qimo, clas, lunwen,n, i, max = -1, sum = 0, buf;
+		scanf ("%d%*c", &n);
+		for (i = 0; i < n; i++)
+		{
+			scanf ("%s %d %d %c %c %d%*c", &name, &qimo, &clas, &ganbu, &xibu, &lunwen);
+			buf = jangjin(qimo, clas, ganbu, xibu, lunwen);
+			sum += buf;
+			if (max < buf)
+			{
+				max = buf;
+				strcpy(maxname, name);
+			}
+		}
+		printf ("%s\n%d\n%d\n", maxname, max, sum);
+
+	}
+
+	return 0;
+}
+
+int jangjin (int qimo, int clas, char ganbu, char xibu, int lunwen)
+{
+	int ans = 0;
+	if (qimo > 90)
+		ans += 2000;
+	if (qimo > 85)
+	{
+		if (clas > 80)
+			ans += 4000;
+		if ('Y' == xibu)
+			ans += 1000;
+	}
+	if (qimo > 80 && lunwen >= 1)
+		ans += 8000;
+	if (clas > 80 && 'Y' == ganbu)
+		ans += 850;
+	return ans;
+}

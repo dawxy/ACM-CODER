@@ -1,0 +1,47 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10;
+struct NODE{
+	int a,b,id;
+	bool operator<(NODE& t) const{
+		if(a-b != t.a-t.b) return a-b > t.a-t.b;
+		if(b != t.b) return b < t.b;
+		return id < t.id;
+	}
+}p[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n)
+		{
+			scanf("%d %d%*c", &p[i].a, &p[i].b);
+			p[i].id = i;
+		}
+		sort(p,p+n);
+		printf("%d", p[0].id);
+		rep(i,1,n) printf(" %d", p[i].id);
+		putchar('\n');
+	}
+	return 0;
+}

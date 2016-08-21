@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <string.h>
+#include <queue>
+#define MAX 30
+//#define scanf scanf_s
+using namespace std;
+struct Node{
+	int i, j, f, time, col;
+	 // 重载<构建最小堆  ,优先队列优化
+	friend bool operator < (const Node &a, const Node &b){ 
+        return a.time > b.time;   
+	}
+}st, ed;
+char g[MAX][MAX];
+//四维vis数组记录i,j(坐标),方向和当前颜色是否被访问过
+int d[4][2] = {{0,-1},{-1,0},{0,1},{1,0}}, h, w, vis[MAX][MAX][4][5];
+
+bool bfs(int *);
+int main ()
+{
+	//FILE *f;
+	//freopen_s(&f,"e:\\1.txt", "r", stdin);
+	int count = 1;
+	while(1)
+	{
+		scanf ("%d %d%*c", &h, &w);
+		if (0 == h && 0 == w)
+			break;
+		memset(vis,0,sizeof(vis));
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				g[i][j] = getchar();
+				if ('S' == g[i][j])
+					st.i = i, st.j = j;
+				else if ('T' == g[i][j])
+					ed.i = i, ed.j = j;
+			}
+			getchar();
+		}
+		int time;
+		if (1 != count)
+			printf ("\n");
+		printf ("Case #%d\n", count++);
+		if (bfs(&time))
+			printf ("minimum time = %d sec\n", time);
+		else
+			puts("destination not reachable");
+	}
+
+	return 0;
+}
+
+bool bfs(int *time)
+{
+	priority_queue<Node> que;
+	Node buf, t;
+	int ni, nj;
+	st.col = st.time = 0;
+	st.f = 1;
+	vis[st.i][st.j][st.f][st.col] = 1;
+	que.push(st);
+	while(!que.empty())
+	{
+		buf = que.top(), que.pop();
+		for (int i = 0; i < 4; i++)
+		{
+			ni = d[i][0]+buf.i;
+			nj = d[i][1]+buf.j;
+			if (0 <= ni && h > ni && 0 <= nj && w > nj && '#' != g[ni][nj])
+			{
+				if (i == buf.f)//方向不改变
+				{
+					t.i = ni, t.j = nj, t.time = buf.time+1;
+					t.col = (buf.col+1)%5;//移动后颜色要改变
+				}
+				else
+				{
+					//需要转两次90度(就是向后)
+					if (2 == buf.f-i || -2 == buf.f-i)
+						t.time = buf.time+2;
+					else//剩下的只有向左或者向右
+						t.time = buf.time+1;
+					//没有移动，颜色 位置都没变
+					t.col = buf.col, t.i = buf.i, t.j = buf.j;
+				}
+				t.f = i;
+				//当前状态没有到过就要加入队列
+				if (!vis[t.i][t.j][t.f][t.col])
+				{
+					//找到终点，退出
+					if (ed.i == t.i && ed.j == t.j && 0 == t.col)
+					{
+						*time = t.time;
+						return true;
+					}
+					que.push(t);
+					vis[t.i][t.j][t.f][t.col] = 1;
+				}
+			}
+		}
+	}
+	return false;
+}

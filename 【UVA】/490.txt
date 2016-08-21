@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <string.h>
+
+int main ()
+{
+	char a[101][101], buf[101];
+	int i = 0, j = 0, len, maxlen = -1, con = 0;
+	for (i = 0; i < 101; i++)
+	{
+		for (j = 0; j < 101; j++)
+		{
+			a[i][j] = ' ';
+		}
+	}
+	j = 0;
+	while (NULL != gets(buf))
+	{
+		len = strlen(buf);
+		if (len > maxlen)
+			maxlen = len;
+		for (i = 0; i < len; i++)
+			a[i][j] = buf[i];
+		j++;
+		con ++;
+	}
+	for (i = 0; i < maxlen; i++)
+	{
+		for (j = con-1; j >= 0; j--)
+		{
+			printf ("%c", a[i][j]);
+		}
+		printf ("\n");
+	}
+
+	return 0;
+}

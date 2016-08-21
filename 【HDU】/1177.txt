@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 150
+struct NODE{
+    int s, t;
+}p[MAXN], im;
+
+bool cmp(const NODE a, const NODE b)
+{
+    if (a.s != b.s)
+		return a.s > b.s;
+    return a.t < b.t;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n,G,S,C,m;
+    while(1)
+	{
+        scanf ("%d %d %d %d %d%*c", &n,&G, &S, &C, &m);
+        if(!n && !G && !S && !C && !m)
+			break;
+        int h,s,mi, ans;
+        for (int i = 0; i < n; i++)
+		{
+            scanf("%d %d:%d:%d%*c", &p[i].s, &h, &s, &mi);
+            p[i].t = h*3600+s*60+mi;
+		}
+		im = p[m-1];
+        sort(p,p+n,cmp);
+        for (int i = 0; i < n && i < G+S+C+1; i++)
+		{
+			if (im.s == p[i].s && im.t == p[i].t)
+			{
+				ans = i;
+				break;
+			}
+		}
+        if (ans < G)
+			puts("Accepted today? I've got a golden medal :)");
+        else if (ans < S+G)
+            puts("Accepted today? I've got a silver medal :)");
+		else if (ans < S+G+C)
+			puts("Accepted today? I've got a copper medal :)");
+        else
+			puts("Accepted today? I've got an honor mentioned :)");
+	}
+    return 0;
+}

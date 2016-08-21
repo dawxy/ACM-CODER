@@ -1,0 +1,114 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 100010
+#define lc u<<1
+#define rc u<<1|1
+struct NODE{
+	int x, y;
+	int mx, lmx, rmx;
+}node[MAXN<<2];
+int a[MAXN];
+
+void push_up(NODE &fa, const NODE &l, const NODE &r)
+{
+	fa.mx = max(l.mx, r.mx);
+	fa.lmx = l.lmx;
+	fa.rmx = r.rmx;
+	if(a[r.x] > a[l.y])
+	{
+		fa.mx = max(fa.mx, l.rmx+r.lmx);
+		if(l.lmx == l.y-l.x+1) fa.lmx += r.lmx;
+		if(r.rmx == r.y-r.x+1) fa.rmx += l.rmx;
+	}
+}
+void bulid(int u, int x, int y)
+{
+	node[u].x = x, node[u].y = y;
+	if(x == y)
+	{
+		node[u].mx = node[u].lmx = node[u].rmx = 1;
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(lc, x, m);
+	bulid(rc, m+1, y);
+	push_up(node[u], node[lc], node[rc]);
+}
+int p,v;
+void update(int u)
+{
+	int x = node[u].x, y = node[u].y;
+	if(x == y)
+	{
+		a[x] = v;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(lc);
+	else update(rc);
+	push_up(node[u], node[lc], node[rc]);
+}
+int ql,qr;
+NODE query(int u)
+{
+	int x = node[u].x, y = node[u].y;
+	if(ql <= x && y <= qr) return node[u];
+	int m = (x+y)>>1;
+	NODE ans;
+	if(ql <= m && qr > m)
+	{
+		NODE a = query(lc), b = query(rc);
+		push_up(ans, a, b);
+		ans.x = a.x, ans.y = b.y;
+	}
+	else if(ql <= m) ans = query(lc);
+	else ans = query(rc);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d %d%*c", &n, &m);
+		rep(i,0,n) scanf("%d%*c", &a[i]);
+		bulid(1,0,n-1);
+		char ch[10];
+		rep(i,0,m)
+		{
+			scanf("%s", ch);
+			if('U' == ch[0])
+			{
+				scanf("%d %d%*c", &p, &v);
+				update(1);
+			}
+			else
+			{
+				scanf("%d %d%*c", &ql, &qr);
+				NODE ans = query(1);
+				printf("%d\n", ans.mx);
+			}
+		}
+	}
+	return 0;
+}

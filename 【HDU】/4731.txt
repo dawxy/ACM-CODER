@@ -1,0 +1,71 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+const char b[9][10]={"","a","ab","aab","aabb","aaaba","aaabab","aaababb","aaababbb"};
+char ans[MAXN],tb[6];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	strcpy(tb,"aababb");
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d %d",&m,&n);
+		if(m >= 3)
+		{
+			int c = 0;
+			rep(i,0,n)
+			{
+				ans[i] = c+'a';
+				c = (c+1)%3;
+			}
+			ans[n] = 0;
+		}
+		else if(1 == m)
+		{
+			rep(i,0,n) ans[i] = 'a';
+			ans[n] = 0;
+		}
+		else
+		{
+			if(n <= 8) strcpy(ans,b[n]);
+			else
+			{
+				int c = 0;
+				ans[0] = ans[1] = 'a';
+				rep(i,2,n)
+				{
+					ans[i] = tb[c];
+					c = (c+1)%6;
+				}
+				if((n-5)%6 == 0)
+					ans[n-1] = 'a';
+				else if((n-5)%6 == 1)
+					ans[n-2] = 'a';
+				ans[n] = 0;
+			}
+		}
+		printf("Case #%d: %s\n",++count,ans);
+	}
+	return 0;
+}

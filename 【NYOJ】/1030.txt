@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1002
+#define max(a,b) (a>b?a:b)
+int ans,ch,f, a[MAXN],sum[MAXN], dp[MAXN][MAXN];
+
+int in()
+{
+	if ((ch = getchar()) == '-') f = -1;
+	else f = 1;
+	while(ch < '0' || '9' < ch) ch = getchar();
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans*f;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		for (int i = 1; i <= n; i++)
+			sum[i] = sum[i-1]+(a[i] = in());
+		for (int i = 1; i <= n; i++)
+			dp[i][i] = a[i];
+		for (int len = 1; len < n; len++)
+		{
+			for (int i = n-len; i >= 1; i--)
+			{
+				int j = len+i;
+				dp[i][j] = max(a[i]+sum[j]-sum[i]-dp[i+1][j], a[j]+sum[j-1]-sum[i-1]-dp[i][j-1]);
+            }
+        }
+		printf("%d\n", dp[1][n]-(sum[n]-dp[1][n]));
+	}
+	return 0;
+}

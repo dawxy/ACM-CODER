@@ -1,0 +1,88 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50, MAXM = 500+10;
+int a[MAXN][MAXN],n;
+LL dp[MAXN][MAXN][MAXM];
+
+inline int left(int i, int j)
+{
+	if(i >= n) return j;
+	return j-1;
+}
+inline int right(int i, int j)
+{
+	if(i >= n) return j+1;
+	return j;
+}
+void pt(int i, int j, int v)
+{
+	if(i == n*2-1) return;
+	if(dp[i+1][left(i,j)][v-a[i][j]])
+	{
+		putchar('L');
+		pt(i+1,left(i,j),v-a[i][j]);
+		return;
+	}
+	putchar('R');
+	pt(i+1,right(i,j),v-a[i][j]);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int m;
+	while(~scanf("%d %d", &n, &m) && n+m)
+	{
+		clc(a,0);
+		rep(i,1,n*2)
+		{
+			repe(j,1,abs(n-i)+1)
+				scanf("%d", &a[i][j]);
+		}
+		clc(dp,0);
+		repe(j,1,n) dp[n*2-1][j][a[n*2-1][j]] = 1;
+		per(i,n*2-2,1)
+		{
+			repe(j,1,abs(n-i)+1)
+			{
+				repe(k,0,m-a[i][j])
+					dp[i][j][k+a[i][j]] = dp[i+1][left(i,j)][k]+dp[i+1][right(i,j)][k];
+			}
+		}
+		LL ans = 0;
+		repe(j,1,n) ans += dp[1][j][m];
+		printf("%lld\n", ans);
+		if(!ans)
+		{
+			putchar('\n');
+			continue;
+		}
+		repe(j,1,n)
+		{
+			if(dp[1][j][m])
+			{
+				printf("%d ", j-1);
+				pt(1,j,m);
+				putchar('\n');
+				break;
+			}
+		}
+	}
+	return 0;
+}

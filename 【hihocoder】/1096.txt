@@ -1,0 +1,140 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000*2+10, MAXM = 100000+10;
+map<string,int> id;
+string name[MAXN];
+int n;
+
+int get_id(char *x)
+{
+	if(id.find(x) == id.end())
+	{
+		name[n] = x;
+		id[x] = n++;
+		return n-1;
+	}
+	return id[x];
+}
+/*LCA在线算法核心思想:
+从树的根节点开始进行深度优先搜索，每次经过某一个点——无论是从它的父亲节点进入这个点，还是从它的儿子节点返回这个点，
+都按顺序记录下来(就是按照每条边访问来记录,深搜是按点)。这样，就把一棵树转换成了一个数组。而找到树上两个节点的最近公共祖先，
+无非就是找到这两个节点第一次出现在数组中的位置所囊括的一段区间中深度最小的那个点。
+*/
+int head[MAXN], tol, nxt[MAXM], to[MAXM];
+void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int cnt, ft[MAXN], d[MAXN<<1],num[MAXN<<1];
+bool vis[MAXN];
+//ft[i]是i点第一次在d中出现的下标,d[]是所有点进入或者返回到时都加入的点的深入(最多有2*m+1个)，num是d对应的点编号
+void dfs(int u, int fa, int deep)//找到每个点进入和返回时的所有ft,d,num
+{
+	ft[u] = cnt;
+	d[cnt] = deep, num[cnt++] = u;
+	vis[u] = true;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(fa == v) continue;
+		dfs(v,u,deep+1);
+		//ft[u] = cnt;
+		d[cnt] = deep, num[cnt++] = u;
+	}
+}
+int dp[MAXN][21], dp_num[MAXN][21];
+void st_init()
+{
+	rep(i,0,cnt) dp[i][0] = d[i], dp_num[i][0] = num[i];
+	for(int j = 1; (1<<j) <= cnt; j++)
+	{
+		for(int i = 0; i+(1<<j)-1 < cnt; i++)
+		{
+			if(dp[i][j-1] < dp[i+(1<<(j-1))][j-1])
+			{
+				dp[i][j] = dp[i][j-1];
+				dp_num[i][j] = dp_num[i][j-1];
+			}
+			else
+			{
+				dp[i][j] = dp[i+(1<<(j-1))][j-1];
+				dp_num[i][j] = dp_num[i+(1<<(j-1))][j-1];
+			}
+		}
+	}
+}
+int st_query(int x, int y)//查询d[x~y]中最小值对应的点编号
+{
+	if(x > y) swap(x,y);
+	int k = 0;
+	while((1<<(k+1)) <= y-x+1) k++;
+	if(dp[x][k] <= dp[y-(1<<k)+1][k]) return dp_num[x][k];
+	return dp_num[y-(1<<k)+1][k];
+}
+void lca_init(int rt)
+{
+	cnt = 0;
+	clc(vis,0);
+	dfs(rt,-1,0);
+	st_init();
+}
+int lca_query(int x, int y)//x,y的LCA
+{
+	return st_query(ft[x],ft[y]);
+}
+
+bool root[MAXN];
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	n = 0;
+	int m;
+	scanf("%d%*c", &m);
+	char a[1000], b[1000];
+	clc(head,-1);
+	tol = 0;
+	clc(root,1);
+	while(m--)
+	{
+		scanf("%s %s", a,b);
+		int u = get_id(a), v = get_id(b);
+		add_edge(u, v);
+		root[v] = false;
+	}
+	rep(i,0,n)
+	{
+		if(root[i])
+		{
+			lca_init(i);
+			//break;
+		}
+	}
+	int q;
+	scanf("%d%*c", &q);
+	while(q--)
+	{
+		scanf("%s %s",a,b);
+		int u = get_id(a), v = get_id(b);
+		puts(name[lca_query(u, v)].c_str());
+	}
+	//printf("%s %s\n", name[5].c_str(), name[10].c_str());
+	return 0;
+}

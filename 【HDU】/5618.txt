@@ -1,0 +1,178 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+struct P{
+	int x,y,z,id;
+	bool operator<(const P&t)const{
+		return x < t.x;
+	}
+}p[MAXN];
+int ans[MAXN];
+struct NODE{
+	NODE *ch[2], *fa;
+	int sz=0,v;
+	int chd(){//当前儿子是否是左儿子(0-左，1-右)
+		return this == fa->ch[1];
+	}
+};
+NODE *null = new NODE;
+NODE* newnode(int v)
+{
+	NODE *tmp = new NODE();
+	tmp->sz = 1;tmp->v = v;
+	tmp->ch[0] = tmp->ch[1] = tmp->fa = null;
+	return tmp;
+}
+void push_up(NODE *u){//向上更新
+	u->sz = u->ch[0]->sz+u->ch[1]->sz+1;
+}
+void free_all(NODE *u)//释放内存
+{
+	if(null == u) return;
+	free_all(u->ch[0]);
+	free_all(u->ch[1]);
+	delete u;
+}
+inline void setch(NODE *fa, NODE *u, int p)//重置关联的儿子和父亲,p=0表示u是fa的左儿子1是右儿子
+{
+	fa->ch[p] = u, u->fa = fa;
+}
+void rot(NODE *u)//旋转
+{
+	NODE*y = u->fa;
+	int d = u->chd();
+	setch(y->fa,u,y->chd());
+	setch(y,u->ch[d^1],d);
+	setch(u,y,d^1);
+	push_up(y), push_up(u);
+}
+NODE* find_kth(NODE *u, int k)//寻找第k小的结点(数列从左往右第k个),u为splay的根
+{
+	int d = k - u->ch[0]->sz;
+	if(1 == d) return u;//找到
+	if(d <= 0) return find_kth(u->ch[0],k);//往左
+	return find_kth(u->ch[1],k-u->ch[0]->sz-1);//往右
+}
+int find_small(NODE *u, int v)
+{
+	if(u == null) return 0;
+	if(v < u->v) return find_small(u->ch[0],v);
+	return find_small(u->ch[1],v)+u->ch[0]->sz+1;
+}
+void splay(NODE* &rt,int k, NODE *p)//把rt树第k大结点(数列从左往右第k个)伸展到p下面
+{
+	NODE *x = find_kth(rt,k);
+	if(x == p) return;
+	while(x->fa != p)
+	{
+		NODE *y = x->fa;
+		if(x->fa->fa != p && x->chd() != y->chd()) rot(y);
+		rot(x);
+	}
+	if(p == null) rt = x;
+}
+void insert(NODE *&rt, int k, NODE* x)//把x结点插入第k个后面
+{
+	splay(rt,k,null);
+	if(rt->ch[1] == null) setch(rt,x,1);
+	else
+	{
+		NODE *u = rt->ch[1];
+		while(u->ch[0] != null) u = u->ch[0];
+		setch(u,x,0);
+		while(x->fa != null) push_up(x), x = x->fa;//向上更新sz
+	}
+	push_up(rt);
+}
+
+void debug(NODE *u)
+{
+	if(u == null) return;
+	debug(u->ch[0]);
+	printf("%d ", u->v);
+	debug(u->ch[1]);
+	push_up(u);
+	if(u->fa == null) putchar('\n');
+}
+NODE *tz[MAXN<<1];
+
+inline int id(int x, int y){return x+y|x!=y;}
+void bulid(int x, int y)
+{
+	tz[id(x,y)] = newnode(-INF);
+	if(x == y)
+	{
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+}
+void clear(int x, int y)
+{
+	free_all(tz[id(x,y)]);
+	if(x == y)
+	{
+		return;
+	}
+	int m = (x+y)>>1;
+	clear(x,m);
+	clear(m+1,y);
+}
+void update(int x, int y, int qy, int az)
+{
+	insert(tz[id(x,y)],find_small(tz[id(x,y)],az),newnode(az));
+	if(x == y) return;
+	int m = (x+y)>>1;
+	if(qy <= m) update(x,m,qy,az);
+	else update(m+1,y,qy,az);
+}
+int query(int x, int y, int qx, int qy, int az)
+{
+	if(qx <= x && y <= qy)
+	{
+		return find_small(tz[id(x,y)],az)-1;
+	}
+	int m = (x+y)>>1,ans = 0;
+	if(qx <= m) ans += query(x,m,qx,qy,az);
+	if(qy > m) ans += query(m+1,y,qx,qy,az);
+	return ans;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n,mx = 0;
+		scanf("%d", &n);
+		rep(i,0,n)
+		{
+			scanf("%d%d%d", &p[i].x, &p[i].y,&p[i].z);
+			p[i].id = i;
+			mx = max(mx,p[i].y);
+		}
+		sort(p,p+n);
+		bulid(0,mx);
+		int j = 0;
+		rep(i,0,n)
+		{
+			while(j < n && p[j].x <= p[i].x) update(0,mx,p[j].y,p[j].z),j++;
+			ans[p[i].id] = query(0,mx,0,p[i].y,p[i].z)-1;
+		}
+		rep(i,0,n) printf("%d\n", ans[i]);
+		
+		clear(0,mx);
+
+	}
+	return 0;
+}

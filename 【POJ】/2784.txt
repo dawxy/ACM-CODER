@@ -1,0 +1,75 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 1005
+#define dis(a,b) ((x[a]-x[b])*(x[a]-x[b])+(y[a]-y[b])*(y[a]-y[b]))
+struct NODE{
+	int a, b, v;
+	bool operator < (const NODE& t) const {return v < t.v;}
+}p[MAXN*MAXN];
+struct NET{
+	int len, a[MAXN], w;
+}net[10];
+int n, q, f[MAXN], x[MAXN], y[MAXN], m, cnt;
+
+int find(int x){return ~f[x]?f[x] = find(f[x]):x;}
+int kruskal()
+{
+	int ans = 0;
+	for(int i = 0; i < m && cnt < n; i++)
+	{
+		int x = find(p[i].a), y = find(p[i].b);
+		if(x != y) ans += p[i].v, f[x] = y, cnt++;
+	}
+	return ans;
+}
+void add(int si)
+{
+	int y = find(net[si].a[0]);
+	for(int i = 1; i < net[si].len; i++)
+	{
+		int x = find(net[si].a[i]);
+		if(x != y) f[x] = y, cnt++;
+	}
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &q))
+	{
+		for(int i = 0; i < q; i++)
+		{
+			scanf("%d %d%*c", &net[i].len, &net[i].w);
+			for(int j = 0; j < net[i].len; j++)
+				scanf("%d%*c", &net[i].a[j]);
+		}
+		for(int i = 1; i <= n; i++)
+			scanf("%d %d%*c", &x[i], &y[i]);
+		m = 0;
+		for(int i = 1; i <= n; i++)
+		{
+			for(int j = i+1; j <= n; j++)
+				p[m].a = i, p[m].b = j, p[m++].v = dis(i,j);
+		}
+		sort(p,p+m);
+		cnt = 1;
+		memset(f,-1,sizeof(f));
+		int ans = kruskal();
+		for(int i = 1; i < (1<<q); i++)
+		{
+			int buf = 0;
+			memset(f,-1,sizeof(f));
+			cnt = 1;
+			for(int j = 0; j < q; j++)
+			{
+				if((i>>j)&1) buf += net[j].w, add(j);
+			}
+			ans = min(ans,buf+kruskal());
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

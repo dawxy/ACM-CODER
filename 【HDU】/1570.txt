@@ -1,0 +1,22 @@
+#include <stdio.h>
+const __int64 d[11] = {1,1,2,6,24,120,720,5040,40320,362880,3628800};
+
+int main ()
+{
+    #ifdef SHY
+		freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		char c;
+		__int64 n, m;
+        scanf ("%c %I64d %I64d%*c", &c, &n, &m);
+        if ('A' == c)
+			printf ("%I64d\n", d[n]/d[n-m]);
+		else
+			printf ("%I64d\n", d[n]/(d[m]*d[n-m]));
+	}
+    return 0;
+}

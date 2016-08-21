@@ -1,0 +1,61 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXIN = 10000;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+int a[MAXN],l[MAXN],r[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,d1,d2;
+	while(in(n))
+	{
+		in(d1);in(d2);
+		rep(i,0,n) in(a[i]);
+		int la = 0;
+		l[0] = 0;
+		rep(i,1,n)
+		{
+			if(d1+a[i-1] != a[i]) la = i;
+			l[i] = la;
+		}
+		la = n-1;
+		r[n-1] = n-1;
+		per(i,n-2,0)
+		{
+			if(d2+a[i] != a[i+1]) la = i;
+			r[i] = la;
+		}
+		LL ans = 0;
+		int mx = 0,p = 0;
+		rep(i,0,n)
+		{
+			while(p < n && l[p] == i) mx = max(mx,r[p++]);
+			ans += (LL)(mx-i+1);
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

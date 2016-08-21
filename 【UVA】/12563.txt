@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXC 9680
+int dp[MAXC];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while (t--)
+	{
+		int n, m, w;
+		scanf("%d %d%*c", &n, &m);
+		m--;
+		memset(dp,-1,sizeof(dp));
+		dp[0] = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%d%*c", &w);
+			for (int j = m; j >= w; j--)
+			{
+				if (-1 != dp[j - w])
+					dp[j] = max(dp[j], dp[j - w] + 1);
+			}
+		}
+		int ans1 = 0, ans2 = 0;
+		for (int i = 0; i <= m; i++)
+		{
+			if (dp[i] >= ans1)
+				ans1 = dp[i], ans2 = i;
+		}
+		printf("Case %d: %d %d\n", ++count, ans1+1, ans2+678);
+	}
+	return 0;
+}

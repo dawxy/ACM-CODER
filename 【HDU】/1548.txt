@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+using namespace std;
+#define MAXN 210
+struct NODE{
+    int dis,f;
+    NODE(int a, int b){dis = a, f = b;}
+};
+const int d[2]={1,-1};
+int a[MAXN], n;
+bool vis[MAXN];
+
+int bfs(int st, int ed)
+{
+    queue<NODE> q;
+    q.push(NODE(0,st));
+    memset(vis,0,sizeof(vis));
+    vis[st] = true;
+    while(!q.empty())
+    {
+        NODE now = q.front();q.pop();
+        if(now.f == ed) return now.dis;
+        for(int i = 0; i < 2; i++)
+        {
+            int to = now.f+d[i]*a[now.f];
+            if(1 <= to && n >= to && !vis[to])
+            {
+                vis[to] = true;
+                q.push(NODE(now.dis+1,to));
+            }
+        }
+    }
+    return -1;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    while(~scanf("%d%*c", &n) && n)
+    {
+        int st, ed;
+        scanf("%d %d%*c", &st, &ed);
+        for(int i = 1; i <= n; i++)
+            scanf("%d%*c", &a[i]);
+        printf("%d\n", bfs(st,ed));
+    }
+    return 0;
+}

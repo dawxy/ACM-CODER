@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1002
+#define max(a,b) (a>b?a:b)
+int s[MAXN],sum[MAXN],dp[2][MAXN];
+//dp[i][j]表示在前1~j序列中取i个子串的最大值
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int m,a,v = 1,num = 0;
+		scanf("%d%*c", &m);
+		for(int i = 1; i <= m; i++)
+			scanf("%d%*c", &s[i]);
+		for(int i = 1; i <= n; i++)
+			scanf("%d%*c", &a), sum[i] = sum[i-1]+a;
+		memset(dp,0,sizeof(dp));
+		for(int i = 1; i <= m; i++)
+		{
+			v ^= 1;
+			num += s[i];
+			for(int j = num; j <= n; j++)
+				dp[v][j] = max(dp[v][j-1],dp[v^1][j-s[i]]+sum[j]-sum[j-s[i]]);
+		}
+		printf("%d\n", dp[v][n]);
+	}
+	return 0;
+}

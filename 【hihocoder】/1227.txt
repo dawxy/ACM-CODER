@@ -1,0 +1,66 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10;
+const double eps = 1e-9;
+double x[MAXN],y[MAXN];
+int n,m,mx;
+
+double dis(int a, int b)
+{
+	return sqrt((x[a]-x[b])*(x[a]-x[b])+(y[a]-y[b])*(y[a]-y[b]));
+}
+bool equal(double a, double b)
+{
+	return fabs(a-b) < eps;
+}
+int can(int x, double r)
+{
+	int cnt = 0;
+	rep(i,0,n)
+	{
+		if(equal(dis(x,i),r)) return INF;
+		if(dis(x,i) < r) cnt++;
+	}
+	return cnt;
+}
+int find(int x)
+{
+	repe(i,1,mx)
+	{
+		if(can(x,i) == m) return i;
+	}
+	return INF;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d %d", &n, &m);
+		mx = 0;
+		rep(i,0,n)
+			scanf("%lf %lf", &x[i], &y[i]);
+		rep(i,0,n)
+		{
+			rep(j,0,n) mx = max(mx,(int)dis(i,j));
+		}
+		mx += 10;
+		int ans = INF;
+		rep(i,0,n)
+		{
+			ans = min(ans,find(i));
+		}
+		if(INF == ans) puts("-1");
+		else printf("%d\n", ans);
+	}
+	return 0;
+}

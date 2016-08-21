@@ -1,0 +1,84 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, MAXM = 1000+10;
+const double eps = 1e-6;
+int n,m;//n-方程个数,m-未知数个数
+double a[MAXN][MAXM],x[MAXM];//a[][]方程左边的矩阵,x[]-方程右边的值以及最后的未知数答案
+
+inline bool zero(double num){return fabs(num) < eps;}
+int gauss()
+{
+	rep(now,0,m)
+	{
+		int mx = now;
+		rep(i,now+1,n) if(fabs(a[i][now]) > fabs(a[mx][now])) mx = i;
+		if(mx != now)
+		{
+			rep(j,now,m) swap(a[mx][j],a[now][j]);
+			swap(x[mx],x[now]);
+		}
+		if(zero(a[mx][now])) return 2;//有多个解
+		rep(i,now+1,n)
+		{
+			double tmp = a[i][now]/a[now][now];
+			a[i][now] = 0;
+			rep(j,now+1,m) a[i][j] -= tmp*a[now][j];
+			x[i] -= tmp*x[now];
+		}
+	}
+	rep(i,0,n)
+	{
+		bool end = true;
+		rep(j,0,m)
+		{
+			if(!zero(a[i][j]))
+			{
+				end = false;
+				break;
+			}
+		}
+		if(end && !zero(x[i])) return 0;//i行所有a为0，而右边值x不为0，无解
+	}
+	per(now,m-1,0)//从下网上推,利用已知解求未知
+	{
+		rep(j,now+1,m) x[now] -= a[now][j]*x[j];
+		x[now] /= a[now][now];
+	}
+	return 1;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	scanf("%d %d", &m, &n);
+	rep(i,0,n)
+	{
+		rep(j,0,m) scanf("%lf", &a[i][j]);
+		scanf("%lf", &x[i]);
+	}
+	int f = gauss();
+	if(0 == f) puts("No solutions");
+	else if(2 == f) puts("Many solutions");
+	else
+	{
+		rep(i,0,m) printf("%d\n", (int)(x[i]+0.5));
+	}
+	return 0;
+}

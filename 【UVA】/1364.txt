@@ -1,0 +1,109 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define min(a,b) (a>b?b:a)
+#define max(a,b) (a>b?a:b)
+#define MAXN 1010 
+struct Edge{
+	int from, to;
+	Edge(int a = 0, int b = 0){from = a, to = b;}
+};
+int pre[MAXN], bccno[MAXN], bcc[MAXN], bcc_clock,bcc_cnt, n, odd[MAXN], color[MAXN];
+vector<int> g[MAXN];
+stack<Edge> s;
+bool map[MAXN][MAXN];
+
+bool bip(int u, int b)
+{
+	int sz = g[u].size();
+	rep(i,0,sz)
+	{
+		int v = g[u][i];
+		if(bccno[v] != b) continue;
+		if(color[v] == color[u]) return false;
+		if(!color[v])
+		{
+			color[v] = 3-color[u];
+			if(!bip(v,b)) return false;
+		}
+	}
+	return true;
+} 
+int dfs(int u, int fa)
+{
+	int lowu = pre[u] = ++bcc_clock;
+	int sz = g[u].size();
+	rep(i,0,sz)
+	{
+		int v = g[u][i];
+		if(v == fa) continue;
+		if(!pre[v])
+		{
+			s.push(Edge(u,v));
+			int lowv = dfs(v,u);
+			lowu = min(lowu, lowu);
+			if(lowv >= pre[u])
+			{
+				bcc_cnt++;
+				bcc[0] = 0;
+				Edge x;
+				do{
+					x = s.top();s.pop();
+					if(bccno[x.from] != bcc_cnt) bcc[++bcc[0]] = x.from, bccno[x.from] = bcc_cnt;
+					if(bccno[x.to] != bcc_cnt) bcc[++bcc[0]] = x.to, bccno[x.to] = bcc_cnt;
+				}while(!(x.from == u && x.to == v));
+				clc(color,0);
+				color[u] = 1;
+				if(!bip(u,bcc_cnt))
+					repe(j,1,bcc[0]) odd[bcc[j]] = true;
+			}
+		}
+		else if(pre[v] < pre[u])
+		{
+			s.push(Edge(u,v));
+			lowu = min(lowu,pre[v]);
+		}
+	}
+	return lowu;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int m;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		int a,b;
+		repe(i,1,n) g[i].clear();
+		clc(map,0);
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a, &b);
+			map[a][b] = map[b][a] = true;
+		}
+		repe(i,1,n)
+		{
+			repe(j,i+1,n)
+				if(!map[i][j]) g[i].push_back(j), g[j].push_back(i);
+		}
+		clc(pre,0);
+		clc(bccno,0);
+		clc(odd,0);
+		bcc_cnt = bcc_clock = 0;
+		repe(i,1,n) if(!pre[i]) dfs(i,-1);
+		int ans = n;
+		repe(i,1,n) if(odd[i]) ans--;
+		printf("%d\n", ans);
+	}
+	return 0;
+}

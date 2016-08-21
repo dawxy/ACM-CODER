@@ -1,0 +1,69 @@
+#include <stdio.h>
+#define MAXN 1001
+int a[MAXN][MAXN], n,m, x1, y1, x2, y2;
+bool in = false;
+
+void dfs (int, int, int, int, int);
+
+int main ()
+{
+	while (1)
+	{
+		int i, j, q, buf;
+		scanf ("%d %d%*c", &n, &m);
+		if (0 == n && 0 == m)
+			break;
+		for (i = 0; i < n; i++)
+			for (j = 0; j < m; j++)
+				scanf ("%d%*c", &a[i][j]);
+		scanf ("%d%*c", &q);
+		for (i = 0; i < q; i++)
+		{
+			scanf ("%d %d %d %d%*c", &x1, &y1, &x2,&y2);
+			x1 -= 1, y1 -= 1, x2 -= 1, y2 -= 1;
+			if (!a[x1][y1] || !a[x2][y2] || a[x1][y1] != a[x2][y2])
+				printf ("NO\n");
+			else
+			{
+				in = false;
+				buf = a[x2][y2];
+				a[x2][y2] = 0;
+				dfs (x1, y1, x1, y1, 0);
+				a[x2][y2] = buf;
+				if (in)
+					printf ("YES\n");
+				else
+					printf ("NO\n");
+			}
+
+		}
+
+	}
+}
+
+void dfs (int li, int lj, int si, int sj, int f)
+{
+	if (2 < f || in)
+		return;
+	if (si == x2 && sj == y2)
+	{
+		in = true;
+		return;
+	}
+	int d[4][2] = {{-1, 0},{1,0},{0, -1}, {0, 1}}, i, ni, nj, buf;
+	for (i = 0; i < 4; i++)
+	{
+		ni = d[i][0]+si;
+		nj = d[i][1]+sj;
+		if (0 <= ni && n > ni && 0 <= nj && m > nj && 0 == a[ni][nj])
+		{
+			buf = a[ni][nj];
+			a[ni][nj] = -1;
+			if (ni != li && nj != lj)
+				dfs(si, sj, ni, nj,f+1);
+			else
+				dfs(si, sj, ni, nj,f);
+			a[ni][nj] = buf;
+		}
+	}
+}

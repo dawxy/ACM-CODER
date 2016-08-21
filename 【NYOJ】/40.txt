@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+int gcd (int a, int b)
+{
+	if (0 == b%a)
+		return a;
+	return gcd(b%a, a);
+}
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int a, b, g;
+		scanf ("%d %d%*c", &a, &b);
+		g = gcd(a,b);
+		printf ("%d %d\n", g, a*b/g);
+	}
+
+	return 0;
+}

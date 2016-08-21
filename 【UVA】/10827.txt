@@ -1,0 +1,73 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 150+10;
+int a[MAXN][MAXN], sum[MAXN][MAXN];
+struct NODE{
+	int id,val;
+}q[MAXN];
+
+int front,rear;
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		repe(i,1,n)
+		{
+			repe(j,1,n)
+			{
+				scanf("%d%*c", &a[i][j]);
+				a[i][j+n] = a[i+n][j] = a[i+n][j+n] = a[i][j];
+			}
+		}
+		int m = n;
+		n <<= 1;
+		repe(i,1,n)
+		{
+			repe(j,1,n)
+				sum[i][j] = sum[i-1][j]+sum[i][j-1]-sum[i-1][j-1]+a[i][j];
+		}
+		int ans = -INF;
+		repe(i,1,n)
+		{
+			repe(j,i,n)
+			{
+				if(j-i >= m) continue;
+				q[0] = {0,0};
+				front = 0, rear = 1;
+				repe(k,1,n)
+				{
+					int v = sum[j][k]-sum[i-1][k];
+					while(front != rear && k-q[front].id > m) front++;
+					//if(q.size() > 0)
+						ans = max(ans, v-q[front].val);
+					while(front != rear && q[rear-1].val >= v) rear--;
+					q[rear++] = {k,v};
+				}
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

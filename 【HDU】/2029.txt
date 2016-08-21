@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <malloc.h>
+#include <string.h>
+
+
+void main ()
+{
+	int n;
+
+	scanf ("%d", &n);
+	getchar();
+	while (n--)
+	{
+		char *p, *d;
+		int m, i, j;
+		p = (char*) malloc (sizeof(char)*1000);
+		for (i = 0; '\n' != p[i-1] && EOF != p[i-1];i++)
+		{
+			p[i] = getchar();
+			if (1000 < i)
+			{
+				p = (char*)realloc(p,sizeof(char)*i);
+			}
+		}
+		m = i-1;
+		p[i] = '\0';
+
+		d = (char*) malloc (sizeof(char)*(m+1));
+
+		for (i = m-1, j = 0; i >= 0; i--, j++)
+		{
+			d[j] = p[i];
+		}
+		d[j] = '\0';
+
+		if (0 == strncmp(d, p, m))
+		{
+			printf ("yes\n");
+		}
+		else
+			printf ("no\n");
+
+	}
+}

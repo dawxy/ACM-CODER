@@ -1,0 +1,32 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int a, ans = 0;
+		for(int i = 0; i < n; i++)
+		{
+			scanf("%d%*c", &a);
+			int len = sqrt(a*1.0);
+			bool is = true;
+			for(int j = 2; j <= len; j++)
+			{
+				if(0 == a%j)
+				{
+					is = false;
+					break;
+				}
+			}
+			if(is) ans++;
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

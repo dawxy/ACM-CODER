@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 32010
+#define MAXX 15010
+int ans[MAXX], c[MAXN], n;
+
+void updata(int s, int val)
+{
+    while(s <= MAXN)
+	{
+        c[s] += val;
+        s += s&-s;
+	}
+}
+int sum(int s)
+{
+	int sum = 0;
+    while(s)
+	{
+        sum += c[s];
+        s -= s&-s;
+	}
+    return sum;
+}
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(EOF != scanf ("%d%*c", &n))
+	{
+		int a, b;
+		memset(ans,0,sizeof(ans));
+		memset(c,0,sizeof(c));
+        for (int i = 1; i <= n; i++)
+		{
+            scanf ("%d %d%*c", &a, &b);
+            ans[sum(++a)]++;
+            updata(a,1);
+		}
+		for (int i = 0; i < n; i++)
+		{
+            printf ("%d\n", ans[i]);
+		}
+	}
+    return 0;
+}

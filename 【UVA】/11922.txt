@@ -1,0 +1,152 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int a[MAXN];
+
+/*
+splay单次可能会是O(n)但是平摊下来为log(n)
+SplayTree可以是左儿子<根<右儿子；也可以不这样，存一个数组，中序遍历顺序和原数组相同即可
+*/
+struct NODE{
+	NODE *ch[2];
+	int v;//存放的值
+	int sum;//以当前节点为根的子树有多少个节点
+	bool f;//lazy标记
+	int cmp(int x){//这里v不是一定要 左儿子<根<右儿子,所以不能比较v的大小
+		int d = x - ch[0]->sum;
+		if(d == 1) return -1;
+		return d <= 0 ? 0 : 1;
+	}
+	void push_up(){
+		sum = 1+ch[0]->sum+ch[1]->sum;
+	}
+	void push_down(){//这里实现的是翻转序列
+		if(f){
+			f = false;
+			swap(ch[0],ch[1]);
+			ch[0]->f ^= 1;
+			ch[1]->f ^= 1;
+		}
+	}
+};
+NODE *null = new NODE();
+void rotate(NODE* &u, int d)//旋转,d=0左旋,d=1右旋
+{
+	NODE *k = u->ch[d^1];
+	u->ch[d^1] = k->ch[d], k->ch[d] = u;
+	u->push_up(), k->push_up();//再向上传递
+	u = k;
+}
+void splay(NODE* &u, int k)//找到序列的左数第k个元素并伸展到整个splay tree的根
+{
+	u->push_down();//先向下传递
+	int d = u->cmp(k);
+	if(1 == d) k -= u->ch[0]->sum + 1;//k在右子树需要减掉左子树结点数量当前结点
+	if(~d)//不是当前结点,则需要往下找,并在找到后旋转上来直到根
+	{
+		NODE *p = u->ch[d];
+		p->push_down();//先向下传递
+		int d2 = p->cmp(k);
+		int k2 = (d2 ? k - p->ch[0]->sum - 1:k);
+		if(~d2)//再往下找，如果找到了就是单旋，没找到就再往下找返回时再旋转(相当于两次旋转)
+		{
+			splay(p->ch[d2],k2);
+			if(d == d2) rotate(u,d^1);//'三点共线时'
+			else rotate(u->ch[d],d);//'三点不共线'
+		}
+		rotate(u,d^1);
+	}
+}
+NODE* merge(NODE* left, NODE *right)//合并left和right，假定left所有元素都比right小；							
+{                                   //right可以是NULL，但left不可以
+	splay(left,left->sum);//把left中中序顺序最后一个结点(也就是sum)伸展到根,这样left就没有右子树了
+	left->ch[1] = right;//把right接到left的右子树
+	left->push_up();//更新根节点需要维护的值
+	return left;
+}
+void split(NODE *u, int k, NODE* &left, NODE* &right)//分裂u,把u前k小结点放在left,其他放在right
+{                                               //1<= k <=u->sum;当k==u->sum时,right=NULL,left不能空
+	splay(u,k);//把第k小的结点伸展到u的根
+	right = u->ch[1];//u的右儿子就是right
+	left = u;//u的左儿子以及u就是left，右儿子改为NULL
+	u->ch[1] = null;
+	left->push_up();//只需要更新左儿子，右儿子不需要更新
+}
+struct SplayTree{
+	int cnt;//结点数
+	NODE node[MAXN];
+	NODE *rt;
+	NODE* build(int sz){
+		if(!sz) return null;
+		NODE *x = build(sz>>1);
+		NODE *u = &node[cnt];
+		u->v = cnt++;
+		u->ch[0] = x;
+		u->ch[1] = build(sz-sz/2-1);
+		u->f = u->sum = 0;
+		u->push_up();
+		return u;
+	}
+	void init(int sz){
+		cnt = 0;
+		null->sum = 0;
+		rt = build(sz);
+	}
+}s;
+void debug(NODE *u)
+{
+	if(u == null) return;
+	u->push_down();//记得这里也要向下传递
+	debug(u->ch[0]);
+	printf("%d\n", u->v);
+	debug(u->ch[1]);
+}
+
+void pt(NODE *u)
+{
+	if(u == null) return;
+	u->push_down();//记得这里也要向下传递
+	pt(u->ch[0]);
+	if(u->v) printf("%d\n", u->v);
+	pt(u->ch[1]);
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		int from,to;
+		s.init(n+1);
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &from, &to);
+			NODE *left,*mid,*right,*buf;
+			split(s.rt,from,left,buf);
+			split(buf,to-from+1,mid,right);
+			mid->f ^= 1;
+			s.rt = merge(merge(left,right),mid);
+		}
+		//debug(s.rt);
+		pt(s.rt);
+	}
+	return 0;
+}

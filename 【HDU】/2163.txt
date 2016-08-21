@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <string.h>
+char a[60];
+
+bool sloved();
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t = 0;
+    while(1)
+	{
+        gets(a);
+        if (!strcmp(a,"STOP"))
+			break;
+        printf ("#%d: ", ++t);
+        if (sloved())
+            puts("YES");
+		else
+			puts("NO");
+	}
+    return 0;
+}
+
+bool sloved()
+{
+	int len = strlen(a);
+    for (int i = 0, j = len-1; i < j; i++, j--)
+	{
+        if (a[i] != a[j])
+            return false;
+	}
+    return true;
+}

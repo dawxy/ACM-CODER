@@ -1,0 +1,24 @@
+#include <stdio.h>
+
+int main ()
+{
+	int a,b,c;
+	while (EOF != scanf ("%d %d %d%*c", &a, &b, &c))
+	{
+		bool in = false;
+		for (int i = 10; i <= 100; i++)
+		{
+			if (i%3 == a && i%5 == b && i%7 == c)
+			{
+				printf ("%d\n", i);
+				in = true;
+				break;
+			}
+		}
+		if (!in)
+			printf ("No answer\n");
+
+	}
+
+	return 0;
+}

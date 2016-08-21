@@ -1,0 +1,64 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+typedef long long LL;
+
+int pow_mod(LL a, int n, int mod)
+{
+    LL ans = 1;
+    while(n)
+    {
+        if(n&1) ans = ans*a%mod;
+        a = a*a%mod;
+        n >>= 1;
+    }
+    return ans;
+}
+int get_phi(int n)
+{
+    int ans = n, m = sqrt(n+0.5);
+    for(int i = 2; i <= m; i++)
+    {
+        if(0 == n%i)
+        {
+            ans -= ans/i;
+            while(0 == n%i) n /= i;
+        }
+    }
+    if(n > 1) ans -= ans/n;
+    return ans;
+}
+LL check(int a, int n, int phi)
+{
+    LL ans = 1;
+    for(int i = 0; i < n; i++)
+    {
+        ans *= a;
+        if(ans >= phi) return ans;
+    }
+    return ans;
+}
+int f(int n, int phi)
+{
+	if(!n) return 1;
+	int b = f(n/10,get_phi(phi));
+	LL ans = check(n%10,b,phi);
+	if(ans >= phi)
+		ans = pow_mod(n%10,b,phi)+phi;
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+    while(t--)
+    {
+		int n,m;
+		scanf("%d %d%*c", &n, &m);
+        printf("%d\n", f(n,m)%m);
+    }
+    return 0;
+}

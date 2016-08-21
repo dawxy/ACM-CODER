@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 32770
+int d[MAXN] = {0};
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int m;
+	d[0] = 1;
+	for(int i = 1; i <= 3; i++)
+		for(int j = i; j <= MAXN; j++)
+			d[j] += d[j - i];
+	while(~scanf("%d%*c", &m))
+	{
+		printf("%d\n", d[m]);
+	}
+	return 0;
+}

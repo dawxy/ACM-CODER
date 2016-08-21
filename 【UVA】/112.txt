@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct Node{
+	int data, sum;
+	Node *lchild, *rchild;
+}node, *pnode;
+int l, r, n;
+bool finded;
+
+bool get_num(int *a);
+pnode creat_tree(pnode);
+void traverse (pnode, int);
+
+int main ()
+{
+	while(EOF != scanf ("%d%*c", &n))
+	{
+		int a;
+		char c;
+		l = r = 0;
+		finded = false;
+		while('(' != (c = getchar()));
+		l++;
+		pnode ph = NULL;
+		ph = creat_tree(ph);
+		if (NULL != ph)
+			traverse(ph, ph->data);
+		if (finded)
+			puts("yes");
+		else
+			puts("no");
+	}
+
+	return 0;
+}
+
+bool get_num(int *a)
+{
+	int count = 0;
+	char s[20], c;
+	while ('(' != (c= getchar()) && ')' != c)	
+	{
+		if (c == '-' || ('0' <= c && '9' >= c))
+			s[count++] = c;
+	}
+	if ('(' == c)
+		l++;
+	else
+		r++;
+	if (count)
+	{
+		s[count] = '\0';
+		sscanf (s, "%d", a);
+		return true;
+	}
+	while(l != r && '(' != (c = getchar()))
+	{
+		if(')' == c)
+			r++;
+	}
+	l++;
+	return false;
+}
+
+pnode creat_tree(pnode p)
+{
+	int a;
+	if (!get_num(&a))
+		return NULL;
+	else
+	{
+		p = (pnode)malloc(sizeof(node));
+		p->sum = 0;
+		p->data = a;
+		p->lchild = creat_tree(p->lchild);
+		p->rchild = creat_tree(p->rchild);
+		return p;
+	}
+}
+
+void traverse (pnode p, int num)
+{
+	if (p->lchild)
+		traverse(p->lchild, num+p->lchild->data);
+	if (p->rchild)
+		traverse(p->rchild, num+p->rchild->data);
+	if (NULL == p->lchild && NULL == p->rchild && num == n)
+		finded = true;
+}

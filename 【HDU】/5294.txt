@@ -1,0 +1,186 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+typedef int type;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 2000+10, MAXM = 60000*2+10;
+int tol,head[MAXN], nxt[MAXM],to[MAXM];
+LL cost[MAXM],dis[MAXN];
+bool inq[MAXN];
+void add_edge(int u, int v, LL c)
+{
+	nxt[tol] = head[u], to[tol] = v, cost[tol] = c;
+	head[u] = tol++;
+}
+LL tmp;
+LL spfa(int s, int ed)
+{
+	queue<int> q;
+	clc(dis,0x3f);
+	clc(inq,0);
+	q.push(s);
+	inq[s] = true;
+	dis[s] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		inq[u] = false;
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(INF != dis[u] && dis[v] > dis[u]+cost[i])
+			{
+				dis[v] = dis[u]+cost[i]+1;
+				if(!inq[v])
+				{
+					q.push(v);
+					inq[v] = true;
+				}
+			}
+		}
+	}
+	if(INF == dis[ed]) return -1;
+	return dis[ed];
+}
+struct Dinic{
+    struct Edge{
+        int next,u,v;
+		type cap;//cap是剩余流量
+    }edge[MAXM<<1];
+    int head[MAXN], tol, s,t,d[MAXN];
+    void init()
+    {
+        clc(head,-1);
+        tol = 0;
+    }
+    void add_edge(int u, int v, type cap, type cap2 = 0)//有向图传前3个，无向图传4个
+    {
+        Edge e1 = {head[u],u,v,cap};
+        edge[tol] = e1;
+        head[u] = tol++;
+        Edge e2 = {head[v],v,u,cap2};//无向图把这里的cap2=cap可以只建一条边(add_edge一次)
+        edge[tol] = e2;
+        head[v] = tol++;
+    }
+    bool bfs()
+    {
+        clc(d,-1);
+        queue<int> q;
+        q.push(s);
+        d[s] = 0;
+        while(!q.empty())
+        {
+            int u = q.front();q.pop();
+            for(int i = head[u]; ~i; i = edge[i].next)
+            {
+                int v = edge[i].v;
+                if(-1 == d[v] && edge[i].cap)
+                {
+                    d[v] = d[u]+1;
+                    q.push(v);
+                    if(~d[t]) return true;
+                }
+            }
+        }
+        return false;
+    }
+    int stack[MAXN],cur[MAXN],top;
+    type maxflow(int s, int t)
+    {
+        this->s = s, this->t = t;
+        type ans = 0;
+        while(bfs())
+        {
+            memcpy(cur,head,sizeof(head));
+            int u = s;
+            top = 0;
+            while(1)
+            {
+                if(u == t)
+                {
+                    type flow = INF;
+					int loc;//loc 表示 stack 中 cap 最小的边
+                    rep(i,0,top)
+                    {
+                        if(flow > edge[stack[i]].cap)
+                        {
+                            flow = edge[stack[i]].cap;
+                            loc = i;
+                        }
+                    }
+                    rep(i,0,top)
+                    {
+                        edge[stack[i]].cap -= flow;
+                        edge[stack[i]^1].cap += flow;
+                    }
+                    ans += flow;
+                    top = loc;
+                    u = edge[stack[top]].u;
+                }
+                for(int i = cur[u]; ~i; cur[u] = i = edge[i].next) //cur[u] 表示u所在能增广的边的下标
+                    if(edge[i].cap && (d[u]+1 == d[edge[i].v])) break;
+                if(~cur[u])
+                {
+                    stack[top++] = cur[u];
+                    u = edge[cur[u]].v;
+                }
+                else
+                {
+                    if(!top) break;
+                    d[u] = -1;
+                    u = edge[stack[--top]].u;
+                }
+            }
+        }
+        return ans;
+    }
+}dinic;
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d", &n, &m))
+	{
+		tmp = m*3;
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,m)
+		{
+			int u,v;
+			LL c;
+			scanf("%d %d %I64d",&u, &v, &c);
+			c = c*tmp;
+			add_edge(u,v,c);
+			add_edge(v,u,c);
+		}
+		int mi = spfa(1,n);
+		dinic.init();
+		repe(i,1,n)
+		{
+			for(int j = head[i]; ~j; j = nxt[j])
+			{
+				int v = to[j];
+				if(dis[i]/tmp+cost[j]/tmp == dis[v]/tmp)
+					dinic.add_edge(i,v,1);
+			}
+		}
+		printf("%d %d\n", dinic.maxflow(1,n),m-mi%tmp);
+	}
+	return 0;
+}

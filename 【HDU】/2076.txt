@@ -1,0 +1,22 @@
+#include <stdio.h>
+#include <math.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		int h, m, s;
+		scanf ("%d %d %d%*c", &h, &m, &s);
+        h %= 12;
+        double ans = fabs((h+m/60.0+s/3600.0)*30.0-(m+s/60.0)*6.0);
+        if (ans > 180)
+            ans = 360-ans;
+        printf ("%d\n", (int)(ans));
+	}
+    return 0;
+}

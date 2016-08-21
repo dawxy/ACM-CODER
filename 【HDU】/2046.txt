@@ -1,0 +1,17 @@
+#include <stdio.h>
+
+void main ()
+{
+	int n, i;
+	double s[51];
+	for (i = 2, s[0] = 1, s[1] = 2; i < 50; i++)
+	{
+		s[i] = s[i-1] + s[i-2];
+	}
+
+	while (EOF != scanf ("%d", &n))
+	{
+		getchar ();
+		printf ("%.0lf\n", s[n-1]);
+	}
+}

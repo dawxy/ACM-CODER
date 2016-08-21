@@ -1,0 +1,122 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int MAXN = 100+10, MAXM = 5000*5+10;
+const LL INF = 4557430888798830399;
+#define type LL
+struct MCMF{
+	int s,t;
+    struct Edge{
+        int next, to, cap;
+		type cost;
+    }edge[MAXM<<1];//记得多开一倍边数(有反向边)
+	int tol,head[MAXN];
+	bool inq[MAXN];
+	int p[MAXN]/*上一条边*/,pre[MAXN]/*上一个点*/;
+	void init(){
+		clc(head,-1);
+		tol = 0;
+	}
+	void add_edge(int from, int to, int cap, type cost)
+    {
+		Edge e = {head[from],to,cap,cost};
+        edge[tol] = e;
+        head[from] = tol++;
+		Edge e2 = {head[to],from,0,-cost};
+        edge[tol] = e2;
+        head[to] = tol++;
+    }
+	type d[MAXN];/*起点到终点的最小花费*/
+	bool spfa()
+	{
+		queue<int> q;
+		clc(d,0x3f);
+		clc(inq,0);
+		d[s] = 0, inq[s] = true,p[s] = 0;
+		q.push(s);
+		while(!q.empty())
+		{
+			int u = q.front();q.pop();
+			inq[u] = false;
+			for(int i = head[u]; ~i; i = edge[i].next)
+			{
+				int v = edge[i].to;
+				type c = edge[i].cost;
+				if(edge[i].cap > 0 && d[v] > d[u]+c)
+				{
+					d[v] = d[u]+c;
+					p[v] = i;
+					pre[v] = u;
+					if(!inq[v]) q.push(v), inq[v] = true;
+				}
+			}
+		}
+		return INF != d[t];
+	}
+	//需要保证初始网络没有负圈，返回最小花费，flow是最大流
+	//如需要求最大费用最大流，则只要把边权改为负的，最后答案为-ans即可
+	type mincostmaxflow(int st, int ed,int &flow)
+	{
+		s = st, t = ed;
+		flow = 0;
+		type cost = 0;
+		while(spfa())
+		{
+			int tmp = INF;
+			for(int i = t; i != s; i = pre[i]) tmp = min(tmp,edge[p[i]].cap);
+			flow += tmp;
+			cost += d[t]*tmp;
+			for (int i = t ; i != s; i = pre[i])
+			{
+				edge[p[i]].cap -= tmp;
+				edge[p[i]^1].cap += tmp;
+			}
+		}
+		return cost;
+	}
+}mcmf;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m,k;
+	while(~scanf("%d %d %d%*c", &n, &m, &k))
+	{
+		mcmf.init();
+		rep(i,0,m)
+		{
+			int u,v,a,c;
+			scanf("%d %d %d %d%*c", &u, &v, &a, &c);
+			int s = 1;
+			repe(j,1,c)
+			{
+				mcmf.add_edge(u,v,1,s*a);
+				s += 2;
+			}
+		}
+		int st = 0, ed = n+1;
+		mcmf.add_edge(st,1,k,0);
+		mcmf.add_edge(n,ed,k,0);
+		int flow;
+		type ans = mcmf.mincostmaxflow(st,ed,flow);
+		if(flow != k) puts("-1");
+		else printf("%I64d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,65 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200010, MOD = 10007;
+char s[MAXN];
+int nxt[MAXN], dp[MAXN];
+
+int get_next(char *x, int m)
+{
+    int i = 0, j = -1;
+    clc(nxt,0);
+    nxt[0] = j;
+    /*for (int i=1; s[i]; ++i) {
+         while (~j && s[j+1]!=s[i]) j = nxt[j];
+         if (s[j+1] == s[i]) ++j;
+         nxt[i] = j;
+     }*/
+
+    while(i<m)
+    {
+        while(~j && x[i] != x[j])
+            j = nxt[j];
+        nxt[++i] = ++j;
+    }
+    rep(i,0,m) nxt[i] = nxt[i+1]-1;
+    int ans = 0;
+    rep(i,0,m) dp[i] = 1;
+    rep(i,0,m)
+    {
+        if(~nxt[i])dp[i] = (dp[i]+dp[nxt[i]])%MOD;
+        ans = (ans+dp[i])%MOD;
+    }
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    s[0]='*';
+    while(t--)
+    {
+        int n;
+        scanf("%d%*c", &n);
+        scanf("%s", s);
+        printf("%d\n", get_next(s,n));
+    }
+    return 0;
+}

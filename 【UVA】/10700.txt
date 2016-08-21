@@ -1,0 +1,113 @@
+#include <stdio.h>
+struct NODE{
+    bool is_add, vis;
+    long long num;
+}p[30], buf[30];
+int n;
+bool vis[30];
+
+long long add();
+long long mul();
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+        n = 1;
+        char c;
+        scanf ("%lld%c",&p[0].num, &c);
+        buf[0].num = p[0].num;
+        while(1)
+		{
+			if ('\n' == c)
+				break;
+            if ('+' == c)
+				p[n].is_add = true;
+			else
+				p[n].is_add = false;
+			buf[n].is_add = p[n].is_add;
+			if (EOF == scanf ("%lld%c", &p[n].num,&c))
+				break;
+			buf[n].num = p[n].num;
+			n++;
+		}
+		long long minnum, maxnum;
+		for (int i = 0; i < n; i++)
+            p[i].vis = false;
+		add();
+        maxnum = mul();
+        for (int i = 0; i < n; i++)
+		{
+            p[i].num = buf[i].num;
+            p[i].is_add = buf[i].is_add;
+            p[i].vis = false;
+		}
+        mul();
+        minnum = add();
+        printf ("The maximum and minimum are %lld and %lld.\n",maxnum, minnum);
+	}
+	return 0;
+}
+
+long long add()
+{
+	int first = 0, i, ans;
+    for (i = 1; i < n; )
+	{
+		if (p[i].vis)
+		{
+			i++;
+			continue;
+		}
+        if(p[i].is_add)
+		{
+			while(p[i].is_add && i < n)
+			{
+				if (p[i].vis)
+				{
+					i++;
+					continue;
+				}
+				p[first].num += p[i].num;
+				p[i++].vis = true;
+			}
+		}
+		else
+			first = i++;
+	}
+	return p[0].num;
+}
+
+long long mul()
+{
+	int first = 0, i;
+    for (i = 1; i < n; )
+	{
+		if (p[i].vis)
+		{
+			i++;
+			continue;
+		}
+        if(!p[i].is_add)
+		{
+			while(!p[i].is_add && i < n)
+			{
+				if (p[i].vis)
+				{
+					i++;
+					continue;
+				}
+				p[first].num *= p[i].num;
+				p[i++].vis = true;
+			}
+		}
+		else
+			first = i++;
+	}
+	return p[0].num;
+}
+

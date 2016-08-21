@@ -1,0 +1,44 @@
+#include<stdio.h>
+
+int main (void)
+{
+	int n;
+	char c, c10, c0;
+
+	scanf ("%d%*c", &n);
+
+		while (n--)
+		{
+			c10 = 0; c0 = 0;
+
+			while((c = getchar ()) != 10)
+			{
+				if (c0 == 0)
+					c0 = c;
+				else
+				{
+					c10 = c0;
+					c0 = c;
+				}
+				printf ("%c", c);
+			}
+			if (c10 == '1')
+			{
+				printf ("th\n");
+			}
+			else
+				switch (c0)
+			{
+				case '1':printf ("st\n");
+					break;
+				case '2':printf ("nd\n");
+					break;
+				case '3':printf ("rd\n");
+					break;
+				default :printf ("th\n");
+					break;
+			}
+
+		}
+	return 0;
+}

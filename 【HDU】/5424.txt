@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXIN = 10000, MAXOUT = 10000, MAXN = 1000+10, MAXM = 1000*2+10;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+char bufout[MAXOUT], outtmp[50],*pout = bufout, *pend = bufout+MAXOUT;
+inline void write(){ fwrite(bufout,sizeof(char),pout-bufout,stdout);pout = bufout;}
+inline void out_char(char c){ *(pout++) = c;if(pout == pend) write();}
+inline void out_str(char *s)
+{
+	while(*s){ *(pout++) = *(s++); if(pout == pend) write(); }
+}
+template <class T>
+inline void out_int(T x) {
+	if(!x){ out_char('0');return;}
+	if(x < 0) x = -x,out_char('-');
+	int len = 0;
+	while(x){ outtmp[len++] = x%10+48; x /= 10;}
+	outtmp[len] = 0;
+	for(int i = 0, j = len-1; i < j; i++,j--) swap(outtmp[i],outtmp[j]);
+	out_str(outtmp);
+}
+int head[MAXN],tol,nxt[MAXM],to[MAXM];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u];to[tol] = v;
+	head[u] = tol++;
+}
+int du[MAXN],cnt,n;
+bool vis[MAXN];
+void dfs(int u)
+{
+	vis[u] = true;
+	cnt++;
+	int v = -1;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		if(vis[to[i]]) continue;
+		if(-1 == v || du[to[i]] < du[v]) v = to[i];
+	}
+	if(~v) dfs(v);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	while(in(n))
+	{
+		clc(head,-1);tol = 0;
+		clc(du,0);
+		rep(i,0,n)
+		{
+			int u,v;
+			in(u);in(v);
+			du[u]++,du[v]++;
+			add_edge(u,v);
+			add_edge(v,u);
+		}
+		int u = 1;
+		repe(i,2,n) if(du[i] < du[u]) u = i;
+		cnt = 0;
+		clc(vis,0);
+		dfs(u);
+		if(cnt == n) out_str("YES\n");
+		else out_str("NO\n");
+	}
+	write();
+	return 0;
+}

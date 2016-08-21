@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10, MAXM = 120*120+10000+10;
+int v[MAXN],c[MAXN],dp[MAXM];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,t;
+	while(~scanf("%d %d%*c", &n, &t))
+	{
+		int mv = -1;
+		rep(i,0,n)
+		{
+			scanf("%d%*c", &v[i]);
+			if(mv < v[i]) mv = v[i];
+		}
+		int m = mv*mv+t+1;
+		rep(i,0,n) scanf("%d%*c", &c[i]);
+		clc(dp,0x3f);
+		dp[0] = 0;
+		rep(i,0,n)
+		{
+			if(c[i]*v[i] >= m)
+				repe(j,v[i],m) dp[j] = min(dp[j],dp[j-v[i]]+1);
+			else
+			{
+				for(int j = 1; j <= c[i]; c[i] -= j, j<<=1)
+				{
+					int w = j*v[i];
+					per(k,m,w) dp[k] = min(dp[k],dp[k-w]+j);
+				}
+				if(c[i] > 0)
+				{
+					int w = c[i]*v[i];
+					per(k,m,w) dp[k] = min(dp[k],dp[k-w]+c[i]);
+				}
+			}
+		}
+		rep(i,0,n)
+		{
+			per(j,m-v[i],0)
+				dp[j] = min(dp[j], dp[j+v[i]]+1);
+		}
+		if(INF != dp[t]) printf("%d\n", dp[t]);
+		else puts("-1");
+	}
+	return 0;
+}

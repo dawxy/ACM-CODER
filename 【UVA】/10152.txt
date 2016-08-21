@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <malloc.h>
+#include <string.h>
+typedef struct node{
+	char s[82];
+}node, *pnode;
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n, i, j;
+		pnode a, b;
+		scanf ("%d%*c", &n);
+		a = (pnode)malloc(sizeof(node)*n);
+		b = (pnode)malloc(sizeof(node)*n);
+		for (i = n-1; i >= 0; i--)
+			gets(a[i].s);
+		for (i = n-1; i >= 0; i--)
+			gets(b[i].s);
+		for (i = 0, j = 0; i < n; )
+		{
+			if (!strcmp(a[i].s, b[j].s))
+				i++, j++;
+			else
+				i++;
+		}
+		for (i = j; i < n; i++)
+			puts(b[i].s);
+		printf ("\n");
+		free(a);
+		free(b);
+	}
+
+	return 0;
+}

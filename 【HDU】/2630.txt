@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <string.h>
+char a[100];
+
+bool ok()
+{
+    if (!strcmp("S.H.E",a) || !strcmp("Jay",a) || !strcmp("Elva",a)|| !strcmp("Jolin",a) || !strcmp("Aska",a) || !strcmp("Yoga",a))
+        return true;
+	return false;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int n, h = 0, m = 0, s = 0, b, c;
+        scanf ("%d%*c", &n);
+        for (int i = 0; i < n; i++)
+		{
+            scanf ("%s%d%*c%d%*c", a, &b,&c);
+            if (ok())
+			{
+				m += b;
+				s += c;
+			}
+		}
+        m += s/60;
+        s %= 60;
+        h += m/60;
+        m %= 60;
+        printf ("Samuel will watch Channel[V] for %d hour(s),%d minute(s),%d second(s).\n", h,m,s);
+	}
+    return 0;
+}

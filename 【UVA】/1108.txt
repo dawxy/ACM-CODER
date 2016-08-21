@@ -1,0 +1,95 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define min(a,b) (a>b?b:a)
+#define max(a,b) (a>b?a:b)
+#define MAXN 100010
+#pragma comment(linker, "/STACK:1024000000,1024000000")
+typedef long long LL;
+struct Edge{
+	int from, to;
+	Edge(int a = 0, int b = 0){from = a, to = b;}
+};
+int p[MAXN] ,pre[MAXN], bccno[MAXN], n, bcc_clock, bcc_cnt;
+bool iscut[MAXN];
+vector<int> g[MAXN], bcc[MAXN];
+stack<Edge> s;
+
+int dfs(int u, int fa)
+{
+	int lowu = pre[u] = ++bcc_clock, sz = g[u].size(), child = 0;
+	rep(i,0,sz)
+	{
+		int v = g[u][i];
+		if(!pre[v])
+		{
+			child++;
+			s.push(Edge(u,v));
+			int lowv = dfs(v,u);
+			lowu = min(lowu, lowv);
+			if(lowv >= pre[u])
+			{
+				iscut[u] = true;
+				Edge x;
+				bcc[++bcc_cnt].clear();
+				do{
+					x = s.top();s.pop();
+					if(bccno[x.from] != bcc_cnt) bcc[bcc_cnt].push_back(x.from), bccno[x.from] = bcc_cnt;
+					if(bccno[x.to] != bcc_cnt) bcc[bcc_cnt].push_back(x.to), bccno[x.to] = bcc_cnt;
+				}while(!(x.from == u && x.to == v));
+			}
+		}
+		else if(pre[v] < pre[u] && v != fa)
+		{
+			s.push(Edge(u,v));
+			lowu = min(lowu,pre[v]);
+		}
+	}
+	if(fa < 0 && child == 1) iscut[u] = 0;
+	return lowu;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int m, count = 0;
+	while(~scanf("%d%*c", &m) && m)
+	{
+		int a,b;
+		n = 0;
+		clc(p,-1);
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a, &b);
+			if(-1 == p[a]) p[a] = n++, g[n-1].clear();
+			if(-1 == p[b]) p[b] = n++, g[n-1].clear();
+			g[p[a]].push_back(p[b]), g[p[b]].push_back(p[a]);
+		}
+		bcc_cnt = bcc_clock = 0;
+		clc(pre,0);
+		clc(iscut,0);
+		clc(bccno,0);
+		rep(i,0,n) if(!pre[i]) dfs(i,-1);
+		int ans1 = 0;
+		LL ans2 = 1;
+		repe(i,1,bcc_cnt)
+		{
+			int cnt = 0, sz = bcc[i].size();
+			rep(j,0,sz) if(iscut[bcc[i][j]]) cnt++;
+			if(1 == cnt) ans1++, ans2 *= (LL)(bcc[i].size()-cnt);
+		}
+		if(1 == bcc_cnt) ans1 = 2, ans2 = bcc[1].size()*(bcc[1].size()-1)/2;
+		printf("Case %d: %d %lld\n", ++count, ans1, ans2);
+	}
+	return 0;
+}

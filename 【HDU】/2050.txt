@@ -1,0 +1,17 @@
+#include <stdio.h>
+
+void main ()
+{
+	int n;
+	scanf ("%d", &n);
+	getchar ();
+
+	while (n--)
+	{
+		int a;
+		scanf ("%d", &a);
+		getchar ();
+
+		printf ("%I64d\n", 2*a*a-a+1);
+	}
+}

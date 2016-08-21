@@ -1,0 +1,76 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50+10,d[4][2]={{0,1},{1,0},{-1,0},{0,-1}};
+struct NODE{
+	int x,y,k;
+	double cost;
+	NODE(int a, int b, int kk, double c)
+	{
+		x = a,y = b;k = kk,cost = c;
+	}
+	bool operator<(const NODE &t) const{
+		return cost > t.cost;
+	}
+};
+double dp[MAXN][MAXN][MAXN];
+bool vis[MAXN][MAXN][MAXN];
+int n,m,k;
+char a[MAXN][MAXN];
+priority_queue<NODE> q;
+
+bool sloved(int si, int sj, int ei, int ej, double &ans)
+{
+	if(k == 0) return false;
+	while(!q.empty()) q.pop();
+	clc(vis,0);
+	q.push(NODE(si,sj,k,0));
+	dp[si][sj][k] = 0;
+	while(!q.empty())
+	{
+		NODE now = q.top();q.pop();
+		if(vis[now.x][now.y][now.k]) continue;
+		vis[now.x][now.y][now.k] = true;
+		if(ei == now.x && ej == now.y)
+		{
+			ans = now.cost;
+			return true;
+		}
+		rep(i,0,4)
+		{
+			int ni = now.x+d[i][0],nj = now.y+d[i][1];
+			if(0 <= ni && n > ni && 0 <= nj && m > nj && now.k > 0 && !vis[ni][nj][now.k-1] && '#' != a[ni][nj])
+			{
+				dp[ni][nj][now.k-1] = now.cost+(abs(a[now.x][now.y]-a[ni][nj]))*1.0/(now.k*1.0);
+				q.push(NODE(ni,nj,now.k-1,dp[ni][nj][now.k-1]));
+			}
+		}
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d%d%d", &n, &m, &k);
+		rep(i,0,n)
+		{
+			scanf("%s", a[i]);
+		}
+		int si,sj,ei,ej;
+		scanf("%d %d %d %d", &si, &sj,&ei, &ej);
+		double ans;
+		if(sloved(si-1,sj-1,ei-1,ej-1,ans)) printf("%.2lf\n", ans);
+		else puts("No Answer");
+	}
+	return 0;
+}

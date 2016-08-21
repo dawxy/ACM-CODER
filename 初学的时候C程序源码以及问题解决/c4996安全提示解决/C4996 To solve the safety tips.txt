@@ -1,0 +1,17 @@
+/*2013年7月25日 10:27:23
+  目的：提示C4996 在函数后面加_s（最新安全函数）
+  直接在预编译器定义添加_CRT_SECURE_NO_DEPRECATE就可以屏蔽错误但是用原来的函数
+  或者直接项目属性->C/C++ ->SDL检查关掉
+
+*/
+#include<stdio.h>
+
+int main (void)
+{
+	int j,k;
+
+	scanf_s ("%d %d", &j, &k);//用scanf会出现C4996安全错误 要在后面加_s
+	printf ("j = %d k = %d\n", j, k);
+
+	return 0;
+}

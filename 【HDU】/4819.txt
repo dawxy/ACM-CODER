@@ -1,0 +1,154 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <ctime>
+using namespace std;
+typedef unsigned int LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 800+10;
+int a[MAXN][MAXN],n;
+int mx[MAXN<<1][MAXN<<1], mi[MAXN<<1][MAXN<<1];
+
+inline int id(int x, int y){return x+y|x!=y;}
+void push_up(int x, int y, int m, int u)
+{
+    mx[u][id(x,y)] = max(mx[u][id(x,m)], mx[u][id(m+1,y)]);
+    mi[u][id(x,y)] = min(mi[u][id(x,m)], mi[u][id(m+1,y)]);
+}
+void bulid2(int x, int y, int ux, int uy, bool yz)
+{
+    if(x == y)
+    {
+        int u = id(ux,uy);
+        if(yz) mx[u][id(x,y)] = mi[u][id(x,y)] = a[ux][x];
+        else
+        {
+            int m = (ux+uy)>>1;
+            mx[u][id(x,y)] = max(mx[id(ux,m)][id(x,y)], mx[id(m+1,uy)][id(x,y)]);
+            mi[u][id(x,y)] = min(mi[id(ux,m)][id(x,y)], mi[id(m+1,uy)][id(x,y)]);
+        }
+        return;
+    }
+    int m = (x+y)>>1;
+    bulid2(x,m,ux,uy,yz);
+    bulid2(m+1,y,ux,uy,yz);
+    push_up(x,y,m,id(ux,uy));
+}
+void bulid(int x, int y)
+{
+    if(x == y)
+    {
+        bulid2(1,n,x,y,1);
+        return;
+    }
+    int m = (x+y)>>1;
+    bulid(x,m);
+    bulid(m+1,y);
+    bulid2(1,n,x,y,0);
+}
+void update2(int x, int y, int p, int v,int ux, int uy, bool yz)
+{
+    if(x == y)
+    {
+        int u = id(ux,uy);
+        if(yz) mx[u][id(x,y)] = mi[u][id(x,y)] = v;
+        else
+        {
+            int m = (ux+uy)>>1;
+            mx[u][id(x,y)] = max(mx[id(ux,m)][id(x,y)], mx[id(m+1,uy)][id(x,y)]);
+            mi[u][id(x,y)] = min(mi[id(ux,m)][id(x,y)], mi[id(m+1,uy)][id(x,y)]);
+        }
+        return;
+    }
+    int m = (x+y)>>1;
+    if(p <= m) update2(x,m,p,v,ux,uy,yz);
+    else update2(m+1,y,p,v,ux,uy,yz);
+    push_up(x,y,m,id(ux,uy));
+}
+void update(int x, int y, int p, int p2, int v)
+{
+    if(x == y)
+    {
+        update2(1,n,p2,v,x,y,1);
+        return;
+    }
+    int m = (x+y)>>1;
+    if(p <= m) update(x,m,p,p2,v);
+    else update(m+1,y,p,p2,v);
+    update2(1,n,p2,v,x,y,0);
+}
+int qmx,qmi;
+void query2(int x, int y, int ql, int qr, int u)
+{
+    if(ql <= x && y <= qr)
+    {
+        qmx = max(qmx,mx[u][id(x,y)]);
+        qmi = min(qmi,mi[u][id(x,y)]);
+        return;
+    }
+    int m = (x+y)>>1;
+    if(ql <= m) query2(x,m,ql,qr,u);
+    if(qr > m) query2(m+1,y,ql,qr,u);
+}
+void query(int x, int y, int ql, int qr, int sl, int sr)
+{
+    if(ql <= x && y <= qr)
+    {
+        query2(1,n,sl,sr,id(x,y));
+        return;
+    }
+    int m = (x+y)>>1;
+    if(ql <= m) query(x,m,ql,qr,sl,sr);
+    if(qr > m) query(m+1,y,ql,qr,sl,sr);
+}
+int main()
+{
+#ifdef SHY
+    freopen("d://1.txt", "r", stdin);
+#endif
+    int t,count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        scanf("%d%*c", &n);
+        repe(i,1,n)
+        {
+            repe(j,1,n) scanf("%d%*c", &a[i][j]);
+        }
+        bulid(1,n);
+        int q;
+        scanf("%d%*c", &q);
+        printf("Case #%d:\n",++count);
+        while(q--)
+        {
+            qmx = -INF, qmi = INF;
+            int x,y,r;
+            scanf("%d %d %d%*c", &x, &y, &r);
+            r >>= 1;
+            int ql,qr,sl,sr;
+            ql = x-r, qr = x+r;
+            sl = y-r, sr = y+r;
+            if(ql < 1) ql = 1;
+            if(qr > n) qr = n;
+            if(sl < 1) sl = 1;
+            if(sr > n) sr = n;
+            query(1,n,ql,qr,sl,sr);
+            int v = (qmx+qmi)>>1;
+            printf("%d\n", v);
+            update(1,n,x,y,v);
+        }
+    }
+    return 0;
+}
+

@@ -1,0 +1,38 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define INF 0x3f3f3f3f
+char c[MAXN];
+int dp[MAXN][MAXN];
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        gets(c);
+        int n = strlen(c);
+        for (int i = 0; i < n; i++)
+            dp[i][i] = 1;
+        for (int m = 1; m < n; m++)//iºÍjµÄ¾àÀë
+        {
+            for (int i = 0; i < n-m; i++)
+            {
+                int j = i+m;
+                dp[i][j] = INF;
+                if (('(' == c[i] && ')' == c[j]) || ('[' == c[i] && ']' == c[j]))
+                    dp[i][j] = min(dp[i][j], dp[i+1][j-1]);
+                for (int k = i; k < j; k++)
+                    dp[i][j] = min(dp[i][j], dp[i][k]+dp[k+1][j]);
+            }
+        }
+        printf ("%d\n", dp[0][n-1]);
+    }
+    return 0;
+}

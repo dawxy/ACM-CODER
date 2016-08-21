@@ -1,0 +1,40 @@
+/*
+	设青蛙A，B都跳了x次，A转了b圈，B转了c圈最后在s点相遇，则可以得到
+	1）M*x+b*L+X=s
+	2）N*x+c*L+Y=s
+	1)-2)得到(M-N)*x+(b-c)*L=Y-X; ==>x(M-N)+yL=Y-X;这个是ax+by=c的形式
+*/
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+typedef long long LL;
+
+void e_gcd(LL a, LL b, LL& d, LL& x, LL &y)
+{
+	if(!b) d = a,x = 1, y = 0;
+	else e_gcd(b,a%b,d,y,x), y -= x*(a/b);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	LL X,Y,m,n,l;
+	while(~scanf("%lld %lld %lld %lld %lld%*c", &X, &Y, &m, &n, &l))
+	{
+		LL a = m-n, b = l, d,x,y, c = Y-X;
+		e_gcd(a,b,d,x,y);
+		if(c%d)
+		{
+			puts("Impossible");
+			continue;
+		}
+		x *= c/d;
+		y *= c/d;
+		LL g = abs(b/d);
+		while(x > 0) x -= g;
+		while(x < 0) x += g;
+		printf("%lld\n", x);
+	}
+	return 0;
+}

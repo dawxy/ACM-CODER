@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <string.h>
+
+int fanzhuan(int a)
+{
+	char s[20], t[20];
+	int len, f;
+	sprintf (s,"%d",a);
+	len = strlen(s);
+	for (int i = 0,j = len-1;i < len;i++, j--)
+		t[j] = s[i];
+	t[len] = '\0';
+	sscanf(t, "%d", &f);
+	return f;
+}
+
+int main ()
+{
+	while (1)
+	{
+		int a, b;
+		scanf ("%d %d%*c", &a, &b);
+		if (0 == a && 0 == b)
+			break;
+		printf ("%d\n", fanzhuan(a)+fanzhuan(b));
+	}
+
+	return 0;
+}

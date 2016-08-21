@@ -1,0 +1,110 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+char buf[MAXN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+	int ans = 0;
+    if(ps == pe) return -1;
+	do{
+		rnext();
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return -1;
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	return ans;
+}
+int a[MAXN];
+
+inline int id(int x, int y){return x+y|x!=y;}
+int mx[MAXN<<1],mi[MAXN<<1];
+void push_up(int x, int y, int m)
+{
+	int u = id(x,y),l = id(x,m),r = id(m+1,y);
+	if(-1 == mx[l]) mx[u] = mx[r], mi[u] = mi[r];
+	else if(-1 == mx[r]) mx[u] = mx[l],mi[u] = mi[l];
+	else mx[u] = max(mx[l],mx[r]), mi[u] = min(mi[l],mi[r]);
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		mx[id(x,y)] = mi[id(x,y)] = a[x];
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+int k;
+int query(int x, int y, int mxx, int mii)
+{
+	if(x == y)
+	{
+		mxx = max(mxx,mx[id(x,y)]);
+		mii = min(mii,mi[id(x,y)]);
+		return x+(bool)(mxx-mii < k);
+	}
+	int m = (x+y)>>1;
+	int tmx = max(mxx,mx[id(x,m)]), tmi = -1 == mi[id(x,m)]?mii:min(mi[id(x,m)],mii);
+	if(tmx-tmi >= k) return query(x,m,mxx,mii);
+	return query(m+1,y,tmx,tmi);
+}
+void del(int x, int y, int p)
+{
+	if(x == y)
+	{
+		mx[id(x,y)] = mi[id(x,y)] = -1;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) del(x,m,p);
+	else del(m+1,y,p);
+	push_up(x,y,m);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t = in();
+	while(t--)
+	{
+		int n = in();
+		k = in();
+		repe(i,1,n) a[i] = in();
+		bulid(1,n);
+		LL ans = 0;
+		repe(i,1,n)
+		{
+			int r = query(1,n,-INF,INF);
+			ans += r-i;
+			del(1,n,i);
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

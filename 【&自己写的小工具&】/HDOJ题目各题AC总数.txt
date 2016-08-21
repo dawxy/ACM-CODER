@@ -1,0 +1,51 @@
+#include <cstdio>
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+int sum[20];
+char a[10000];
+
+char* get_p(char *s, char *ans)
+{
+	int cnt = 0;
+	while(*s && *s != ',')
+	{
+		ans[cnt++] = *s;
+		s++;
+	}
+	ans[cnt] = 0;
+	return *s?s+1:s;
+}
+bool ok(char *s)
+{
+	while(*s)
+	{
+		if(*s == ':') return true;
+		s++;
+	}
+	return false;
+}
+int main()
+{
+	int n;
+	printf("请输入有几个题目(并存在同一目录下的in.txt)：");
+	scanf("%d", &n);
+	freopen("in.txt","r",stdin);
+	int cnt = 0;
+	gets(a);gets(a);
+	char buf[200],*p;
+	while(gets(a))
+	{
+		p = a;
+		rep(i,0,4) p = get_p(p,buf);
+		repe(i,1,n)
+		{
+			p = get_p(p,buf);
+			sum[i] += ok(buf);
+		}
+	}
+	repe(i,1,n) printf("10%02d: %d\n", i,sum[i]);
+	freopen("con","r",stdin);
+	getchar();
+	return 0;
+}

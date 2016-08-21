@@ -1,0 +1,55 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10,MAXM = 100000+10;
+int v[MAXN],num[MAXN],cnt[MAXM];
+bool dp[MAXM];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		rep(i,0,n) scanf("%d%*c",&v[i]);
+		rep(i,0,n) scanf("%d%*c",&num[i]);
+		clc(dp,0);
+		dp[0] = true;
+		rep(i,0,n)
+		{
+			clc(cnt,0);
+			repe(j,v[i],m)
+			{
+				if(!dp[j] && dp[j-v[i]] && cnt[j-v[i]] < num[i])
+				{
+					dp[j] = true;
+					cnt[j] = cnt[j-v[i]]+1;
+				}
+			}
+		}
+		int ans = 0;
+		repe(i,1,m)
+		{
+			if(dp[i])
+				ans++;
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

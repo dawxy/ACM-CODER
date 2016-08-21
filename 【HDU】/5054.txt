@@ -1,0 +1,24 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <string>
+#include <map>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int n,m,a,b;
+    while(~scanf("%d %d %d %d%*c", &n,&m,&a,&b))
+    {
+        if(2*a == n && 2*b == m)
+            puts("YES");
+        else
+            puts("NO");
+    }
+    return 0;
+}

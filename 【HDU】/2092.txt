@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+int n, m;
+
+bool sloved()
+{
+	int len = ceil(sqrt(1.0*abs(m)));
+	for (int i = -len; i <= len+1; i++)
+	{
+        if (i*(n-i) == m)
+            return true;
+	}
+	return false;
+}
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(1)
+	{
+        scanf ("%d %d%*c", &n, &m);
+        if (!n && !m)
+			break;
+		if (sloved())
+			puts("Yes");
+		else
+			puts("No");
+	}
+    return 0;
+}

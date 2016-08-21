@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 10010
+int d[MAXN], v[2] = {150,200};
+
+int main ()
+{
+        #ifdef SHY
+        freopen("e:\\1.txt","r",stdin);
+        #endif
+        int t;
+        scanf ("%d%*c", &t);
+        while(t--)
+	{
+                int m;
+                memset(d, 0, sizeof(d));
+                scanf ("%d%*c", &m);
+                for (int i = 0; i < 2; i++)
+                        for (int j = v[i]; j <= m ;j++)
+                                d[j] = max(d[j],d[j-v[i]]+v[i]);
+                printf ("%d\n", m-d[m]);
+	}
+        return 0;
+}

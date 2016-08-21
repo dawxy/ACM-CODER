@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define MAXM 5000
+struct NODE{
+	int a, b, v;
+	bool operator <(const NODE& t) const { return v < t.v;}
+}p[MAXM];
+int f[MAXN];
+
+int find(int x) { return f[x] == x ? x : f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int m = n*(n-1)/2, d, ans = 0;
+		for(int i = 1; i <= n; i++) f[i] = i;
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d %d%*c", &p[i].a, &p[i].b, &p[i].v, &d);
+			if(d) p[i].v = 0;
+		}
+		sort(p,p+m);
+		for(int i = 0; i < m; i++)
+		{
+			int x = find(p[i].a), y = find(p[i].b);
+			if(x != y)
+			{
+				ans += p[i].v;
+				f[x] = y;
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

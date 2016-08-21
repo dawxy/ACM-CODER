@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <string.h>
+
+int main ()
+{
+	int t = 0;
+	char a[5], b[6];
+	while (EOF != scanf("%s %s%*c", a, b))
+	{
+		if (!strcmp(a, "A#"))
+			strcpy(a,"Bb");
+		else if (!strcmp(a, "Bb"))
+			strcpy(a,"A#");
+		else if (!strcmp(a, "C#"))
+			strcpy(a,"Db");
+		else if (!strcmp(a, "Db"))
+			strcpy(a,"C#");
+		else if (!strcmp(a, "D#"))
+			strcpy(a,"Eb");
+		else if (!strcmp(a, "Eb"))
+			strcpy(a,"D#");
+		else if (!strcmp(a, "F#"))
+			strcpy(a,"Gb");
+		else if (!strcmp(a, "Gb"))
+			strcpy(a,"F#");
+		else if (!strcmp(a, "G#"))
+			strcpy(a,"Ab");
+		else if (!strcmp(a, "Ab"))
+			strcpy(a,"G#");
+		else
+		{
+			printf ("Case %d: UNIQUE\n", ++t);
+			continue;
+		}
+		printf ("Case %d: %s %s\n", ++t, a, b);
+	}
+
+	return 0;
+}

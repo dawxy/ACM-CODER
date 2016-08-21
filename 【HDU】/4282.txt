@@ -1,0 +1,64 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+const LL MAXN = 2147483648;
+int k,maxx;
+
+LL k_pow(LL x, int n)
+{
+	LL ans = 1, w = x;
+	while(n)
+	{
+		if(n&1) ans *= x;
+		x *= x;
+		n >>= 1;
+	}
+	return ans;
+}
+bool find(int x, int z)
+{
+	int l = x+1, r = maxx;
+	while(l <= r)
+	{
+		int m = (l+r)>>1;
+		LL ans = k_pow(x,z)+k_pow(m,z)+x*m*z;
+		if(ans < 0) ans = MAXN;
+		if(ans == k) return true;
+		if(ans < k) l = m+1;
+		else r = m-1;
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &k) && k)
+	{
+		int ans = 0;
+		maxx = sqrt((double)k);
+		repe(x,1,maxx)
+		{
+			for(int z = 2; k_pow(x,z) <= k && k_pow(2,z) <= k;z++)
+				ans += find(x,z);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

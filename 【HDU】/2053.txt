@@ -1,0 +1,27 @@
+#include <stdio.h>
+
+void main ()
+{
+    int n;
+
+    while (EOF != scanf ("%d", &n))
+    {
+        int i, j, s = 3, r,p;
+
+
+        for (i = 1, p = 1; i <= n; i++)
+        {
+            if (i == p)
+            {
+                r = 1;
+                p = s+i;
+                s += 2;
+            }
+            else
+                r = 0;
+        }
+
+        printf ("%d\n", r);
+
+    }
+}

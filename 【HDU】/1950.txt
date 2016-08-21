@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 40010
+int d[MAXN];
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        int len = -1, a, n;
+        scanf ("%d%*c", &n);
+        d[0] = 0;
+        for (int i = 0; i < n; i++)
+        {
+            scanf ("%d%*c", &a);
+            if (a > d[len])
+                d[++len] = a;
+            else
+            {
+                int l = 0, r = len, mid;
+                while(l <= r)
+                {
+                    mid = (l+r) >> 1;
+                    if (a <= d[mid])
+                        r = mid-1;
+                    else
+                        l = mid+1;
+                }
+                d[l] = a;
+            }
+        }
+        printf ("%d\n", len+1);
+    }
+    return 0;
+}

@@ -1,0 +1,119 @@
+/*n^2*/
+#include <cstdio>
+#include <cstring>
+#define MAXN 210
+#define INF 0x3f3f3f3f
+#define min(a,b) (a<b?a:b)
+bool vis[MAXN];
+int dp[MAXN], cost[MAXN][MAXN], st, ed;
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		int a,b, v, st, ed;
+		memset(dp,0x3f,sizeof(dp));
+		memset(vis,0,sizeof(vis));
+		memset(cost,0x3f,sizeof(cost));
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b, &v);
+			if(cost[a][b] > v)
+				cost[a][b] = cost[b][a] = v;
+		}
+		scanf("%d %d%*c", &st, &ed);
+		dp[st] = 0;
+		for(int i = 0; i < n; i++)
+		{
+			int x,m = INF;
+			for(int j = 0; j < n; j++) if(!vis[j] && dp[j] <= m) m = dp[x=j];
+			vis[x] = true;
+			for(int j = 0; j < n; j++) dp[j] = min(dp[j],dp[x]+cost[x][j]);
+		}
+		if(INF == dp[ed]) puts("-1");
+		else printf("%d\n", dp[ed]);
+	}
+	return 0;
+}
+========================================================================================
+/* mlogn */
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <vector>
+using namespace std;
+#define MAXN 210
+#define INF 0x3f3f3f3f
+int dp[MAXN];
+bool vis[MAXN];
+struct NODE{
+	int dis, u;
+	NODE(int a = 0, int b = 0){ dis = a, u = b;}
+	bool operator <(const NODE& a) const {return dis > a.dis;}
+};
+struct E{
+	int from, to, cost;
+	E(int a = 0, int b = 0, int c = 0){ from = a, to = b, cost = c;}
+};
+vector<E> edge;//记录所有边
+vector<int> g[MAXN];//每个点出发的所有边的编号
+
+void add(int a, int b, int v)//加一条有向边
+{
+	edge.push_back(E(a,b,v));
+	int buf = edge.size();
+	g[a].push_back(buf-1);
+}
+void dijkstra(int st)
+{
+	priority_queue<NODE> q;
+	memset(dp,0x3f,sizeof(dp));
+	memset(vis,0,sizeof(vis));
+	dp[st] = 0;
+	q.push(NODE(0,st));
+	while(!q.empty())
+	{
+		NODE buf = q.top();
+		q.pop();
+		if(vis[buf.u]) continue;
+		vis[buf.u] = true;
+		for(int i = 0; i < g[buf.u].size(); i++)
+		{
+			E& e = edge[g[buf.u][i]];
+			if(dp[e.to] > dp[buf.u]+e.cost)
+			{
+				dp[e.to] = dp[buf.u]+e.cost;
+				q.push(NODE(dp[e.to],e.to));
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		int a,b,v;
+		for(int i = 0; i < n; i++) g[i].clear();
+		edge.clear();
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b, &v);
+			add(a,b,v);
+			add(b,a,v);
+		}
+		int st, ed;
+		scanf("%d %d%*c", &st, &ed);
+		dijkstra(st);
+		if(INF == dp[ed]) puts("-1");
+		else printf("%d\n", dp[ed]);
+	}
+	return 0;
+}

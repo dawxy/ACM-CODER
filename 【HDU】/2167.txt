@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 16
+#define MAXC 1598
+struct NODE{
+	int last, now;
+}p[MAXC*MAXC];
+int a[MAXN][MAXN], dp[MAXN][MAXC], s[MAXC], v[MAXN][MAXC];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while (~scanf("%d%*c", &a[1][1]))
+	{
+		int n = 1, len = 0, sum = 0;
+		char ch = 0;
+		memset(v,0,sizeof(v));
+		memset(dp,0,sizeof(dp));
+		while ('\n' != ch) scanf("%d%c", &a[1][++n], &ch);
+		for (int i = 2; i <= n; i++)
+		{
+			for (int j = 1; j <= n; j++)
+				scanf("%d%*c", &a[i][j]);
+		}
+		for (int i = 0; i < (1 << n); i++)
+		{
+			if (i&(i << 1)) continue;
+			s[len++] = i;
+		}
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 0; j < len; j++)
+			{
+				int x = s[j], d = 0;
+				while (x)
+				{
+					if (x & 1) v[i][j] += a[i][d+1];
+					x >>= 1;
+					d++;
+				}
+			}
+		}
+		for (int i = 0; i < len; i++)
+		{
+			for (int j = 0; j < len; j++)
+			{
+				if ((s[i] & s[j]) || ((s[i] << 1)&s[j]) || ((s[i] >> 1)&s[j])) continue;
+				p[sum].last = i, p[sum++].now = j;
+			}
+		}
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 0; j < sum; j++)
+				dp[i][p[j].now] = max(dp[i][p[j].now], dp[i-1][p[j].last]+v[i][p[j].now]);
+		}
+		int ans = 0;
+		for (int i = 0; i < len; i++)
+			ans = max(ans,dp[n][i]);
+		printf("%d\n", ans);
+	}
+	return 0;
+}

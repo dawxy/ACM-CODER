@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <malloc.h>
+
+typedef struct Node {
+	int data;
+	Node* next;
+}node, *pnode;
+pnode plast;
+
+pnode init_list ();//创建单链表
+bool add_list(pnode, int);//在单链表最后增加一个元素
+void traverse_list (pnode);//遍历
+pnode search_midlist(pnode);//查找并返回链表中间元素
+
+int main ()
+{
+	pnode phead = init_list();
+	for (int i = 1; i <= 10; i++)
+		add_list(phead, i);
+	pnode mid = search_midlist(phead);
+	printf ("%d\n", mid->data);
+	return 0;
+}
+
+pnode init_list ()
+{
+	pnode phead = (pnode)malloc (sizeof(node));
+	phead->next = NULL;
+	plast = phead;
+	return phead;
+}
+
+bool add_list(pnode ph, int val)
+{
+	pnode p = (pnode)malloc(sizeof (node)), q = ph;
+	if (!p)
+		return false;
+	p->data = val;
+	p->next = NULL;
+	//plast->next = p;//plast记录当前最后一个节点这样效率高
+	//plast = p;
+	while (NULL != q->next)
+		q = q->next;
+	q->next = p;
+	return true;
+}
+
+void traverse_list (pnode ph)
+{
+	pnode p = ph->next;
+	if (!p)
+	{
+		printf ("链表为空\n");
+		return;
+	}
+	while (NULL != p)
+	{
+		printf ("%d\n", p->data);
+		p = p->next;
+	}
+}
+
+pnode search_midlist(pnode ph)
+{
+	pnode search, mid;
+	mid = search = ph->next;
+	while (NULL != search->next)//search 是快指针每次移动两个元素mid移动一个
+	{                           //当search移动到最后元素时mid正好是中间元素
+		if (NULL != search->next->next)
+			search = search->next->next, mid = mid->next;
+		else
+			search = search->next;
+	}
+	return mid;
+}

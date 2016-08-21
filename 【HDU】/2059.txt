@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define INF 0x3f3f3f3f
+double dp[MAXN];//dp[i]表示乌龟到达i个加油站需要的最少时间
+int s[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	double L;
+	while(~scanf("%lf%*c", &L))
+	{
+		int n;
+		double c, t, vr, v1, v2;
+		scanf("%d %lf %lf %lf %lf %lf%*c", &n, &c, &t, &vr, &v1, &v2);
+		for (int i = 1; i <= n; i++)
+			scanf("%d%*c", &s[i]);
+		s[n+1] = L;			
+		dp[0] = 0;
+		for (int i = 1; i <= n+1; i++)
+		{
+			dp[i] = INF;
+			for (int j = 0; j < i; j++)
+			{
+				double buf = dp[j]+(c<s[i]-s[j]?c/v1+(s[i]-s[j]-c)/v2:(s[i]-s[j])/v1);
+				if (j>0)
+					buf += t;
+				dp[i] = min(dp[i], buf);
+			}
+		}
+		if (dp[n+1] < (L/vr))
+			puts("What a pity rabbit!");
+		else
+			puts("Good job,rabbit!");
+	}
+	return 0;
+}

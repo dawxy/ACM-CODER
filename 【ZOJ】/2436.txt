@@ -1,0 +1,78 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <ext/rope>
+using namespace std;
+using namespace __gnu_cxx;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 131072*2+10;
+char buf[MAXN], *ps = buf, *pe = ps+1;
+inline void rnext()
+{
+	if(++ps == pe){
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+	}
+}
+inline int in()
+{
+	do{
+		rnext();
+	}while(!isdigit(*ps));
+	int ans = 0;
+	do{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps));
+	return ans;
+}
+rope<int> p;
+int f[MAXN];
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+	{
+		int n = in();
+		int m= in();
+		p.clear();
+		p.insert(1,m,0);
+		repe(i,1,n+m) f[i] = i;
+		repe(j,1,n)
+		{
+			int a = in();
+			int x = find(a);
+			p.insert(a-1,j);
+			int k = x;
+			p.erase(k,1);
+			f[x] = f[x+1];
+		}
+		int sz = p.size(), ed;
+		for(ed = sz-1; ed >= 0; ed--)
+		{
+			if(p[ed]) break;
+		}
+		printf("%d\n%d", ed+1,p[0]);
+		repe(i,1,ed) printf(" %d", p[i]);
+		putchar('\n');
+		if(t) putchar('\n');
+	}
+    return 0;
+}

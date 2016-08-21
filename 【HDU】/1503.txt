@@ -1,0 +1,53 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 110
+struct NODE{
+	int x,y;
+}p[MAXN][MAXN];
+char a[MAXN],b[MAXN];
+int dp[MAXN][MAXN];
+
+void pt(int x, int y)
+{
+	if(!x || !y)
+	{
+		if(x)
+			for(int i = 1; i <= x; i++) putchar(a[i-1]);
+		else
+			for(int i = 1; i <= y; i++) putchar(b[i-1]);
+		return;
+	}
+	pt(p[x][y].x, p[x][y].y);
+	if(p[x][y].x < x)
+		putchar(a[x-1]);
+	else
+		putchar(b[y-1]);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%s %s%*c", a, b))
+	{
+		int lena = strlen(a), lenb = strlen(b);
+		for(int i = 1; i <= lena; i++)
+		{
+			for(int j = 1; j <= lenb; j++)
+			{
+				if(a[i-1] == b[j-1])
+					dp[i][j] = dp[i-1][j-1]+1,p[i][j].x = i-1,p[i][j].y = j-1;
+				else
+				{
+					if(dp[i-1][j] > dp[i][j-1])
+						dp[i][j] = dp[i-1][j], p[i][j].x = i-1,p[i][j].y = j;
+					else
+						dp[i][j] = dp[i][j-1], p[i][j].x = i,p[i][j].y = j-1;
+				}
+			}
+		}
+		pt(lena,lenb);
+		putchar('\n');
+	}
+	return 0;
+}

@@ -1,0 +1,53 @@
+/*
+在n种怪物中杀死不多于s个怪物,消耗最小的忍耐度，使得获得的经验值最大
+*/
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+int d[MAXN][MAXN];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int c, m, n, s;
+        while(~scanf ("%d %d %d %d%*c", &c, &m, &n, &s))
+	{
+                int val, w;
+                memset(d,0,sizeof(d));
+                //d[i][j][k]表示在杀死第i个怪物时总消耗j忍耐度，杀掉k个这种怪物时获得的最大的经验值
+                //因为每个怪物有无限多，所以是完全背包问题
+                for (int i = 0; i < n; i++)
+		{
+			scanf ("%d %d%*c", &val, &w);
+                        for (int j = w; j <= m; j++)
+			{
+                                for (int k = 1; k <= s; k++)
+					d[j][k] = max(d[j][k],d[j-w][k-1]+val);
+			}
+		}
+		int i;//寻找当获得的经验值>=c时，消耗的最少的忍耐度i
+		bool finded = false;
+		for (i = 0; i <= m; i++)
+		{
+                        for (int j = 0; j <= s; j++)
+			{
+                                if (d[i][j] >= c)
+				{
+					finded = true;
+                                        break;
+				}
+			}
+                        if (finded)
+				break;
+		}
+                if (!finded)
+                        puts("-1");
+		else
+			printf ("%d\n", m-i);
+	}
+        return 0;
+}

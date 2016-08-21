@@ -1,0 +1,19 @@
+#include <stdio.h>
+#include <math.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		double a, b, c;
+		scanf ("%lf %lf %lf%*c", &a, &b, &c);
+		if (fabs(a+b-c) <= 0.00001)
+			puts("Yes");
+		else
+			puts("No");
+	}
+
+	return 0;
+}

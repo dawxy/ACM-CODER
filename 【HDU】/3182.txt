@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 15
+struct NODE{
+	int len, s[MAXN];
+}p[MAXN];
+int n, m, v[MAXN], w[MAXN], dp[1<<MAXN];
+//dp[s]表示当前已经做的汉堡集合s还能获得的最大价值
+
+bool ok(int s, int i)//判断现在已经制作的汉堡能否满足制作汉堡i
+{
+	for (int j = 0; j < p[i].len; j++)
+	{
+		if (0 == (s&(1 << p[i].s[j])))
+			return false;
+	}
+	return true;
+}
+int dfs(int s, int c)
+{
+	if (-1 != dp[s]) return dp[s];
+	dp[s] = 0;
+	for (int i = 0; i < n; i++)
+	{
+		if (s&(1 << i)) continue;//已经制作过的汉堡不能再做了
+		if (0 <= c - w[i] && ok(s, i))//找到下一个制作哪种汉堡能获得的价值最大
+			dp[s] = max(dp[s], dfs(s|(1<<i),c-w[i])+v[i]);
+	}
+	return dp[s];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while (t--)
+	{
+		int a;
+		scanf("%d %d%*c", &n, &m);
+		for (int i = 0; i < n; i++)
+			p[i].len = 0;
+		memset(dp,-1,sizeof(dp));
+		for (int i = 0; i < n; i++)
+			scanf("%d%*c", &v[i]);
+		for (int i = 0; i < n; i++)
+			scanf("%d%*c", &w[i]);
+		for (int i = 0; i < n; i++)
+		{
+			scanf("%d%*c", &p[i].len);
+			for (int j = 0; j < p[i].len; j++)
+			{
+				scanf("%d%*c", &a);
+				p[i].s[j] = a-1;
+			}
+		}
+		printf("%d\n", dfs(0, m));
+	}
+	return 0;
+}

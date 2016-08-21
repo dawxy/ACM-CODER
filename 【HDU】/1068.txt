@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+#define MAXN 510
+bool vis[MAXN], d[MAXN][MAXN];
+int lin[MAXN], n;
+vector<int> g[MAXN];
+
+bool dfs(int u)
+{
+    for(int i = 0; i < g[u].size(); i++)
+    {
+        int v = g[u][i];
+        if(!vis[v])
+        {
+            vis[v] = true;
+            if(-1 == lin[v] || dfs(lin[v]))
+            {
+                lin[v] = u;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+int hungary()
+{
+    int ans = 0;
+    memset(lin,-1,sizeof(lin));
+    for(int i = 0; i < n; i++)
+    {
+        memset(vis,0,sizeof(vis));
+        if(dfs(i)) ans++;
+    }
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    while(~scanf("%d%*c", &n))
+    {
+        int a, b, len;
+        memset(d,0,sizeof(d));
+        for(int i = 0; i < n; i++) g[i].clear();
+        for(int i = 0; i < n; i++)
+        {
+            scanf("%d: (%d)%*c", &a, &len);
+            for(int j = 0; j < len; j++)
+            {
+                scanf("%d%*c", &b);
+                if(!d[b][a])
+                    g[a].push_back(b);
+                d[a][b] = true;
+            }
+        }
+        printf("%d\n", n-hungary());
+    }
+    return 0;
+}

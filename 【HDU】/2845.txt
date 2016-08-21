@@ -1,0 +1,47 @@
+#include <cstdio>
+#include <cstring>
+#include <malloc.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 200010
+int ans, ch, dp[MAXN];
+
+inline int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int h, w;
+	while(~scanf("%d %d%*c", &h, &w))
+	{
+		h += 3, w += 3;
+		int **r = (int**)malloc(sizeof(int*)*h);
+		for (int i = 0; i < h; i++)
+			r[i] = (int*)malloc(sizeof(int)*w);
+		for (int i = 0; i < h; i++)
+		{
+		    for (int j = 0; j <= 3; j++)
+				r[i][j] = 0;
+		}
+		for(int i = 3; i < h; i++)
+		{
+			for (int j = 3; j < w; j++)
+			{
+				r[i][j] = in();
+				r[i][j] += max(r[i][j-2],r[i][j-3]);
+			}
+		}
+		for (int i = 3; i < h; i++)
+			dp[i] = max(r[i][w-1],r[i][w-2])+max(dp[i-2], dp[i-3]);
+		printf("%d\n", max(dp[h-1], dp[h-2]));
+		free(r);
+	}
+	return 0;
+}

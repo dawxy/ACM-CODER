@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 100
+#ifdef SHY
+#define scanf_s scanf
+#define gets_s gets
+#endif
+char a[MAXN];
+int p[MAXN];
+
+int main ()
+{
+#ifdef SHY
+    freopen("d:\\1.txt","r",stdin);
+#endif
+    int k;
+    while(EOF != scanf ("%d%*c", &k) && k)
+    {
+        gets(a);
+        int n = strlen(a);
+        for (int i = 0; i < n; i++)
+        {
+            if ('a' <= a[i] && 'z' >= a[i])
+                a[i] -= 96;
+            else if ('_' == a[i])
+                a[i] = 0;
+            else
+                a[i] = 27;
+        }
+        for (int i = 0; i < n; i++)
+            p[k*i%n] = (a[i]+i)%28;
+        for (int i = 0; i < n; i++)
+        {
+            if (1 <= p[i] && 26 >= p[i])
+                printf ("%c",p[i]+96);
+            else if(0 == p[i])
+                printf ("_");
+            else
+                printf (".");
+        }
+        printf ("\n");
+    }
+    return 0;
+}

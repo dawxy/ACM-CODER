@@ -1,0 +1,22 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 210
+#define MAXM 6
+int dp[MAXM][MAXN];
+
+int main()
+{
+	int n,m;
+	scanf("%d %d%*c", &n, &m);
+	dp[0][0] = 1;
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= m; j++)
+		{
+			for (int k = i; k <= n; k++)
+				dp[j][k] += dp[j-1][k-i];
+		}
+	}
+	printf("%d\n", dp[m][n]);
+	return 0;
+}

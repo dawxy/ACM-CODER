@@ -1,0 +1,31 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 102
+#define MAXM 1002
+#define min(a,b) (a<b?a:b)
+int dp[MAXN], c[MAXN], sum[MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n, a;
+		scanf("%d%*c", &n);
+		for(int i = 1; i <= n; i++)
+			scanf("%d %d%*c", &a, &c[i]), sum[i] = sum[i-1]+a;
+		memset(dp,0x3f,sizeof(dp));
+		dp[0] = 0;
+		for(int i = 1; i <= n; i++)
+		{
+			for(int j = 0; j < i; j++)
+				dp[i] = min(dp[i], dp[j]+(sum[i]-sum[j]+10)*c[i]);
+		}
+		printf("%d\n", dp[n]);
+	}
+	return 0;
+}

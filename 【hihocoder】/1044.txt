@@ -1,0 +1,74 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+int dp[MAXN][1<<10];//dp[i][s]表示前i个且[i-M,i]的状态为s时取到最大值
+int w[MAXN], cnt[1<<10];
+
+int count(int s)
+{
+	int sum = 0;
+	while(s)
+	{
+		if(s&1) sum++;
+		s >>= 1;
+	}
+	return sum;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	rep(i,0,1<<10) cnt[i] = count(i);
+	int n,m,q;
+	scanf("%d %d %d%*c", &n, &m, &q);
+	repe(i,1,n) scanf("%d%*c", &w[i]);
+	clc(dp,0);
+	int ALL = (1<<m)-1;
+	if(n < m)
+	{
+		sort(w+1,w+1+n);
+		int sum = 0;
+		repe(i,1,q) sum += w[i];
+		printf("%d\n", sum);
+		return 0;
+	}
+	rep(i,0,n)
+	{
+		int mx, h;
+		if(i < m) mx = (1<<i)-1, h = i+1;
+		else mx = ALL, h = m;
+		repe(s,0,mx)
+		{
+			//选择i+1
+			int ns = s<<1|1;
+			if((1<<h)&ns) ns ^= 1<<h;
+			if(cnt[ns] <= q)
+				dp[i+1][ns] = max(dp[i+1][ns], dp[i][s]+w[i+1]);
+			//不选i+1
+			ns = s<<1;
+			if((1<<h)&ns) ns ^= 1<<h;
+			if(cnt[ns] <= q)
+				dp[i+1][ns] = max(dp[i+1][ns], dp[i][s]);
+		}
+	}
+	int ans = 0;
+	repe(s,0,ALL) ans = max(ans, dp[n][s]);
+	printf("%d\n", ans);
+	return 0;
+}

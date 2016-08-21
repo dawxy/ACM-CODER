@@ -1,0 +1,91 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 10010
+#define MAXM 20010
+struct P{
+	int u,v;
+	char ch;
+}p[MAXM];
+struct Edge{
+	int next, v;
+	Edge(int a = 0, int b = 0){next = a, v = b;}
+}edge[MAXM];
+int f[MAXN], head[MAXN], tol, in[MAXN], cnt, n;
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+void add_edge(int u, int v)
+{
+	edge[tol] = Edge(head[u], v);
+	head[u] = tol++;
+}
+int topo()
+{
+	int p = 0, c = 1;
+	queue<int> q;
+	rep(i,0,n) if(!in[i] && f[i] == i) q.push(i);
+	while(!q.empty())
+	{
+		if(q.size() > 1) c = 0;
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v;
+			if(!--in[v]) q.push(v);
+		}
+		p++;
+	}
+	if(p < cnt) return -1;
+	return c;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		cnt = n;
+		rep(i,0,n) f[i] = i;
+		clc(in,0);
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,m)//必须先缩完所有点再连边
+		{
+			scanf("%d %c %d%*c", &p[i].u, &p[i].ch, &p[i].v);
+			if('=' == p[i].ch)
+			{
+				int x = find(p[i].u), y = find(p[i].v);
+				if(x != y) f[x] = y, cnt--;
+			}
+		}
+		rep(i,0,m)
+		{
+			if('=' == p[i].ch) continue;
+			int x = find(p[i].u), y = find(p[i].v);
+			if('>' == p[i].ch)
+				add_edge(x,y), in[y]++;
+			else
+				add_edge(y,x), in[x]++;
+		}
+		int ans = topo();
+		if(-1 == ans) puts("CONFLICT");
+		else if(0 == ans) puts("UNCERTAIN");
+		else puts("OK");
+	}
+	return 0;
+}

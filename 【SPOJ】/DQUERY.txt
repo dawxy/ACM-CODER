@@ -1,0 +1,82 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 30000+10, MAXQ = 200000+10;
+struct IN{
+	int x,y,id;
+	bool operator<(const IN &t)const
+	{
+		return y < t.y;
+	}
+}in[MAXQ];
+int c[MAXN], a[MAXN], tol, ans[MAXQ], n;
+int vis[1000000];
+
+inline int lowbit(int x){return x&-x;}
+void add(int x, int v)
+{
+	while(x <= n)
+	{
+		c[x] += v;
+		x += lowbit(x);
+	}
+}
+int sum(int x)
+{
+	int ans = 0;
+	while(x > 0)
+	{
+		ans += c[x];
+		x -= lowbit(x);
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d", &n))
+	{
+		tol = 0;
+		repe(i,1,n) scanf("%d", &a[i]);
+		int q;
+		scanf("%d", &q);
+		rep(i,0,q) scanf("%d %d", &in[i].x, &in[i].y), in[i].id = i;
+		sort(in,in+q);
+		int p = 1;
+		clc(c,0);
+		clc(vis,-1);
+		rep(i,0,q)
+		{
+			int st = in[i].x, ed = in[i].y;
+			for(;p <= ed; p++)
+			{
+				if(-1 == vis[a[p]]) add(p,1);
+				else
+				{
+					add(vis[a[p]],-1);
+					add(p,1);
+				}
+				vis[a[p]] = p;
+			}
+			ans[in[i].id] = sum(ed)-sum(st-1);
+		}
+		rep(i,0,q) printf("%d\n", ans[i]);
+	}
+	return 0;
+}

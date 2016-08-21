@@ -1,0 +1,72 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+struct NODE{
+	NODE *ch[2];
+	int v;
+	int cmp(int k){
+		return v < k;
+	}
+}node[MAXN];
+int cnt;
+
+void insert(NODE *&u, int v)
+{
+	if(NULL == u)
+	{
+		u = &node[cnt++];
+		u->ch[0] = u->ch[1] = NULL;
+		u->v = v;
+		return;
+	}
+	int d = u->cmp(v);
+	insert(u->ch[d],v);
+}
+vector<int> ans;
+void pt(NODE *&u)
+{
+	if(NULL == u) return;
+	ans.push_back(u->v);
+	pt(u->ch[0]);
+	pt(u->ch[1]);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int v;
+		NODE *rt = NULL;
+		cnt = 0;
+		rep(i,0,n)
+		{
+			scanf("%d%*c", &v);
+			insert(rt,v);
+		}
+		ans.clear();
+		pt(rt);
+		n = ans.size();
+		printf("%d",ans[0]);
+		rep(i,1,n) printf(" %d", ans[i]);
+		putchar('\n');
+	}
+	return 0;
+}

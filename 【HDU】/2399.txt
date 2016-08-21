@@ -1,0 +1,41 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(1)
+	{
+        int n = 0, sum = 0, e;
+        char a,c;
+        bool ok = true;
+        while(1)
+		{
+			e = scanf ("%c%c", &a, &c);
+			n++;
+            if ('A' == a)
+                sum += 4;
+			else if ('B' == a)
+				sum += 3;
+			else if ('C' == a)
+				sum += 2;
+            else if ('D' == a)
+				sum += 1;
+            else if ('F' == a);
+            else
+                ok = false;
+            if (2 != e || '\n' == c)
+				break;
+		}
+		if (-1 == e)
+            break;
+        if (!ok)
+			puts ("Unknown letter grade in input");
+		else
+			printf("%.2lf\n",sum*1.0/(1.0*n));
+		if (2 != e)
+			break;
+	}
+    return 0;
+}

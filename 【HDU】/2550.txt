@@ -1,0 +1,49 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 100
+struct NODE{
+	int len, sum;
+	bool operator<(const NODE& t) const{return len < t.len;}
+}p[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		rep(i,0,n)
+			scanf("%d %d%*c", &p[i].len, &p[i].sum);
+		sort(p,p+n);
+		rep(i,0,n)
+		{
+			rep(j,0,p[i].sum)
+			{
+				printf(">+");
+				rep(k,2,p[i].len) putchar('-');
+				printf("+>\n");
+			}
+			putchar('\n');
+		}
+	}
+	return 0;
+}

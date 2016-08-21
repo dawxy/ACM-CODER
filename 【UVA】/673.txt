@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <stack>
+#include <string.h>
+using namespace std;
+
+int main ()
+{
+	int t;
+	stack<char> s;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		char buf, m[130];
+		bool in = false;
+		int len, i;
+		gets (m);
+		len = strlen(m);
+		if (0 == len)
+		{
+			printf ("Yes\n");
+			continue;
+		}
+		if (len%2)
+		{
+			printf ("No\n");
+			continue;
+		}
+		for (i = 0; i < len; i++)
+		{
+			if (' ' == m[i])
+				continue;
+			if ('(' == m[i] || '[' == m[i])
+				s.push(m[i]);
+			else if(m[i]==')' && !s.empty() && s.top()=='(' || m[i]==']' && !s.empty() && s.top()=='[')
+				s.pop();
+			else
+			{
+				in = true;
+				break;
+			}
+		}
+		if(!in && s.empty())
+			printf ("Yes\n");
+		else
+			printf ("No\n");
+		while(s.size())
+			s.pop();
+	}
+
+	return 0;
+}

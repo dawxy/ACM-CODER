@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+struct NODE{
+    int a, b, num;
+}p[1010];
+
+bool cmp(NODE a, NODE b)
+{
+	double c = a.b*1.0/a.a,d = b.b*1.0/b.a;
+    if (c == d)
+        return a.num < b.num;
+    return c > d;
+}
+int main ()
+{
+    #ifdef SHY
+		freopen("e:\\1.txt","r",stdin);
+	#endif
+	int t;
+	scanf ("%d%*c%*c", &t);
+    while(t--)
+	{
+        int n;
+        scanf ("%d%*c", &n);
+        for (int i = 0;  i < n; i++)
+		{
+            scanf ("%d %d%*c", &p[i].a, &p[i].b);
+            p[i].num = i;
+		}
+		getchar();
+        sort(p, p+n,cmp);
+        printf ("%d",p[0].num+1);
+        for (int i = 1; i < n; i++)
+            printf (" %d",p[i].num+1);
+        printf ("\n");
+        if (t)
+            printf ("\n");
+	}
+    return 0;
+}

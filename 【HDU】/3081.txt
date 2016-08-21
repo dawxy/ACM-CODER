@@ -1,0 +1,370 @@
+/*dinic费用流：二分+起点终点k费用 */
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 400+10, MAXM = 10000*2*2*2+10;
+struct Edge{
+    int next,u,v;
+}edge[MAXM];
+int head[MAXN],tol,st,ed, cap[MAXM], tmp, buf[MAXM], f[MAXN];
+int vis[MAXN][MAXN];
+
+void add_edge(int u, int v, int c)
+{
+    Edge e = {head[u],u,v};
+    edge[tol] = e;
+    cap[tol] = c;
+    head[u] = tol++;
+    Edge e1 = {head[v],v,u};
+    edge[tol] = e1;
+    cap[tol] = 0;
+    head[v] = tol++;
+}
+int d[MAXN];
+bool bfs()
+{
+    clc(d,-1);
+    queue<int> q;
+    q.push(st);
+    d[st] = 0;
+    while(!q.empty())
+    {
+        int u = q.front();q.pop();
+        for(int i = head[u]; ~i; i = edge[i].next)
+        {
+            int v = edge[i].v;
+            if(-1 == d[v] && cap[i])
+            {
+                d[v] = d[u]+1;
+                q.push(v);
+                if(~d[ed]) return true;
+            }
+        }
+    }
+    return false;
+}
+int stack[MAXN],top,cur[MAXN];
+int maxflow()
+{
+    int ans = 0;
+    while(bfs())
+    {
+        memcpy(cur,head,sizeof(head));
+        int u = st;
+        top = 0;
+        while(1)
+        {
+            if(u == ed)
+            {
+                int flow = INF,loc;
+                rep(i,0,top)
+                {
+                    if(flow > cap[stack[i]])
+                    {
+                        flow = cap[stack[i]];
+                        loc = i;
+                    }
+                }
+                rep(i,0,top)
+                {
+                    cap[stack[i]] -= flow;
+                    cap[stack[i]^1] += flow;
+                }
+                ans += flow;
+                top = loc;
+                u = edge[stack[top]].u;
+            }
+            for(int i = cur[u]; ~i; cur[u] = i = edge[i].next)
+                if(cap[i] && d[u]+1 == d[edge[i].v]) break;
+            if(~cur[u])
+            {
+                stack[top++] = cur[u];
+                u = edge[cur[u]].v;
+            }
+            else
+            {
+                if(!top) break;
+                d[u] = -1;
+                u = edge[stack[--top]].u;
+            }
+        }
+    }
+    return ans;
+}
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n,m,fn;
+        scanf("%d %d %d%*c", &n, &m, &fn);
+        clc(head,-1);
+        clc(vis,0);
+        tol = 0;
+        rep(i,0,m)
+        {
+            int a,b;
+            scanf("%d %d%*c", &a, &b);
+            vis[a][b] = true;
+        }
+        repe(i,1,n) f[i] = i;
+        rep(i,0,fn)
+        {
+            int a,b;
+            scanf("%d %d%*c", &a, &b);
+            int x = find(a), y = find(b);
+            if(x != y) f[x]= y;
+        }
+        repe(i,1,n)
+        {
+            int x = find(i);
+            repe(j,1,n)
+            {
+                int y = find(j);
+                if(x == y && i != j)
+                {
+                    repe(k,1,n)
+                    {
+                        if(vis[j][k])
+                            vis[i][k] = true;
+                    }
+                }
+            }
+        }
+        /*repe(i,1,n)
+        {
+            repe(j,1,n) fd[i][j] = fd[i][j] || vis[i][j];
+        }*/
+        st = 0, ed = n*2+1;
+        repe(i,1,n)
+        {
+            repe(j,1,n)
+            {
+                if(vis[i][j])
+                    add_edge(i,j+n,1);
+            }
+        }
+        tmp = tol;
+        repe(i,1,n) add_edge(st,i,INF), add_edge(i+n,ed,INF);
+        memcpy(buf,cap,sizeof(int)*tmp);
+        int x = 0, y = n+1,ans;
+        while(x <= y)
+        {
+            int mid = (x+y)>>1;
+            memcpy(cap,buf,sizeof(int)*tmp);
+            rep(i,tmp,tol) cap[i] = mid;
+            if(maxflow() == n*mid)
+                x = mid+1, ans = mid;
+            else y = mid-1;
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}
+==================================================================================
+/*dinic暴力二分匹配+删边*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 400+10, MAXM = 10000*2*2*2+10;
+struct Edge{
+	int next,u,v;
+}edge[MAXM];
+int head[MAXN],tol,st,ed, cap[MAXM], tmp, buf[MAXM], f[MAXN];
+int vis[MAXN][MAXN];
+bool del[MAXM];
+
+void add_edge(int u, int v, int c)
+{
+	Edge e = {head[u],u,v};
+	edge[tol] = e;
+	cap[tol] = c;
+	head[u] = tol++;
+	Edge e1 = {head[v],v,u};
+	edge[tol] = e1;
+	cap[tol] = 0;
+	head[v] = tol++;
+}
+int d[MAXN];
+bool bfs()
+{
+	clc(d,-1);
+	queue<int> q;
+	q.push(st);
+	d[st] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			if(del[i]) continue;
+			int v = edge[i].v;
+			if(-1 == d[v] && cap[i])
+			{
+				d[v] = d[u]+1;
+				q.push(v);
+				if(~d[ed]) return true;
+			}
+		}
+	}
+	return false;
+}
+int stack[MAXN],top,cur[MAXN];
+int maxflow()
+{
+	int ans = 0;
+	while(bfs())
+	{
+		memcpy(cur,head,sizeof(head));
+		int u = st;
+		top = 0;
+		while(1)
+		{
+			if(u == ed)
+			{
+				int flow = INF,loc;
+				rep(i,0,top)
+				{
+					if(flow > cap[stack[i]])
+					{
+						flow = cap[stack[i]];
+						loc = i;
+					}
+				}
+				rep(i,0,top)
+				{
+					cap[stack[i]] -= flow;
+					cap[stack[i]^1] += flow;
+				}
+				ans += flow;
+				top = loc;
+				u = edge[stack[top]].u;
+			}
+			for(int i = cur[u]; ~i; cur[u] = i = edge[i].next)
+				if(cap[i] && d[u]+1 == d[edge[i].v] && !del[i]) break;
+			if(~cur[u])
+			{
+				stack[top++] = cur[u];
+				u = edge[cur[u]].v;
+			}
+			else
+			{
+				if(!top) break;
+				d[u] = -1;
+				u = edge[stack[--top]].u;
+			}
+		}
+	}
+	return ans;
+}
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m,fn;
+		scanf("%d %d %d%*c", &n, &m, &fn);
+		clc(head,-1);
+		clc(vis,0);
+		tol = 0;
+		rep(i,0,m)
+		{
+			int a,b;
+			scanf("%d %d%*c", &a, &b);
+			vis[a][b] = true;
+		}
+		repe(i,1,n) f[i] = i;
+		rep(i,0,fn)
+		{
+			int a,b;
+			scanf("%d %d%*c", &a, &b);
+			int x = find(a), y = find(b);
+			if(x != y) f[x]= y;
+		}
+		int fd[MAXN][MAXN]={0};
+		repe(i,1,n)
+		{
+			int x = find(i);
+			repe(j,1,n)
+			{
+				int y = find(j);
+				if(x == y && i != j)
+				{
+					repe(k,1,n)
+					{
+						if(vis[j][k])
+							vis[i][k] = true;
+					}
+				}
+			}
+		}
+		repe(i,1,n)
+		{
+			repe(j,1,n) fd[i][j] = fd[i][j] || vis[i][j];
+		}
+		st = 0, ed = n*2+1;
+		repe(i,1,n)
+		{
+			repe(j,1,n)
+			{
+				if(fd[i][j])
+					add_edge(i,j+n,1);
+			}
+		}
+		repe(i,1,n) add_edge(st,i,1), add_edge(i+n,ed,1);
+		memcpy(buf,cap,sizeof(int)*tol);
+		int ans = 0;
+		clc(del,0);
+		while(maxflow() == n)
+		{
+			ans++;
+			for(int i = 0; i < tol; i += 2)
+			{
+				if(!cap[i] && edge[i].u != st && edge[i].v != ed)
+				{
+					//printf("%d->%d\n", edge[i].u,edge[i].v);
+					del[i] = true;
+				}
+			}
+			memcpy(cap,buf,sizeof(int)*tol);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

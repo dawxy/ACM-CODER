@@ -1,0 +1,21 @@
+#include <cstdio>
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n;
+    while(~scanf ("%d%*c", &n) && n)
+    {
+        int a[101] = {0}, s;
+        for (int i = 0; i < n; i++)
+        {
+            scanf ("%d%*c", &s);
+            a[s]++;
+        }
+        scanf ("%d%*c", &s);
+        printf ("%d\n", a[s]);
+    }
+    return 0;
+}

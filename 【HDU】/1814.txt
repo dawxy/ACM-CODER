@@ -1,0 +1,84 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <algorithm>
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+using namespace std;
+const int MAXN = 8000+10, MAXM = 20000*2+10;
+struct Twosat{
+	int to[MAXM], next[MAXM], head[MAXN<<1], tol;
+	void init()
+	{
+		clc(head,-1);
+		tol = 0;
+	}
+	void add_edge(int u, int v)
+	{
+		next[tol] = head[u], to[tol] = v;
+		head[u] = tol++;
+	}
+	void add_clause(int x, int y)
+	{
+		add_edge(x^1,y);
+		add_edge(y^1,x);
+	}
+	bool vis[MAXN<<1];
+	int s[MAXN<<1], c;
+	bool dfs(int u)
+	{
+		if(vis[u^1]) return false;
+		if(vis[u]) return true;
+		vis[u] = true;
+		s[c++] = u;
+		for(int i = head[u]; ~i; i = next[i])
+			if(!dfs(to[i])) return false;
+		return true;
+	}
+	bool sloved(int n)
+	{
+		clc(vis,0);
+		int mx = n<<1;
+		for(int  i = 0; i < mx; i += 2)
+		{
+			if(!vis[i] && !vis[i^1])
+			{
+				c = 0;
+				if(!dfs(i))
+				{
+					while(c > 0) vis[s[--c]] = false;
+					if(!dfs(i^1)) return false;
+				}
+			}
+		}
+		return true;
+	}
+}ts;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		int a,b;
+		ts.init();
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a, &b);
+			a--,b--;
+			ts.add_clause(a^1,b^1);
+		}
+		if(!ts.sloved(n)) puts("NIE");
+		else
+		{
+			rep(i,0,n<<1)
+			{
+				if(ts.vis[i]) printf("%d\n", i+1);
+			}
+		}
+	}
+    return 0;
+}

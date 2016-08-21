@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <algorithm>
+#include <math.h>
+using namespace std;
+#define MAXN 1000
+double a[MAXN];
+
+bool cmp(const double a, const double b)
+{
+    return a > b;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		int n;
+		scanf ("%d%*c", &n);
+        for (int i = 0; i < n; i++)
+		{
+			scanf ("%lf%*c", &a[i]);
+			a[i] = sqrt(a[i]*a[i]-1.0)*2;
+		}
+        sort(a,a+n, cmp);
+        double sum = 0;
+        int ans = 0;
+        while(sum < 20.0 && fabs(sum - 20.0) > 1e-6)
+		{
+            sum += a[ans++];
+		}
+		printf ("%d\n", ans);
+	}
+    return 0;
+}

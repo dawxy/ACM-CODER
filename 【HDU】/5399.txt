@@ -1,0 +1,69 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10;
+const LL MOD = 1e9+7;
+int a[MAXN][MAXN],n,m,buf[MAXN];
+bool know[MAXN];
+LL fac[MAXN];
+
+int f(int p)
+{
+	per(i,m-1,0)
+		p = a[i][p];
+	return p;
+}
+bool ok()
+{
+	rep(i,0,n)
+	{
+		if(f(i) != i) return false;
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	fac[1] = 1;
+	repe(i,2,100) fac[i] = fac[i-1]*i%MOD;
+	while(~scanf("%d %d", &n, &m))
+	{
+		int cnt = 0;
+		bool flag = false;
+		rep(i,0,m)
+		{
+			int tmp;
+			scanf("%d",&tmp);
+			if(-1 == tmp) know[i] = false,cnt++;
+			else
+			{
+				know[i] = true;
+				a[i][0] = tmp;
+				rep(j,1,n) scanf("%d", &a[i][j]);
+				rep(j,0,n) buf[j] = --a[i][j];
+				sort(buf,buf+n);
+				rep(j,0,n) if(buf[j] != j) flag = true;
+			}
+		}
+		if(flag || !cnt)
+		{
+			if(flag) puts("0");
+			else
+			{
+				if(ok()) puts("1");
+				else puts("0");
+			}
+			continue;
+		}
+		LL ans = 1;
+		rep(i,1,cnt) ans = fac[n]*ans%MOD;
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

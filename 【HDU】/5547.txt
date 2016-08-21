@@ -1,0 +1,104 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 5,d[4][2]={{0,0},{0,1},{1,0},{1,1}};
+char a[MAXN][MAXN];
+int can[MAXN][MAXN][MAXN],cnt[MAXN][MAXN];
+
+char get_c(int x, int y)
+{
+	rep(i,0,4)
+	{
+		if(1 == can[x][y][i])
+			return i+'1';
+	}
+}
+void check_h(int x, int y)
+{
+	rep(i,0,4)
+	{
+		if('*' == a[i][y]) continue;
+		if(1 == can[x][y][a[i][y]-'1'])
+		{
+			can[x][y][a[i][y]-'1'] = 0;
+			if(--cnt[x][y] == 1)
+				a[x][y] = get_c(x,y);
+		}
+	}
+}
+void check_w(int x, int y)
+{
+	rep(i,0,4)
+	{
+		if('*' == a[x][i]) continue;
+		if(1 == can[x][y][a[x][i]-'1'])
+		{
+			can[x][y][a[x][i]-'1'] = 0;
+			if(--cnt[x][y] == 1)
+				a[x][y] = get_c(x,y);
+		}
+	}
+}
+void check_b(int x, int y)
+{
+	int si = x/2*2,sj = y/2*2;
+	rep(i,0,4)
+	{
+		int ni = si+d[i][0],nj = sj+d[i][1];
+		if('*' == a[ni][nj]) continue;
+		if(1 == can[x][y][a[ni][nj]-'1'])
+		{
+			can[x][y][a[ni][nj]-'1'] = 0;
+			if(--cnt[x][y] == 1)
+				a[x][y] = get_c(x,y);
+		}
+	}
+}
+void check(int x, int y)
+{
+	check_h(x,y);
+	check_w(x,y);
+	check_b(x,y);
+}
+bool end()
+{
+	rep(i,0,4) rep(j,0,4) if('*' == a[i][j]) return false;
+	return true;
+}
+void sloved()
+{
+	while(!end())
+	{
+		rep(i,0,4)
+		{
+			rep(j,0,4)
+			{
+				if('*' == a[i][j])
+				{
+					check(i,j);
+				}
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		rep(i,0,4) scanf("%s",a[i]);
+		rep(i,0,4) rep(j,0,4) rep(k,0,4) can[i][j][k] = 1,cnt[i][j] = 4;
+		sloved();
+		printf("Case #%d:\n",++count);
+		rep(i,0,4) puts(a[i]);
+	}
+	return 0;
+}

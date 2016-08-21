@@ -1,0 +1,70 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+struct NODE{
+	NODE *ch[2];
+	int v;
+}node[MAXN];
+int a[MAXN],b[MAXN],rk[MAXN],tol;
+
+int find_minrk(int x, int y)
+{
+	int mi = INF,id = -1;
+	repe(i,x,y) if(mi > rk[b[i]]) mi = rk[b[i]], id = i;
+	return id;
+}
+void bulid(NODE *&u, int x, int y)
+{
+	if(x > y) return;
+	int m = find_minrk(x,y);
+	u = &node[tol++];
+	u->ch[0] = u->ch[1] = NULL;
+	u->v = b[m];
+	if(x == y) return;
+	bulid(u->ch[0],x,m-1);
+	bulid(u->ch[1],m+1,y);
+}
+vector<int> ans;
+void pt(NODE *u)
+{
+	if(NULL == u) return;
+	pt(u->ch[0]);
+	pt(u->ch[1]);
+	ans.push_back(u->v);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n) scanf("%d%*c", &a[i]),rk[a[i]] = i;
+		rep(i,0,n) scanf("%d%*c", &b[i]);
+		tol = 0;
+		NODE *rt = NULL;
+		bulid(rt,0,n-1);
+		ans.clear();
+		pt(rt);
+		printf("%d", ans[0]);
+		rep(i,1,n) printf(" %d", ans[i]);
+		putchar('\n');
+	}
+	return 0;
+}

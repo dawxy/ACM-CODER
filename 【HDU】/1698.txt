@@ -1,0 +1,102 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 100010
+#define lc u<<1
+#define rc u<<1|1
+struct NDOE{
+	int x,y;//左右区间
+	int sum;//附加信息
+	int setv;//需要修改的值(标记),-1不需要修改
+}node[MAXN<<2];
+
+inline void push_up(int u)//向上更新
+{
+	node[u].sum = node[lc].sum+node[rc].sum;
+}
+void bulid(int u, int x, int y)//建树
+{
+	node[u].x = x, node[u].y = y;
+	node[u].setv = -1;
+	if(x == y)
+	{
+		node[u].sum = 1;
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(lc,x,m);
+	bulid(rc,m+1,y);
+	push_up(u);
+}
+void push_down(int u)//向下更新
+{
+	if(~node[u].setv)//如果被标记过需要更新
+	{
+		node[lc].setv = node[rc].setv = node[u].setv;
+		node[lc].sum = node[u].setv*(node[lc].y-node[lc].x+1);
+		node[rc].sum = node[u].setv*(node[rc].y-node[rc].x+1);
+		node[u].setv = -1;
+	}
+}
+int ql,qr,v;//修改区间[ql,qr]为v
+void update(int u)
+{
+	int x = node[u].x, y = node[u].y;
+	if(ql <= x && y <= qr)//只更新到被覆盖区间(不更新此区间下面的节点,查询的时候再更新)
+	{
+		node[u].sum = (y-x+1)*v;
+		node[u].setv = v;
+		return;
+	}
+	push_down(u);
+	int m = (x+y)>>1;
+	if(ql <= m) update(lc);
+	if(qr > m) update(rc);
+	push_up(u);
+}
+int query(int u)
+{
+	int x = node[u].x, y = node[u].y;
+	if(ql <= x && y <= qr)
+		return node[u].sum;
+	push_down(u);
+	int m = (x+y)>>1, ans = 0;
+	if(ql <= m) ans += query(lc);
+	if(qr > m) ans += query(rc);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,q;
+		scanf("%d%*c%d%*c", &n, &q);
+		bulid(1,1,n);
+		rep(i,0,q)
+		{
+			scanf("%d %d %d%*c", &ql, &qr, &v);
+			update(1);
+		}
+		ql = 1, qr = n;
+		printf("Case %d: The total value of the hook is %d.\n", ++count, query(1));
+	}
+	return 0;
+}

@@ -1,0 +1,16 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int n;
+		char c;
+		scanf ("%c %d%*c", &c,&n);
+		printf ("%d\n", (c-'a' >= 0 ? (-1)*(c-'a'+1): c-'A'+1)+n);
+	}
+
+	return 0;
+}

@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+int main ()
+{
+	int from, to, s = 0, i;
+	while (1)
+	{
+		printf ("请输入需要产生的随机数的范围:");
+		scanf_s ("%d %d", &from, &to);
+		srand(time(0));//time(0)返回系统时间减去1970.1.1午夜,srand是初始化rand种子，否则产生的随机序列一直相同
+		for (i = 0; i < 10; i++)
+			printf ("%d\n", from+rand()%(to-from+1));
+		printf ("还要继续吗？继续请输入1,否则输入任意值:");
+		scanf_s("%d", &s);
+		if (1 != s)
+			break;
+	}
+
+	return 0;
+}
+
+

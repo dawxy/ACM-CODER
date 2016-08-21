@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <math.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    double n, d;
+    while(~scanf ("%lf %lf%*c", &n, &d))
+	{
+		int v = 1, ans = 0;
+		double t = n/d;
+        while(1)
+		{
+            if (t > v)
+			{
+                t -= v;
+                ans += (++v);
+			}
+			else
+			{
+				ans += ceil(t);
+				break;
+			}
+		}
+        printf ("%d\n", ans);
+	}
+	return 0;
+}

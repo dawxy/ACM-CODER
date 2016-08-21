@@ -1,0 +1,88 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 1010
+struct NODE{
+	int a,b;
+}p[MAXN];
+int n;
+
+bool is_stack()
+{
+	stack<int> s;
+	rep(i,0,n)
+	{
+		if(1 == p[i].a)
+			s.push(p[i].b);
+		else
+		{
+			if(s.empty()) return false;
+			if(s.top() != p[i].b) return false;
+			s.pop();
+		}
+	}
+	return true;
+}
+bool is_queue()
+{
+	queue<int> q;
+	rep(i,0,n)
+	{
+		if(1 == p[i].a) q.push(p[i].b);
+		else
+		{
+			if(q.empty()) return false;
+			if(q.front() != p[i].b) return false;
+			q.pop();
+		}
+	}
+	return true;
+}
+bool is_priority_queue()
+{
+	priority_queue<int> q;
+	rep(i,0,n)
+	{
+		if(1 == p[i].a) q.push(p[i].b);
+		else
+		{
+			if(q.empty()) return false;
+			if(q.top() != p[i].b) return false;
+			q.pop();
+		}
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n) scanf("%d %d%*c", &p[i].a, &p[i].b);
+		int a = is_stack(),b = is_queue(),c = is_priority_queue();
+		if(0 == a+b+c) puts("impossible");
+		else if(a+b+c == 1)
+		{
+			if(a) puts("stack");
+			else if(b) puts("queue");
+			else puts("priority queue");
+		}
+		else puts("not sure");
+	}
+	return 0;
+}

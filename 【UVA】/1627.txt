@@ -1,0 +1,136 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+struct NODE{
+	int len, s[MAXN];
+}g[MAXN], p[MAXN][2];//p[i][2]表示在连通分量i中被染成0和1的元素的长度和分别是哪几个
+struct NODE2{
+	int pi,pj,y;//pi,pj是路径，y表示染成y颜色的放在第一组
+}path[MAXN][MAXN];
+bool a[MAXN][MAXN];
+int vis[MAXN], dp[MAXN][MAXN], x[MAXN], y[MAXN], sum, n;
+//dp[i][j]表示第一组有i个人第二组有j个人的情况是否存在
+
+bool dfs(int si, int y)//图染色，并区分连通分量
+{
+	vis[si] = y;
+	p[sum][y].s[p[sum][y].len++] = si;
+	for (int i = 0; i < g[si].len; i++)
+	{
+		if (-1 == vis[g[si].s[i]])
+		{
+			if (!dfs(g[si].s[i], !y))
+				return false;
+		}
+		else if (y == vis[g[si].s[i]])
+			return false;
+	}
+	return true;
+}
+void pt(int cnt,int si, int sj)
+{
+	if (cnt == 0) return;
+	pt(cnt-1,path[si][sj].pi, path[si][sj].pj);
+	for (int i = 0; i < p[cnt][path[si][sj].y].len; i++)
+		printf(" %d", p[cnt][path[si][sj].y].s[i]), vis[p[cnt][path[si][sj].y].s[i]] = 1;
+}
+void sloved()
+{
+	int len = 0;
+	memset(dp, 0, sizeof(dp));
+	dp[0][0] = 1;
+	for (int i = 1; i < sum; i++)
+	{
+		for (int j = 0; j <= len; j++)
+		{
+			if (dp[j][len - j])
+			{
+				NODE2& pa = path[j + p[i][0].len][len - j + p[i][1].len];
+				dp[j + p[i][0].len][len - j + p[i][1].len] = 1;
+				pa.pi = j, pa.pj = len-j, pa.y = 0;
+				NODE2& pb = path[j + p[i][1].len][len - j + p[i][0].len];
+				dp[j + p[i][1].len][len - j + p[i][0].len] = 1;
+				pb.pi = j, pb.pj = len - j, pb.y = 1;
+			}
+		}
+		len += p[i][0].len + p[i][1].len;
+	}
+	int sj, si, ans = 0x3f3f3f3f;
+	for (int i = 1; i <= n; i++)
+	{
+		int j = n - i;
+		if (dp[i][j] && ans > abs(i - j))
+		{
+			si = i;
+			sj = j;
+			ans = abs(i-j);
+		}
+	}
+	memset(vis,0,sizeof(vis));
+	printf("%d", si);
+	pt(sum-1,si,sj);
+	printf("\n%d", sj);
+	for (int i = 1; i <= n; i++)
+	{
+		if (!vis[i])
+			printf(" %d", i);
+	}
+	puts("");
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while (t--)
+	{
+		scanf("%d%*c", &n);
+		memset(a, 0, sizeof(a));
+		memset(vis,-1,sizeof(vis));
+		sum = 1;
+		for (int i = 1; i <= n; i++)
+			g[i].len = p[i][0].len = p[i][1].len = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			int buf;
+			while (1)
+			{
+				scanf("%d%*c", &buf);
+				if (!buf) break;
+				a[i][buf] = true;
+			}
+		}
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 1; j <= n; j++)
+			{
+				if (i == j || (a[i][j] && a[j][i])) continue;
+				g[i].s[g[i].len++] = j;
+			}
+		}
+		bool ok = true;
+		for (int i = 1; i <= n; i++)
+		{
+			if (-1 == vis[i])
+			{
+				if (!dfs(i, 0))
+				{
+					ok = false;
+					break;
+				}
+				sum++;
+			}
+		}
+		if (!ok)
+			puts("No solution");
+		else
+			sloved();
+		if (t)
+			puts("");
+	}
+	return 0;
+}

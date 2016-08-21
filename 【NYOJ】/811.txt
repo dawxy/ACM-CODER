@@ -1,0 +1,40 @@
+#include <stdio.h>
+
+int main ()
+{
+	int n;
+	while (EOF != scanf ("%d%*c", &n))
+	{
+		int i, ans = -1, max = -1, count = 0, buf;
+		bool f = true;
+		for (i = 0; i < n; i++)
+		{
+			scanf ("%d%*c", &buf);
+			count ++;
+			if (f)
+			{
+				if(max < buf)
+					max = buf;
+			}
+			else
+			{
+				if(max > buf)
+					max = buf;
+			}
+			if (3 == count)
+			{
+				count = 0;
+				if (max > ans)
+					ans = max;
+				f = !f;
+				if (f)
+					max = -1;
+				else
+					max = 99999999;
+			}
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

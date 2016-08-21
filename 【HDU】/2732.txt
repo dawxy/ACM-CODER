@@ -1,0 +1,190 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 400*3+10, MAXM = 2*(400*2+2*36*400)+10;
+const int f[4][2]={{-1,0},{1,0},{0,-1},{0,1}}, z[4][2]={{1,1},{-1,1},{1,-1},{-1,-1}};
+struct Edge{
+	int next, u,v,cap;
+}edge[MAXM];
+int tol, head[MAXN], m,st,ed;
+char a[25][25],mp[25][25];
+
+void add_edge(int u, int v, int cap)
+{
+	Edge e = {head[u],u,v,cap};
+	edge[tol] = e;
+	head[u] = tol++;
+	Edge e1 = {head[v],v,u,0};
+	edge[tol] = e1;
+	head[v] = tol++;
+}
+inline int id(int a, int b){
+	return a*m+b;
+}
+int d[MAXN];
+bool bfs()
+{
+	clc(d,-1);
+	queue<int> q;
+	q.push(st);
+	d[st] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v;
+			if(-1 == d[v] && edge[i].cap)
+			{
+				d[v] = d[u]+1;
+				q.push(v);
+				if(~d[ed]) return true;
+			}
+		}
+	}
+	return false;
+}
+int stack[MAXN],cur[MAXN],top;
+int maxflow()
+{
+	int ans = 0;
+	while(bfs())
+	{
+		memcpy(cur,head,sizeof(head));
+		int u = st;
+		top = 0;
+		while(1)
+		{
+			if(u == ed)
+			{
+				int flow = INF,loc;
+				rep(i,0,top)
+				{
+					if(flow > edge[stack[i]].cap)
+					{
+						flow = edge[stack[i]].cap;
+						loc = i;
+					}
+				}
+				rep(i,0,top)
+				{
+					edge[stack[i]].cap -= flow;
+					edge[stack[i]^1].cap += flow;
+				}
+				ans += flow;
+				top = loc;
+				u = edge[stack[top]].u;
+			}
+			for(int i = cur[u]; ~i; cur[u] = i = edge[i].next)
+				if(edge[i].cap && d[u]+1 == d[edge[i].v]) break;
+			if(~cur[u])
+			{
+				stack[top++] = cur[u];
+				u = edge[cur[u]].v;
+			}
+			else
+			{
+				if(!top) break;
+				d[u] = -1;
+				u = edge[stack[--top]].u;
+			}
+		}
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,d;
+		scanf("%d %d%*c", &n, &d);
+		rep(i,0,n) scanf("%s",a[i]);
+		rep(i,0,n) scanf("%s",mp[i]);
+		m = strlen(mp[0]);
+		int tmp = n*m;
+		clc(head,-1);
+		tol = 0;
+		int sum = 0;
+		rep(i,0,n)
+		{
+			rep(j,0,m)
+			{
+				repe(k,1,d)
+				{
+					if('0' == a[i][j]) continue;
+					rep(q,0,4)
+					{
+						int ni = i+k*f[q][0], nj = j+k*f[q][1];
+						if(0 <= ni && n > ni && 0 <= nj && m > nj && a[ni][nj] != '0')
+							add_edge(tmp+id(i,j),id(ni,nj),INF);
+					}
+					rep(q,1,k)
+					{
+						int tx = -q, ty = k-q;
+						rep(w,0,4)
+						{
+							int ni = i+tx*z[w][0], nj = j+ty*z[w][1];
+							if(0 <= ni && n > ni && 0 <= nj && m > nj && a[ni][nj] != '0')
+								add_edge(tmp+id(i,j),id(ni,nj),INF);
+						}
+					}
+				}
+			}
+		}
+		rep(i,0,n)
+		{
+			rep(j,0,m)
+			{
+				if(a[i][j] != '0')
+					add_edge(id(i,j),id(i,j)+tmp,a[i][j]-'0');
+			}
+		}
+		st = tmp*2, ed = st+1;
+		rep(i,0,n)
+		{
+			rep(j,0,m)
+			{
+				if('L' == mp[i][j])
+					add_edge(st,id(i,j),1), sum++;
+			}
+		}
+		int vis[25][25]={0};
+		rep(k,0,d)
+		{
+			rep(j,0,m-k)
+			{
+				if(!vis[k][j] && '0' != a[k][j]) vis[k][j] = true, add_edge(tmp+id(k,j),ed,INF);
+				if(!vis[n-k-1][j] && '0' != a[n-k-1][j]) vis[n-k-1][j] = true, add_edge(tmp+id(n-k-1,j),ed,INF);
+			}
+			rep(i,0,n-k)
+			{
+				if(!vis[i][k] && '0' != a[i][k]) vis[i][k] = true, add_edge(tmp+id(i,k),ed,INF);
+				if(!vis[i][m-k-1] && '0' != a[i][m-k-1]) vis[i][m-k-1] = true, add_edge(tmp+id(i,m-k-1),ed,INF);
+			}
+		}
+		int ans = maxflow();
+		printf("Case #%d: ", ++count);
+		if(sum == ans) puts("no lizard was left behind.");
+		else if(1 == sum-ans) puts("1 lizard was left behind.");
+		else printf("%d lizards were left behind.\n", sum-ans);
+	}
+	return 0;
+}

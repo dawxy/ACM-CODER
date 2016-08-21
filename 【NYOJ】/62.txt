@@ -1,0 +1,41 @@
+#include <stdio.h>
+
+bool is_prime(int a)
+{
+	if (1 == a || 0 == a)
+		return false;
+	for (int i = 2; i*i <= a; i++)
+	{
+		if (0 == a%i)
+			return false;
+	}
+	return true;
+}
+
+int main()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int word[26]={0}, i, max = -1, min = 200;
+		char c;
+		while ('\n' != (c = getchar()) && EOF != c)
+		{
+			word[c-'a']++;
+		}
+		for (i = 0; i < 26; i++)
+		{
+			if (max < word[i])
+				max = word[i];
+			if (0 != word[i] && min > word[i])
+				min = word[i];
+		}
+		if (is_prime(max-min))
+			printf ("Lucky Word\n%d\n", max-min);
+		else
+			printf ("No Answer\n0\n");
+	}
+
+	return 0;
+}

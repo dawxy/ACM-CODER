@@ -1,0 +1,205 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10, MAXM = 10000*2+10;
+int head[MAXN], tol, nxt[MAXM], to[MAXM];
+int cost[MAXN], e[MAXN][2];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int fa[MAXN], sz[MAXN], dep[MAXN], son[MAXN];
+void dfs1(int u)
+{
+	int num = 0;
+	sz[u] = 1;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v == fa[u]) continue;
+		dep[v] = dep[u]+1;fa[v] = u;
+		dfs1(v);
+		sz[u] += sz[v];
+		if(sz[v] > num) num = sz[v], son[u] = v;
+	}
+}
+int cnt, top[MAXN], tree[MAXN], ft[MAXN];
+void dfs2(int u, int num)
+{
+	top[u] = num; tree[u] = cnt, ft[cnt++] = u;
+	if(-1 == son[u]) return;
+	dfs2(son[u], num);
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v != fa[u] && son[u] != v) dfs2(v,v);
+	}
+}
+int mx[MAXN<<1],mi[MAXN<<1],lz[MAXN<<1], p[MAXN];
+inline int id(int x, int y){return x+y|x!=y;}
+void push_up(int x, int y, int m){
+	mx[id(x,y)] = max(mx[id(x,m)], mx[id(m+1,y)]);
+	mi[id(x,y)] = min(mi[id(x,m)], mi[id(m+1,y)]);
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		mi[id(x,y)] = mx[id(x,y)] = cost[p[ft[x]]];
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+void init(int rt)
+{
+	clc(son,-1);
+	dep[rt] = 0;fa[rt] = -1;
+	dfs1(rt);
+	cnt = 0;
+	dfs2(rt,rt);
+	clc(lz,0);
+	rep(i,1,cnt)
+	{
+		if(dep[e[i][0]] > dep[e[i][1]]) swap(e[i][0],e[i][1]);
+		p[e[i][1]] = i;
+	}
+	bulid(0,cnt-1);
+}
+void push_down(int x, int y, int m)
+{
+	int u = id(x,y);
+	if(lz[u])
+	{
+		int l = id(x,m), r = id(m+1,y);
+		lz[l] ^= 1, lz[r] ^= 1;
+		mx[l] = -mx[l], mx[r] = -mx[r];
+		mi[l] = -mi[l], mi[r] = -mi[r];
+		swap(mx[l],mi[l]);swap(mx[r],mi[r]);
+		lz[u] = 0;
+	}
+}
+void fz(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr)
+	{
+		int u = id(x,y);
+		lz[u] ^= 1;
+		mx[u] = -mx[u];
+		mi[u] = -mi[u];
+		swap(mx[u],mi[u]);
+		return;
+	}
+	int m = (x+y)>>1;
+	push_down(x,y,m);
+	if(ql <= m) fz(x,m,ql,qr);
+	if(qr > m) fz(m+1,y,ql,qr);
+	push_up(x,y,m);
+}
+void update(int x, int y, int p, int v)
+{
+	if(x == y)
+	{
+		mx[id(x,y)] = mi[(id(x,y))] = v;
+		return;
+	}
+	int m = (x+y)>>1;
+	push_down(x,y,m);
+	if(p <= m) update(x,m,p,v);
+	else update(m+1,y,p,v);
+	push_up(x,y,m);
+}
+int query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr) return mx[id(x,y)];
+	int m = (x+y)>>1, ans = -INF;
+	push_down(x,y,m);
+	if(ql <= m) ans = max(ans, query(x,m,ql,qr));
+	if(qr > m) ans = max(ans, query(m+1,y,ql,qr));
+	push_up(x,y,m);
+	return ans;
+}
+void CHANGE(int x, int v)
+{
+	update(0,cnt-1,tree[e[x][1]],v);
+}
+void NEGATE(int x, int y)
+{
+	int f1 = top[x], f2 = top[y];
+	while(f1 != f2)
+	{
+		if(dep[f1] < dep[f2]) swap(f1,f2), swap(x,y);
+		fz(0,cnt-1,tree[f1],tree[x]);
+		x = fa[f1], f1 = top[x];
+	}
+	if(x == y) return;
+	if(dep[x] > dep[y]) swap(x,y);
+	fz(0,cnt-1,tree[son[x]],tree[y]);
+}
+int QUERY(int x, int y)
+{
+	int f1 = top[x], f2 = top[y], ans = -INF;
+	while(f1 != f2)
+	{
+		if(dep[f1] < dep[f2]) swap(f1,f2), swap(x,y);
+		ans = max(ans,query(0,cnt-1,tree[f1],tree[x]));
+		x = fa[f1], f1 = top[x];
+	}
+	if(x == y) return ans;
+	if(dep[x] > dep[y]) swap(x,y);
+	ans = max(ans,query(0,cnt-1,tree[son[x]],tree[y]));
+	return ans;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		clc(head,-1);
+		tol = 0;
+		rep(i,1,n)
+		{
+			int u,v;
+			scanf("%d %d %d%*c", &u, &v, &cost[i]);
+			e[i][0] = u, e[i][1] = v;
+			add_edge(u,v);
+			add_edge(v,u);
+		}
+		init(1);
+		char op[20];
+		while(~scanf("%s",op) && strcmp(op,"DONE"))
+		{
+			int x,y;
+			scanf("%d %d%*c", &x, &y);
+			if('C' == op[0]) CHANGE(x,y);
+			else if('N' == op[0]) NEGATE(x,y);
+			else printf("%d\n", QUERY(x,y));
+		}
+	}
+	return 0;
+}

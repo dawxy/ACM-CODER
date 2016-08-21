@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <string.h>
+int n;
+char c[30];
+
+bool sloved()
+{
+	int r = 0, y = 0;
+	for (int i = 0; i < n; i++)
+	{
+        if ('R' == c[i])
+			r++;
+		else if ('Y' == c[i])
+			y++;
+        else if ('B' == c[i])
+		{
+            if (r < 7)
+				return false;
+			else
+				return true;
+		}
+        else
+		{
+            if (y < 7)
+				return true;
+			else
+				return false;
+		}
+	}
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(~scanf ("%d%*c", &n) && n)
+	{
+		gets(c);
+		if (sloved())
+			puts("Red");
+		else
+			puts("Yellow");
+	}
+    return 0;
+}

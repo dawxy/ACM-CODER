@@ -1,0 +1,53 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 100010
+int ans, ch, s[MAXN], vis[MAXN];
+//vis[]保存a[]中各个元素的下标,s[]保存a[]b[]共同元素在a[]中下标，按照b[]出现的顺序
+
+int in()
+{
+	while((ch = getchar())< '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		int len = 0, b, ans = 0;
+		memset(vis,-1,sizeof(vis));
+		for (int i = 0; i < n; i++)
+			vis[in()] = i;
+		for (int i = 0; i < m; i++)
+		{
+			if (~vis[b=in()])
+				s[len++] = vis[b];
+		}
+		vis[0] = 0;
+		for (int i = 0; i < len; i++)
+		{
+			if (s[i] > vis[ans])
+				vis[++ans] = s[i];
+			else
+			{
+				int l = 1, r = ans, mid;
+				while(l <= r)
+				{
+					mid = (l+r)>>1;
+					if (vis[mid] >= s[i])
+						r = mid-1;
+					else
+						l = mid+1;
+				}
+				vis[l] = s[i];
+			}
+		}
+		printf("%d\n", ans+1);
+	}
+	return 0;
+}

@@ -1,0 +1,104 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000000+10, MOD = 1000007;
+struct HASH{
+    int head[MOD], next[MAXN], sum[MAXN], cnt;
+    LL node[MAXN];
+    void clear(){
+        cnt = 0;
+        clc(head,-1);
+        clc(sum,0);
+    }
+    int hash(LL s){
+        if(s < 0) s = -s;
+        return s%MOD;
+    }
+    void insert(LL s){
+        int id = hash(s);
+        int u = head[id];
+        while(~u){
+            if(s == node[u])
+            {
+                sum[u]++;
+                return;
+            }
+            u = next[u];
+        }
+        sum[cnt] = 1;
+        node[cnt] = s;
+        next[cnt] = head[id];
+        head[id] = cnt++;
+    }
+    bool find(int s){
+        int id = hash(s);
+        int u = head[id];
+        while(~u){
+            if(node[u] == s) return true;
+            u = next[u];
+        }
+        return false;
+    }
+}vis;
+LL sum[MAXN];
+
+inline int in()
+{
+    int ch, f = 1;
+    while((ch = getchar()) < '0' || ch > '9') if('-' == ch) f = -1;
+    int ans = ch-'0';
+    while((ch = getchar()) >= '0' && ch <= '9') ans = (ans<<1)+(ans<<3)+ch-'0';
+    return ans*f;
+}
+int n,k;
+bool ok()
+{
+    vis.clear();
+    per(i,n,1)
+    {
+        vis.insert(sum[i]);
+        if(i&1)
+        {
+            if(vis.find(sum[i-1]+k)) return true;
+        }
+        else if(vis.find(sum[i-1]-k)) return true;
+    }
+    return false;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t, count = 0;
+    sum[0] = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        scanf("%d %d%*c", &n, &k);
+        repe(i,1,n)
+        {
+            sum[i] = in();
+            if(i&1) sum[i] = sum[i-1]+sum[i];
+            else sum[i] = sum[i-1]-sum[i];
+        }
+        printf("Case #%d: ", ++count);
+        if(ok()) puts("Yes.");
+        else puts("No.");
+    }
+    return 0;
+}

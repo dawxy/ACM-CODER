@@ -1,0 +1,53 @@
+#include <cstdio>
+#include <cstring>
+#define max(a,b) (a>b?a:b)
+#define MAXN 100010
+int f[MAXN];
+bool vis[MAXN];
+
+int find(int x){return ~f[x] ? f[x] = find(f[x]) : x;}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int a,b;
+	while(~scanf("%d %d%*c", &a, &b) && (~a || ~b))
+	{
+		int maxn = -1;
+		if(0 == a && 0 == b)
+		{
+			puts("Yes");
+			continue;
+		}
+		bool ok = true;
+		memset(f,-1,sizeof(f));
+		memset(vis,0,sizeof(vis));
+		int x = find(a), y = find(b);
+		maxn = max(max(a,b),maxn);
+		vis[a] = vis[b] = true;
+		if(x != y) f[y] = x;
+		else ok = false;
+		while(~scanf("%d %d%*c", &a, &b) && a+b)
+		{
+			x = find(a), y = find(b);
+			maxn = max(max(a,b),maxn);
+			vis[a] = vis[b] = true;
+			if(x != y) f[y] = x;
+			else ok = false;
+		}
+		x = find(maxn);
+		for(int i = 1; i < maxn; i++)
+		{
+			if(!vis[i]) continue;
+			if(x != find(i))
+			{
+				ok = false;
+				break;
+			}
+		}
+		if(ok) puts("Yes");
+		else puts("No");
+	}
+	return 0;
+}

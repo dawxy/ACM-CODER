@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+struct NODE{
+	int v,id;
+	bool operator<(const NODE &t)const{
+		return v < t.v;
+	}
+}p[MAXN];
+int a[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,q;
+	while(~scanf("%d %d", &n, &q) && n+q)
+	{
+		p[0].v = p[0].id = 0;
+		repe(i,1,n) scanf("%d", &a[i]),p[i].id = i,p[i].v = p[i-1].v+a[i];
+		sort(p,p+1+n);
+		while(q--)
+		{
+			int k;
+			scanf("%d", &k);
+			int ans = -1,x,y,mi = INF, st = 0, ed = 1;
+			while(st <= n && ed <= n)
+			{
+				int sum = p[ed].v-p[st].v;
+				if(abs(sum-k) < mi)
+				{
+					mi = abs(sum-k);
+					ans = sum;
+					x = p[st].id,y = p[ed].id;
+				}
+				if(sum < k) ed++;
+				else if(sum > k) st++;
+				else break;
+				if(st == ed) ed++;
+			}
+			if(x > y)swap(x,y);
+			printf("%d %d %d\n",ans,x+1,y);
+		}
+	}
+	return 0;
+}

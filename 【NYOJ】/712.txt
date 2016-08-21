@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 51
+#define max(a,b) (a>b?a:b)
+#define MAX(a,b,c,d) (max(max(a,b), max(c,d)))
+int dp[MAXN<<1][MAXN][MAXN], a[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int h, w;
+		scanf("%d %d%*c", &h, &w);
+		for (int i = 1; i <= h; i++)
+		{
+			for (int j = 1; j <= w; j++)
+				scanf("%d%*c", &a[i][j]);
+		}
+		int m = h+w;
+		for (int i = 2; i <= m; i++)
+		{
+			for (int j = 1; j <= h && j <= i; j++)
+			{
+				for (int k = 1; k <= h && k <= i; k++)
+				{
+					if (k != j)
+						dp[i][j][k] = MAX(dp[i-1][j][k], dp[i-1][j][k-1],dp[i-1][j-1][k], dp[i-1][j-1][k-1])+a[j][i-j]+a[k][i-k];
+				}
+			}
+		}
+		printf("%d\n", max(dp[m][h-1][h],dp[m][h][h-1]));
+	}
+	return 0;
+}

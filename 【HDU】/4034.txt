@@ -1,0 +1,58 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 110
+int map[MAXN][MAXN], dp[MAXN][MAXN], n, ans;
+bool vis[MAXN][MAXN];
+
+bool ok()
+{
+	ans = n*(n-1);
+	for(int i = 0; i < n; i++)
+	{
+		for(int j = 0; j < n; j++)
+		{
+			if(vis[i][j] && dp[i][j] == map[i][j])
+				ans--;
+			if(dp[i][j] < map[i][j])
+				return false;
+		}
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d%*c", &n);
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = 0; j < n; j++)
+				scanf("%d%*c", &map[i][j]), dp[i][j] = map[i][j];
+		}
+		memset(vis,0,sizeof(vis));
+		for(int k = 0; k < n; k++)
+		{
+			for(int i = 0; i < n; i++)
+			{
+				for(int j = 0; j < n; j++)
+				{
+					if(i != k && k != j && dp[i][j] >= dp[i][k]+dp[k][j])
+					{
+						vis[i][j] = true;
+						dp[i][j] = dp[i][k]+dp[k][j];
+					}
+				}
+			}
+		}
+		printf("Case %d: ", ++count);
+		if(ok())
+			printf("%d\n", ans);
+		else puts("impossible");
+	}
+	return 0;
+}

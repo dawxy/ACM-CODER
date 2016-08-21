@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n;
+    while(~scanf ("%d%*c", &n) && n)
+	{
+        double ans = n;
+        int c = (n-1)*2;
+        for (int i = 2; i <= n; i++)
+		{
+            ans += 1.0*c/i;
+            c -= 2;
+		}
+        printf ("%.2f\n", ans);
+	}
+    return 0;
+}

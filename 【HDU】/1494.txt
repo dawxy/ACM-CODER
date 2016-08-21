@@ -1,0 +1,37 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 105
+#define INF 0x3f3f3f3f
+#define min(a,b) (a<b?a:b)
+int dp[MAXN*MAXN][15], a[MAXN], b[MAXN], n, m;
+//dp[i][j]表示跑完第i段赛道当前拥有m点能量
+
+int dfs(int s, int e)
+{
+	if (e >= 15) e = 10;
+	int& ans = dp[s][e];
+	if(~ans) return ans;
+	if(s == m-1) return ans = 0;
+	ans = INF;
+	ans = min(ans,dfs(s+1,e+1)+a[(s+1)%n]);
+	if(e >= 5)
+		ans = min(ans,dfs(s+1,e-5)+b[(s+1)%n]);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		for(int i = 0; i < n; i++)
+			scanf("%d%*c", &a[i]);
+		for(int i = 0; i < n; i++)
+			scanf("%d%*c", &b[i]);
+		m *= n;
+		memset(dp,-1,sizeof(dp));
+		printf("%d\n", dfs(0,1)+a[0]);
+	}
+	return 0;
+}

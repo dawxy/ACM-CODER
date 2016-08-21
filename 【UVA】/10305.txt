@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <string.h>
+//#define scanf scanf_s
+#define MAX 101
+bool g[MAX][MAX], vis[MAX];
+int n, topo[MAX], len;
+
+void dfs(int);
+int main ()
+{
+	//FILE *f;
+	//freopen_s(&f,"e:\\1.txt","r",stdin);
+	while(1)
+	{
+		int m, a, b;
+		scanf ("%d %d%*c", &n, &m);
+		if (0 == n && 0 == m)
+			break;
+		memset(vis,false,sizeof(vis));
+		memset(g,false,sizeof(g));
+		while(m--)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			g[a][b] = true;
+		}
+		len = n;
+		for (int i = 1; i <= n; i++)
+			if (!vis[i])
+				dfs(i);
+		for (int i = 0; i < n-1; i++)
+			printf ("%d ", topo[i]);
+		printf ("%d\n", topo[n-1]);
+	}
+
+	return 0;
+}
+
+void dfs(int u)
+{
+	vis[u] = true;
+	for (int i = 1; i <= n; i++)
+	{
+		if (!vis[i] && g[u][i])
+			dfs(i);
+	}
+	topo[--len] = u;
+}

@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define MAXV 100010
+int v[MAXN], d[MAXV];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n, c;
+	while(~scanf ("%d %d%*c", &n, &c) && n+c)
+	{
+		int num, len = 0;
+		memset(d,0,sizeof(d));
+                for (int i = 0; i < n; i++)
+			scanf ("%d%*c", &v[i]);
+                for (int i = 0; i < n; i++)
+		{
+                        scanf ("%d%*c", &num);
+                        if (num*v[i] >= c)
+			{
+                                for (int j = v[i]; j <= c; j++)
+					d[j] = max(d[j],d[j-v[i]]+v[i]);
+			}
+                        else
+			{
+                                for (int j = 1; j <= num; num -= j, j <<= 1)
+				{
+					int buf = j*v[i];
+                                        for (int k = c; k >= buf; k--)
+						d[k] = max(d[k],d[k-buf]+buf);
+				}
+				if (num > 0)
+				{
+					int buf = num*v[i];
+					for (int k = c; k >= buf; k--)
+						d[k] = max(d[k],d[k-buf]+buf);
+				}
+			}
+		}
+		int ans = 0;
+                for (int i = 1; i <= c; i++)
+		{
+			if (i == d[i])
+                                ans++;
+		}
+                printf ("%d\n", ans);
+	}
+        return 0;
+}

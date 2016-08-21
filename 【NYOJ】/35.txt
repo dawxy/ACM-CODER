@@ -1,0 +1,80 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1010;
+char a[MAXN], s[MAXN];
+double num[MAXN];
+
+double get_num(char *s, int &len)
+{
+	double ans;
+	sscanf(s,"%lf", &ans);
+	len = 0;
+	while((*s) == '.' || isdigit(*s)) len++,s++;
+	return ans;
+}
+double dfs(int x, int y)
+{
+	int p = 0, c1 = -1, c2 = -1, u;//c1：最右边的+-号,c2:左右边的*/
+	if(y-x == 1) return num[x];//叶子肯定是数字
+	char op1 = 0, op2 = 0;
+	rep(i,x,y)//找到最后一个计算的运算符
+	{
+		if('(' == s[i]) p++;
+		else if(')' == s[i]) p--;
+		else if('+' == s[i] || '-' == s[i])
+		{
+			if(!p) c1 = i, op1 = s[i];
+		}
+		else if('*' == s[i] || '/' == s[i])
+		{
+			if(!p) c2 = i, op2 = s[i];
+		}
+	}
+	if(-1 == c1) c1 = c2, op1 = op2;//找不到+-用*/
+	if(-1 == c1) return dfs(x+1,y-1);//整个被括号括起来了
+	if('+' == op1) return dfs(x,c1)+dfs(c1+1,y);
+	if('-' == op1) return dfs(x,c1)-dfs(c1+1,y);
+	if('*' == op1) return dfs(x,c1)*dfs(c1+1,y);
+	if('/' == op1) return dfs(x,c1)/dfs(c1+1,y);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		gets(a);
+		int n = strlen(a)-1,cnt = 0;
+		rep(i,0,n)
+		{
+			if(isdigit(a[i]))
+			{
+				int len;
+				num[cnt] = get_num(a+i,len);
+				i += len-1;
+				s[cnt++] = '#';
+			}
+			else s[cnt++] = a[i];
+		}
+		printf("%.2lf\n", dfs(0,cnt));
+	}
+	return 0;
+}

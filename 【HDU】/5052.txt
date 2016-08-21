@@ -1,0 +1,232 @@
+#pragma comment(linker, "/STACK:1024000000,1024000000") 
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50000+10;
+char buf[MAXN*2], *ps = buf, *pe = buf+1;//ps当前读取到的开头指针，pe当前缓存结尾指针
+inline void rnext(){
+    if(++ps == pe)
+        pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+    int ans = 0;
+    if(ps == pe) return -1; //判断是否到文件结尾
+    do{
+        rnext();
+    }while(!isdigit(*ps) && ps != pe);
+    if(ps == pe) return -1;//判断是否到文件结尾
+    do
+    {
+        ans = (ans<<1)+(ans<<3)+*ps-48;
+        rnext();
+    }while(isdigit(*ps) && ps != pe);
+    return ans;
+}
+int head[MAXN],to[MAXN<<1],nxt[MAXN<<1],tol;
+
+void add_edge(int u, int v)
+{
+    nxt[tol] = head[u],to[tol] = v;
+    head[u] = tol++;
+}
+int fa[MAXN],dep[MAXN],sz[MAXN],son[MAXN];
+void dfs1(int u)
+{
+    int num = 0;
+    sz[u] = 1;
+    for(int i = head[u]; ~i; i = nxt[i])
+    {
+        int v = to[i];
+        if(v == fa[u]) continue;
+        fa[v] = u;dep[v] = dep[u]+1;
+        dfs1(v);
+        sz[u] += sz[v];
+        if(sz[v] > num) num = sz[v],son[u] = v;
+    }
+}
+int top[MAXN],tree[MAXN],pre[MAXN],cnt;
+void dfs2(int u, int num)
+{
+    tree[u] = cnt;pre[cnt++] = u;top[u] = num;
+    if(-1 == son[u]) return;
+    dfs2(son[u],num);
+    for(int i = head[u]; ~i; i = nxt[i])
+    {
+        int v = to[i];
+        if(v != fa[u] && son[u] != v) dfs2(v,v);
+    }
+}
+int lmx[MAXN<<1],rmx[MAXN<<1],mi[MAXN<<1],mx[MAXN<<1],add[MAXN<<1], a[MAXN];
+inline int id(int x, int y){return x+y|x!=y;}
+void push_up(int x, int y, int m)
+{
+    int u = id(x,y),l = id(x,m), r = id(m+1,y);
+    mi[u] = min(mi[l],mi[r]);mx[u] = max(mx[l],mx[r]);
+    lmx[u] = max(max(lmx[l],lmx[r]),mx[r]-mi[l]);
+    rmx[u] = max(max(rmx[l],rmx[r]),mx[l]-mi[r]);
+}
+void bulid(int x, int y)
+{
+    if(x == y)
+    {
+        int u = id(x,y);
+        mi[u] = mx[u] = a[pre[x]];
+        lmx[u] = rmx[u] = 0;
+        return;
+    }
+    int m = (x+y)>>1;
+    bulid(x,m);
+    bulid(m+1,y);
+    push_up(x,y,m);
+}
+void push_down(int x, int y, int m)
+{
+    int u = id(x,y),l = id(x,m), r = id(m+1,y);
+    if(add[u])
+    {
+        add[l] += add[u];
+        mi[l] += add[u];
+        mx[l] += add[u];
+        add[r] += add[u];
+        mi[r] += add[u];
+        mx[r] += add[u];
+        add[u] = 0;
+    }
+}
+void update(int x, int y, int ql, int qr, int v)
+{
+    if(ql <= x && y <= qr)
+    {
+        int u = id(x,y);
+        mi[u] += v;mx[u] += v;
+        add[u] += v;
+        return;
+    }
+    int m = (x+y)>>1;
+    push_down(x,y,m);
+    if(ql <= m) update(x,m,ql,qr,v);
+    if(qr > m) update(m+1,y,ql,qr,v);
+    push_up(x,y,m);
+}
+struct NODE{
+    int ans,mi,mx;
+    NODE(){
+        ans = mx = 0;
+        mi = INF;
+    }
+};
+void merge(NODE &ans,const NODE &l, const NODE &r, bool lf)
+{
+    ans.ans = max(max(l.ans,r.ans),lf?r.mx-l.mi:l.mx-r.mi);
+    ans.mi = min(l.mi,r.mi);ans.mx = max(l.mx,r.mx);
+}
+NODE query(int x, int y, int ql, int qr, bool lf)
+{
+    if(ql <= x && y <= qr)
+    {
+        int u = id(x,y);
+        NODE tmp;
+        tmp.mi = mi[u], tmp.mx = mx[u];
+        tmp.ans = lf?lmx[id(x,y)]:rmx[id(x,y)];
+        return tmp;
+    }
+    int m = (x+y)>>1;
+    NODE ans;
+    push_down(x,y,m);
+    if(ql <= m && qr > m)
+    {
+        NODE l = query(x,m,ql,qr,lf),r = query(m+1,y,ql,qr,lf);
+        merge(ans,l,r,lf);
+    }
+    else if(ql <= m) ans = query(x,m,ql,qr,lf);
+    else if(qr > m) ans = query(m+1,y,ql,qr,lf);
+    push_up(x,y,m);
+    return ans;
+}
+void init(int rt)
+{
+    clc(son,-1);
+    dep[rt] = 0,fa[rt] = -1;
+    dfs1(rt);
+    cnt = 0;
+    dfs2(rt,rt);
+    clc(add,0);
+    bulid(0,cnt-1);
+}
+void tcp_update(int x, int y, int v)
+{
+    int f1 = top[x],f2 = top[y];
+    while(f1 != f2)
+    {
+        if(dep[f1] < dep[f2]) swap(f1,f2),swap(x,y);
+        update(0,cnt-1,tree[f1],tree[x],v);
+        x = fa[f1], f1 = top[x];
+    }
+    if(dep[x] > dep[y]) swap(x,y);
+    update(0,cnt-1,tree[x],tree[y],v);
+}
+int tcp_query(int x, int y)
+{
+    NODE ans,ax,ay;
+    int f1 = top[x],f2 = top[y];
+    while(f1 != f2)
+    {
+        if(dep[top[x]] < dep[top[y]])//LCA(x,y)右边
+        {
+            merge(ay,query(0,cnt-1,tree[top[y]],tree[y],1),ay,1);
+            y = fa[f2];f2 = top[y];
+        }
+        else//LCA(x,y)左边
+        {
+            merge(ax,query(0,cnt-1,tree[top[x]],tree[x],0),ax,0);
+            x = fa[f1], f1 = top[x];
+        }
+    }
+    if(dep[x] < dep[y]) merge(ay,query(0,cnt-1,tree[x],tree[y],1),ay,1);
+    else merge(ax,query(0,cnt-1,tree[y],tree[x],0),ax,0);
+    merge(ans,ax,ay,1);
+    return ans.ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t = in();
+    while(t--)
+    {
+        int n = in();
+        repe(i,1,n) a[i] = in();
+        clc(head,-1);tol = 0;
+        rep(i,1,n)
+        {
+            int u = in(),v = in();
+            add_edge(u,v);
+            add_edge(v,u);
+        }
+        init(1);
+        int q = in();
+        while(q--)
+        {
+            int x = in(),y = in(),v = in();
+            printf("%d\n", tcp_query(x,y));
+            tcp_update(x,y,v);
+        }
+    }
+    return 0;
+}

@@ -1,0 +1,47 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 55;
+LL dp[MAXN][MAXN];//dp[i][j]长度为i前面几位有j个1时包含1的总数
+
+int bit[MAXN];
+LL dfs(int len, int num, bool ismax)
+{
+	if(!len) return num;
+	LL &ans = dp[len][num];
+	if(!ismax && ~ans) return ans;
+	int mx = ismax?bit[len]:1;
+	LL cnt = 0;
+	repe(i,0,mx)
+	{
+		if(i) cnt += dfs(len-1,num+1,ismax&&i == mx);
+		else cnt += dfs(len-1,num,ismax&&i==mx);
+	}
+	return ismax?cnt:ans = cnt;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	clc(dp,-1);
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		LL n;
+		scanf("%lld", &n);
+		int cnt = 0;
+		while(n)
+		{
+			bit[++cnt] = n&1;
+			n >>= 1;
+		}
+		printf("%lld\n", dfs(cnt,0,1));
+	}
+	return 0;
+}

@@ -1,0 +1,41 @@
+#include <stdio.h>
+
+int gcd(int, int);
+
+int main ()
+{
+	int a,b,c,d;
+	char f;
+	while(EOF != scanf ("%d%*c%d%c%d%*c%d%*c", &a,&b,&f, &c,&d))
+	{
+		int m, z, g, h = 1;
+		if ('+' == f)
+			m = a*d+b*c;
+		else
+			m = a*d-b*c;
+		z = b*d;
+		if (0 == m%z || 0 == ((-1)*m)%z || 0 == m)
+		{
+			printf ("%d\n", m/z);
+			continue;
+		}
+		if (m < 0)
+		{
+			h = -1;
+			m *= -1;
+		}
+		g = gcd(m,z);
+		m /= g;
+		z /= g;
+		printf ("%d/%d\n", m*h, z);
+	}
+
+	return 0;
+}
+
+int gcd(int a, int b)
+{
+	if (0 == b%a)
+		return a;
+	return gcd(b%a, a);
+}

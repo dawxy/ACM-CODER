@@ -1,0 +1,193 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXM = 100000*2+10;
+int head[MAXN], tol, nxt[MAXM], to[MAXM];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int fa[MAXN], sz[MAXN], dep[MAXN], son[MAXN],cnt;
+void dfs1(int u)
+{
+	int num = 0;
+	sz[u] = 1;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v == fa[u]) continue;
+		dep[v] = dep[u]+1;fa[v] = u;
+		dfs1(v);
+		sz[u] += sz[v];
+		if(sz[v] > num) num = sz[v], son[u] = v;
+	}
+}
+int top[MAXN], tree[MAXN], pre[MAXN];
+void dfs2(int u, int num)
+{
+	top[u] = num;tree[u] = cnt, pre[cnt++] = u;
+	if(-1 == son[u]) return;
+	dfs2(son[u],num);
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v != fa[u] && v != son[u]) dfs2(v,v);
+	}
+}
+int sum[MAXN<<1],lz[MAXN<<1],lc[MAXN<<1],rc[MAXN<<1], a[MAXN];
+inline int id(int x, int y){return x+y|x!=y;}
+void push_up(int x, int y, int m)
+{
+	int u = id(x,y), l = id(x,m), r = id(m+1,y);
+	sum[u] = sum[l]+sum[r];
+	lc[u] = lc[l], rc[u] = rc[r];
+	if(rc[l] == lc[r]) sum[u]--;
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		int u = id(x,y);
+		sum[u] = 1;
+		lc[u] = rc[u] = a[pre[x]];
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+void init(int rt)
+{
+	clc(son,-1);
+	dep[rt] = 0;fa[rt] = -1;cnt = 0;
+	dfs1(rt);
+	cnt = 0;
+	dfs2(rt,rt);
+	clc(lz,-1);
+	bulid(0,cnt-1);
+}
+inline void one(int u, int z){
+	lz[u] = lc[u] = rc[u] = z;
+	sum[u] = 1;
+}
+void push_down(int x, int y, int m)
+{
+	int u = id(x,y);
+	if(~lz[u])
+	{
+		int l = id(x,m), r = id(m+1,y);
+		one(l,lz[u]), one(r,lz[u]);
+		lz[u] = -1;
+	}
+}
+void update(int x, int y, int ql, int qr, int v)
+{
+	if(ql <= x && y <= qr)
+	{
+		one(id(x,y),v);
+		return;
+	}
+	int m = (x+y)>>1;
+	push_down(x,y,m);
+	if(ql <= m) update(x,m,ql,qr,v);
+	if(qr > m) update(m+1,y,ql,qr,v);
+	push_up(x,y,m);
+}
+int query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr) return sum[id(x,y)];
+	int m = (x+y)>>1, ans = 0, l = -1, r = -1;
+	push_down(x,y,m);
+	if(ql <= m) ans += query(x,m,ql,qr), l = id(x,m);
+	if(qr > m) ans += query(m+1,y,ql,qr),r = id(m+1,y);
+	push_up(x,y,m);
+	if(~l && ~r && rc[l] == lc[r]) ans--;
+	return ans;
+}
+int find_col(int x, int y, int p)
+{
+	if(x == y) return lc[id(x,y)];
+	int m = (x+y)>>1, ans;
+	push_down(x,y,m);
+	if(p <= m) ans = find_col(x,m,p);
+	else ans = find_col(m+1,y,p);
+	push_up(x,y,m);
+	return ans;
+}
+void tcp_update(int x, int y, int v)
+{
+	int f1 = top[x], f2 = top[y];
+	while(f1 != f2)
+	{
+		if(dep[f1] < dep[f2]) swap(f1,f2), swap(x,y);
+		update(0,cnt-1,tree[f1],tree[x],v);
+		x = fa[f1], f1 = top[x];
+	}
+	if(dep[x] > dep[y]) swap(x,y);
+	update(0,cnt-1,tree[x],tree[y],v);
+}
+int tcp_query(int x, int y)
+{
+	int f1 = top[x], f2 = top[y], ans = 0;
+	while(f1 != f2)
+	{
+		if(dep[f1] < dep[f2]) swap(f1,f2), swap(x,y);
+		ans += query(0,cnt-1,tree[f1],tree[x]);
+		if(find_col(0,cnt-1,tree[f1]) == find_col(0,cnt-1,tree[fa[f1]])) ans--;
+		x = fa[f1], f1 = top[x];
+	}
+	if(dep[x] > dep[y]) swap(x,y);
+	ans += query(0,cnt-1,tree[x],tree[y]);
+	return ans;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,q;
+	scanf("%d %d%*c", &n, &q);
+	repe(i,1,n) scanf("%d%*c", &a[i]);
+	clc(head,-1);
+	tol = 0;
+	rep(i,1,n)
+	{
+		int u,v;
+		scanf("%d %d%*c", &u,&v);
+		add_edge(u,v);
+		add_edge(v,u);
+	}
+	init(1);
+	char op[10];
+	while(q--)
+	{
+		int a,b;
+		scanf("%s %d %d", op, &a, &b);
+		if('C' == op[0])
+		{
+			int c;
+			scanf("%d%*c",&c);
+			tcp_update(a,b,c);
+		}
+		else printf("%d\n", tcp_query(a,b));
+	}
+	return 0;
+}

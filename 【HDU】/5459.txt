@@ -1,0 +1,46 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 201314;
+const LL MOD = 530600414;
+LL ans[MAXN],cnt[MAXN],tol[MAXN],sum[MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    tol[3] = 3,tol[4] = 5;
+    repe(i,5,201314)
+        tol[i] = (tol[i-2]+tol[i-1])%MOD;
+    cnt[3] = 1, cnt[4] = 1;
+    repe(i,5,201314)
+        cnt[i] = (cnt[i-2]+cnt[i-1])%MOD;
+    sum[3] = 0, sum[4] = 2;
+    repe(i,5,201314)
+    {
+        sum[i] = (sum[i-2]+sum[i-1]+tol[i-2]*cnt[i-1]%MOD)%MOD;
+    }
+    ans[3] = 0, ans[4] = 0;
+    ans[5] = 5;
+    repe(i,6,201314)
+    {
+        LL ss = (sum[i]-sum[i-2]+MOD)%MOD;
+        ss = ss*cnt[i-2]%MOD;
+        ss = (ss-sum[i-2]*cnt[i-1]%MOD+MOD)%MOD;
+        ans[i] = (ans[i-1]+ans[i-2]+ss)%MOD;
+    }
+    int t,count = 0;
+    scanf("%d", &t);
+    while(t--)
+    {
+        int n;
+        scanf("%d", &n);
+        printf("Case #%d: %I64d\n", ++count,ans[n]);
+    }
+    return 0;
+}

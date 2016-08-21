@@ -1,0 +1,51 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+/*这个是求：按位(10进制)出现，奇数出现偶数次，偶数出现奇数次的数的个数*/
+const int INF = 0x3f3f3f3f, MAXN = 21;
+int dp[MAXN][10][2];
+int bit[MAXN];
+
+//len-数字位数(高到低),odd&even-dp参数,ismax是否当前查询数上限,z是否为0(包括前导零)
+int dfs(int len, int la, bool ismax, bool z)
+{
+	if(!len) return !z;
+	int &ans = dp[len][la][z];
+	if(!ismax && ~ans) return ans;
+	int sum = 0;
+	int mx = ismax?bit[len]:9;
+	repe(i,0,mx)
+	{
+		if(abs(la-i) >= 2 || z)
+			sum += dfs(len-1,i,ismax&&i==mx,z&&0==i);
+	}
+	return ismax?sum:ans=sum;
+}
+int sloved(int n)//[0~n]满足条件的个数
+{
+	int len = 0;
+	while(n)
+	{
+		bit[++len] = n%10;
+		n /= 10;
+	}
+	return dfs(len,100,1,1);
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int a,b;
+	clc(dp,-1);
+	while(~scanf("%d %d", &a, &b))
+	{
+		printf("%d\n", sloved(b)-sloved(a-1));
+	}
+	return 0;
+}

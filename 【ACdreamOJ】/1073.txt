@@ -1,0 +1,59 @@
+
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+int a[MAXN], c[5], n;
+ 
+bool cmp(int a, int b)
+{
+    return a > b;
+}
+int sloved (int val, int len, int lv)
+{
+    if (4 <= lv)
+    {
+        sort(a,a+n, cmp);
+        int sum = 0;
+        for (int i = 0; i < len; i++)
+            sum += a[i];
+        return sum;
+    }
+    if (len <= 0)
+        return -1;
+    sort(a,a+n, cmp);
+    if (a[0] < val)//只用一个经验球不能升级时
+    {
+        val -= a[0];
+        a[0] = -1;
+        return sloved(val, len-1, lv);
+    }
+    //用一个球可以升级，选择经验值最小并且能升级的球
+    int i;
+    for (i = 1; i < len && a[i] >= val ; i++);
+    a[i-1] = -1;
+    return sloved(c[lv+1], len-1, lv+1);
+}
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    while (~scanf ("%d%*c", &n))
+    {
+        for (int i = 0; i < 4; i++)
+            scanf ("%d%*c", &c[i]);
+        for(int i = 0; i < n; i++)
+            scanf ("%d%*c", &a[i]);
+        int ans = sloved(c[0],n,0);
+        if (-1 == ans)
+            printf ("NO\n");
+        else
+            printf ("YES %d\n", ans);
+    }
+    return 0;
+}
+ 
+
+

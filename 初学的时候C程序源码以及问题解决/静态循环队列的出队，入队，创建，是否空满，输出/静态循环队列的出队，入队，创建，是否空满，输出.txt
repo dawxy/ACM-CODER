@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <malloc.h>
+#define LEN 5
+typedef struct queue{
+	int *pf;
+	int front;
+	int rear;
+}QUEUE, *PQUEUE;
+
+void init_queue (PQUEUE);//创建队列
+bool full_queue(PQUEUE);//判断队列是否已满
+bool en_queue(PQUEUE, int);//入队
+bool traverse_queue(PQUEUE);//遍历输出
+bool empty_queue(PQUEUE);//判断队列是否为空
+bool out_queue(PQUEUE, int*);//出队
+
+int main ()
+{
+	QUEUE d;
+	int val;
+	init_queue (&d);
+	en_queue(&d, 1);
+	en_queue(&d, 2);
+	en_queue(&d, 3);
+	en_queue(&d, 4);
+	en_queue(&d, 5);
+	traverse_queue(&d);
+	if (out_queue(&d, &val))
+		printf ("出队成功!出队的元素是：%d\n", val);
+	else
+		printf ("出队失败，队列为空！\n");
+	traverse_queue(&d);
+	return 0;
+}
+
+void init_queue (PQUEUE d)
+{
+	d->pf = (int*)malloc(sizeof(int)*LEN);
+	d->front = d->rear = 0;
+	return;
+}
+
+bool full_queue (PQUEUE d)
+{
+	if ((d->rear+1)%LEN == d->front)
+		return true;
+	return false;
+}
+
+bool en_queue (PQUEUE d, int val)
+{
+	if (full_queue(d))
+	{
+		printf ("队列已满，入队失败！\n");
+		return false;
+	}
+	d->pf[d->rear] = val;
+	d->rear = (d->rear+1)%LEN;
+	return true;
+}
+
+bool empty_queue (PQUEUE d)
+{
+	if (d->front == d->rear)
+		return true;
+	return false;
+}
+
+bool traverse_queue(PQUEUE d)
+{
+	int i;
+	if (empty_queue(d))
+	{
+		printf ("队列为空，输出失败！\n");
+		return false;
+	}
+	for (i = d->front; d->rear != i;i = (i+1)%LEN)
+		printf ("%d ", d->pf[i]);
+	printf ("\n");
+	return true;
+}
+
+bool out_queue (PQUEUE d, int*val)
+{
+	if (empty_queue(d))
+		return false;
+	*val = d->pf[d->front];
+	d->front = (d->front+1)%LEN;
+	return true;
+}

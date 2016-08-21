@@ -1,0 +1,72 @@
+#include <stdio.h>
+#define MAX 21
+#define MAXNUM 99999999
+int w, h, map[MAX][MAX], min,d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+
+void dfs (int , int, int);
+
+int main ()
+{
+	while (1)
+	{
+		int i, j, si, sj;
+		min = MAXNUM;
+		scanf ("%d %d%*c", &w, &h);
+		if (0 == w && 0 == h)
+			break;
+		for (i = 0; i < h; i++)
+		{
+			for (j = 0; j < w; j++)
+			{
+				scanf ("%d%*c", &map[i][j]);
+				if (2 == map[i][j])
+				{
+					si = i;
+					sj = j;
+					map[i][j] = 0;
+				}
+			}
+		}
+		dfs(0, si, sj);
+		if (min == MAXNUM)
+			min = -1;
+		printf ("%d\n", min);
+
+
+	}
+
+	return 0;
+}
+
+void dfs (int sum, int si, int sj)
+{
+	int i, ni, nj;
+	if (10 <= sum)
+		return;
+	for (i = 0; i < 4; i++)
+	{
+		ni = si+d[i][0];
+		nj = sj+d[i][1];
+		if (1 == map[ni][nj])
+			continue;
+		while(!map[ni][nj])
+		{
+			ni += d[i][0];
+			nj += d[i][1];
+		}
+		if (0 <= ni && h > ni && 0 <= nj && w > nj)
+		{
+			if (1 == map[ni][nj])
+			{
+				map[ni][nj] = 0;
+				dfs (sum+1, ni-d[i][0], nj-d[i][1]);
+				map[ni][nj] = 1;
+			}
+			if (3 == map[ni][nj])
+			{
+				if (sum+1 < min)
+					min = sum+1;
+			}
+		}
+	}
+}

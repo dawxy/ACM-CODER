@@ -1,0 +1,75 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <vector>
+using namespace std;
+#define MAXN 10010
+struct NODE{
+	int s, v;
+	NODE(int a, int b)//重载
+	{
+		s = a;
+		v = b;
+	}
+};
+int son[MAXN][2], dp[MAXN], p[MAXN];
+//son[i][0]表示i节点为根的最长距离，son[i][1]是次长距离,p[i]记录i的最长距离来自那个儿子
+//dp[i]是经过i的父亲的以及其父亲节点的其他儿子的路径的最长距离
+vector<NODE> g[MAXN];
+
+void dfs(int r)
+{
+	int len = g[r].size();
+	for (int i = 0; i < len; i++)
+	{
+		int s = g[r][i].s;
+		dfs(s);
+		if (son[r][0] < son[s][0] + g[r][i].v)//求出当前r往下走的最大值以及最大值来自哪个儿子（不是叶子）
+			son[r][0] = son[s][0] + g[r][i].v, p[r] = s;
+	}
+	for (int i = 0; i < len; i++)//求出次大值
+	{
+		int s = g[r][i].s;
+		if (s == p[r]) continue;
+		son[r][1] = max(son[r][1], son[s][0] + g[r][i].v);
+	}
+}
+void dfs2(int r)//求出i往上走通过他父亲节点的其他儿子再往下走的最大值
+{
+	int len = g[r].size();
+	for (int i = 0; i < len; i++)
+	{
+		int s = g[r][i].s;
+		if (s == p[r])//如果当前儿子是r的最大值来源，那么就取次大值和r通过父亲节点的最大值
+			dp[s] = max(son[r][1],dp[r])+g[r][i].v;
+		else
+			dp[s] = max(son[r][0],dp[r])+g[r][i].v;
+		dfs2(s);
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while (~scanf("%d%*c", &n))
+	{
+		int a, val;
+		for (int i = 0; i <= n; i++)
+			g[i].clear();
+		memset(son, 0, sizeof(son));
+		memset(p, 0, sizeof(p));
+		memset(dp,0,sizeof(dp));
+		for (int i = 2; i <= n; i++)
+		{
+			scanf("%d %d%*c", &a, &val);
+			g[a].push_back(NODE(i,val));
+		}
+		dfs(1);
+		dfs2(1);
+		for (int i = 1; i <= n; i++)
+			printf("%d\n", max(son[i][0],dp[i]));//每次比价i节点往上走大还是往下走大
+	}
+	return 0;
+}

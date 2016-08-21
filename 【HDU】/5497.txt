@@ -1,0 +1,82 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1e5+10;
+int n;
+struct TREE{
+	int cnt[MAXN];
+	void init(){clc(cnt,0);}
+	int lowbit(int x){return x&-x;}
+	void add(int x, int v)
+	{
+		while(x <= n)
+		{
+			cnt[x] += v;
+			x += lowbit(x);
+		}
+	}
+	int query(int x)
+	{
+		int ans = 0;
+		while(x > 0)
+		{
+			ans += cnt[x];
+			x -= lowbit(x);
+		}
+		return ans;
+	}
+}tr,tr2;
+int a[MAXN];
+
+int get_cnt(int p)
+{
+	return tr.query(n)-tr.query(p)+tr2.query(p-1);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int len;
+		scanf("%d%d", &n,&len);
+		repe(i,1,n) scanf("%d", &a[i]);
+		tr.init();tr2.init();
+		LL ans = 0;
+		repe(i,1,n-len)
+		{
+			ans += tr.query(n)-tr.query(a[i]);
+			tr.add(a[i],1);
+		}
+		LL tmp = ans;
+		per(i,n-len,1)
+		{
+			int r = i+len;
+			tr.add(a[i],-1);
+			tmp += get_cnt(a[r]);
+			tmp -= get_cnt(a[i]);
+			tr2.add(a[r],1);
+			ans = min(ans,tmp);
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 110
+#define max(a,b) (a>b?a:b)
+int d[MAXN], a[MAXN], s[MAXN], e[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n, len, l, r, mid;
+	scanf("%d%*c", &n);
+	for(int i = 0; i < n; i++)
+		scanf("%d%*c", &a[i]);
+	len = 0;
+	for(int i = 0; i < n; i++)
+	{
+		if (a[i] > d[len])
+			d[++len] = a[i];
+		else
+		{
+			l = 0, r = len;
+			while(l <= r)
+			{
+				mid = (l+r)>>1;
+				if (a[i] > d[mid])
+					l = mid+1;
+				else
+					r = mid-1;
+			}
+			d[l] = a[i];
+		}
+		s[i] = len;
+	}
+	len = 0;
+	for(int i = n-1; i >= 0; i--)
+	{
+		if (a[i] > d[len])
+			d[++len] = a[i];
+		else
+		{
+			l = 0, r = len;
+			while(l <= r)
+			{
+				mid = (l+r)>>1;
+				if (a[i] > d[mid])
+					l = mid+1;
+				else
+					r = mid-1;
+			}
+			d[l] = a[i];
+		}
+		e[i] = len;
+	}
+	int ans = 0;
+	for (int i = 0; i < n; i++)
+		ans = max(ans,s[i]+e[i]-1);
+	printf("%d\n", n-ans);
+	return 0;
+}

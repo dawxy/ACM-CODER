@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 1010
+struct NODE{
+	int a,b;
+}p[MAXN];
+bool g[MAXN][MAXN];
+int d[MAXN], n;//d[]记录以当前节点为起点的路径长度
+
+bool can(int a, int b)//a是否能嵌套在b中
+{
+	if ((p[a].a < p[b].a && p[a].b < p[b].b)|| (p[a].b < p[b].a && p[a].a < p[b].b))
+		return true;
+	return false;
+}
+int dp(int i)//求出i为起点的通路长度
+{
+	if (d[i] > 0)//记忆化
+		return d[i];
+	d[i] = 1;//标记访问过
+	for (int j = 0; j < n; j++)//找到最长路径
+	{
+		if (g[i][j])
+		{
+			int buf = dp(j)+1;
+			if (d[i] < buf)
+				d[i] = buf;
+		}
+	}
+	return d[i];
+}
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		scanf ("%d%*c", &n);
+		for (int i = 0; i < n; i++)
+			scanf ("%d %d%*c", &p[i].a, &p[i].b);
+		memset(g,false,sizeof(g));
+		for (int i = 0; i < n; i++)//创建图
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (i == j)
+					continue;
+				if (can(i,j))
+					g[i][j] = true;
+			}
+		}
+		memset(d,0,sizeof(d));
+		int max = dp(0);
+		for (int i = 1; i < n; i++)
+		{
+			if (d[i])//记忆化
+				continue;
+			int buf = dp(i);
+			if (buf > max)
+				max = buf;
+		}
+		printf ("%d\n", max);
+	}
+	return 0;
+}

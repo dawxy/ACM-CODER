@@ -1,0 +1,28 @@
+#include <stdio.h>
+
+void main (void)
+{
+	int i, j;
+	char t, ch, a[3];
+
+	
+	while (scanf("%c%c%c",&a[0],&a[1],&a[2])!=EOF)
+	{
+		while ( (ch=getchar()) !='\n' )
+		continue;
+		//getchar();
+		for (i = 0; i < 2; i++)
+		{
+			for (j = 0; j < 2-i; j++)
+			{
+				if (a[j] > a[j+1])
+				{
+					t = a[j];
+					a[j] = a[j+1];
+					a[j+1] = t;
+				}
+			}
+		}
+		printf ("%c %c %c\n", a[0], a[1], a[2]);
+	}
+}

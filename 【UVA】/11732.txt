@@ -1,0 +1,82 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 4001*1000+10;
+
+struct Trie{
+	/*和链式前向星差不多*/
+	struct NODE{
+		int son, next, tol, cnt;//son左儿子,next右兄弟,tol记录该结点经过的单词数,cnt为以这个结点结束的单词数
+		char ch;//该结点的字母
+	}node[MAXN];
+	LL ans;
+	int sz;
+	void init(){sz = 1, node[0].son = node[0].next = -1, ans = node[0].tol = node[0].cnt = 0;}
+	void insert(char *s)
+	{
+		int u = 0, n = strlen(s);
+		ans += node[0].tol++;
+		rep(i,0,n)
+		{
+			bool finded = false;
+			int v;
+			for(v = node[u].son; ~v; v = node[v].next)//查找s[i]
+			{
+				if(s[i] == node[v].ch)
+				{
+					finded = true;
+					break;
+				}
+			}
+			if(!finded)//新建结点
+			{
+				v = sz++;
+				//初始化新建的节点
+				node[v].ch = s[i];
+				node[v].cnt = node[v].tol = 0;
+				node[v].next = node[u].son;//u的儿子就是v的兄弟
+				node[v].son = -1;
+				//新节点插入到u的儿子节点
+				node[u].son = v;
+			}
+			u = v;
+			ans += node[u].tol*2;
+			node[u].tol++;
+		}
+		ans += node[u].cnt++;
+	}
+}trie;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, count = 0;
+	char str[1010];
+	while(~scanf("%d%*c", &n) && n)
+	{
+		trie.init();
+		rep(i,0,n)
+		{
+			scanf("%s", str);
+			trie.insert(str);
+		}
+		printf("Case %d: %lld\n", ++count,trie.ans);
+	}
+	return 0;
+}

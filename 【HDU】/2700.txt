@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <string.h>
+char c[50];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(1)
+	{
+        gets(c);
+        if ('#' == c[0])
+			break;
+        int len = strlen(c);
+        int sum = 0;
+        for (int i = 0; i < len-1; i++)
+		{
+            if ('1' == c[i])
+                sum++;
+            printf ("%c", c[i]);
+		}
+        if (('e' == c[len-1] && sum&1) ||  ('o' == c[len-1] && !(sum&1)))
+            puts ("1");
+        else
+			puts("0");
+	}
+    return 0;
+}

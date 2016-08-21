@@ -1,0 +1,79 @@
+#include <stdio.h>
+
+#include <algorithm>
+
+using namespace std;
+
+struct NODE{
+
+	int a, b;
+
+}p[1100];
+
+
+bool cmp(const NODE a, const NODE b)
+
+{
+
+	return a.b < b.b;
+
+}
+
+int main ()
+
+{
+
+#ifdef DSHY
+
+	freopen("e:\\1.txt","r",stdin);
+
+#endif
+
+	int t = 0, n;
+
+	while(EOF != scanf ("%d%*c", &n))
+
+	{
+
+		int i;
+
+		for (i = 0; i < n; i++)
+
+		{
+
+			scanf ("%d %d%*c", &p[i].a, &p[i].b);
+
+			if (p[i].a > p[i].b)
+
+			{
+
+				p[i].a ^= p[i].b;
+
+				p[i].b ^= p[i].a;
+
+				p[i].a ^= p[i].b;
+
+			}
+
+		}
+
+		sort(p,p+n,cmp);
+
+		int end = p[0].b, ans = 1;
+
+		for (i = 1; i < n; i++)
+
+		{
+
+			if (end < p[i].a)
+
+				ans++, end = p[i].b;
+
+		}
+
+		printf ("Case %d:\n%d.\n",++t,ans);
+
+	}
+	return 0;
+
+}        

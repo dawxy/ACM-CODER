@@ -1,0 +1,27 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+#include <cmath>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 11000
+typedef long long LL;
+char c[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+	//freopen("e:\\out.txt","w",stdout);
+#endif
+	int ans = 0;
+	while(~scanf("%s", &c)) ans++;
+	printf("%d\n", ans);
+	return 0;
+}

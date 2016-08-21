@@ -1,0 +1,78 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10;
+struct NODE{
+	char name[100];
+	int sex,s1,s2;
+	double s;
+	bool operator<(const NODE&t) const{
+		return s > t.s;
+	}
+}p[MAXN],ans[MAXN];
+
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d%d", &n, &m);
+		int mx1 = 0,mx2 = 0;
+		rep(i,0,n)
+		{
+			char buf[30];
+			scanf("%s %s %d %d", p[i].name,buf,&p[i].s1,&p[i].s2);
+			if('m' == buf[0]) p[i].sex = 0;
+			else p[i].sex = 1;
+			mx1 = max(mx1,p[i].s1);
+			mx2 = max(mx2,p[i].s2);
+		}
+		rep(i,0,n)
+		{
+			p[i].s = (300.0/mx1)*p[i].s1*0.3+(300.0/mx2)*p[i].s2*0.7;
+		}
+		sort(p,p+n);
+		puts("The member list of Shandong team is as follows:");
+		if(0 == m)
+		{
+			continue;
+		}
+		int st = -1;
+		do{
+			++st;
+		}while(p[st].sex == 0 && st < n);
+		if(st < n && p[st].sex == 1)
+		{
+			if(st < m)
+				rep(i,0,m) printf("%s\n", p[i].name);
+			else
+			{
+				rep(i,0,m-1) printf("%s\n", p[i].name);
+				printf("%s\n", p[st].name);
+			}
+		}
+		else rep(i,0,m) printf("%s\n", p[i].name);
+	}
+	return 0;
+}

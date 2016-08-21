@@ -1,0 +1,220 @@
+/*¿Îœﬂ*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 40000+10, MAXM = 40000*2+10;
+int head[MAXN], tol, to[MAXM], nxt[MAXM], cost[MAXM];
+struct Q{
+	int v, id;
+};
+vector<Q> q[MAXN];
+
+void add_edge(int u, int v, int c)
+{
+	nxt[tol] = head[u], to[tol] = v, cost[tol] = c;
+	head[u] = tol++;
+}
+int f[MAXN];
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+void bing(int a, int b)
+{
+	int x = find(a), y = find(b);
+	if(x != y) f[y] = x;
+}
+bool vis[MAXN];
+int ans[200+10], dis[MAXN];
+void lca(int u)
+{
+	vis[u] = true;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(vis[v]) continue;
+		dis[v] = dis[u]+cost[i];
+		lca(v);
+		bing(u,v);
+	}
+	int sz = q[u].size();
+	rep(i,0,sz)
+	{
+		int v = q[u][i].v;
+		if(vis[v])
+		{
+			int fa = find(v);
+			ans[q[u][i].id] = dis[u]+dis[v]-2*dis[fa];
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d %d%*c", &n, &m);
+		clc(head,-1);
+		tol = 0;
+		rep(i,1,n)
+		{
+			int u,v,c;
+			scanf("%d %d %d%*c", &u, &v, &c);
+			add_edge(u,v,c);
+			add_edge(v,u,c);
+		}
+		repe(i,1,n) q[i].clear(), f[i] = i;
+		rep(i,0,m)
+		{
+			int u,v;
+			scanf("%d %d%*c", &u, &v);
+			q[u].push_back(Q{v,i});
+			q[v].push_back(Q{u,i});
+		}
+		clc(vis,0);
+		dis[1] = 0;
+		lca(1);
+		rep(i,0,m) printf("%d\n", ans[i]);
+	}
+	return 0;
+}
+=========================================================================================
+/*‘⁄œﬂ*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 40000+10, MAXM = 40000*2+10;
+int head[MAXN], tol, to[MAXM], nxt[MAXM], cost[MAXM];
+
+void add_edge(int u, int v, int c)
+{
+	nxt[tol] = head[u], to[tol] = v, cost[tol] = c;
+	head[u] = tol++;
+}
+int dis[MAXN],ft[MAXN],d[MAXN<<1],num[MAXN<<1],cnt;
+bool vis[MAXN];
+void dfs(int u, int deep)
+{
+	ft[u] = cnt;
+	d[cnt] = deep, num[cnt++] = u;
+	vis[u] = true;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(vis[v]) continue;
+		dis[v] = dis[u]+cost[i];
+		dfs(v,deep+1);
+		d[cnt] = deep, num[cnt++] = u;
+	}
+}
+int mi_num[MAXN<<2];
+inline int id(int x, int y){return x+y|x!=y;}
+inline void push_up(int x, int y, int m)
+{
+	int u = id(x,y), l = id(x,m), r = id(m+1,y);
+	if(d[mi_num[l]] < d[mi_num[r]]) mi_num[u] = mi_num[l];
+	else mi_num[u] = mi_num[r];
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		mi_num[id(x,y)] = x;
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+int query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr) return mi_num[id(x,y)];
+	int m = (x+y)>>1, ans, mi = INF;
+	if(ql <= m)
+	{
+		int p = query(x,m,ql,qr);
+		if(mi > d[p]) mi = d[p], ans = p;
+	}
+	if(qr > m)
+	{
+		int p = query(m+1,y,ql,qr);
+		if(mi > d[p]) mi = d[p], ans = p;
+	}
+	return ans;
+}
+void lca_init()
+{
+	cnt = 0;
+	dis[1] = 0;
+	clc(vis,0);
+	dfs(1,0);
+	bulid(0,cnt-1);
+}
+int lca_query(int x, int y)
+{
+	int l = ft[x], r = ft[y];
+	if(l > r) swap(l,r);
+	int fa = num[query(0,cnt-1,l,r)];
+	return dis[x]+dis[y]-2*dis[fa];
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d %d%*c", &n, &m);
+		clc(head,-1);
+		tol = 0;
+		rep(i,1,n)
+		{
+			int u,v,c;
+			scanf("%d %d %d%*c", &u, &v, &c);
+			add_edge(u,v,c);
+			add_edge(v,u,c);
+		}
+		lca_init();
+		rep(i,0,m)
+		{
+			int u,v;
+			scanf("%d %d%*c", &u, &v);
+			printf("%d\n", lca_query(u,v));
+		}
+	}
+	return 0;
+}

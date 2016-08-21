@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 510
+int a[MAXN],b[MAXN],c[MAXN],d[MAXN*MAXN], l, n, m, k;
+
+bool bfind(int x)
+{
+	int l = 0, r = k;
+        while(l <= r)
+	{
+                int mid = (l+r)>>1;
+                if (d[mid] == x)
+			return true;
+                if (x > d[mid])
+			l = mid+1;
+                else
+			r = mid-1;
+	}
+	return false;
+}
+bool sloved(int s)
+{
+	for (int i = 0; i < m; i++)
+	{
+		if (bfind(s-c[i]))
+			return true;
+	}
+        return false;
+}
+int main ()
+{
+	#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+	#endif
+        int count = 0;
+	while(~scanf ("%d %d %d%*c", &l, &n, &m))
+	{
+		for (int i = 0; i < l; i++)
+			scanf ("%d%*c", &a[i]);
+		for (int i = 0; i < n; i++)
+			scanf ("%d%*c", &b[i]);
+		for (int i = 0; i < m; i++)
+			scanf ("%d%*c", &c[i]);
+		k = 0;
+		for (int i = 0; i < l; i++)
+		{
+                        for (int j = 0; j < n; j++)
+                                d[k++] = a[i]+b[j];
+		}
+		sort(c,c+m);
+		sort(d,d+k);
+		int s, f;
+		scanf ("%d%*c", &f);
+		printf ("Case %d:\n", ++count);
+		while(f--)
+		{
+                        scanf ("%d%*c", &s);
+			if (sloved(s))
+				puts("YES");
+			else
+				puts("NO");
+		}
+	}
+        return 0;
+}

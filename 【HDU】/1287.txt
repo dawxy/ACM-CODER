@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a));
+#define MAXN 10100
+int a[MAXN], n;
+
+bool ok(int x)
+{
+	rep(i,0,n)
+	{
+		int c = a[i]^x;
+		if('A' > c || 'Z'< c) return false;
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d%*c", &n))
+	{
+		int x;
+		rep(i,0,n) scanf("%d%*c", &a[i]);
+		repe(i,'A','Z')
+		{
+			if(ok(i))
+			{
+				x = i;
+				break;
+			}
+		}
+		rep(i,0,n) putchar(a[i]^x);
+		putchar('\n');
+	}
+	return 0;
+}

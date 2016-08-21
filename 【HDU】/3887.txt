@@ -1,0 +1,100 @@
+/*模拟栈*/
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 100010
+struct EDGE{
+	int next, v;
+	EDGE(int a = 0, int b = 0){next = a, v = b;}
+}edge[MAXN<<1];
+int cnt[MAXN], n, head[MAXN], tol, ans[MAXN], st[MAXN];
+bool vis[MAXN];
+
+inline int lowbit(int x){return x&-x;}
+int sum(int x)
+{
+	int ans = 0;
+	while(x > 0)
+	{
+		ans += cnt[x];
+		x -= lowbit(x);
+	}
+	return ans;
+}
+void update(int x, int d)
+{
+	while(x <= n)
+	{
+		cnt[x] += d;
+		x += lowbit(x);
+	}
+}
+void add_edge(int u, int v)
+{
+	edge[tol] = EDGE(head[u], v);
+	head[u] = tol++;
+}
+void dfs(int p)
+{
+	stack<int> s;
+	s.push(p);
+	clc(vis,0);
+	while(!s.empty())
+	{
+		int u = s.top();
+		if(vis[u])//返回这个节点时
+		{
+			s.pop();
+			ans[u] = sum(u-1)-st[u];
+			update(u,1);
+			continue;
+		}
+		//第一次访问这个节点
+		vis[u] = true;
+		st[u] = sum(u-1);
+		printf("%d\n", u);
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v;
+			if(!vis[v])//这里不是第一次访问的时候
+				s.push(v);
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int p;
+	while(~scanf("%d %d%*c", &n, &p) && n+p)
+	{
+		int a,b;
+		clc(head,-1);
+		tol = 0;
+		rep(i,1,n)
+		{
+			scanf("%d %d%*c", &a, &b);
+			add_edge(a,b);
+			add_edge(b,a);
+		}
+		clc(cnt,0);
+		dfs(p);
+		rep(i,1,n) printf("%d ", ans[i]);
+		printf("%d\n", ans[n]);
+	}
+	return 0;
+}

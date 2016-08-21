@@ -1,0 +1,22 @@
+#include <stdio.h>
+
+void main ()
+{
+	int n;
+	scanf ("%d", &n);
+	getchar ();
+
+	while (n--)
+	{
+		int a, i, s;
+		scanf ("%d", &a);
+		getchar ();
+
+		for (i = 0, s = 3; i < a; i++)
+		{
+			s = 2 * (s-1); 
+		}
+
+		printf ("%d\n", s);
+	}
+}

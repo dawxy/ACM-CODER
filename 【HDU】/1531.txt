@@ -1,0 +1,85 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 210
+#define MAXM 1010
+struct Edge{
+	int next, v, cost;
+	Edge(int a = 0, int b = 0, int c = 0){next = a, v = b, cost = c;}
+}edge[MAXM];
+int head[MAXN], tol, dis[MAXN], cnt[MAXN], n;
+bool inq[MAXN];
+
+void add_edge(int u, int v, int cost)
+{
+	edge[tol] = Edge(head[u], v, cost);
+	head[u] = tol++;
+}
+bool spfa(int s)
+{
+	queue<int> q;
+	clc(dis,0x3f);
+	clc(cnt,0);
+	clc(inq,0);
+	dis[s] = 0;
+	inq[s] = true;
+	q.push(s);
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		inq[u] = false;
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			Edge &e = edge[i];
+			if(dis[u] != INF && dis[e.v] > dis[u]+e.cost)
+			{
+				dis[e.v] = dis[u]+e.cost;
+				if(!inq[e.v])
+				{
+					inq[e.v] = true;
+					q.push(e.v);
+					if(++cnt[e.v] > n+1) return false;
+				}
+			}
+		}
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	char ch[10];
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int m,a,b,c;
+		scanf("%d%*c", &m);
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,m)
+		{
+			scanf("%d %d %s %d%*c", &a, &b, ch, &c);
+			if('g' == ch[0]) add_edge(a+b,a-1,-1-c);
+			else add_edge(a-1,a+b,c-1);
+		}
+		int st = n+1;
+		repe(i,0,n) add_edge(st,i,0);
+		if(spfa(st)) puts("lamentable kingdom");
+		else puts("successful conspiracy");
+	}
+	return 0;
+}

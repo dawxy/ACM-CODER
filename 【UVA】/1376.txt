@@ -1,0 +1,132 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000*1000*3+10, MAXM = 1000*1000*3*4+10, MAXBUF = 100000;
+char buf[MAXBUF], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;//EOF
+	do{
+		rnext();
+		if('-' == *ps) f = -1;
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;//EOF
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+int head[MAXN], tol,nxt[MAXM<<1],to[MAXM<<1];
+void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int m, cost[MAXN];
+
+void add_all(int a, int b, int c)
+{
+	add_edge(a,b);add_edge(b,a);
+	add_edge(a,c);add_edge(c,a);
+	add_edge(b,c);add_edge(c,b);
+}
+struct NODE{
+	int dis;//这里的dis不一定是dis[u]
+	int u;
+	NODE(int a, int b){ dis = a, u = b;}
+	bool operator <(const NODE& a) const {return dis > a.dis;}
+};
+priority_queue<NODE> q;
+int dis[MAXN];
+bool vis[MAXN];
+int dijkstra(int st, int ed)
+{
+	while(!q.empty()) q.pop();
+	clc(dis, 0x3f);
+	clc(vis, 0);
+	dis[st] = 0;
+	q.push(NODE(dis[st], st));
+	while(!q.empty())
+	{
+		NODE now = q.top(); q.pop();
+		int u = now.u;
+		if(dis[u] > now.dis) dis[u] = now.dis;
+		if(ed == u) return dis[u];
+		if(vis[u]) continue;
+		vis[u] = true;
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(dis[v] > now.dis+cost[v]) q.push(NODE(now.dis+cost[v], v));
+		}
+	}
+	return dis[ed];
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,count = 0;
+	while(in(n) && in(m) && n+m)
+	{
+		clc(head,-1);
+		tol = 0;
+		int cnt = 0;
+		rep(i,0,n) rep(j,1,m) in(cost[cnt++]);
+		int cnt1 = cnt;
+		rep(i,1,n) rep(j,0,m) in(cost[cnt++]);
+		int cnt2 = cnt;
+		rep(i,1,n) rep(j,1,m) in(cost[cnt++]);
+		rep(i,1,n)
+		{
+			rep(j,1,m-1)
+			{
+				int a = cnt1+(i-1)*m+j, b = cnt2+(i-1)*(m-1)+j, c = i*(m-1)+j;
+				add_all(a,b,c);
+				b = cnt2+(i-1)*(m-1)+j-1, c = (i-1)*(m-1)+j-1;
+				add_all(a,b,c);
+			}
+			int a = cnt1+(i-1)*m, b = cnt2+(i-1)*(m-1), c = i*(m-1);
+			add_all(a,b,c);
+			a = cnt1+i*m-1, b = cnt2+(i-1)*(m-1)+m-2, c = (i-1)*(m-1)+m-2;
+			add_all(a,b,c);
+		}
+		int st = cnt, ed = cnt+1;
+		cost[st] = cost[ed] = 0;
+		rep(i,1,n)
+		{
+			add_edge(st,cnt1+(i-1)*m);
+			add_edge(cnt1+(i-1)*m+m-1,ed);
+		}
+		rep(j,1,m)
+			add_edge(st,(n-1)*(m-1)+j-1), add_edge(j-1,ed);
+		printf("Case %d: Minimum = %d\n",++count,dijkstra(st,ed));
+	}
+	return 0;
+}

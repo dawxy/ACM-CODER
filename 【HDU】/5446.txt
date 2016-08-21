@@ -1,0 +1,100 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+
+LL mul_mod(LL a, LL b, LL MOD)
+{
+    a %= MOD;
+    LL ans = 0;
+    while(b)
+    {
+        if(b&1)
+        {
+            ans += a;
+            if(ans >= MOD) ans -= MOD;
+        }
+        a <<= 1;
+        if(a >= MOD) a -= MOD;
+        b >>= 1;
+    }
+    return ans;
+}
+LL pow_mod(LL x,LL n, LL MOD)
+{
+    LL ans = 1;
+    while(n)
+    {
+        if(n&1) ans = mul_mod(ans,x,MOD);
+        x = mul_mod(x,x,MOD);
+        n >>= 1;
+    }
+    return ans;
+}
+LL getc(LL n,LL m, LL MOD)
+{
+    if(n<m)return 0;
+    if(m>n-m)m=n-m;
+    LL s1=1,s2=1;
+    rep(i,0,m)
+    {
+        s1=s1*(n-i)%MOD;
+        s2=s2*(i+1)%MOD;
+    }
+    return s1*pow_mod(s2,MOD-2,MOD)%MOD;
+}
+LL lucas(LL n,LL m, LL MOD)
+{
+    if(m==0)return 1;
+    return getc(n%MOD,m%MOD,MOD)*lucas(n/MOD,m/MOD,MOD)%MOD;
+}
+void e_gcd(LL a, LL b, LL& d, LL& x, LL& y)
+{
+    if (!b) d = a, x = 1, y = 0;
+    else e_gcd(b, a%b, d, y, x), y -= x*(a / b);
+}
+LL crt(LL cnt, LL *m, LL *a)  
+{
+    LL aa = a[0];
+    LL mm = m[0];
+    rep(i,0,cnt)
+    {
+        LL sub = (a[i] - aa);
+        LL d, x, y;
+        e_gcd(mm, m[i], d, x, y);
+        if(sub % d) return -1;
+        LL new_m = m[i] / d;
+        new_m = (sub / d * x % new_m + new_m) % new_m;
+        aa = mm * new_m + aa;
+        mm = mm * m[i] / d;
+    }  
+    aa = (aa + mm) % mm;
+    return aa;
+}
+LL a[20],d[20],p[20];
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        LL n,m;
+        int k;
+        scanf("%I64d %I64d %d", &n, &m, &k);
+        rep(i,0,k)
+        {
+            scanf("%I64d", &p[i]);
+            a[i] = lucas(n,m,p[i]);
+        }
+        printf("%I64d\n", crt(k,p,a));
+    }
+    return 0;
+}

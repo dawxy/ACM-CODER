@@ -1,0 +1,102 @@
+01./* 
+02.    coder: ACboy 
+03.    date: 2010-3-7 
+04.    result: 1A 
+05.    description: UVa 540 Team Queue 
+06.*/  
+07.  
+08.#include <iostream>  
+09.#include <algorithm>  
+10.#include <map>  
+11.using namespace std;  
+12.  
+13.struct cmp {  
+14.    bool operator () (const int & a, const int & b) {  
+15.        return a < b;  
+16.    }  
+17.};  
+18.  
+19.// 队号的队列用来统计有哪些队进入的总的队列  
+20.int TeamQueue[1010];  
+21.// 用来标记那些队已经进入的了总队列  
+22.int TeamVis[1010];  
+23.// 队号队列的队尾  
+24.int teamFront;  
+25.// 队号队列的队头  
+26.int teamRear;  
+27.// 具体的不同的队的成员队列  
+28.int EveryTeamQueue[1010][1010];  
+29.// 各个不同队的队列的队尾  
+30.int everyTeamFront[1010];  
+31.// 各个不同队的队列的队头  
+32.int everyTeamRear[1010];  
+33.  
+34.int main()  
+35.{  
+36.    int t;  
+37.    int count = 0;  
+38.#ifndef ONLINE_JUDGE  
+39.    freopen("540.txt", "r", stdin);  
+40.#endif  
+41.    while (cin >> t) {  
+42.        if (t == 0) break;  
+43.        map<int, int, cmp> dataMap;  
+44.        int i, j;  
+45.        for (i = 0; i < t; i++) {  
+46.            int k;  
+47.            cin >> k;  
+48.            for (j = 0; j < k; j++) {  
+49.                int temp;  
+50.                cin >> temp;  
+51.                dataMap.insert(make_pair(temp, i));  
+52.            }  
+53.        }  
+54.        char input[50];  
+55.        gets(input);  
+56.        cout << "Scenario #" << ++count << endl;  
+57.          
+58.        memset(TeamVis, 0, sizeof(TeamVis));  
+59.        teamFront = 0;  
+60.        teamRear = -1;  
+61.        memset(everyTeamFront, 0, sizeof(everyTeamFront));  
+62.        memset(everyTeamRear, -1, sizeof(everyTeamRear));  
+63.        while (gets(input)) {  
+64.            if (strcmp(input, "STOP") == 0) {  
+65.                cout << endl;  
+66.                break;  
+67.            }   
+68.            else   
+69.            {  
+70.                int teamNum;  
+71.                if (strcmp(input, "DEQUEUE") != 0) {  
+72.                    int num;  
+73.                    char cmd[20];  
+74.                    sscanf(input, "%s %d", cmd, &num);  
+75.                    teamNum = dataMap[num];  
+76.                    if (!TeamVis[teamNum]) {  
+77.                        // 队号入队的队列  
+78.                        TeamQueue[teamFront++] = teamNum;  
+79.                        // 标记该队已经在队的队列中  
+80.                        TeamVis[teamNum] = 1;  
+81.                    }  
+82.                    // 把队的元素入相应的队的队列  
+83.                    EveryTeamQueue[teamNum][everyTeamFront[teamNum]++] = num;  
+84.                }  
+85.                else  
+86.                {  
+87.                    // 获取当前在队号队列的队头的队号。  
+88.                    teamNum = TeamQueue[teamRear + 1];  
+89.                    // 根据获取的队号输出该队列中的队头数据  
+90.                    cout << EveryTeamQueue[teamNum][++everyTeamRear[teamNum]] << endl;  
+91.                    // 如果输出数据后该队列变空则从队号队列中删除该队号  
+92.                    // 把该队号从标记数组中去除（即设为零）  
+93.                    if (everyTeamFront[teamNum] - everyTeamRear[teamNum] == 1) {  
+94.                        teamRear++;  
+95.                        TeamVis[teamNum] = 0;  
+96.                    }  
+97.                }  
+98.            }  
+99.        }  
+100.    }  
+101.    return 0;  
+102.}  

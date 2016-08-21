@@ -1,0 +1,89 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+char a[1000];
+
+void pt2(int num, int cnt)
+{
+    if(cnt == 5) return;
+    pt2(num>>1, cnt+1);
+    printf("%d", num&1);
+}
+int to10(char* c, int len)
+{
+    int ans = 0;
+    rep(i,0,len)
+        ans = (ans<<1)+(*(c+i))-'0';
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int s;
+    while(~scanf("%d%*c", &s))
+    {
+        gets(a);
+        if(s)
+        {
+            if('S' == a[0] && 'E' == a[1])
+            {
+                int b;
+                sscanf(a,"%*s %*c%d", &b);
+                printf("000110");
+                pt2(b,0);
+                pt2(0,0);
+                putchar('\n');
+                continue;
+            }
+            if(a[0] == 'A') printf("000001");
+            else if('S' == a[0]) printf("000010");
+            else if('D' == a[0]) printf("000011");
+            else if('M' == a[0])
+            {
+                if('U' == a[1]) printf("000100");
+                else printf("000101");
+            }
+            int b,c;
+            sscanf(a,"%*s %*c%d,%*c%d", &b, &c);
+            pt2(b,0);
+            pt2(c,0);
+            putchar('\n');
+            continue;
+        }
+        int len = strlen(a);
+        if(len != 16)
+        {
+            puts("Error!");
+            continue;
+        }
+        int b = to10(a,6), c = to10(a+6,5), d = to10(a+11,5);
+        if ((0 < b && 5 >= b && 1 <= c && 31 >= c && 1 <= d && 31 >= d) || (6 == b && 1 <= c && 31 >= c && 0 == d))
+        {
+            if(1 == b) printf("ADD");
+            else if(2 == b) printf("SUB");
+            else if (3 == b) printf("DIV");
+            else if(4 == b) printf("MUL");
+            else if (5 == b) printf("MOVE");
+            else if (6 == b) printf("SET");
+            if(6 == b) printf(" R%d\n", c);
+            else printf(" R%d,R%d\n",c,d);
+        }
+        else puts("Error!");
+    }
+    return 0;
+}

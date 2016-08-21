@@ -1,0 +1,47 @@
+/*
+利用公式：s[j]-s[i-1]就是a[i]~a[j]序列的和
+当j确定时想要s[j]-s[i-1](也就是a[i]~a[j]序列的和)最大，只要s[i-1]最小就行
+然后枚举每个j不断更新当前出现的最小的s，找到一个s[j]-s[i-1]比当前记录的大时，就更新他，最后就是答案
+*/
+#include <stdio.h>
+int mini, n, a[10002], s[10002], ansl, ansr, ans;
+//mini记录当前出现过的最小的S的下标
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(1)
+	{
+		scanf ("%d%*c", &n);
+		if (!n)
+			break;
+		for (int i = 1; i <= n; i++)
+			scanf ("%d%*c", &a[i]);
+		s[0] = 0;
+		for (int i = 1; i <= n; i++)
+			s[i] = s[i-1]+a[i];
+		ans = s[1];
+		mini = ansl = ansr = 1;
+		for (int i = 2; i <= n; i++)
+		{
+			if (ans < s[i]-s[mini])//更新最大子列和
+			{
+				ansl = mini+1;
+				ansr = i;
+				ans = s[i]-s[mini];
+			}
+			if (s[mini] > s[i])//更新当前出现过的最小的s
+				mini = i;
+		}
+		if (ans < 0)
+		{
+			ans = 0;
+			ansl = 1;
+			ansr = n;
+		}
+		printf ("%d %d %d\n", ans, a[ansl],a[ansr]);
+	}
+	return 0;
+}

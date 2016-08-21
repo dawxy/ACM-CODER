@@ -1,0 +1,122 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <vector>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 2600
+#define INF 0x3f3f3f3f
+struct Isap{
+	int n,s,t,d[MAXN],num[MAXN];
+	struct Edge{
+		int from, to,cap;
+		Edge(int a, int b, int c){from = a, to = b, cap = c;}
+	};
+	vector<Edge> edge;
+	vector<int> g[MAXN];
+	void init(int n)
+	{
+		this->n = n;
+		edge.clear();
+		rep(i,0,n) g[i].clear();
+		clc(num,0);
+		clc(d,0);
+	}
+	void add_edge(int from, int to, int cap)
+	{
+		edge.push_back(Edge(from,to,cap));
+		edge.push_back(Edge(to,from,0));
+		int m = edge.size();
+		g[from].push_back(m-2);
+		g[to].push_back(m-1);
+	}
+	int dfs(int x, int a)
+	{
+		if(x == t) return a;
+		int i, delta, mi = n-1,ans = 0, sz = g[x].size();
+		rep(i,0,sz)
+		{
+			int id = g[x][i];
+			Edge& e = edge[id];
+			if(!e.cap) continue;
+			if(d[e.to]+1 == d[x])
+			{
+				delta = dfs(e.to, min(a,e.cap));
+				if(delta)
+				{
+					e.cap -= delta;
+					edge[id^1].cap += delta;
+					ans += delta;
+					a -= delta;
+				}
+				else if(d[s] >= n || !a) return ans;
+			}
+			mi = min(mi,d[edge[id].to]);
+		}
+		if(!ans)
+		{
+			if(!--num[d[x]])
+			{
+				d[s] = n;
+				return 0;
+			}
+			num[d[x] = mi+1]++;
+		}
+		return ans;
+	}
+	int maxflow(int s, int t)
+	{
+		this->s = s, this->t = t;
+		int flow = 0;
+		num[0] = n;
+		while(d[s] < n) flow += dfs(s,INF);
+		return flow;
+	}
+}isap;
+int h,w,d,f,b;
+const int p[4][2] = {{1,0},{-1,0},{0,-1},{0,1}};
+
+inline int hh(int x, int y){return x*w+y;}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d %d%*c%d %d %d%*c", &w, &h, &d, &f, &b);
+		int st = w*h, ed = st+1, cost = 0;
+		char ch;
+		isap.init(ed+1);
+		rep(i,0,h)
+		{
+			rep(j,0,w)
+			{
+				ch = getchar();
+				if(!i || !j || h-1 == i || w-1 == j)
+				{
+					if('.' == ch) cost += f;
+					isap.add_edge(st,hh(i,j),INF);
+				}
+				else
+				{
+					if('#' == ch) isap.add_edge(st,hh(i,j),d);
+					else isap.add_edge(hh(i,j),ed,f);
+				}
+				rep(k,0,4)
+				{
+					int ni = i+p[k][0], nj = j+p[k][1];
+					if(0 <= ni && h > ni && 0 <= nj && w > nj)
+						isap.add_edge(hh(i,j),hh(ni,nj),b);
+				}
+			}
+			getchar();
+		}
+		printf("%d\n", isap.maxflow(st,ed)+cost);
+	}
+	return 0;
+}

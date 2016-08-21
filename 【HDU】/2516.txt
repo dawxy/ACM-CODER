@@ -1,0 +1,36 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 46;
+int f[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	f[0] = 1, f[1] = 1;
+	rep(i,2,MAXN)
+		f[i] = f[i-1]+f[i-2];
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		if(binary_search(f,f+MAXN,n)) puts("Second win");
+		else puts("First win");
+	}
+	return 0;
+}

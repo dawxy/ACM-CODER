@@ -1,0 +1,76 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 15;
+int dp[1<<MAXN][110],sum[1<<MAXN],a[MAXN];
+
+int cnt(int s)
+{
+	int ans = 0;
+	while(s)
+	{
+		if(s&1) ans++;
+		s >>= 1;
+	}
+	return ans;
+}
+bool dfs(int s, int x)
+{
+	int& ans = dp[s][x];
+	if(~ans) return ans;
+	if(1 == cnt(s)) return ans = 1;
+	ans = 0;
+	int y = sum[s]/x;
+	for(int s0 = (s-1)&s; s0; s0 = (s0-1)&s)//枚举s的子集
+	{
+		int s1 = s-s0;//切割后的另一半
+		//把x切开
+		if(0 == sum[s0]%x && dfs(s0,min(x,sum[s0]/x)) && dfs(s1,min(x,sum[s1]/x))) return ans = 1;
+		if(0 == sum[s0]%y && dfs(s0,min(y,sum[s0]/y)) && dfs(s1,min(y,sum[s1]/y))) return ans = 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, count = 0;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int x,y;
+		scanf("%d %d%*c", &x, &y);
+		rep(i,0,n) scanf("%d%*c", &a[i]);
+		int ALL = (1<<n)-1;
+		clc(sum,0);
+		repe(i,1,ALL)
+		{
+			rep(j,0,n)
+				if(i&(1<<j)) sum[i] += a[j];
+		}
+		clc(dp,-1);
+		printf("Case %d: ", ++count);
+		if(sum[ALL] != x*y || sum[ALL]%(min(x,y)))
+		{
+			puts("No");
+			continue;
+		}
+		if(dfs(ALL,min(x,y))) puts("Yes");
+		else puts("No");
+	}
+	return 0;
+}

@@ -1,0 +1,97 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 71;
+LL MOD = 1e9+7;
+struct MATRIX{
+	LL num[MAXN][MAXN];
+	MATRIX(){
+		clc(num,0);
+	}
+	MATRIX operator*(const MATRIX& b)const{
+		MATRIX ans;
+		rep(i,0,MAXN)
+		{
+			rep(k,0,MAXN)
+			{
+				rep(j,0,MAXN)
+				{
+					ans.num[i][j] = (ans.num[i][j]+num[i][k]*b.num[k][j])%MOD;
+				}
+			}
+		}
+		return ans;
+	}
+	MATRIX operator ^(int n)
+	{
+		MATRIX ans, x = *this;
+		if(n < 0) return ans;
+		rep(i,0,MAXN) ans.num[i][i] = 1;
+		while(n)
+		{
+			if(n&1) ans = ans*x;
+			x = x*x;
+			n >>= 1;
+		}
+		return ans;
+	}
+};
+LL st[MAXN],ed[MAXN];//初始状态和最后状态的各个结果，0~69就是对应dp的70个状态，70对应dp[i-1]所有%7=0的方案之和
+
+inline int mhash(int x, int y){return x*7+y;}//mhash(x,y)表示把最低位为x且%7为y的状态
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	rep(i,1,10) st[mhash(i,i%7)] = 1;//dp[1][i][i%7]=1;
+	while(t--)
+	{
+		int l,r,m;
+		scanf("%d%d%d", &l,&r,&m);
+		//构造转移矩阵x
+		MATRIX x;
+		rep(j,0,10)
+		{
+			rep(l,0,10)
+			{
+				if(j+l == m) continue;
+				rep(k,0,7)
+				{
+					x.num[mhash(j,k)][mhash(l,(k*10+l)%7)] = 1;
+					//dp[i+1][l][(k*10+l)%7] += dp[i][j][k];
+				}
+			}
+		}
+		rep(j,0,10) x.num[mhash(j,0)][70] = 1;//累加dp[i-1]中%7=0的所有状态
+		x.num[70][70] = 1;//x*x过程中始终是1,是为了最后乘上st矩阵时ed[70]不为0
+		MATRIX ret = x^(r-1);
+		//初始矩阵乘上x^(r-1)则就是dp[r]的所有结果
+		clc(ed,0);
+		rep(i,0,MAXN)
+		{
+			rep(j,0,MAXN)
+				ed[i] = (ed[i]+st[j]*ret.num[j][i])%MOD;
+		}
+		LL ans = ed[70];//sum{dp[1 ~ i-1];}
+		rep(j,0,10) ans = (ans+ed[mhash(j,0)])%MOD;//加上当前dp[r]中所有方案数
+		//初始矩阵乘上x^(l-2)则就是dp[l-1]的所有结果
+		ret = x^(l-2);
+		clc(ed,0);
+		rep(i,0,MAXN)
+		{
+			rep(j,0,MAXN)
+				ed[i] = (ed[i]+st[j]*ret.num[j][i])%MOD;
+		}
+		LL ans2 = ed[70];
+		rep(j,0,10) ans2 = (ans2+ed[mhash(j,0)])%MOD;
+		printf("%lld\n", (ans-ans2+MOD)%MOD);
+	}
+	return 0;
+}

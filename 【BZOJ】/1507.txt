@@ -1,0 +1,325 @@
+/*块状链表*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1024*1024+10, SIZE = 9000;
+char buf[MAXN], *ps = buf, *pe = ps+1;
+inline void rnext()
+{
+	if(++ps == pe)
+		pe = (ps=buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int get_int()
+{
+	do{
+		rnext();
+	}while(!isdigit(*ps));
+	int ans = 0;
+	do{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps));
+	return ans;
+}
+inline void get_str(char *s)
+{
+	do{
+		rnext();
+	}while(!isalpha(*ps));
+	int cnt = 0;
+	do{
+		s[cnt++] = *ps;
+		rnext();
+	}while(isalpha(*ps));
+	s[cnt] = 0;
+}
+struct NODE{
+    char c[SIZE+10];
+    int len;
+    NODE *next;
+    NODE()
+    {
+        c[0] = len = 0;
+        next = NULL;
+    }
+}*rt;
+int p;
+char str[MAXN], op[100];
+  
+void read(int len)
+{
+    int cnt = 0;
+    while(cnt < len)
+    {
+		rnext();
+        int ch = *ps;
+        if(32 <= ch && 126 >= ch)
+            str[cnt++] = ch;
+    }
+    str[cnt] = 0;
+}
+NODE* find_block(int pos, int &k)//找到位置pos在哪个块，并且返回是该块中的第k个字符
+{
+    int sum = 0;
+    NODE * tmp = rt;
+    while(tmp->next)
+    {
+        if(sum + tmp->len >= pos) break;
+        sum += tmp->len;
+        tmp = tmp->next;
+    }
+    k = pos-sum;
+    return tmp;
+}
+void split(NODE *u,int k,NODE *&r)//把u在第k个位置分裂成u和r,并且u->next == r
+{
+    r = new NODE();
+    r->next = u->next;
+    u->next = r;
+    strcpy(r->c,u->c+k);
+    r->len = u->len-k;
+    u->c[k] = 0;
+    u->len = k;
+}
+void merge(NODE *u, NODE *r)//把u后面的r合并到u,r必须是n->next,且r不为空
+{
+    strcat(u->c,r->c);
+    u->len += r->len;
+    u->next = r->next;
+    free(r);
+    r = NULL;
+}
+void insert(int len)//在p后面插入len个字符
+{
+    int k;
+    NODE *u = find_block(p,k), *r;
+    if(k == u->len)//刚好在块u后面插入
+        r = u->next;
+    else
+        split(u,k,r);//否则需要分裂u
+    //在u和r之间插入若干块总长度为len
+    NODE *tmp = u;
+    int cnt = 0;
+    while(len-cnt >= SIZE)
+    {
+        NODE *now = new NODE();
+        strncpy(now->c,str+cnt,SIZE);
+        now->c[SIZE] = 0;
+        now->len = SIZE;
+        now->next = tmp->next;
+        tmp->next = now;
+        tmp = now;
+        cnt += SIZE;
+    }
+    if(len-cnt)
+    {
+        NODE *now = new NODE();
+        strcpy(now->c,str+cnt);
+        now->len = len-cnt;
+        now->next = tmp->next;
+        tmp->next = now;
+        tmp = now;
+        cnt = len;
+    }
+    //如果有连续的两块大小都小于SIZE/2则合并
+    if(rt != u && u->len <= (SIZE>>1) && u->next && u->next->len <= (SIZE>>1))
+    {
+        if(tmp == u->next)
+            merge(u,u->next), tmp = u;
+        else merge(u,u->next);
+    }
+    if(tmp != rt && tmp->len <= (SIZE>>1) && r && r->len <= (SIZE>>1)) merge(tmp,r);
+}
+void del(int len)//删除p后面的len个字符
+{
+    int sk,ek;
+    NODE *st = find_block(p,sk), *sr;
+    NODE *ed = find_block(p+len,ek), *er;
+    split(ed,ek,er);
+    split(st,sk,sr);
+    NODE *tmp = st->next;
+    while(tmp != er)
+    {
+        NODE *buf = tmp;
+        tmp = tmp->next;
+        free(buf);
+    }
+    st->next = er;
+    if(st->len <= (SIZE>>1) && er->len <= (SIZE>>1)) merge(st,er);
+}
+void get(int len)
+{
+    int k, cnt = 0;
+    NODE *now = find_block(p+1,k);
+    while(now && cnt < len)
+    {
+        for(int i = k-1;i < now->len && cnt < len; i++) putchar(now->c[i]), cnt++;
+        now = now->next;
+        k = 1;
+    }
+    putchar('\n');
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+    //freopen("d:\\out.txt", "w", stdout);
+#endif
+    int q = get_int();
+    p = 0;
+    rt = new NODE();
+    while(q--)
+    {
+        get_str(op);
+        if('I' == op[0])
+        {
+            int len = get_int();
+            read(len);
+            insert(len);
+        }
+        else if('M' == op[0])
+        {
+            p = get_int();
+        }
+        else if('D' == op[0])
+        {
+            int len = get_int();
+            del(len);
+        }
+        else if('G' == op[0])
+        {
+            int len = get_int();
+            get(len);
+        }
+        else if('P' == op[0])
+        {
+            p--;
+        }
+        else p++;
+    }
+    return 0;
+}
+============================================================
+/* (ext/rope) */
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <ext/rope>
+using namespace std;
+using namespace __gnu_cxx;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 2*1024*1024+10, SIZE = 7000;
+char buf[MAXN], *ps = buf, *pe = ps+1;
+inline void rnext()
+{
+	if(++ps == pe)
+		pe = (ps=buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int get_int()
+{
+	do{
+		rnext();
+	}while(!isdigit(*ps));
+	int ans = 0;
+	do{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps));
+	return ans;
+}
+inline void get_str(char *s)
+{
+	do{
+		rnext();
+	}while(!isalpha(*ps));
+	int cnt = 0;
+	do{
+		s[cnt++] = *ps;
+		rnext();
+	}while(isalpha(*ps));
+	s[cnt] = 0;
+}
+int p;
+char str[MAXN], op[100];
+rope<char> rp;
+ 
+void read(int len)
+{
+    int cnt = 0;
+    while(cnt < len)
+    {
+		rnext();
+        int ch = *ps;
+        if(32 <= ch && 126 >= ch)
+            str[cnt++] = ch;
+    }
+    str[cnt] = 0;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+    //freopen("d:\\out.txt", "w", stdout);
+#endif
+    int q = get_int();
+    p = 0;
+    rp.clear();
+    while(q--)
+    {
+        get_str(op);
+        if('I' == op[0])
+        {
+            int len = get_int();
+            read(len);
+            rp.insert(p,str);
+        }
+        else if('M' == op[0])
+        {
+            p = get_int();
+        }
+        else if('D' == op[0])
+        {
+            int len = get_int();
+            rp.erase(p,len);
+        }
+        else if('G' == op[0])
+        {
+            int len = get_int();
+			rp.copy(p,len,str);
+			str[len] = 0;
+            puts(str); 
+        }
+        else if('P' == op[0])
+        {
+            p--;
+        }
+        else p++;
+    }
+    return 0;
+}

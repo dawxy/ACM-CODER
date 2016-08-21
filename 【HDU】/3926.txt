@@ -1,0 +1,85 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 10010
+struct NODE{
+	int sum;
+	bool list;
+	bool operator<(const NODE& t) const{
+		if(list != t.list) return list < t.list;
+		return sum < t.sum;
+	}
+}ans[2][MAXN];
+int f[MAXN], p[MAXN];
+bool list[MAXN];
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int sloved(int s)
+{
+	int n,m;
+	scanf("%d %d%*c", &n, &m);
+	clc(list,1);
+	repe(i,1,n) f[i] = i, p[i] = 1;
+	int a,b;
+	rep(i,0,m)
+	{
+		scanf("%d %d%*c", &a, &b);
+		int x = find(a), y = find(b);
+		if(x != y) f[x] = y, p[y] += p[x];
+		else list[y] = false;
+	}
+	int cnt = 0;
+	repe(i,1,n)
+	{
+		if(f[i] == i)
+		{
+			ans[s][cnt].sum = p[i];
+			ans[s][cnt++].list = list[i];
+		}
+	}
+	sort(ans[s],ans[s]+cnt);
+	return cnt;
+}
+bool ok(int n)
+{
+	rep(i,0,n)
+	{
+		if(ans[0][i].list != ans[1][i].list || ans[0][i].sum != ans[1][i].sum)
+			return false;
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		printf("Case #%d: ", ++count);
+		int n;
+		if((n = sloved(0)) != sloved(1))
+		{
+			puts("NO");
+			continue;
+		}
+		if(ok(n)) puts("YES");
+		else puts("NO");
+	}
+	return 0;
+}

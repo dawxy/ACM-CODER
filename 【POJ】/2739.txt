@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <ctime>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000;
+int prime[MAXN+1];
+
+void get_p()
+{
+	repe(i,2,MAXN)
+	{
+		if(prime[i]) continue;
+		prime[++prime[0]] = i;
+		for(int j = i; j <= MAXN; j += i)
+			prime[j] = 1;
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	get_p();
+	int n;
+	while(~scanf("%d", &n) && n)
+	{
+		int ans = 0,sum = 0,st = 1;
+		repe(i,1,prime[0])
+		{
+			sum += prime[i];
+			while(st <= i && sum >= n)
+			{
+				if(sum == n) ans++;
+				sum -= prime[st++];
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

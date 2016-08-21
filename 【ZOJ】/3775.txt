@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <string.h>
+char a[300], out[30000];
+
+bool sloved()
+{
+	int len = strlen(a), x = 0;
+	out[0] = 0;
+    for (int i = 0; i < len; i++)
+	{
+        if ('_' == a[i])
+            strcat(out,a), x++;
+        else if ('!' == a[i])
+            strcat(out,"Hello, world!");
+        if (x > 1)
+            return false;
+	}
+	if (!strcmp(out,a))
+		return true;
+	return false;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+	{
+        gets(a);
+        if (sloved())
+			puts("Yes");
+		else
+			puts("No");
+	}
+    return 0;
+}
+

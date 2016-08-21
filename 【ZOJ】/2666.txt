@@ -1,0 +1,74 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 100010
+int ans[MAXN], e[100], prime[MAXN], m_p[100], sum;
+
+void get_prime()
+{
+	for(int i = 2; i <= 100000; i++)
+	{
+		if(!prime[i]) prime[++prime[0]] = i;
+		for(int j = 1; j <= prime[0] && prime[j] <= 100000/i; j++)
+		{
+			prime[prime[j]*i] = 1;
+			if(i%prime[j] == 0) break;
+		}
+	}
+}
+void mul(int n, int f)
+{
+	for(int i = 0; m_p[i] <= n && i < sum; i++)
+	{
+		while(n % m_p[i] == 0)
+		{
+			n /= m_p[i];
+			e[i] += f;
+		}
+		if(1 == n) break;
+	}
+}
+bool ali()
+{
+	for(int i = 0; i < sum; i++)
+		if(e[i] < 0) return false;
+	return true;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,m;
+	get_prime();
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		memset(e,0,sizeof(e));
+		int len = 0;
+		sum = 0;
+		for(int i = 1; prime[i]*prime[i] <= m; i++)
+		{
+			if(0 == m%prime[i])
+			{
+				m_p[sum] = prime[i];
+				while(0 == m%prime[i]) m /= prime[i],e[sum]--;
+				sum++;
+			}
+		}
+		if(m > 1) m_p[sum] = m, e[sum++]--;
+		for(int i = 1; i < n; i++)
+		{
+			mul(n-i,1);
+			mul(i,-1);
+			if(ali()) ans[len++] = i+1;
+		}
+		printf("%d\n",len);
+		if(len)
+		{
+			printf("%d", ans[0]);
+			for(int i = 1; i < len; i++)
+				printf(" %d", ans[i]);
+		}
+		putchar('\n');
+	}
+	return 0;
+}

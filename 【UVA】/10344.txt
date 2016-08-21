@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <string.h>
+int a[5];
+bool find, vis[5] = {0};
+
+void dfs(int p, int sum)
+{
+	if (find)
+		return;
+	if (5 == p)
+	{
+		if (23 == sum)
+			find = true;
+		return;
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		if (!vis[i])
+		{
+			vis[i] = true;
+			dfs(p+1,sum+a[i]);
+			dfs(p+1,sum-a[i]);
+			dfs(p+1,sum*a[i]);
+			vis[i] = false;
+		}
+		if (find)
+			break;
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(1)
+	{
+		int i;
+		bool end = true;
+		for(i = 0; i < 5; i++)
+		{
+			scanf ("%d%*c", &a[i]);
+			if (a[i])
+				end = false;
+		}
+		if (end)
+			break;
+		find = false;
+		memset(vis,false,sizeof(vis));
+		for (i = 0; i < 5; i++)
+		{
+			vis[i] = true;
+			dfs(1, a[i]);
+			vis[i] = false;
+		}
+		if(find)
+			printf ("Possible\n");
+		else
+			printf ("Impossible\n");
+	}
+
+	return 0;
+}

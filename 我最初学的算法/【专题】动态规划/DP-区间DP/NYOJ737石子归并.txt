@@ -1,0 +1,81 @@
+/*递推232ms*/
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+#define MAXN 205
+#define INF 0x3f3f3f3f
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int n;
+    while(~scanf ("%d%*c", &n))
+    {
+        int dp[MAXN][MAXN] = {0}, buf, sum[MAXN] = {0};
+        for (int i = 1; i <= n; i++)
+        {
+            scanf ("%d%*c", &buf);
+            sum[i] = sum[i-1]+buf;
+        }
+        for (int m = 1; m < n; m++)//区间长度
+        {
+            for (int i = 1; i <= n-m; i++)//i~j区间
+            {
+                int j = i+m;
+                dp[i][j] = INF;
+                for (int k = i; k < j; k++)
+                    dp[i][j] = min(dp[i][j], dp[i][k]+dp[k+1][j]+sum[j]-sum[i-1]);
+            }
+        }
+        printf ("%d\n", dp[1][n]);
+    }
+    return 0;
+}
+}
+
+
+
+------------------------------------------------------------------------------------
+/*记忆化340ms*/
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 210
+#define INF 0x3f3f3f3f
+int sum[MAXN], dp[MAXN][MAXN];
+//dp[i][j]表示i~j之间的石子全部合并的最小费用
+
+int dfs(int i, int j)
+{
+    if (-1 != dp[i][j])//记忆化
+        return dp[i][j];
+    if (j-i < 1)//不足两堆石子不需要合并
+        return dp[i][j] = 0;
+    if (j-i == 1)//当只有两堆石子时直接合并
+        return dp[i][j] = sum[j]-sum[i-1];
+    int ans = INF;
+    for (int k = i; k < j; k++)//枚举第k(i~j-1)堆为最后合并的费用，取最小的
+        ans = min(ans, dfs(i,k)+dfs(k+1,j)+sum[j]-sum[i-1]);
+    return dp[i][j] = ans;
+}
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int n, a;
+    while(~scanf ("%d%*c", &n))
+    {
+        memset(dp,-1,sizeof(dp));
+        for (int i = 1; i <= n; i++)
+        {
+            scanf ("%d%*c", &a);
+            sum[i] = sum[i-1]+a;
+        }
+        printf ("%d\n", dfs(1,n));
+    }
+    return 0;
+}

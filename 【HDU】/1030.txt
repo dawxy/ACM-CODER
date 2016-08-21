@@ -1,0 +1,20 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n,m;
+    while(EOF != scanf ("%d %d%*c", &n, &m))
+	{
+        int ln,lm,rn,rm, hn, hm;
+        hn = ceil(sqrt(n*1.0)), hm = ceil(sqrt(m*1.0));
+        ln = (n-(hn-1)*(hn-1)-1)/2+1, rn = (hn*hn-n)/2+1;
+        lm = (m-(hm-1)*(hm-1)-1)/2+1,rm = (hm*hm-m)/2+1;
+        printf ("%d\n", abs(hn-hm)+abs(ln-lm)+abs(rn-rm));
+	}
+    return 0;
+}

@@ -1,0 +1,94 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+typedef pair<int,int> P;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXNUM = 100000;
+int prime[MAXN];
+bool isprime[MAXN];
+
+void get_prime()
+{
+	int len = sqrt(MAXNUM+0.5);
+	clc(isprime,1);
+	repe(i,2,MAXNUM)
+	{
+		if(!prime[i]) prime[++prime[0]] = i;
+		if(i > len || !isprime[i]) continue;
+		for(int j = i*i; j <= MAXNUM; j += i) isprime[j] = 0,prime[j] = 1;
+	}
+	isprime[1] = false;
+}
+vector<int> p[MAXN];
+bool vis[MAXN];
+void get_p(int n)
+{
+	if(vis[n]) return;
+	vis[n] = true;
+	if(isprime[n])
+	{
+		p[n].push_back(n);
+		return;
+	}
+	vector<int> &pp = p[n];
+	repe(i,1,prime[0])
+	{
+		if(n%prime[i] == 0)
+		{
+			pp.push_back(prime[i]);
+			while(n%prime[i] == 0) n /= prime[i];
+		}
+		else if(isprime[n] || n < prime[i]*prime[i]) break;
+	}
+	if(n > 1) pp.push_back(n);
+}
+int sloved(int x, int y, int n)
+{
+	get_p(n);
+	int sz = p[n].size(), all = 1<<sz, ans = 0;
+	rep(s,1,all)
+	{
+		int cnt = 0,tmp = 1;
+		rep(i,0,sz)
+		{
+			if(s&(1<<i))
+			{
+				cnt++;
+				tmp *= p[n][i];
+			}
+		}
+		if(cnt&1) ans += y/tmp-(x-1)/tmp;
+		else ans -= y/tmp-(x-1)/tmp;
+	}
+	return y-x+1-ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	get_prime();
+	int t,tt = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int a,b,c,d,n;
+		scanf("%d %d %d %d %d", &a, &b, &c, &d, &n);
+		printf("Case %d: ",++tt);
+		if(n == 0)
+		{
+			puts("0");
+			continue;
+		}
+		if(b > d) swap(b,d);
+		b /= n, d /= n;
+		LL ans = 0;
+		repe(i,1,b)
+			ans += sloved(i,d,i);
+		printf("%I64d\n",ans);
+	}
+	return 0;
+}

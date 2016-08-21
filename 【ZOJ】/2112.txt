@@ -1,0 +1,479 @@
+/*分块*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50000+10, SIZE = 305;
+int block[MAXN/SIZE+10][SIZE], cnt, len[MAXN/SIZE+10], a[MAXN], mi, mx;
+
+void update(int p, int v)//logn*SIZE
+{
+	int x = p/SIZE;
+	int c = lower_bound(block[x],block[x]+len[x],a[p])-block[x];
+	block[x][c] = a[p] = v;
+	sort(block[x],block[x]+len[x]);
+	mx = max(mx,v), mi = min(mi,v);
+}
+int tmp[SIZE<<1],tol;
+bool find_k(int st, int ed, int v, int kk)
+{
+	int sum = upper_bound(tmp,tmp+tol,v)-tmp;
+	if(sum >= kk) return true;
+	rep(i,st+1,ed)
+	{
+		sum += upper_bound(block[i],block[i]+len[i],v)-block[i];
+		if(sum >= kk) return true;
+	}
+	return false;
+}
+int query(int x, int y, int k)
+{
+	int bx = x/SIZE, by = y/SIZE;
+	tol = 0;
+	if(bx == by)//SIZE*logn
+	{
+		repe(i,x,y) tmp[tol++] = a[i];
+		sort(tmp,tmp+tol);
+		return tmp[k-1];
+	}
+	rep(i,x%SIZE,len[bx]) tmp[tol++] = a[bx*SIZE+i];
+	repe(i,0,y%SIZE) tmp[tol++] = a[by*SIZE+i];
+	sort(tmp,tmp+tol);//SIZE*logn
+	int l = mi,r = mx, ans = -1;
+	while(l <= r)
+	{
+		int m = (l+r)>>1;
+		if(find_k(bx,by,m,k))
+		{
+			ans = m;
+			r = m-1;
+		}
+		else l = m+1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,q;
+		scanf("%d %d", &n, &q);
+		cnt = 0;
+		clc(len,0);
+		mx = -1, mi = INF;
+		rep(i,0,n)
+		{
+			scanf("%d", &a[i]);
+			block[cnt][len[cnt]++] = a[i];
+			mx = max(mx,a[i]);
+			mi = min(mi,a[i]);
+			if(len[cnt] == SIZE) cnt++;
+		}
+		rep(i,0,cnt)
+			sort(block[i],block[i]+len[i]);
+		char op[10];
+		while(q--)
+		{
+			scanf("%s", op);
+			if('C' == op[0])
+			{
+				int p,v;
+				scanf("%d %d%*c", &p, &v);
+				update(p-1,v);
+			}
+			else
+			{
+				int x,y,k;
+				scanf("%d %d %d%*c",&x, &y,&k);
+				printf("%d\n", query(x-1,y-1,k));
+			}
+		}
+	}
+	return 0;
+}
+=========================================================================================================
+/*线段树套Treap*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50000+10;
+struct NODE{
+	NODE *ch[2];
+	int r, v, sum, cnt;
+}node[MAXN*20];
+int a[MAXN], mi, mx, tol;
+NODE *rt[MAXN<<1];
+
+int cmp(const NODE *a, int x){
+	if(x == a->v) return -1;
+	return x<a->v?0:1;
+}
+void push_up(NODE *u){
+	u->sum = u->cnt;
+	if(u->ch[0]) u->sum += u->ch[0]->sum;
+	if(u->ch[1]) u->sum += u->ch[1]->sum;
+}
+NODE *newnode(int a){
+	node[tol].v = a,node[tol].ch[0] = node[tol].ch[1] = NULL, node[tol].r = rand();
+	node[tol].sum = node[tol].cnt = 1;
+	return &node[tol++];
+}
+void clear(NODE* &u)//清空树
+{
+	u = NULL;
+}
+void rotate(NODE* &u, int d)//旋转，d = 0左旋,d = 1右旋
+{
+	NODE *k = u->ch[d^1];
+	u->ch[d^1] = k->ch[d], k->ch[d] = u;
+	push_up(u), push_up(k);  //更新sum,先更新u
+	u = k;
+}
+void insert(NODE* &u, int v)//插入键值v(不需要保证v是否存在)
+{
+	if(!u) u = newnode(v);
+	else
+	{
+		int d = cmp(u,v);//不要使用cmp(),可能已经存在相同的v
+		if(-1 == d)//已经存在该点
+		{
+			u->cnt++;
+			u->sum++;
+			return;
+		}
+		insert(u->ch[d], v);
+		if(u->r < u->ch[d]->r) //如果儿子的r比当前大则需要旋转
+			rotate(u,d^1);//左儿子则右旋，右儿子左旋
+	}
+	push_up(u);//更新sum
+}
+void del(NODE* &u, int v)//删除键值v
+{
+	int d = cmp(u,v);
+	if(~d)//没找到继续往下找
+		del(u->ch[d],v);
+	else
+	{
+		if(u->cnt > 1)
+		{
+			u->cnt--;
+			u->sum--;
+			return;
+		}
+		NODE *o = u;
+		if(u->ch[0] && u->ch[1])//左右儿子都存在
+		{
+			int d2 = u->ch[0]->r > u->ch[1]->r?1:0;//优先级大的儿子旋转为根
+			rotate(u,d2);
+			del(u->ch[d2],v);
+		}
+		else
+		{
+			if(!u->ch[0]) u = u->ch[1];//只有右儿子
+			else u = u->ch[0];//只有左儿子
+			//delete o;
+			//u = NULL;
+		}
+	}
+	if(u) push_up(u);
+}
+int upper(NODE *u, int v)//v在树中排第几,即有几个<=v
+{
+	if(!u) return 0;
+	if(v == u->v) return u->cnt+(u->ch[0]?u->ch[0]->sum:0);
+	if(v < u->v) return upper(u->ch[0], v);
+	return upper(u->ch[1],v)+(u->ch[0]?u->ch[0]->sum:0)+u->cnt;
+}
+void pt(NODE *u)
+{
+	if(NULL == u) return;
+	pt(u->ch[0]);
+	rep(i,0,u->cnt)
+		printf("%d\n", u->v);
+	pt(u->ch[1]);
+}
+
+inline int id(int x, int y){return x+y|x!=y;}
+void bulid(int x, int y)
+{
+	int u = id(x,y);
+	clear(rt[u]);
+	repe(i,x,y) insert(rt[u],a[i]);
+	if(x == y) return;
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+}
+int tmp;
+void update(int x, int y, int p, int v)
+{
+	if(x == y)
+	{
+		int u = id(x,y);
+		tmp = rt[u]->v;
+		rt[u]->v = v;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(x,m,p,v);
+	else update(m+1,y,p,v);
+	int u = id(x,y);
+	del(rt[u],tmp);
+	insert(rt[u],v);
+}
+int query(int x, int y, int ql, int qr, int v)
+{
+	if(ql <= x && y <= qr)
+	{
+		int u = id(x,y);
+		return upper(rt[u],v);
+	}
+	int m = (x+y)>>1, ans = 0;
+	if(ql <= m) ans += query(x,m,ql,qr,v);
+	if(qr > m) ans += query(m+1,y,ql,qr,v);
+	return ans;
+}
+int n;
+int sloved(int x, int y, int k)
+{
+	int l = mi, r = mx, ans;
+	while(l <= r)
+	{
+		int m = (l+r)>>1;
+		if(query(0,n-1,x,y,m) >= k)
+			ans = m, r = m-1;
+		else l = m+1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int q;
+		scanf("%d %d%*c", &n, &q);
+		mi = INF, mx = -1;
+		tol = 0;
+		rep(i,0,n)
+		{
+			scanf("%d%*c", &a[i]);
+			mi = min(mi,a[i]);
+			mx = max(mx,a[i]);
+		}
+		bulid(0,n-1);
+		while(q--)
+		{
+			char op[10];
+			scanf("%s",op);
+			if('C' == op[0])
+			{
+				int p,v;
+				scanf("%d %d", &p,&v);
+				p--;
+				update(0,n-1,p,v);
+				mi = min(mi,v);
+				mx = max(mx,v);
+			}
+			else
+			{
+				int x,y,k;
+				scanf("%d %d %d",&x, &y, &k);
+				x--,y--;
+				printf("%d\n", sloved(x,y,k));
+			}
+		}
+	}
+	return 0;
+}
+============================================================================================
+/*树状数组+主席树*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50000+10, MAXQ = 10000+10,MAXM = MAXN*30;
+struct IN{
+	bool f;
+	int a,b,k;
+}in[MAXQ];
+int lc[MAXM], rc[MAXM], sum[MAXM], tol;//主席树内存池
+int num[MAXN+MAXQ], sot[MAXN+MAXQ], cnt;//离散
+int rt[MAXN<<1], a[MAXN], n;//rt[]保存各个版本的线段树根,rt[1~n]保存树状数组套的主席树,后面的保存初始的n个前缀主席树
+
+inline int mhash(int v){return lower_bound(sot+1,sot+1+cnt,v)-sot;}
+void init_hash(int cc)
+{
+	sort(num+1,num+1+cc);
+	sot[1] = num[1];
+	cnt = 1;
+	repe(i,2,cc) if(num[i] != num[i-1]) sot[++cnt] = num[i];
+}
+inline int newnode(int _lc, int _rc, int _sum)
+{
+	lc[tol] = _lc, rc[tol] = _rc, sum[tol] = _sum;
+	return tol++;
+}
+void bulid(int &u, int x, int y, int p)//在前一个版本基础上添加一个新的结点v,成为一棵新树
+{
+	u = newnode(lc[u],rc[u],sum[u]+1);
+	if(x == y) return;
+	int m = (x+y)>>1;
+	if(p <= m) bulid(lc[u],x,m,p);
+	else bulid(rc[u],m+1,y,p);
+}
+void t_update(int &u, int x, int y, int p, int v)//树状数组中每个结点所套的主席树,更新到才新建，省内存
+{
+	if(!u) u = newnode(0,0,0);
+	sum[u] += v;
+	if(x == y) return;
+	int m = (x+y)>>1;
+	if(p <= m) t_update(lc[u],x,m,p,v);
+	else t_update(rc[u],m+1,y,p,v);
+}
+/*树状数组记录区间[1,n]每个数字出现的次数,次数用值域主席树记录*/
+inline int lowbit(int x){return x&-x;}
+void add(int x, int v)//树状数组添加或删除元素a[x]
+{
+	int p = a[x];
+	while(x <= n)
+	{
+		t_update(rt[x],1,cnt,p,v);
+		x += lowbit(x);
+	}
+}
+int tx[50], ty[50], len[2];//查询用到的所有树
+int t_query(int x, int y, int k)
+{
+	if(x == y) return x;
+	int d = 0;
+	rep(i,0,len[1]) d += sum[lc[ty[i]]];
+	rep(i,0,len[0]) d -= sum[lc[tx[i]]];
+	int m = (x+y)>>1;
+	if(d >= k)
+	{
+		rep(i,0,len[1]) ty[i] = lc[ty[i]];
+		rep(i,0,len[0]) tx[i] = lc[tx[i]];
+		return t_query(x,m,k);
+	}
+	rep(i,0,len[1]) ty[i] = rc[ty[i]];
+	rep(i,0,len[0]) tx[i] = rc[tx[i]];
+	return t_query(m+1,y,k-d);
+}
+/*====== 调用操作 ======*/
+void init(int cc)//logn*n新建初始前缀树
+{
+	init_hash(cc);
+	repe(i,1,n) a[i] = mhash(a[i]);//把所有a[i]变成离散值
+	tol = 1;
+	clc(rt,0);
+	rt[0] = sum[0] = lc[0] = rc[0] = 0;//只需要用一个结点代表第0颗树
+	repe(i,1,n)
+	{
+		rt[i+n] = rt[i+n-1];
+		bulid(rt[i+n],1,cnt,a[i]);
+	}
+}
+void update(int p, int v)//更新a[p] -> v
+{
+	add(p,-1);
+	a[p] = mhash(v);
+	add(p,1);
+}
+int query(int x, int y, int k)//查询区间[x,y]的第k大元素
+{
+	/*把所有表示区间y的树减去区间x-1的树存起来查询*/
+	len[0] = len[1] = 1;
+	tx[0] = rt[x-1?x-1+n:0], ty[0] = rt[y+n];//先把初始的一棵树加进去
+	for(int i = x-1; i > 0; i -= lowbit(i)) tx[len[0]++] = rt[i];//树状数组求区间[x,y]和就是sum(y)-sum(x-1)则，把多个这样的点一起在主席树中算就可以了
+	for(int i = y; i > 0; i -= lowbit(i)) ty[len[1]++] = rt[i];
+	return t_query(1,cnt,k);
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int q;
+		scanf("%d %d", &n, &q);
+		int cc = 0;//所有值没去重的数量
+		repe(i,1,n) scanf("%d", &a[i]), num[++cc] = a[i];
+		char op[10];
+		rep(i,0,q)
+		{
+			scanf("%s", op);
+			if('Q' == op[0])
+			{
+				in[i].f = 0;
+				scanf("%d %d %d",&in[i].a, &in[i].b, &in[i].k);
+			}
+			else
+			{
+				in[i].f = 1;
+				scanf("%d %d", &in[i].a, &in[i].b);
+				num[++cc] = in[i].b;
+			}
+		}
+		init(cc);
+		rep(i,0,q)
+		{
+			if(!in[i].f) printf("%d\n", sot[query(in[i].a,in[i].b,in[i].k)]);
+			else update(in[i].a,in[i].b);
+		}
+	}
+	return 0;
+}

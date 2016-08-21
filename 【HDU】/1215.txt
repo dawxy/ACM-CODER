@@ -1,0 +1,27 @@
+#include <stdio.h>
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n ,ans = 1;
+		scanf ("%d%*c", &n);
+		for (int i = 2;  i*i <= n; i++)
+		{
+			if (0 == n%i)
+			{
+				ans += i;
+				if (n/i != i)//这个是对称的另外一边的因子
+					ans += n/i;
+			}
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

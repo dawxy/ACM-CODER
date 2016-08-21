@@ -1,0 +1,75 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 110
+#define INF 0x3f3f3f3f
+int dp[MAXN][MAXN];
+int n, sum[MAXN];
+
+void floyd()
+{
+	repe(i,1,n) dp[i][i] = true;
+	repe(k,1,n)
+	{
+		repe(i,1,n)
+			repe(j,1,n)
+			dp[i][j] = dp[i][j]||(dp[i][k]&&dp[k][j]);
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int m;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		int a,b;
+		clc(dp,0);
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a, &b);
+			dp[a][b] = true;
+		}
+		floyd();
+		int ans = 0;
+		clc(sum,0);
+		repe(i,1,n)
+		{
+			repe(j,1,n)
+			{
+				if(i != j && dp[i][j])
+					sum[i]++;
+			}
+		}
+		repe(i,1,n)
+		{
+			repe(j,i+1,n)
+			{
+				dp[i][j] ^= dp[j][i];
+				dp[j][i] ^= dp[i][j];
+				dp[i][j] ^= dp[j][i];
+			}
+		}
+		floyd();
+		repe(i,1,n)
+		{
+			repe(j,1,n)
+			{
+				if(i != j && dp[i][j])
+					sum[i]++;
+			}
+		}
+		repe(i,1,n) if(sum[i] == n-1) ans++;
+		printf("%d\n", ans);
+	}
+	return 0;
+}

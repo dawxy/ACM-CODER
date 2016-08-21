@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <math.h>
+#include <algorithm>
+using namespace std;
+struct NODE{
+	double a, b;
+}p[1010];
+int n, r;
+
+bool cmp(NODE a, NODE b)
+{
+	return a.b < b.b || a.b == b.b && a.a > b.a;
+}
+void zhuanhuan(int s, int a, int b)
+{
+	double buf = (sqrt)(1.0*r*r-b*b);
+	p[s].a = a-buf;
+	p[s].b = a+buf;
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t = 0;
+	while(1)
+	{
+		scanf ("%d %d%*c", &n, &r);
+		if (!n && !r)
+			break;
+		int a, b;
+		bool noans = false;
+		for (int i = 0; i < n; i++)
+		{
+			scanf ("%d %d%*c", &a, &b);
+			if (b > r)
+				noans = true;
+			zhuanhuan(i,a,b);
+		}
+		if (noans)
+		{
+			printf ("Case %d: -1\n", ++t);
+			continue;
+		}
+		sort(p,p+n,cmp);
+		int ans = 1;
+		double end = p[0].b;
+		for (int i = 1; i < n; i++)
+		{
+			if (p[i].a > end)
+			{
+				ans++;
+				end = p[i].b;
+			}
+		}
+		printf ("Case %d: %d\n", ++t, ans);
+	}
+	return 0;
+}

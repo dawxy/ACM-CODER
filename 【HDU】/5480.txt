@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXIN = 10000, MAXN = 100000+10;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+    if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+    ans = 0;
+    T f = 1;
+    if(ps == pe) return false;
+    do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+    if(ps == pe) return false;
+    do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+    ans *= f;
+    return true;
+}
+struct TREE{
+    int cnt[MAXN],mx,vis[MAXN];
+    void init()
+    {
+        clc(cnt,0);clc(vis,0);
+    }
+    inline int lowbit(int x){return x&-x;}
+    int sum(int x)
+    {
+        int ans = 0;
+        while(x > 0)
+        {
+            ans += cnt[x];
+            x -= lowbit(x);
+        }
+        return ans;
+    }
+    void add(int x, int num)
+    {
+        while(x <= mx)
+        {
+            cnt[x] += num;
+            x += lowbit(x);
+        }
+    }
+}tx,ty;
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    in(t);
+    while(t--)
+    {
+        int n,m,k,q;
+        in(n),in(m),in(k),in(q);
+        tx.init();ty.init();
+        tx.mx = n,ty.mx = m;
+        rep(i,0,k)
+        {
+            int x,y;
+            in(x),in(y);
+            if(!tx.vis[x])
+            {
+                tx.vis[x] = true;
+                tx.add(x,1);
+            }
+            if(!ty.vis[y])
+            {
+                ty.vis[y] = true;
+                ty.add(y,1);
+            }
+        }
+        while(q--)
+        {
+            int x1,y1,x2,y2;
+            in(x1),in(y1),in(x2),in(y2);
+            if(tx.sum(x2)-tx.sum(x1-1) == x2-x1+1 || ty.sum(y2)-ty.sum(y1-1) == y2-y1+1)
+                puts("Yes");
+            else puts("No");
+        }
+    }
+    return 0;
+}

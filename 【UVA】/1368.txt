@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+const char p[4]={'A','C','G','T'};
+int cnt[MAXN][100];
+char tmp[MAXN], ans[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,len;
+		scanf("%d %d%*c", &n, &len);
+		clc(cnt,0);
+		rep(i,0,n)
+		{
+			scanf("%s",tmp);
+			rep(j,0,len)
+				cnt[j][tmp[j]]++;
+		}
+		int sum = 0;
+		rep(i,0,len)
+		{
+			int mx = 0;
+			char c;
+			rep(j,0,4)
+			{
+				if(cnt[i][p[j]] > mx)
+				{
+					mx = cnt[i][p[j]];
+					c = p[j];
+				}
+			}
+			ans[i] = c;
+			sum += n-mx;
+		}
+		ans[len] = 0;
+		puts(ans);
+		printf("%d\n", sum);
+	}
+	return 0;
+}

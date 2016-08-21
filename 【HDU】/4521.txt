@@ -1,0 +1,83 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define id(x,y) ((x)+(y)|(x)!=(y))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int mx[MAXN<<1];//线段树维护值(a[])的区间最大的序列长度(dp[])
+
+inline void push_up(int x, int y, int m){
+	mx[id(x,y)] = max(mx[id(x,m)],mx[id(m+1,y)]);
+}
+int p,v;
+void update(int x, int y)
+{
+	if(x == y)
+	{
+		mx[id(x,y)] = max(mx[id(x,y)],v);
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(x,m);
+	else update(m+1,y);
+	push_up(x,y,m);
+}
+int ql,qr;
+int query(int x, int y)
+{
+	if(ql <= x && y <= qr) return mx[id(x,y)];
+	int m = (x+y)>>1, ans = 0;
+	if(ql <= m) ans = max(ans,query(x,m));
+	if(qr > m) ans = max(ans,query(m+1,y));
+	return ans;
+}
+int dp[MAXN], a[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,d;
+	while(~scanf("%d %d*c", &n, &d))
+	{
+		int ma = 0;
+		rep(i,0,n) scanf("%d%*c", &a[i]), ma = max(ma,a[i]);
+		if(d >= n)
+		{
+			puts("1");
+			continue;
+		}
+		clc(mx,0);
+		repe(i,0,d) dp[i] = 1;
+		int ans = 1;
+		rep(i,0,n-d-1)
+		{
+			p = a[i];v = dp[i];
+			update(0,ma);
+			if(!a[i+d+1])
+			{
+				dp[i+d+1] = 1;
+				continue;
+			}
+			ql = 0, qr = a[i+d+1]-1;
+			dp[i+d+1] = query(0,ma)+1;
+			ans = max(ans,dp[i+d+1]);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

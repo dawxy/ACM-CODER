@@ -1,0 +1,116 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 2000+10;
+
+double sum[MAXN<<1];//覆盖的长度
+int cov[MAXN<<1];//是否完全覆盖
+int lz[MAXN<<1];
+double pos[MAXN];
+inline int id(int x, int y){return x+y|x!=y;}
+void init()
+{
+    clc(sum,0);
+    clc(cov,0);
+    clc(lz,0);
+}
+void push_up(int x, int y, int m)
+{
+    int u = id(x,y), l = id(x,m), r = id(m+1,y);
+    if(cov[u]) sum[u] = pos[y+1]-pos[x];//全部覆盖
+    else if(x == y) sum[u] = 0;//叶子结点
+    else sum[u] = sum[l]+sum[r];
+}
+void push_down(int x, int y, int m)
+{
+    int u = id(x,y);
+    if(lz[u])
+    {
+        int l = id(x,m), r = id(m+1,y);
+        lz[l] += lz[u], lz[r] += lz[u];
+        cov[l] += lz[u], cov[r] += lz[u];
+        lz[u] = 0;
+    }
+}
+void update(int x, int y, int ql, int qr, int v)
+{
+    int m = (x+y)>>1;
+    if(ql <= x && y <= qr)
+    {
+        cov[id(x,y)] += v;
+        push_up(x,y,m);
+        return;
+    }
+    push_down(x,y,m);
+    if(ql <= m) update(x,m,ql,qr,v);
+    if(qr > m) update(m+1,y,ql,qr,v);
+    push_up(x,y,m);
+}
+
+int cnt;
+set<double> vis;
+void add(double x)
+{
+    if(vis.find(x) == vis.end())
+        pos[cnt++] = x;
+}
+
+int tol;
+struct NODE{
+    double l,r,h;
+    int v;
+    bool operator<(const NODE& t)const{
+        return h < t.h;
+    }
+}p[MAXN];
+double sloved()
+{
+    double ans = 0;
+    sort(pos,pos+cnt);
+    sort(p,p+tol);
+    init();
+    rep(i,0,tol)
+    {
+        int x = lower_bound(pos,pos+cnt,p[i].l)-pos, y = lower_bound(pos,pos+cnt,p[i].r)-pos-1;
+        update(0,cnt-1,x,y,p[i].v);
+        if(i < tol-1)
+            ans += sum[id(0,cnt-1)]*(p[i+1].h-p[i].h);
+    }
+    return ans;
+}
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int n,count = 0;
+    while(~scanf("%d%*c", &n) && n)
+    {
+        tol = 0;
+        rep(i,0,n)
+        {
+            double x1,x2,y1,y2;
+            scanf("%lf %lf %lf %lf%*c", &x1, &y1, &x2, &y2);
+            add(x1), add(x2);
+            p[tol].h = y1, p[tol].l = x1, p[tol].r = x2, p[tol++].v = 1;
+            p[tol].h = y2, p[tol].l = x1, p[tol].r = x2, p[tol++].v = -1;
+        }
+        printf("Test case #%d\nTotal explored area: %.2f\n\n", ++count,sloved());
+    }
+    return 0;
+}

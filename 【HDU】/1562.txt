@@ -1,0 +1,26 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		int a, b, c;
+		scanf ("%d %d %d%*c", &a, &b, &c);
+        int x = 1000;
+        for (; x <= 9999; x++)
+		{
+            if (0 == x%a && 0 == (x+1)%b && 0 == (x+2)%c)
+                break;
+		}
+        if (x >= 10000)
+            puts("Impossible");
+        else
+			printf ("%d\n",x);
+	}
+    return 0;
+}

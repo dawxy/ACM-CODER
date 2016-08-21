@@ -1,0 +1,29 @@
+#include <stdio.h>
+
+double jc(int a)
+{
+	double ans = 1;
+    for (int i = 2; i <= a; i++)
+        ans *= i;
+	return ans;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int n, m;
+        scanf ("%d %d%*c", &n, &m);
+        if (n < m)
+			printf ("0\n");
+		else if (n == m)
+			printf ("1\n");
+		else
+			printf ("%.0lf\n", jc(n)/(jc(m)*jc(n-m)));
+	}
+    return 0;
+}

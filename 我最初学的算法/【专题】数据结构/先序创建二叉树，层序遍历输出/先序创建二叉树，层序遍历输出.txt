@@ -1,0 +1,63 @@
+//层次遍历二叉树
+#include <stdio.h>
+#include <malloc.h>
+#include <queue>
+#define scanf scanf_s
+using namespace std;
+typedef struct NODE{
+	int data;
+	NODE *lchild, *rchild;
+}node, *pnode;
+
+void init_binarytree(pnode *);
+pnode creat_binarytree(pnode);//先序创建树
+void traverse (pnode);
+
+int main ()
+{
+	pnode pt;
+	init_binarytree (&pt);
+	pt = creat_binarytree (pt);
+	traverse (pt);
+}
+
+void init_binarytree(pnode * pt)
+{
+	*pt = (pnode)malloc (sizeof(node));
+	(*pt)->lchild = (*pt)->rchild= NULL;
+}
+
+pnode creat_binarytree(pnode t)
+{
+	int a;
+	scanf ("%d", &a);
+	if (0 == a)
+	{
+		return NULL;
+	}
+	else
+	{
+		t = (pnode)malloc(sizeof(node));
+		t->data = a;
+		t->lchild = creat_binarytree (t->lchild);
+		t->rchild = creat_binarytree (t->rchild);
+		return t;
+	}
+}
+
+void traverse (pnode pt)
+{
+	pnode p;
+	queue<pnode> que;//利用队列
+	que.push(pt);
+	while (que.size())
+	{
+		p = que.front();
+		printf ("%d\n", p->data);
+		que.pop();
+		if (p->lchild)
+			que.push(p->lchild);
+		if (p->rchild)
+			que.push(p->rchild);
+	}
+}

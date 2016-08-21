@@ -1,0 +1,53 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 100010
+int f[MAXN], cnt = 0;
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+void merge(int a, int b)
+{
+	int x = find(a), y = find(b);
+	if(x != y)
+		f[x] = y;
+	else cnt++;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int a,b;
+	while(~scanf("%d%*c", &a))
+	{
+		if(-1 == a)
+		{
+			puts("0");
+			continue;
+		}
+		rep(i,0,MAXN) f[i] = i;
+		scanf("%d%*c", &b);
+		cnt = 0;
+		merge(a,b);
+		while(~scanf("%d%*c", &a) && ~a)
+		{
+			scanf("%d%*c", &b);
+			merge(a,b);
+		}
+		printf("%d\n", cnt);
+	}
+	return 0;
+}

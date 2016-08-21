@@ -1,0 +1,41 @@
+#include <stdio.h>
+
+int count (int s, int n)
+{
+	int sum = 0;
+	while(s)
+	{
+		if(s&1)
+			sum++;
+		s >>= 1;
+	}
+	return sum;
+}
+
+int main ()
+{
+	#ifdef DSHY
+		freopen("e:\\1.txt","r",stdin);
+	#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n, h;
+		scanf ("%d %d%*c", &n, &h);
+		int len = 1<<n, i, j;
+		for (i = 0; i < len;i++)
+		{
+			if (h == count(i,n))
+			{
+				for (j = n-1; j >= 0; j--)
+					printf ("%d", (bool)(i&(1<<j)));
+				printf ("\n");
+			}
+		}
+		if (t)
+			printf ("\n");
+	}
+
+	return 0;
+}

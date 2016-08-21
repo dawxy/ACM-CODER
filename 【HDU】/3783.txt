@@ -1,0 +1,34 @@
+#include <stdio.h>
+#include <string.h>
+char a[150];
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(gets(a) && 'E' != a[0])
+	{
+		int n = strlen(a), z = 0, o = 0, j = 0;
+        for (int i = 0; i < n; i++)
+		{
+			if ('Z' == a[i])
+				z++;
+			else if ('O' == a[i])
+				o++;
+			else
+				j++;
+		}
+        while(z||o||j)
+		{
+            if (z)
+				printf ("Z"),z--;
+			if (o)
+				printf ("O"),o--;
+            if (j)
+				printf ("J"),j--;
+		}
+        printf ("\n");
+	}
+    return 0;
+}

@@ -1,0 +1,78 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100010;
+struct NODE{
+	string str[MAXN];
+	int n,ord[MAXN];//ord[]排序后下标,key[]键值对应下标
+	int find(char *s)
+	{
+		int x = 0, y = n-1,m;
+		while(x <= y)
+		{
+			m = (x+y)>>1;
+			if(str[ord[m]] == s)
+				return ord[m];
+			if(str[ord[m]] < s) x = m+1;
+			else y = m-1;
+		}
+		return -1;
+	}
+}t1,t2;
+inline bool cmp1(int a, int b){return t1.str[a] < t1.str[b];}
+inline bool cmp2(int a, int b){return t2.str[a] < t2.str[b];}
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    char a[100], in[1010];
+    while(gets(in) && strcmp("@END@",in))
+    {
+		int i;
+		for(i = 1; ']' != in[i]; i++) a[i-1] = in[i];
+		a[i-1] = 0;
+		t1.ord[t1.n] = t1.n;
+        t1.str[t1.n++] = a;
+		t2.ord[t2.n] = t2.n;
+        t2.str[t2.n++] = in+i+2;
+    }
+	sort(t1.ord,t1.ord+t1.n,cmp1);
+	sort(t2.ord,t2.ord+t2.n,cmp2);
+    int m;
+    scanf("%d%*c", &m);
+    while(m--)
+    {
+        gets(a);
+        int id;
+        if('[' == a[0])
+        {
+            a[strlen(a)-1] = 0;
+            id = t1.find(a+1);
+			if(~id) puts(t2.str[id].c_str());
+			else puts("what?");
+        }
+        else
+		{
+			id = t2.find(a);
+			if(~id) puts(t1.str[id].c_str());
+			else puts("what?");
+		}
+    }
+    return 0;
+}

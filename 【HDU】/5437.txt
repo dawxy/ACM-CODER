@@ -1,0 +1,79 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 150000+10;
+char name[MAXN][300];
+struct NODE{
+    int id,v;
+    bool operator<(const NODE&t)const{
+        if(v != t.v) return v < t.v;
+        return id > t.id;
+    }
+}p[MAXN];
+struct IN{
+    int k,cnt;
+    bool operator<(const IN&t)const{
+        return k<t.k;
+    }
+}in[MAXN];
+priority_queue<NODE> que;
+int ans[MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        int n,m,q;
+        scanf("%d%d%d", &n, &m, &q);
+        rep(i,0,n)
+        {
+            scanf("%s %d", name[i], &p[i].v);
+            p[i].id = i;
+        }
+        rep(i,0,m) scanf("%d %d", &in[i].k, &in[i].cnt);
+        sort(in,in+m);
+        int p1 = 0,p2 = 0,tol = 0;
+        while(!que.empty()) que.pop();
+        while(p1 < m && p2 < n)
+        {
+            while(p2 < n && p2 < in[p1].k)
+            {
+                que.push(p[p2++]);
+            }
+            int tmp = 0;
+            while(!que.empty() && tmp < in[p1].cnt)
+            {
+                ans[tol++] = que.top().id;
+                que.pop();
+                tmp++;
+            }
+            p1++;
+        }
+        while(p2 < n)
+        {
+            que.push(p[p2++]);
+        }
+        while(!que.empty())
+        {
+            ans[tol++] = que.top().id; que.pop();
+        }
+        while(q--)
+        {
+            int x;
+            scanf("%d", &x);
+            printf("%s", name[ans[x-1]]);
+            if(q) putchar(' ');
+            else putchar('\n');
+        }
+    }
+    return 0;
+}

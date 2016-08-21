@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <malloc.h>
+#include <string.h>
+#define MAX 1010
+int n, tq[MAX], tfront, trear, map[MAX*MAX];
+int eq[MAX][MAX], eqfront[MAX];
+
+int main ()
+{
+	int count = 1;
+	while(1)
+	{
+		int m, i, j, tin[MAX] = {0}, eqrear[MAX]={0}, buf;
+		scanf("%d%*c", &n);
+		if (0 == n)
+			break;
+		for (i = 0; i < n; i++)
+		{
+			scanf ("%d%*c", &m);
+			for(j = 1; j <= m; j++)
+			{
+				scanf ("%d%*c", &buf);
+				map[buf] = i;
+			}
+		}
+		tfront = -1;
+		trear = 0;
+		memset(eqfront, -1, sizeof(eqfront));
+		printf ("Scenario #%d\n", count++);
+		while(1)
+		{
+			char s[10];
+			int a, team;
+			scanf ("%s%*c", s);
+			if ('S' == s[0])
+				break;
+			if ('E' == s[0])
+			{
+				scanf ("%d", &a);
+				team = map[a];
+				if (!tin[team])
+				{
+					tin[team] = 1;
+					tq[trear++] = team;
+				}
+				eq[team][eqrear[team]++] = a;
+			}
+			else
+			{
+				team = tq[tfront+1];
+				printf ("%d\n", eq[team][++eqfront[team]]);
+				if (1 == eqrear[team]-eqfront[team])
+				{
+					++tfront;
+					tin[team] = 0;
+				}
+			}
+		}
+		printf ("\n");
+	}
+
+	return 0;
+}

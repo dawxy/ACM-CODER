@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 510
+int a[MAXN], b[MAXN], dp[MAXN][MAXN];
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        int na, nb;
+        scanf ("%d%*c", &na);
+        for (int i = 1; i <= na; i++)
+            scanf ("%d%*c", &a[i]);
+        scanf ("%d%*c", &nb);
+        for (int i = 1; i <= nb; i++)
+            scanf ("%d%*c", &b[i]);
+        memset(dp,0,sizeof(dp));
+        for (int i = 1; i <= na; i++)
+        {
+            for (int j = 1; j <= nb; j++)
+            {
+                if (a[i] == b[j])
+                {
+                    dp[i][j] = 1;
+                    for (int k = 1; k < j; k++)
+                    {
+                        if (b[k] < b[j])
+                            dp[i][j]= max(dp[i][j], dp[i-1][k]+1);
+                    }
+                }
+                else
+                    dp[i][j] = dp[i-1][j];
+            }
+        }
+        int ans = 0;
+        for (int i = 1; i <= nb; i++)
+            ans = max(ans,dp[na][i]);
+        printf ("%d\n", ans);
+        if (t)
+            printf ("\n");
+    }
+    return 0;
+}

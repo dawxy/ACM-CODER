@@ -1,0 +1,396 @@
+/*主席树*/
+#pragma comment(linker, "/STACK:1024000000,1024000000") 
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXQ = 100000+10, MAXM = 100*MAXN;
+struct IN{
+    int k,a,b;
+}in[MAXQ];
+int a[MAXN],n,num[MAXN+MAXQ],cnt,sot[MAXN+MAXQ],head[MAXN],e,nxt[MAXN<<1],to[MAXN<<1];
+int sum[MAXM], lc[MAXM],rc[MAXM],tol;
+int rt[MAXN<<2];
+ 
+inline void add_edge(int u, int v)
+{
+    nxt[e] = head[u], to[e] = v;
+    head[u] = e++;
+}
+inline int mhash(int v){return lower_bound(sot+1,sot+1+cnt,v)-sot;}
+int fa[MAXN], ft[MAXN], d[MAXN<<1],id[MAXN<<1],all;
+int df[MAXN<<1],st[MAXN],ed[MAXN],dcnt;
+bool ised[MAXN<<1];
+void dfs(int u, int dep)
+{
+    ft[u] = all, d[all] = dep, id[all++] = u;
+    df[++dcnt] = a[u];st[u] = dcnt;ised[dcnt] = 0;
+    for(int i = head[u]; ~i; i = nxt[i])
+    {
+        int v = to[i];
+        if(v == fa[u]) continue;
+        fa[v] = u;
+        dfs(v,dep+1);
+        d[all] = dep, id[all++] = u;
+    }
+    df[++dcnt] = a[u];ed[u] = dcnt;ised[dcnt] = 1;
+}
+int mi[MAXN<<2],minum[MAXN<<2];
+inline int get_id(int x, int y){return x+y|x!=y;}
+void lca_bulid(int x, int y)
+{
+	if(x == y)
+	{
+		mi[get_id(x,y)] = d[x];
+		minum[get_id(x,y)] = id[x];
+		return;
+	}
+	int m = (x+y)>>1;
+	lca_bulid(x,m);
+	lca_bulid(m+1,y);
+	int u = get_id(x,y),l = get_id(x,m), r = get_id(m+1,y);
+	if(mi[l] < mi[r]) mi[u] = mi[l], minum[u] = minum[l];
+	else mi[u] = mi[r], minum[u] = minum[r];
+}
+int qid, tmpmi;
+void l_query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr)
+	{
+		if(tmpmi > mi[get_id(x,y)])
+			tmpmi = mi[get_id(x,y)], qid = minum[get_id(x,y)];
+		return;
+	}
+	int m = (x+y)>>1;
+	if(ql <= m) l_query(x,m,ql,qr);
+	if(qr > m) l_query(m+1,y,ql,qr);
+}
+int lca_query(int x, int y)
+{
+	x = ft[x], y = ft[y];
+	if(x > y) swap(x,y);
+	tmpmi = INF;
+	l_query(0,all-1,x,y);
+	return qid;
+}
+void bulid(int &u, int x, int y, int p, int v)
+{
+    sum[++tol] = sum[u]^1,lc[tol] = lc[u],rc[tol] = rc[u];
+    u = tol;
+    if(x == y) return;
+    int m = (x+y)>>1;
+    if(p <= m) bulid(lc[u],x,m,p,v);
+    else bulid(rc[u],m+1,y,p,v);
+}
+void init()
+{
+    all = tol = dcnt = 0;
+	fa[1] = 0;
+    clc(rt,0);
+    dfs(1,1);
+    lca_bulid(0,all-1);
+    rt[dcnt+1] = rt[0];
+    bulid(rt[dcnt+1],1,cnt,mhash(df[1]),1);
+    repe(i,2,dcnt)
+    {
+        rt[i+dcnt] = rt[i-1+dcnt];
+        int v = 1;
+        if(ised[i]) v = -1;
+        bulid(rt[i+dcnt],1,cnt,mhash(df[i]),v);
+    }
+}
+void t_update(int &u, int x, int y, int p, int v)
+{
+    if(!u) {lc[++tol] = lc[u],rc[tol] = rc[u], sum[tol] = sum[u];u = tol;}
+    sum[u] ^= 1;
+    if(x == y) return;
+    int m = (x+y)>>1;
+    if(p <= m) t_update(lc[u],x,m,p,v);
+    else t_update(rc[u],m+1,y,p,v);
+}
+inline int lowbit(int x){return x&-x;}
+void add(int x, int v)
+{
+    int p = mhash(df[x]);
+    while(x <= dcnt)
+    {
+        t_update(rt[x],1,cnt,p,v);
+        x += lowbit(x);
+    }
+}
+void update(int x, int v)
+{
+    add(st[x],-1);//第一次出现点删掉原来加上新的
+    df[st[x]] = v;
+    add(st[x],1);
+    add(ed[x],1);//最后一次出现点相反
+    df[ed[x]] = v;
+    add(ed[x],-1);
+}
+int tx[100],ty[100],len[2];
+int query(int x, int y)
+{
+    if(x == y) return x;
+    int m = (x+y)>>1, tmp = 0;
+    rep(i,0,len[1]) tmp ^= sum[rc[ty[i]]];
+    rep(i,0,len[0]) tmp ^= sum[rc[tx[i]]];
+	/*if(tmp > 1 || tmp < 0) 
+		while(1) puts("error");*/
+    if(tmp)
+    {
+        rep(i,0,len[1]) ty[i] = rc[ty[i]];
+        rep(i,0,len[0]) tx[i] = rc[tx[i]];
+        return query(m+1,y);
+    }
+    rep(i,0,len[1]) ty[i] = lc[ty[i]];
+    rep(i,0,len[0]) tx[i] = lc[tx[i]];
+    return query(x,m);
+}
+ 
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int q;
+		scanf("%d %d",&n, &q);
+		e = 0;
+		clc(head,-1);
+		rep(i,1,n)
+		{
+			int u,v;
+			scanf("%d %d", &u, &v);
+			add_edge(u,v);
+			add_edge(v,u);
+		}
+		int cc = 0;
+		repe(i,1,n) scanf("%d", &a[i]), num[++cc] = a[i];
+		rep(i,0,q)
+		{
+			scanf("%d %d %d", &in[i].k, &in[i].a, &in[i].b);
+			if(!in[i].k) num[++cc] = in[i].b;
+		}
+		sort(num+1,num+1+cc);
+		sot[cnt=1] = num[1];
+		repe(i,2,cc) if(num[i] != num[i-1]) sot[++cnt] = num[i];
+		init();
+		rep(i,0,q)
+		{
+			if(in[i].k)
+			{
+				len[0]=len[1]=0;
+				int lca = lca_query(in[i].a,in[i].b);
+				int ta = st[in[i].a], tb = st[in[i].b],tlca = st[lca],tflca = st[fa[lca]];
+				ty[len[1]++] = rt[ta+dcnt],ty[len[1]++] = rt[tb+dcnt];//静态初始值
+				for(int j = ta; j > 0; j -= lowbit(j)) ty[len[1]++] = rt[j];
+				for(int j = tb; j > 0; j -= lowbit(j)) ty[len[1]++] = rt[j];
+				tx[len[0]++] = rt[tlca+dcnt],tx[len[0]++] = rt[tflca?tflca+dcnt:0];
+				for(int j = tlca; j > 0; j -= lowbit(j)) tx[len[0]++] = rt[j];
+				for(int j = tflca; j > 0; j -= lowbit(j)) tx[len[0]++] = rt[j];
+				int tmp = 0;
+				rep(j,0,len[1]) tmp ^= sum[ty[j]];
+				rep(j,0,len[0]) tmp ^= sum[tx[j]];
+				/*if(tmp > 1 || tmp < 0) 
+					while(1) puts("error"); */
+				if(!tmp) puts("-1");
+				else printf("%d\n", sot[query(1,cnt)]);
+			}
+			else
+				update(in[i].a,in[i].b);
+		}
+	}
+    return 0;
+}
+================================================================================================================
+/*DFS序+路径XOR*/
+#pragma comment(linker, "/STACK:1024000000,1024000000")
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+char buf[MAXN], *ps = buf, *pe = buf+1;//ps当前读取到的开头指针，pe当前缓存结尾指针
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+	int ans = 0;
+    if(ps == pe) return -1; //判断是否到文件结尾
+	do{
+		rnext();
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return -1;//判断是否到文件结尾
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	return ans;
+}
+int head[MAXN],tol,nxt[MAXN<<1],to[MAXN<<1],a[MAXN],n;
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int d[MAXN<<1],num[MAXN<<1],ft[MAXN],cnt, fa[MAXN];
+int df[MAXN<<1],st[MAXN<<1],ed[MAXN<<1],all;
+void dfs(int u ,int dep)
+{
+	d[++cnt] = dep,num[cnt] = u;
+	ft[u] = cnt;
+	df[++all] = a[u];st[u] = all;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v == fa[u]) continue;
+		fa[v] = u;
+		dfs(v,dep+1);
+		d[++cnt] = dep,num[cnt] = u;
+	}
+	df[++all] = a[u],ed[u] = all;
+}
+int mi[MAXN<<2],minum[MAXN<<2];
+inline int id(int x, int y){return x+y|x!=y;}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		mi[id(x,y)] = d[x];
+		minum[id(x,y)] = num[x];
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	int u = id(x,y), l = id(x,m),r = id(m+1,y);
+	if(mi[l] < mi[r]) mi[u] = mi[l], minum[u] = minum[l];
+	else mi[u] = mi[r], minum[u] = minum[r];
+}
+int qid,qmi;
+void query(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr)
+	{
+		if(qmi > mi[id(x,y)])
+			qmi = mi[id(x,y)], qid = minum[id(x,y)];
+		return;
+	}
+	int m = (x+y)>>1;
+	if(ql <= m) query(x,m,ql,qr);
+	if(qr > m) query(m+1,y,ql,qr);
+}
+int lca_query(int x, int y)
+{
+	x = ft[x], y = ft[y];
+	if(x > y) swap(x,y);
+	qmi = INF;
+	query(1,cnt,x,y);
+	return qid;
+}
+int c[MAXN<<1];
+inline int lowbit(int x){return x&-x;}
+void add(int x, int v)
+{
+	while(x <= all)
+	{
+		c[x] ^= v;
+		x += lowbit(x);
+	}
+}
+int get_sum(int x)
+{
+	int ans = 0;
+	while(x > 0)
+	{
+		ans ^= c[x];
+		x -= lowbit(x);
+	}
+	return ans;
+}
+void init()
+{
+	cnt = all = 0;
+	dfs(1,0);
+	bulid(1,cnt);
+	clc(c,0);
+	repe(i,1,all) add(i,df[i]);
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t = in();
+	while(t--)
+	{
+		tol = 0;
+		clc(head,-1);
+		n = in();
+		int q = in();
+		rep(i,1,n)
+		{
+			int u = in(),v = in();
+			add_edge(u,v);
+			add_edge(v,u);
+		}
+		repe(i,1,n) a[i] = in()+1;
+		init();
+		while(q--)
+		{
+			int op = in(),x = in(),y = in();
+			if(op)
+			{
+				int lca = lca_query(x,y);
+				int ans = get_sum(st[x])^get_sum(st[y])^get_sum(st[lca])^get_sum(st[fa[lca]]);
+				if(ans) printf("%d\n", ans-1);
+				else puts("-1");
+			}
+			else
+			{
+				y++;
+				add(st[x],df[st[x]]);
+				df[st[x]] = y;
+				add(st[x],y);
+				add(ed[x],df[ed[x]]);
+				df[ed[x]] = y;
+				add(ed[x],y);
+			}
+		}
+	}
+	return 0;
+}

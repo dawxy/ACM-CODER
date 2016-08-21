@@ -1,0 +1,138 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 510
+#define MAXM 250100
+struct NODE{
+	int st, ed, a,b,c,d;
+}p[MAXN];
+struct Edge{
+	int next, v;
+	Edge(int a = 0, int b = 0){next = a, v = b;}
+}edge[MAXM];
+int head[MAXN], tol, n, dis, dx[MAXN], dy[MAXN], mx[MAXN], my[MAXN];
+bool vis[MAXN];
+
+bool bfs()
+{
+	queue<int> q;
+	dis = INF;
+	clc(dx,-1);
+	clc(dy,-1);
+	rep(i,0,n)
+	{
+		if(-1 == mx[i])
+		{
+			q.push(i);
+			dx[i] = 0;
+		}
+	}
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		if(dx[u] > dis) break;
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v;
+			if(-1 == dy[v])
+			{
+				dy[v] = dx[u]+1;
+				if(-1 == my[v]) dis = dy[v];
+				else
+				{
+					dx[my[v]] = dy[v]+1;
+					q.push(my[v]);
+				}
+			}
+		}
+	}
+	return dis != INF;
+}
+bool dfs(int u)
+{
+	for(int i = head[u]; ~i; i = edge[i].next)
+	{
+		int v = edge[i].v;
+		if(!vis[v] && dx[u]+1 == dy[v])
+		{
+			vis[v] = true;
+			if(-1 != my[v] && dy[v] == dis) continue;
+			if(-1 == my[v] || dfs(my[v]))
+			{
+				my[v] = u;
+				mx[u] = v;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int maxmatch()
+{
+	int ans = 0;
+	clc(mx,-1);
+	clc(my,-1);
+	while(bfs())
+	{
+		clc(vis,0);
+		rep(i,0,n)
+		{
+			if(-1 == mx[i] && dfs(i))
+				ans++;
+		}
+	}
+	return ans;
+}
+void add_edge(int u, int v)
+{
+	edge[tol] = Edge(head[u], v);
+	head[u] = tol++;
+}
+inline int cost(int a, int b, int c, int d){
+	return abs(a-c)+abs(b-d);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int h,s;
+		scanf("%d%*c", &n);
+		rep(i,0,n)
+		{
+			scanf("%d:%d %d %d %d %d%*c", &h,&s,&p[i].a,&p[i].b,&p[i].c, &p[i].d);
+			p[i].st = h*60+s;
+			p[i].ed = p[i].st+cost(p[i].a,p[i].b,p[i].c,p[i].d);
+		}
+		clc(head,-1);
+		tol = 0;
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+			{
+				if(i == j) continue;
+				if(p[i].ed+cost(p[i].c,p[i].d,p[j].a,p[j].b) < p[j].st)
+					add_edge(i,j);
+			}
+		}
+		printf("%d\n", n-maxmatch());
+	}
+	return 0;
+}

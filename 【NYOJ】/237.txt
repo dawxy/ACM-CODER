@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 510
+int vis[MAXN], lin[MAXN];
+vector<int> g[MAXN];
+
+bool dfs(int u)
+{
+	int sz = g[u].size();
+	rep(i,0,sz)
+	{
+		int v = g[u][i];
+		if(!vis[v])
+		{
+			vis[v] = true;
+			if(-1 == lin[v] || dfs(lin[v]))
+			{
+				lin[v] = u;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m,a,b;
+		scanf("%d %d%*c", &n, &m);
+		repe(i,1,n) g[i].clear();
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a, &b);
+			g[a].push_back(b);
+		}
+		clc(lin,-1);
+		int ans = 0;
+		repe(i,1,n)
+		{
+			clc(vis,0);
+			if(dfs(i)) ans++;
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

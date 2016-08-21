@@ -1,0 +1,46 @@
+#include <cstdio>
+#include <cstring>
+typedef unsigned long long LL;
+#define MAXN 1005
+int f[MAXN*MAXN];
+
+int pow_mod(LL a, LL n, LL mod)
+{
+	LL ans = 1;
+	a %= mod;
+	while(n)
+	{
+		if(n&1) ans = ans*a%mod;
+		a = a*a%mod;
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	f[0] = 0,f[1] = 1;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		LL a,b,n;
+		scanf("%llu %llu %llu%*c", &a,&b,&n);
+		if(1 == n)
+		{
+			puts("0");
+			continue;
+		}
+		int m = 2;
+		while(1)
+		{
+			f[m] = (f[m-1]+f[m-2])%n;
+			if(1 == f[m] && 0 == f[m-1]) break;
+			m++;
+		}
+		printf("%d\n", f[pow_mod(a,b,m-1)]);
+	}
+	return 0;
+}

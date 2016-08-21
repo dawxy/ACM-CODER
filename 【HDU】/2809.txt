@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 20
+#define kill(si,gi) dp[si].h-((g[gi].h-1)/max(1,dp[si].a-g[gi].d)*max(1,g[gi].a-dp[si].d))
+struct NODE{
+	int a, d, h, e;
+}dp[1 << MAXN], g[MAXN];
+int n, la, ld, lh;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while (~scanf("%d %d %d %d %d %d%*c", &dp[0].a, &dp[0].d, &dp[0].h, &la, &ld, &lh))
+	{
+		scanf("%d%*c", &n);
+		for (int i = 0; i < n; i++)
+			scanf("%*s %d %d %d %d%*c", &g[i].a, &g[i].d, &g[i].h, &g[i].e);
+		for (int i = 1; i < (1 << n); i++)
+			dp[i].h = 0;
+		dp[0].e = 0;
+		for (int i = 0; i < (1 << n)-1; i++)
+		{
+			if (dp[i].h <= 0) continue;
+			for (int j = 0; j < n; j++)
+			{
+				if (i&(1 << j)) continue;
+				NODE buf = dp[i];
+				buf.h = kill(i, j);
+				if (buf.h <= 0) continue;
+				buf.e += g[j].e;
+				if (buf.e >= 100)
+				{
+					buf.a += la;
+					buf.d += ld;
+					buf.h += lh;
+					buf.e -= 100;
+				}
+				if (buf.h > dp[i | (1 << j)].h)
+					dp[i | (1 << j)] = buf;
+			}
+		}
+		if (!dp[(1 << n) - 1].h)
+			puts("Poor LvBu,his period was gone.");
+		else
+			printf("%d\n", dp[(1 << n) - 1].h);
+	}
+	return 0;
+}

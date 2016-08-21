@@ -1,0 +1,29 @@
+#include <cstdio>
+#include <cstring>
+#define MOD 9973
+
+void e_gcd(int a, int b, int& d, int& x, int&y)
+{
+    if(!b) d = a, x = 1, y = 0;
+    else e_gcd(b,a%b,d,y,x), y -= a/b*x;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n,b, d, x, y;
+        scanf("%d %d%*c", &n, &b);
+        b %= MOD;
+        e_gcd(b,-MOD,d,x,y);
+        x *= n/d;
+        int gx = -MOD/d;
+        x = (x%gx+gx)%gx;
+        printf("%d\n", x);
+    }
+    return 0;
+}

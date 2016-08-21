@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int n, k, ans, buf;
+		scanf ("%d %d%*c", &n, &k);
+		ans = n;
+		while (n >= k)
+		{
+			ans += n/k;
+			n = n/k+n%k;
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

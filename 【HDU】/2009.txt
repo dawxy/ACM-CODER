@@ -1,0 +1,19 @@
+#include <stdio.h>
+#include <math.h>
+
+
+void main (void)
+{
+	int n, m, i;
+	double x = 0, s = 0;
+	while (EOF != scanf ("%d %d", &n, &m))
+	{
+		getchar();
+		for (i = 0, x = n, s = 0; i < m; i++)
+		{
+			s += x;
+			x = sqrt(x);
+		}
+		printf ("%.2lf\n", s);
+	}
+}

@@ -1,0 +1,73 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 2000+10;
+struct Q{
+	int k,v;
+}q[MAXN];
+int front,rear,ap[MAXN],bp[MAXN],as[MAXN],bs[MAXN], dp[MAXN][MAXN];
+//dp[i][j]第i天持有j股时的最多赚多少钱
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,mp,w;
+		scanf("%d %d %d%*c", &n, &mp, &w);
+		repe(i,1,n) scanf("%d %d %d %d%*c", &ap[i], &bp[i], &as[i], &bs[i]);
+		clc(dp,-0x3f);
+		repe(i,1,w+1)
+		{
+			int now = min(mp,as[i]);
+			repe(j,0,now) dp[i][j] = -(j*ap[i]);
+		}
+		repe(i,1,n)
+		{
+			repe(j,0,mp)
+				dp[i][j] = max(dp[i][j],dp[i-1][j]);
+			if(i <= w+1) continue;
+			//单调队列只维护i-w-1天的max值, k是pos值，v是维护的值
+			front = 1, rear = 0;
+			repe(j,0,mp)
+			{
+				int now = dp[i-w-1][j]+j*ap[i];
+				while(front <= rear && now > q[rear].v) rear--;
+				q[++rear].k = j, q[rear].v = now;
+				while(front <= rear && j > q[front].k+as[i]) front++;
+				dp[i][j] = max(dp[i][j], q[front].v-j*ap[i]);
+			}
+			front = 1, rear = 0;
+			per(j,mp,0) //j >= k(由k股卖出变成j) 所以需要j从大到小枚举才能保证k已经计算过
+			{
+				int now = dp[i-w-1][j]+j*bp[i];
+				while(front <= rear && now > q[rear].v) rear--;
+				q[++rear].k = j, q[rear].v = now;
+				while(front <= rear && j < q[front].k-bs[i]) front++;
+				dp[i][j] = max(dp[i][j], q[front].v-j*bp[i]);
+			}
+		}
+		int ans = -INF;
+		repe(j,0,mp) ans = max(ans,dp[n][j]);
+		printf("%d\n", ans);
+	}
+	return 0;
+}

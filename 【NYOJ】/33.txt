@@ -1,0 +1,32 @@
+#include <stdio.h>
+
+int main ()
+{
+	int n;
+	while (EOF != scanf("%d%*c", &n))
+	{
+		int a[102][102] = {0}, i, j = n, f = 0, count = 1, d[4][2]={{1,0},{0,-1},{-1,0},{0,1}};
+		for (i = 0; i <= n+1; i++)
+			a[0][i] = a[n+1][i] = a[i][0] = a[i][n+1] = -1;
+		i = 1;
+		while (count <= n*n)
+		{
+			a[i][j] = count++;
+			if (a[(i+d[f][0])][(j+d[f][1])] != 0)
+				f = (f+1)%4;
+			i += d[f][0];
+			j += d[f][1];
+		}
+		for (i = 1; i <= n; i++)
+		{
+			for (j = 1; j <= n; j++)
+			{
+				printf ("%d", a[i][j]);
+				if (n != j)
+					printf (" ");
+			}
+			printf ("\n");
+		}
+	}
+	return 0;
+}

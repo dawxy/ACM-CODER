@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a));
+#define MAXN 1010
+int d[MAXN],n, sum;
+bool vis[MAXN];
+vector<int> g[MAXN];
+
+void dfs(int u)
+{
+	vis[u] = true;
+	sum++;
+	int sz = g[u].size();
+	rep(i,0,sz)
+	{
+		int v = g[u][i];
+		if(!vis[v])
+			dfs(v);
+	}
+}
+bool ok()
+{
+	int ji = 0;
+	repe(i,1,n) if(d[i]&1) ji++;
+	if(ji > 2) return false;
+	sum = 0;
+	clc(vis,0);
+	dfs(1);
+	if(sum != n) return false;
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int m,a,b;
+		scanf("%d %d%*c", &n, &m);
+		clc(d,0);
+		repe(i,1,n) g[i].clear();
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c",&a, &b);
+			d[a]++, d[b]++;
+			g[a].push_back(b);
+			g[b].push_back(a);
+		}
+		if(ok()) puts("Yes");
+		else puts("No");
+	}
+	return 0;
+}

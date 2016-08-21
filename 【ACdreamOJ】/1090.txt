@@ -1,0 +1,13 @@
+#include<cstdio>
+ 
+int main()
+{
+    int t;
+    scanf("%d%*c", &t);
+    while (t--)
+    {
+        scanf("%*lld%*c");
+        puts("Dudu");
+    }
+    return 0;
+}

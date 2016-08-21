@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 9
+int m, n, t, sp[MAX], maxnum, g[23][3];
+
+bool cango (int s)
+{
+	for (int i = g[s][0]; i < g[s][1]; i++)
+	{
+		if (sp[i]+g[s][2] > m)
+			return false;
+	}
+	return true;
+}
+void dfs(int s, int sum)
+{
+	if(sum > maxnum)
+		maxnum = sum;
+	if (s >= t)
+		return;
+	if (cango(s))
+	{
+		for (int i = g[s][0]; i < g[s][1]; i++)
+			sp[i] += g[s][2];
+		dfs(s+1, sum+(g[s][2]*(g[s][1]-g[s][0])));
+		for (int i = g[s][0]; i < g[s][1]; i++)
+			sp[i] -= g[s][2];
+	}
+	dfs(s+1, sum);
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(1)
+	{
+		scanf ("%d%d%d%*c", &m, &n, &t);
+		if (0 == m && 0 == n && 0 == t)
+			break;
+		memset(g,0,sizeof(g));
+		memset(sp,0,sizeof(sp));
+		for (int i = 0; i < t; i++)
+			scanf ("%d%d%d%*c",&g[i][0], &g[i][1], &g[i][2]);
+		maxnum = 0;
+		dfs(0,0);
+		printf ("%d\n", maxnum);
+	}
+	return 0;
+}

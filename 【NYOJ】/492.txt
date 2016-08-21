@@ -1,0 +1,138 @@
+#include <cstdio>
+#include <cstring>
+typedef long long LL;
+#define MAXN 12
+#define MAXM 145
+#define pf(a) (a*a)
+struct NODE{
+	int now, last;
+}p[1370];
+LL dp[2][MAXM][26];
+int s[MAXM], c[MAXM], n, m, len, sum;
+
+void dfs(int j, int now)//枚举出同一行不冲突的状态
+{
+	if (j == n)
+	{
+		int buf = now;
+		while(buf)
+		{
+			if (buf&1) c[sum]++;
+			buf >>= 1;
+		}
+		s[sum++] = now;
+		return;
+	}
+	dfs(j+1,now<<1);
+	if (now&1) return;
+	dfs(j+1,now<<1|1);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		if (pf((n+1)/2) < m)
+		{
+			puts("0");
+			continue;
+		}
+		sum = len = 0;
+		memset(c,0,sizeof(c));
+		dfs(0,0);
+		for (int i = 0; i < sum; i++)
+		{
+			for (int j = 0; j < sum; j++)
+			{
+				if (s[i]&s[j] || s[i]&(s[j]<<1) || s[i]&(s[j]>>1)) continue;
+				p[len].now = i, p[len++].last = j;
+			}
+		}
+		memset(dp[0],0,sizeof(dp[0]));
+		int si = 0;
+		dp[0][0][0] = 1;
+		for (int i = 1; i <= n; i++)
+		{
+			memset(dp[si^=1],0,sizeof(dp[si]));
+			for (int j = 0; j < len; j++)
+			{
+				for (int k = c[p[j].now]; k <= m; k++)
+				{
+					dp[si][p[j].now][k] += dp[si^1][p[j].last][k-c[p[j].now]];
+				}
+			}
+		}
+		LL ans = 0;
+		for(int i = 0; i < sum; i++)
+			ans += dp[si][i][m];
+		printf("%lld\n", ans);
+	}
+	return 0;
+}
+============================================================================================
+#include <cstdio>
+#include <cstring>
+typedef long long LL;
+#define MAXN 12
+#define MAXM 145
+#define pf(a) (a*a)
+struct NODE{
+	int now, last;
+}p[1370];
+LL dp[MAXN][MAXM][26];
+int s[MAXM], c[MAXM], n, m, len, sum;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		if (pf((n+1)/2) < m)
+		{
+			puts("0");
+			continue;
+		}
+		sum = len = 0;
+		memset(c,0,sizeof(c));
+		for (int i = 0; i < (1<<n); i++)
+		{
+			if (i&(i<<1)) continue;
+			int buf = i;
+			while(buf)
+			{
+				if (buf&1) c[sum]++;
+				buf >>= 1;
+			}
+			s[sum++] = i;
+		}
+		for (int i = 0; i < sum; i++)
+		{
+			for (int j = 0; j < sum; j++)
+			{
+				if (s[i]&s[j] || s[i]&(s[j]<<1) || s[i]&(s[j]>>1)) continue;
+				p[len].now = i, p[len++].last = j;
+			}
+		}
+		memset(dp,0,sizeof(dp));
+		dp[0][0][0] = 1;
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 0; j < len; j++)
+			{
+				for (int k = c[p[j].now]; k <= m; k++)
+				{
+					dp[i][p[j].now][k] += dp[i-1][p[j].last][k-c[p[j].now]];
+				}
+			}
+		}
+		LL ans = 0;
+		for(int i = 0; i < sum; i++)
+			ans += dp[n][i][m];
+		printf("%lld\n", ans);
+	}
+	return 0;
+}

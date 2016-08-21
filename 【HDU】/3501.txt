@@ -1,0 +1,74 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MOD = 1000000007;
+
+int p[10],len;
+void get_p(int n)
+{
+	int mx = sqrt(n+0.5);
+	len = 0;
+	repe(i,2,mx)
+	{
+		if(n%i == 0)
+		{
+			while(n%i == 0) n /= i;
+			p[len++] = i;
+		}
+		else if(i > n) break;
+	}
+	if(n > 1) p[len++] = n;
+}
+int pow_mod(LL x, int n)
+{
+	LL ans = 1;
+	while(n)
+	{
+		if(n&1) ans = ans*x%MOD;
+		x  = x*x%MOD;
+		n >>= 1;
+	}
+	return ans;
+}
+int count(int y, int c)
+{
+	LL n = y/c;
+	LL ans = n*(n-1)%MOD*c%MOD;
+	return ans*pow_mod(2,MOD-2)%MOD;
+}
+int sloved(int y, int n)
+{
+	get_p(n);
+	int sz = len,all = 1<<sz,ans = 0;
+	rep(s,1,all)
+	{
+		int cnt = 0, tmp = 1;
+		rep(i,0,sz)
+		{
+			if(s&(1<<i))
+			{
+				cnt++;
+				tmp *= p[i];
+			}
+		}
+		if(cnt&1) ans = (ans+count(y,tmp))%MOD;
+		else ans = (ans-count(y,tmp)+MOD)%MOD;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d", &n) && n)
+	{
+		printf("%d\n", sloved(n,n));
+	}
+	return 0;
+}

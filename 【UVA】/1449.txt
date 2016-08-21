@@ -1,0 +1,120 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 150*70+10, MAXM = 1000000+10, MAXSIZE = 26;
+char name[155][75];
+struct Trie{
+	int cnt, ch[MAXN][MAXSIZE], fail[MAXN], num[MAXN],n;
+	int newnode()
+	{
+		clc(ch[cnt],-1);
+		num[cnt++] = -1;
+		return cnt-1;
+	}
+	void init(int n)
+	{
+		this->n = n;
+		cnt = 0;
+		newnode();
+	}
+	void insert(char *s, int id)
+	{
+		int u = 0, len = strlen(s);
+		rep(i,0,len)
+		{
+			int &c = ch[u][s[i]-'a'];
+			if(-1 == c)
+				c = newnode();
+			u = c;
+		}
+		num[u] = id;
+	}
+	void get_fail()
+	{
+		queue<int> q;
+		fail[0] = 0;
+		q.push(0);
+		while(!q.empty())
+		{
+			int u = q.front();q.pop();
+			rep(i,0,MAXSIZE)
+			{
+				int &c = ch[u][i];
+				int p = u?ch[fail[u]][i]:0;
+				if(~c)
+				{
+					fail[c] = p;
+					q.push(c);
+				}
+				else c = p;
+			}
+		}
+	}
+	struct NODE{
+		int id,sum;
+		bool operator<(NODE &t) const{
+			if(sum != t.sum) return sum > t.sum;
+			return id < t.id;
+		};
+	}ans[150];
+	void query(char *s)
+	{
+		rep(i,0,n) ans[i].id = i, ans[i].sum = 0;
+		int u = 0, len = strlen(s);
+		rep(i,0,len)
+		{
+			u = ch[u][s[i]-'a'];
+			int temp = u;
+			while(temp)
+			{
+				ans[num[temp]].sum++;
+				temp = fail[temp];
+			}
+		}
+		sort(ans,ans+n);
+	}
+}ac;
+
+char str[MAXM];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		ac.init(n);
+		rep(i,0,n)
+		{
+			scanf("%s%*c", name[i]);
+			ac.insert(name[i],i);
+		}
+		ac.get_fail();
+		scanf("%s%*c", str);
+		ac.query(str);
+		int mx = ac.ans[0].sum;
+		printf("%d\n", mx);
+		rep(i,0,n)
+		{
+			if(mx == ac.ans[i].sum)
+				printf("%s\n", name[ac.ans[i].id]);
+			else break;
+		}
+	}
+	return 0;
+}

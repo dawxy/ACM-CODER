@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 110
+#define min(a,b) (a<b?a:b)
+#define max(a,b) (a>b?a:b)
+int dp[13][MAXN], a[13];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int b,w,s, m = 0;
+		scanf("%d %d %d%*c", &b, &w, &s);
+		for(int i = 1; i <= n; i++)
+			scanf("%d%*c", &a[i]), m = max(m,a[i]);
+		memset(dp,0x3f,sizeof(dp));
+		dp[0][0] = 0;
+		for(int i = 1; i <= n; i++)
+		{
+			for(int j = a[i-1]; j <= m; j++)//上个月的人数
+			{
+				for (int k = a[i]; k <= m; k++)//这个月的人数
+				{
+					if(k >= j)
+						dp[i][k] = min(dp[i][k],dp[i-1][j]+b*(k-j)+w*k);//买进
+					if(j >= k)
+						dp[i][k] = min(dp[i][k],dp[i-1][j]+s*(j-k)+w*k);//卖出
+				}
+			}
+		}
+		int ans = 0x3f3f3f3f;
+		for(int i = a[n]; i <= m; i++)
+			ans = min(ans,dp[n][i]);
+		printf("%d\n", ans);
+	}
+	return 0;
+}

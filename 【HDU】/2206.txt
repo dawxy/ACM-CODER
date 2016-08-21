@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 105
+char a[MAXN];
+
+bool sloved();
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(NULL != gets(a))
+	{
+        if (sloved())
+			puts("YES");
+		else
+			puts("NO");
+	}
+    return 0;
+}
+
+bool is_num(char val)
+{
+    if ('0' <= val && '9' >= val)
+		return true;
+    return false;
+}
+bool sloved()
+{
+	int sum = 0, n = strlen(a);
+    for (int i = 0; i < n; i++)
+	{
+        if ('.' == a[i])
+			sum++;
+		else
+		{
+			if(!is_num(a[i]))
+				return false;
+		}
+	}
+	if (3 != sum)
+		return false;
+    int num[4] = {-1,-1,-1,-1};
+    sscanf (a,"%d.%d.%d.%d", &num[0],&num[1],&num[2], &num[3]);
+    for (int i = 0; i < 4; i++)
+    {
+        if (num[i]>255 || num[i] < 0)
+			return false;
+    }
+    sum = 0;
+    for (int i = 0; i < n; i++)
+	{
+        if (is_num(a[i]))
+		{
+            sum++;
+            if (sum > 3)
+                return false;
+		}
+        else
+            sum = 0;
+	}
+	return true;
+}

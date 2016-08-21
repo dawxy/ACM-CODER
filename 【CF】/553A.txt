@@ -1,0 +1,64 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+const LL MOD = 1000000007;
+
+LL fact(int n)
+{
+	LL ans = 1;
+	repe(i,2,n) ans = (ans*i)%MOD;
+	return ans;
+}
+LL pow_mod(LL x, int n)
+{
+	LL ans = 1;
+	while(n)
+	{
+		if(n&1) ans = (ans*x)%MOD;
+		x = (x*x)%MOD;
+		n >>= 1;
+	}
+	return ans;
+}
+LL dv(LL a, LL b)
+{
+	return a*pow_mod(b,MOD-2)%MOD;
+}
+LL cal(int n, int m)
+{
+	LL fn = fact(n),tmp = fact(m)*fact(n-m)%MOD;
+	return dv(fn,tmp);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	scanf("%d", &n);
+	LL ans = 1,sum = 0;
+	rep(i,0,n)
+	{
+		LL a;
+		scanf("%I64d", &a);
+		sum += a;
+		ans = ans*cal(sum-1,a-1)%MOD;
+	}
+	printf("%I64d\n", ans);
+	return 0;
+}

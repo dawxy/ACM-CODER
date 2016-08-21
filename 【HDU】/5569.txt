@@ -1,0 +1,78 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, MAXIN = 10000;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+    if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+    ans = 0;
+    T f = 1;
+    if(ps == pe) return false;
+    do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+    if(ps == pe) return false;
+    do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+    ans *= f;
+    return true;
+}
+int a[MAXN][MAXN],dp[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int n,m;
+    while(in(n))
+    {
+        in(m);
+        int mx = 0;
+        repe(i,1,n)
+        {
+            repe(j,1,m) in(a[i][j]),mx = max(mx,a[i][j]);
+        }
+        clc(dp,0);
+        repe(i,1,n)
+        {
+            repe(j,1,m)
+            {
+                if(i == 1 && j == 1) continue;
+                int cnt = (i-1)+(j-1)+1;
+                if(cnt&1)
+                {
+                    dp[i][j] = INF;
+                    if(i-1 > 0) dp[i][j] = min(dp[i][j], dp[i-1][j]);
+                    if(j-1 > 0) dp[i][j] = min(dp[i][j], dp[i][j-1]);
+                    //dp[i][j] = min(dp[i-1][j],dp[i][j-1]);
+                }
+                else
+                {
+                    dp[i][j] = INF;
+                    if(i-1 > 0) dp[i][j] = min(dp[i][j],dp[i-1][j]+a[i-1][j]*a[i][j]);
+                    if(j-1 > 0) dp[i][j] = min(dp[i][j], dp[i][j-1]+a[i][j-1]*a[i][j]);
+                    //dp[i][j] = min(dp[i-1][j]+a[i-1][j]*a[i][j], dp[i][j-1]+a[i][j-1]*a[i][j]);
+                }
+            }
+        }
+        printf("%d\n", dp[n][m]);
+    }
+    return 0;
+}

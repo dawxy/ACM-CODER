@@ -1,0 +1,68 @@
+/*
+dp[i][j]表示以i为根的子树派j个人能获得的最大的价值
+转移方程：
+dp[root][j] = max{dp[root][k] + dp[g[root].s[i]][j - k]};
+*/
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+int w[MAXN], v[MAXN], dp[MAXN][MAXN];
+struct NODE{
+	int len, s[MAXN];
+}g[MAXN];
+
+void dfs(int root, int fa, int sum)
+{
+	int a = w[root] / 20 + (w[root] % 20 ? 1 : 0);//计算当前占领当前节点需要多少几个人
+	if (a <= sum)
+	{
+		for (int i = a; i <= sum; i++)//赋给当前节点占领后最少人数到当前可以用的sum人之间的初始价值v[root]
+			dp[root][i] = v[root];
+	}
+	else//当前人数不够占领这个节点，直接退出
+		return;
+	for (int i = 0; i < g[root].len; i++)
+	{
+		if (fa == g[root].s[i]) continue;
+		dfs(g[root].s[i], root, sum - a);
+		for (int j = sum; j >= a; j--)//寻找root节点有j个人人时最大能获得多少价值
+		{
+			for (int k = a; k < j; k++)//分配给root节点j个人，给当前儿子节点j-k个人，寻找最大值
+				dp[root][j] = max(dp[root][j], dp[root][k] + dp[g[root].s[i]][j - k]);
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, m;
+	while (~scanf("%d %d%*c", &n, &m))
+	{
+		if (-1 == n && -1 == m)
+			break;
+		int a, b;
+		for (int i = 1; i <= n; i++)
+			g[i].len = 0;
+		memset(dp, 0, sizeof(dp));
+		for (int i = 1; i <= n; i++)
+			scanf("%d %d%*c", &w[i], &v[i]);
+		for (int i = 1; i < n; i++)
+		{
+			scanf("%d %d%*c", &a, &b);
+			g[a].s[g[a].len++] = b;
+			g[b].s[g[b].len++] = a;
+		}
+		if (!m)
+		{
+			puts("0");
+			continue;
+		}
+		dfs(1, -1, m);
+		printf("%d\n", dp[1][m]);
+	}
+	return 0;
+}

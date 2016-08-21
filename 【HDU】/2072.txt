@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <string.h>
+#include <string>
+#include <map>
+using namespace std;
+map <string,bool> vis;
+char ch[200];
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	char a[100];
+	while(1)
+	{
+		gets(ch);
+		if ('#' == ch[0])
+			break;
+		vis.clear();
+		int len = strlen(ch), ans = 0;
+		char *buf = ch;
+		while(EOF != sscanf (buf, "%s", a))
+		{
+			if (vis.end() == vis.find(string(a)))
+			{
+				vis[string(a)];
+				ans++;
+			}
+			buf = strstr(buf, a)+strlen(a);
+		}
+		printf ("%d\n", ans);
+	}
+	return 0;
+}

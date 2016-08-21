@@ -1,0 +1,73 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+struct NODE{
+	NODE* ch[26];
+	int sum;
+	NODE(){
+		sum = 0;
+		clc(ch,0);
+	}
+};
+
+void insert(NODE *rt, char *s)//²åÈës
+{
+	int n = strlen(s);
+	rep(i,0,n)
+	{
+		int c = s[i]-'a';
+		if(!rt->ch[c])
+			rt->ch[c] = new NODE();
+		rt = rt->ch[c];
+		rt->sum++;
+	}
+}
+int query(NODE *rt, char *s)
+{
+	int n = strlen(s);
+	rep(i,0,n)
+	{
+		int c = s[i]-'a';
+		if(!rt->ch[c]) return 0;
+		rt = rt->ch[c];
+	}
+	return rt->sum;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	char s[20];
+	scanf("%d%*c", &n);
+	NODE *rt = new NODE();
+	rep(i,0,n)
+	{
+		scanf("%s", s);
+		insert(rt,s);
+	}
+	int m;
+	scanf("%d%*c", &m);
+	rep(i,0,m)
+	{
+		scanf("%s", s);
+		printf("%d\n", query(rt,s));
+	}
+	return 0;
+}

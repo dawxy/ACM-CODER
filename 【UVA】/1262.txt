@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <cstring>
+char map[2][6][5], p[5][26];
+bool vis[2][26];
+int sum[5], c[5];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		memset(sum,0,sizeof(sum));
+		for(int k = 0; k < 2; k++)
+		{
+			for(int i = 0; i < 6; i++)
+			{
+				for(int j = 0; j < 5; j++)
+					map[k][i][j] = getchar();
+				getchar();
+			}
+		}
+		for(int j = 0; j < 5; j++)
+		{
+			memset(vis,0,sizeof(vis));
+			for(int k = 0; k < 2; k++)
+			{
+				for(int i = 0; i < 6; i++)
+					vis[k][map[k][i][j]-'A'] = true;
+			}
+			for(int i = 0; i < 26; i++)
+			{
+				if(vis[0][i] && vis[1][i])
+					p[j][sum[j]++] = i+'A';
+			}
+		}
+		c[4] = sum[4];
+		for(int i = 3; i >= 0; i--)
+			c[i] = c[i+1]*sum[i];
+		if(n > c[0])
+		{
+			puts("NO");
+			continue;
+		}
+		for(int i = 0; i < 4; i++)
+		{
+			for(int j = 0; j < sum[i]; j++)
+			{
+				if(c[i+1]*(j+1) >= n)
+				{
+					n -= c[i+1]*j;
+					putchar(p[i][j]);
+					break;
+				}
+			}
+		}
+		putchar(p[4][n-1]);
+		putchar('\n');
+	}
+	return 0;
+}

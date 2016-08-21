@@ -1,0 +1,84 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define lc u<<1
+#define rc u<<1|1
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+struct NODE{
+	int x,y,mx,mi;
+}node[MAXN<<2];
+int a[MAXN];
+
+void push_up(int u)
+{
+	node[u].mi = min(node[lc].mi, node[rc].mi);
+	node[u].mx = max(node[lc].mx, node[rc].mx);
+}
+void bulid(int u, int x, int y)
+{
+	node[u].x = x, node[u].y = y;
+	if(x == y)
+	{
+		node[u].mx = node[u].mi = a[x];
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(lc,x,m);
+	bulid(rc,m+1,y);
+	push_up(u);
+}
+int ql, qr, ansmi, ansmx;
+void query(int u)
+{
+	int x = node[u].x, y = node[u].y;
+	if(ql <= x && y <= qr)
+	{
+		ansmi = min(ansmi,node[u].mi);
+		ansmx = max(ansmx,node[u].mx);
+		return;
+	}
+	int m = (x+y)>>1;
+	if(ql <= m) query(lc);
+	if(qr > m) query(rc);
+}
+int in()
+{
+	int ans,ch;
+	while((ch = getchar()) < '0' || ch > '9');
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && ch <= '9') ans = (ans<<3)+(ans<<1)+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,q;
+	scanf("%d %d%*c", &n, &q);
+	repe(i,1,n) a[i] = in();
+	bulid(1,1,n);
+	rep(i,0,q)
+	{
+		ql = in(), qr = in();
+		if(ql > qr) swap(ql,qr);
+		ansmi = INF, ansmx = -INF;
+		query(1);
+		printf("%d\n", ansmx-ansmi);
+	}
+	return 0;
+}

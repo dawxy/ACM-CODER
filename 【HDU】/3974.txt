@@ -1,0 +1,142 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 50010
+#define lc u<<1
+#define rc u<<1|1
+struct Edge{
+    int next, v;
+    Edge(int a = 0, int b = 0){next = a, v = b;}
+}edge[MAXN];
+struct NODE{
+    int x,y,setv;//setv-lazy标记,在叶子时为值
+}node[MAXN<<3];
+int head[MAXN], tol, in[MAXN], st[MAXN], ed[MAXN], cnt;
+//a[]dfs序列,st[i]员工i在a[]的开始位置，ed为结束位置
+
+void add_edge(int u, int v)
+{
+    edge[tol] = Edge(head[u], v);
+    head[u] = tol++;
+}
+void dfs(int u)//编号
+{
+    st[u] = cnt++;
+    for(int i = head[u]; ~i; i = edge[i].next)
+    {
+        int v = edge[i].v;
+        dfs(v);
+    }
+    ed[u] = cnt++;
+}
+void bulid(int u, int x, int y)
+{
+    node[u].x = x, node[u].y = y;
+    node[u].setv = -1;
+    if(x == y) return;
+    int m = (x+y)>>1;
+    bulid(lc,x,m);
+    bulid(rc,m+1,y);
+}
+inline void push_down(int u)
+{
+    if(~node[u].setv)
+    {
+        node[lc].setv = node[rc].setv = node[u].setv;
+        node[u].setv = -1;
+    }
+}
+int ql,qr,s;//[ql,qr]都修改为s
+void update(int u)//区间更新
+{
+    int x = node[u].x, y = node[u].y;
+    if(ql <= x && y <= qr)
+    {
+        node[u].setv = s;
+        return;
+    }
+    push_down(u);
+    int m = (x+y)>>1;
+    if(ql <= m) update(lc);
+    if(qr > m) update(rc);
+}
+int p;//p是a[i]中的下标
+int query(int u)//点值查询
+{
+    int x = node[u].x, y = node[u].y;
+    if(x == y) return node[u].setv;
+    push_down(u);
+    int m = (x+y)>>1;
+    if(p <= m) return query(lc);
+    return query(rc);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t, count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n;
+        scanf("%d%*c", &n);
+        clc(head,-1);
+        clc(in,0);
+        tol = 0;
+        int u,v;
+        rep(i,1,n)
+        {
+            scanf("%d %d%*c", &u, &v);
+            add_edge(v,u);
+            in[u]++;
+        }
+        int rt;
+        repe(i,1,n)
+        {
+            if(!in[i])
+            {
+                rt = i;
+                break;
+            }
+        }
+        cnt = 1;
+        dfs(rt);
+        bulid(1,1,n<<1);
+        int q;
+        scanf("%d%*c", &q);
+        char str[10];
+        printf("Case #%d:\n", ++count);
+        rep(i,0,q)
+        {
+            scanf("%s", &str);
+            if('T' == str[0])
+            {
+                scanf("%d %d%*c", &p, &s);
+                ql = st[p], qr = ed[p];
+                update(1);
+            }
+            else
+            {
+                scanf("%d%*c", &p);
+                p = st[p];
+                printf("%d\n", query(1));
+            }
+        }
+    }
+    return 0;
+}

@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10;
+const double PI = acos(-1.0);
+int n,k;
+double sum, v[MAXN];
+
+bool ok(double x)
+{
+	int cnt = 0;
+	rep(i,0,n)
+		cnt += (int)(v[i]/x);
+	return cnt >= k+1;
+}
+double find()
+{
+	double x = 0, y = sum,m;
+	while(x < y && fabs(x-y) > 1e-6)
+	{
+		m = (x+y)/2;
+		if(ok(m)) x = m;
+		else y = m;
+	}
+	return x;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d %d%*c", &n, &k);
+		sum = 0;
+		int r;
+		rep(i,0,n)
+		{
+			scanf("%d%*c", &r);
+			v[i] = PI*r*r;
+			sum += v[i];
+		}
+		printf("%.4lf\n", find());
+	}
+	return 0;
+}

@@ -1,0 +1,18 @@
+#include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    puts ("# Cards  Overhang");
+    int n;
+    while(~scanf ("%d%*c", &n))
+	{
+        double ans = 0;
+        for (int i = 1; i <= n; i++)
+            ans += 1.0/(i*2.0);
+        printf ("%5.d%10.3lf\n", n, ans);
+	}
+    return 0;
+}

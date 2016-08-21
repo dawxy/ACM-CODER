@@ -1,0 +1,86 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define MAXT 510
+struct NODE{
+	int s, w;
+	NODE(int a, int b)
+	{
+		s = a;
+		w = b;
+	}
+};
+vector<NODE> g[MAXN];
+int dp[MAXN][MAXT], v[MAXN], time, t;
+bool is[MAXN];//记录在1~n上的路径
+
+void creat(int r, int fa)//重建树，把1~n上的路径全部放在其父亲节点的最右边，为了后面的DP
+{
+	int len = g[r].size(), ni = -1;
+	for (int i = 0; i < len; i++)
+	{
+		int s = g[r][i].s;
+		if (s == fa) continue;
+		creat(s, r);
+		if (is[s])
+			ni = i, time += g[r][i].w;
+	}
+	if (-1 != ni)
+		swap(g[r][ni],g[r][len-1]), is[r] = true;
+}
+void dfs(int r, int fa,int w)
+{
+	int len = g[r].size();
+	for (int i = w; i <= t; i++)
+		if(dp[fa][i-w] != -1)
+			dp[r][i] = dp[fa][i - w] + v[r];
+	for (int i = 0; i < len; i++)
+	{
+		int s = g[r][i].s;
+		if (s == fa) continue;
+		dfs(s,r,g[r][i].w);
+	}
+	if (-1 == fa) return;
+	for (int i = w; i <= t; i++)
+		dp[fa][i] = max(dp[fa][i], dp[r][i-w]);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int	n;
+	while (~scanf("%d %d%*c", &n, &t))
+	{
+		int a, b, w;
+		for (int i = 1; i <= n; i++)
+			g[i].clear();
+		memset(is,0,sizeof(is));
+		time = 0;
+		for (int i = 1; i < n; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b, &w);
+			g[a].push_back(NODE(b,w));
+			g[b].push_back(NODE(a,w));
+		}
+		for (int i = 1; i <= n; i++)
+			scanf("%d%*c", &v[i]);
+		is[n] = true;
+		creat(1, -1);
+		if (time > t)
+		{
+			puts("Human beings die in pursuit of wealth, and birds die in pursuit of food!");
+			continue;
+		}
+		memset(dp, -1, sizeof(dp));
+		dp[1][0] = 0;
+		for (int i = 0; i <= t; i++)
+			dp[1][i] = v[1];
+		dfs(1,-1,1000);
+		printf("%d\n", dp[n][t]);
+	}
+	return 0;
+}

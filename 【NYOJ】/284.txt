@@ -1,0 +1,71 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 310
+struct NODE{
+	int dis, x,y;
+	NODE(int a, int b, int c){dis = a, x = b, y = c;}
+	bool operator<(const NODE&t) const{return dis > t.dis;}
+};
+const int d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+char a[MAXN][MAXN];
+int si, sj, ei, ej, n,m;
+bool vis[MAXN][MAXN];
+
+int bfs()
+{
+	clc(vis,0);
+	priority_queue<NODE> q;
+	q.push(NODE(0,si,sj));
+	vis[si][sj] = true;
+	while(!q.empty())
+	{
+		NODE buf = q.top();q.pop();
+		if(buf.x == ei && buf.y == ej) return buf.dis;
+		rep(i,0,4)
+		{
+			int ni = buf.x+d[i][0], nj = buf.y+d[i][1];
+			if(0 <= ni && n > ni && 0 <= nj && m > nj && 'R' != a[ni][nj] && 'S' != a[ni][nj] && !vis[ni][nj])
+			{
+				if('B' == a[ni][nj])
+					q.push(NODE(buf.dis+2,ni,nj));
+				else q.push(NODE(buf.dis+1, ni,nj));
+				vis[ni][nj] = true;
+			}
+		}
+	}
+	return -1;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		rep(i,0,n)
+		{
+			rep(j,0,m)
+			{
+				a[i][j] = getchar();
+				if('Y' == a[i][j]) si = i, sj = j;
+				else if('T' == a[i][j]) ei = i, ej = j;
+			}
+			getchar();
+		}
+		printf("%d\n", bfs());
+	}
+	return 0;
+}

@@ -1,0 +1,45 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 210
+int a[MAXN], dp[MAXN][MAXN];
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        int n, ans = 1;
+        scanf ("%d%*c", &n);
+        for (int i = 1; i <= n; i++)
+            scanf ("%d%*c", &a[i]);
+        for (int i = 1; i <= n; i++)
+        {
+            int maxn = 0;
+            for (int j = n; j >= i; j--)
+            {
+                if (a[i] == a[j])
+                {
+                    dp[i][j] = maxn+1;
+                    if (i == j)
+                        ans = max(ans, dp[i][j]*2-1);
+                    else
+                        ans = max(ans, dp[i][j]*2);
+                }
+                else
+                {
+                    dp[i][j] = dp[i-1][j];
+                    if (a[i] > a[j])
+                        maxn = max(maxn,dp[i-1][j]);
+                }
+            }
+        }
+        printf ("%d\n", ans);
+    }
+    return 0;
+}

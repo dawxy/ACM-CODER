@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+int num[4],id[4],rk[4];
+
+bool cmp(int a, int b)
+{
+    return num[a] > num[b];
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n;
+        scanf("%d%*c", &n);
+        repe(i,1,n)
+        {
+            int a,b,c;
+            scanf("%d %d %d%*c", &a,&b,&c);
+            num[i] = max(a,max(b,c));
+            id[i] = i;
+        }
+        sort(id+1,id+1+n,cmp);
+        repe(i,1,n) rk[id[i]] = i;
+        printf("%d",rk[1]);
+        repe(i,2,n) printf(" %d",rk[i]);
+        putchar('\n');
+    }
+    return 0;
+}

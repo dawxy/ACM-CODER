@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <stdlib.h>
+bool ans;
+
+int solved();
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		ans = true;
+		getchar();
+		int sum = solved();
+		if (ans)
+			puts("YES");
+		else
+			puts("NO");
+		if (0 != t)
+			printf ("\n");
+	}
+
+	return 0;
+}
+
+int solved()
+{
+	int wl, dl, wr, dr;
+	scanf ("%d %d %d %d%*c", &wl, &dl, &wr, &dr);
+	if (0 == wl)
+		wl = solved();
+	if (0 == wr)
+		wr = solved();
+	if (wr*dr != wl*dl)
+		ans = false;
+	return wl+wr;
+}

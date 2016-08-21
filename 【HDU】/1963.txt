@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 45000
+int dp[MAXN], v[15], w[15];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int c, y, n;
+		scanf ("%d %d%*c%d%*c", &c, &y, &n);
+                for (int i = 0; i < n; i++)
+		{
+			scanf ("%d %d%*c", &v[i], &w[i]);
+                        v[i] /= 1000;
+		}
+                for (int i = 0; i < y; i++)
+		{
+			int s = c/1000;
+			memset(dp,0,sizeof(s));
+                        for (int j = 0; j < n; j++)
+                                for (int k = v[j]; k <= s; k++)
+                                        dp[k] = max(dp[k],dp[k-v[j]]+w[j]);
+                        c += dp[s];
+		}
+                printf ("%d\n", c);
+	}
+        return 0;
+}

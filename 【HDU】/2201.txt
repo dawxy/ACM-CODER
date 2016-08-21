@@ -1,0 +1,14 @@
+#include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n, m;
+    while(~scanf ("%d %d%*c", &n, &m))
+	{
+        printf ("%.2lf\n", 1.0/n);
+	}
+    return 0;
+}

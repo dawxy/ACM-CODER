@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+struct NODE{
+	int v, w;
+}p[20];
+
+bool cmp(NODE a, NODE b)
+{
+	return a.v > b.v;
+}
+int min(int a, int b)
+{
+	if (a > b)
+		return b;
+	return a;
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int s, m, ans = 0;
+		scanf ("%d %d%*c", &s, &m);
+		for (int i = 0; i < s; i++)
+			scanf ("%d %d%*c", &p[i].v, &p[i].w);
+		sort(p, p+s,cmp);
+		for (int i = 0; i < s && m; i++)
+		{
+			int s = min(m,p[i].w);
+			ans += s*p[i].v;
+			m -= s;
+		}
+		printf ("%d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 10010
+#define MAXM 100010
+struct Edge{
+	int u,v,cost;
+	bool operator<(const Edge& t) const{return cost > t.cost;}
+}edge[MAXM];
+int n,m,f[MAXN], roop[MAXN];
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int sloved()
+{
+	int ans = 0, cnt = n;
+	rep(i,0,n) f[i] = i;
+	clc(roop,0);
+	rep(i,0,m)
+	{
+		int x = find(edge[i].u), y = find(edge[i].v);
+		if(x != y)
+		{
+			if(roop[x]+roop[y]>1) continue;
+			if(roop[x] || roop[y]) roop[x] = roop[y] = 1;
+			ans += edge[i].cost;
+			f[x] = y;
+			cnt--;
+		}
+		else if(!roop[x])
+		{
+			ans += edge[i].cost;
+			roop[x] = 1;
+			f[x] = y;
+			cnt--;
+		}
+		if(!cnt) break;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		rep(i,0,m)
+			scanf("%d %d %d%*c", &edge[i].u, &edge[i].v, &edge[i].cost);
+		sort(edge,edge+m);
+		printf("%d\n", sloved());
+	}
+	return 0;
+}

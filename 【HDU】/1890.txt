@@ -1,0 +1,151 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+
+/* 从下往上伸展的splay */
+struct NODE{
+	NODE *ch[2],*fa;
+	int sz;//当前子树有多少个结点
+	int v;
+	bool f;//lazy标记
+	int chd(){//当前结点是左儿子还是右儿子,返回0-左儿子,1-右儿子
+		return this == fa->ch[1];
+	}
+	void push_up(){
+		sz = ch[0]->sz+ch[1]->sz+1;
+	}
+	void push_down(){
+		if(f){
+			f = false;
+			swap(ch[0],ch[1]);
+			ch[0]->f ^= 1;
+			ch[1]->f ^= 1;
+		}
+	}
+};
+NODE *null = new NODE();
+NODE* &rt = null->ch[1];
+inline void setch(NODE *fa, NODE *u, int p){//重置关联的儿子和父亲,p=0表示u是fa的左儿子1是右儿子
+	fa->ch[p] = u, u->fa = fa;
+}
+void rot(NODE *u)//旋转
+{
+	NODE *y = u->fa;
+	int d = u->chd();//决定是左旋还是右旋d=0左儿子对应右旋,d=1右儿子对应左旋
+	setch(y->fa,u,y->chd());//把y的父亲(就是u父亲的父亲)的y儿子变为u =====把u放到当前根
+	setch(y,u->ch[d^1],d);//把u的对应儿子放到u所在位置(此时变成两颗树了 y成另外一颗树的根)
+	setch(u,y,d^1);//把y放到u的对应儿子
+	y->push_up(),u->push_up();//先更新y再更新u(y在u下面了)
+}
+void dfs(NODE *x)//先把根到x所用到的所有的标记下放
+{
+	if(null == x) return;
+	dfs(x->fa);
+	x->push_down();//保证从上往下push_down
+}
+void splay(NODE *x, NODE *rt)//把x节点伸展到rt下方(即rt的儿子),从下往上伸展
+{
+	dfs(x);
+	while(x->fa != rt)
+	{
+		NODE *y = x->fa;
+		int d = x->chd();
+		if(x->fa->fa != rt && d == y->chd()) rot(y);
+		rot(x);
+	}
+}
+void del(NODE *x)//删除结点x 
+{
+	NODE *u = x->ch[0], *v = x->ch[1];
+	if(null == u) setch(null,v,1);//如果没有左儿子就把右儿子设为根
+	else if(null == v) setch(null,u,1);//没有左儿子就把左儿子设为根,左右都没的话就变成空树了
+	else
+	{
+		//左右儿子都存在时分别找出x左边和x右边的结点
+		u->push_down(), v->push_down();
+		while(u->ch[1] != null){u = u->ch[1], u->push_down();}
+		while(v->ch[0] != null){v = v->ch[0], v->push_down();}
+		//把x左边的u伸展到根，把x右边的v伸展到u下面
+		splay(u,null), splay(v,u);
+		v->ch[0] = null;
+	}
+}
+struct SplayTree{
+	NODE node[MAXN];
+	void bulid(NODE* &u, int x, int y, NODE *fa)
+	{
+		if(x>y)
+		{
+			u = null;
+			return;
+		}
+		int m = (x+y)>>1;
+		u = &node[m];
+		u->fa = fa;
+		u->f = 0;
+		u->v = m;
+		bulid(u->ch[0],x,m-1,u);
+		bulid(u->ch[1],m+1,y,u);
+		u->push_up();
+	}
+	void init(int sz)
+	{
+		null->sz = 0;
+		null->ch[0] = null->ch[1] = null->fa = null;
+		bulid(rt,1,sz,null);
+	}
+}s;
+void pt(NODE *u)
+{
+	if(null == u) return;
+	pt(u->ch[0]);
+	printf("%d\n", u->v);
+	pt(u->ch[1]);
+}
+typedef pair<int,int> P;
+P a[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		repe(i,1,n)
+		{
+			scanf("%d%*c", &a[i].first);
+			a[i].second = i;
+		}
+		s.init(n);
+		sort(a+1,a+n+1);
+		repe(i,1,n)
+		{
+			//把因为node[]的下标和a[]下标是一样的，所以根据排序后的编号可以直接伸展上来
+			NODE *x = &s.node[a[i].second];
+			splay(x,null);//把x伸展到根
+			x->ch[0]->f ^= 1;
+			printf("%d", rt->ch[0]->sz+1+i-1);
+			if(i == n) putchar('\n');
+			else putchar(' ');
+			del(x);
+		}
+	}
+	return 0;
+}

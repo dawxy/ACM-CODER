@@ -1,0 +1,60 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 50000+10, MOD = 998244353;
+int ch[35*MAXN][2], sum[35*MAXN], cnt, ans;
+int newnode()
+{
+	ch[cnt][0] = ch[cnt][1] = -1;
+	sum[cnt++] = 0;
+	return cnt-1;
+}
+void insert(int u, int v)
+{
+	rep(i,0,29)
+	{
+		int p = (bool)(v&(1<<i));
+		if(~ch[u][p^1])
+			ans = (ans+(LL)(1<<(i+1))*sum[ch[u][p^1]]%MOD)%MOD;
+		if(-1 == ch[u][p]) ch[u][p] = newnode();
+		sum[u]++;
+		u = ch[u][p];
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		cnt = ans = 0;
+		int root = newnode();
+		rep(i,0,n)
+		{
+			int a;
+			scanf("%d", &a);
+			insert(root,a);
+		}
+		printf("Case #%d: %d\n", ++count,ans);
+	}
+	return 0;
+}

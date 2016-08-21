@@ -1,0 +1,22 @@
+import java.util.*;
+import java.math.BigInteger;
+public class Main
+{
+	public static void main(String args[])
+	{
+		Scanner in = new Scanner(System.in);
+		int t, count;
+		t = in.nextInt();
+		String buf;
+		for(count = 1; count <= t; count++)
+		{
+			buf = in.next();
+			BigInteger a = new BigInteger(buf,2);
+			buf = in.next();
+			BigInteger b = new BigInteger(buf,2);
+			a = a.gcd(b);
+			System.out.printf("Case #%d: ",count);
+			System.out.println(a.toString(2));
+		}
+	}
+}

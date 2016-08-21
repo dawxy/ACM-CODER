@@ -1,0 +1,63 @@
+#include <stdio.h>
+int n, m, ans[35];
+bool finded;
+
+void dfs(int);
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t, count = 0;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		scanf ("%d %d%*c", &n, &m);
+		finded = false;
+		for (int i = 1; i <= 9; i++)
+		{
+			ans[0] = i;
+			dfs(1);
+			if (finded)
+				break;
+		}
+		printf ("Case %d: ", ++count);
+		if (finded)
+		{
+			for (int i = 0; i < m; i++)
+				printf ("%d",ans[i]);
+			printf ("\n");
+		}
+		else
+			printf ("-1\n");
+	}
+	return 0;
+}
+
+int mod(int n)
+{
+	int sum = 0;
+	for (int i = 0; i < n; i++)
+		sum = (sum*10+ans[i])%n;
+	return sum;
+}
+void dfs(int p)
+{
+	if (p == m)
+	{
+		finded = true;
+		return;
+	}
+	if (finded)
+		return;
+	for (int i = 0; i <= 9 && !finded; i++)
+	{
+		ans[p] = i;
+		if (n-1 > p || (p >= n-1 && !mod(p+1)))
+		{
+			dfs(p+1);
+			if (finded)
+				return;
+		}
+	}
+}

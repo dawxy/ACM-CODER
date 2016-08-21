@@ -1,0 +1,87 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <string>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 810
+struct Edge{
+	int next,to;
+	double cost;
+	Edge(int a = 0,int b = 0, double c = 0){next = a, to = b, cost = c;}
+}edge[MAXN*MAXN];
+int head[MAXN], cnt[MAXN], tol, n, m;
+double dis[MAXN];
+bool inq[MAXN];
+
+void add_edge(int from, int to, double cost)
+{
+	edge[tol] = Edge(head[from],to,cost);
+	head[from] = tol++;
+}
+bool spfa(int s)
+{
+	queue<int> q;
+	int nn = 2*(n+2*m), cnt = 0;
+	rep(i,0,n+m) dis[i] = INF;
+	clc(inq,0);
+	inq[s] = true;
+	dis[s] = 0;
+	q.push(s);
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		inq[u] = false;
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].to;
+			double cost = edge[i].cost;
+			if(dis[u] < INF && dis[v] > dis[u]+cost)
+			{
+				dis[v] = dis[u]+cost;
+				if(!inq[v])
+				{
+					inq[v] = true;
+					q.push(v);
+					if(++cnt > nn) return false;
+				}
+			}
+		}
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	double l,u;
+	while(~scanf("%d %d %lf %lf%*c", &n, &m, &l, &u))
+	{
+		int a;
+		tol = 0;
+		clc(head,-1);
+		rep(i,0,n)
+		{
+			rep(j,0,m)
+			{
+				scanf("%d%*c", &a);
+				add_edge(i,j+n,-log(l/a));
+				add_edge(j+n,i,log(u/a));
+			}
+		}
+		if(spfa(0)) puts("YES");
+		else puts("NO");
+	}
+	return 0;
+}

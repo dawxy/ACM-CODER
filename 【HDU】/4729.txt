@@ -1,0 +1,177 @@
+#pragma comment(linker, "/STACK:1024000000,1024000000")
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXM = MAXN*2, MAXV = 100000*30;
+char buf[MAXN*5], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+	int ans = 0;
+	do{
+		rnext();
+	}while(!isdigit(*ps) && ps != pe);
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	return ans;
+}
+int head[MAXN], tol,nxt[MAXM],to[MAXM],cost[MAXM];
+int rt[MAXN],c[MAXV],sum[MAXV], lc[MAXV], rc[MAXV],all,mx;
+
+inline void add_edge(int u, int v, int c)
+{
+	nxt[tol] = head[u], to[tol] = v, cost[tol] = c;
+	head[u] = tol++;
+}
+void insert(int &u, int x, int y, int v)
+{
+	c[++all] = c[u]+1,sum[all] = sum[u]+v,lc[all] = lc[u],rc[all] = rc[u];
+	u = all;
+	if(x == y) return;
+	int m = (x+y)>>1;
+	if(v <= m) insert(lc[u],x,m,v);
+	else insert(rc[u],m+1,y,v);
+}
+/*LCA*/
+int d[MAXN<<1], num[MAXN<<1],cnt,ft[MAXN],fa[MAXN];
+void dfs(int u, int dep)
+{
+	d[cnt] = dep,num[cnt] = u;ft[u] = cnt++;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(fa[u] == v) continue;
+		insert(rt[v]=rt[u],0,mx,cost[i]);
+		fa[v] = u;
+		dfs(v,dep+1);
+		d[cnt] = dep, num[cnt++] = u;
+	}
+}
+int mi[MAXN<<2],minum[MAXN<<2];
+inline int id(int x, int y){return x+y|x!=y;}
+void lca_bulid(int x, int y)
+{
+	int u = id(x,y);
+	if(x == y)
+	{
+		mi[u] = d[x];
+		minum[u] = num[x];
+		return;
+	}
+	int m = (x+y)>>1;
+	lca_bulid(x,m);
+	lca_bulid(m+1,y);
+	int l = id(x,m), r = id(m+1,y);
+	if(mi[l] < mi[r]) mi[u] = mi[l],minum[u] = minum[l];
+	else mi[u] = mi[r], minum[u] = minum[r];
+}
+void init(int root)
+{
+	all = cnt = 0;
+	fa[root] = -1;
+	rt[root] = rt[0];
+	dfs(root,0);
+	lca_bulid(0,cnt-1);
+}
+int qid,qmi;
+void lca_q(int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr)
+	{
+		int u = id(x,y);
+		if(qmi > mi[u])
+			qmi = mi[u], qid = minum[u];
+		return;
+	}
+	int m = (x+y)>>1;
+	if(ql <= m) lca_q(x,m,ql,qr);
+	if(qr > m) lca_q(m+1,y,ql,qr);
+}
+int lca_query(int x, int y)
+{
+	x = ft[x], y = ft[y];
+	if(x > y) swap(x,y);
+	qmi = INF;
+	lca_q(0,cnt-1,x,y);
+	return qid;
+}
+int mi_query(int x, int y, int a, int b, int lca)
+{
+	if(x == y) return x;
+	int m = (x+y)>>1;
+	int cnt = c[lc[a]]+c[lc[b]]-2*c[lc[lca]];
+	if(cnt) return mi_query(x,m,lc[a],lc[b],lc[lca]);
+	return mi_query(m+1,y,rc[a],rc[b],rc[lca]);
+}
+int find(int x, int y, int a, int b, int lca, int k, int lcnt, int lsum)
+{
+	if(x == y)
+	{
+		int cnt = c[a]+c[b]-2*c[lca]+lcnt, s = sum[a]+sum[b]-2*sum[lca]+lsum;
+		if(k < cnt*x-s)
+			return x-1+(k-(lcnt*(x-1)-lsum))/lcnt;
+		return x+(k-(cnt*x-s))/cnt;
+	}
+	int m = (x+y)>>1;
+	int cnt = c[lc[a]]+c[lc[b]]-2*c[lc[lca]]+lcnt, s = sum[lc[a]]+sum[lc[b]]-2*sum[lc[lca]]+lsum;
+	if(k < cnt*m-s) return find(x,m,lc[a],lc[b],lc[lca],k,lcnt,lsum);
+	return find(m+1,y,rc[a],rc[b],rc[lca],k,cnt,s);
+}
+int query(int s, int t, int k, int a, int b)
+{
+	int lca = lca_query(s,t);
+	int st = mi_query(0,mx,rt[s],rt[t],rt[lca]);
+	if(a <= b)
+		return st+k/a;
+	int ans = st+((k<a)?0:(1+(k-a)/b));
+	ans = max(ans,find(0,mx,rt[s],rt[t],rt[lca],k/b,0,0));
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t = in(),count = 0;
+	while(t--)
+	{
+		int n = in(),q = in();
+		clc(head,-1);
+		tol = mx = 0;
+		rep(i,1,n)
+		{
+			int u = in(),v = in(),c = in();
+			mx = max(mx,c);
+			add_edge(u,v,c);
+			add_edge(v,u,c);
+		}
+		init(1);
+		printf("Case #%d:\n",++count);
+		while(q--)
+		{
+			int s = in(),t = in(),k = in(),a = in(),b = in();
+			printf("%d\n", query(s,t,k,a,b));
+		}
+	}
+	return 0;
+}

@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+int n, w[30], c;
+
+int min (int a, int b)
+{
+	if (a < b)
+		return a;
+	return b;
+}
+void find_c()
+{
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = i+1; j < n; j++)
+		{
+			if ((c/w[i])%n == (c/w[j])%n)
+			{
+				c = min(((c/w[i])+1)*w[i],((c/w[j])+1)*w[j]);
+				find_c();
+				return;
+			}
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	char ch[300];
+	while(NULL != gets(ch))
+	{
+		int len = strlen(ch);
+		n = 0;
+		memset(w,0,sizeof(w));
+		for (int i = 0; i <= len; i++)
+		{
+			if (' ' == ch[i] || '\0' == ch[i])
+			{
+				n++;
+				while(' ' == ch[i+1])++i;
+			}
+			else
+				w[n] = (w[n]<<5)+ch[i]-'a'+1;
+		}
+		sort(w,w+n);
+		c = w[0];
+		find_c();
+		puts(ch);
+		printf ("%d\n\n", c);
+	}
+	return 0;
+}

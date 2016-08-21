@@ -1,0 +1,28 @@
+#include <cstdio>
+#include <cstring>
+
+int gcd(int a, int b)
+{
+	while(b)
+	{
+		a %= b;
+		if(a < b) a ^= b, b ^= a, a^= b;
+	}
+	return a;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int a,b;
+		scanf("%d %d%*c", &a, &b);
+		if(1 == gcd(a,b)) puts("NO");
+		else puts("YES");
+	}
+	return 0;
+}

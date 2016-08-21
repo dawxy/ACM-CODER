@@ -1,0 +1,20 @@
+#include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int m, n;
+        scanf ("%d %d%*c" ,&m, &n);
+        if (m&1)
+            puts("NO");
+		else
+			puts("YES");
+	}
+    return 0;
+}

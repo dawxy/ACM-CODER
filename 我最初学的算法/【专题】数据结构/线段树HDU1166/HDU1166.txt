@@ -1,0 +1,96 @@
+/*线段树的标号：u（父亲节点）, 2*u(左儿子)，2*u+1（右儿子）
+叶子全是点
+*/
+#include <stdio.h>
+struct node{
+    int l;
+    int r;
+    int sum;
+}t[150010];
+int a[50002];
+
+void create (int, int, int);//创建线段树
+void add_sum (int, int,int);//部分更新（累加）sum
+int query (int, int, int);//查找区间总和
+
+
+int main ()
+{
+    int t, f, e, Case = 0;
+    scanf("%d%*c", &t);
+    char c[7];
+    while (t--)
+    {
+        int n, i;
+        Case ++;
+        printf ("Case %d:\n", Case);
+        scanf("%d%*c", &n);
+        for (i = 1; i <= n; i++)
+        	scanf("%d%*c", &a[i]);
+        create(1, 1, n);
+        while (1)
+        {
+            scanf ("%s%*c", c);
+           	if ('E' == c[0])
+				break;
+            scanf("%d %d%*c", &f, &e);
+            if ('A' == c[0])
+                add_sum(1, f, e);
+            else
+                if ('S' == c[0])
+                    add_sum(1, f, -e);
+                else
+                    if ('Q' == c[0])
+                        printf ("%d\n",query(1, f, e));
+
+        }
+
+
+    }
+
+    return 0;
+}
+
+void create (int u, int l, int r)
+{
+    t[u].l = l;
+    t[u].r = r;
+    if (l == r)//叶子为点
+    {
+        t[u].sum = a[r];
+        return;
+    }
+    int mid = (l+r)/2;
+    create(2*u, l, mid);//左儿子
+    create(2*u+1, mid+1, r);//右儿子
+    t[u].sum = t[2*u].sum + t[2*u+1].sum;//父亲的SUM=左儿子SUM+右儿子SUM
+}
+
+void add_sum (int u, int pos, int val)
+{
+    if (pos == t[u].l && pos == t[u].r)
+    {
+        t[u].sum += val;
+        return;
+    }
+    else
+    {
+        if (pos <= t[2*u].r)
+            add_sum (2*u, pos, val);
+        else
+            add_sum (2*u+1, pos, val);
+        t[u].sum = t[2*u].sum + t[2*u+1].sum;
+    }
+}
+
+int query (int u, int from, int to)
+{
+    if (from == t[u].l && to == t[u].r)
+        return t[u].sum;
+    if (to <= t[2*u].r)
+        return query (2*u, from, to);
+	if (from >= t[2*u+1].l)
+		return query (2*u+1, from, to);
+	else
+		return query (2*u, from, t[2*u].r)+query(2*u+1, t[2*u+1].l, to);
+}

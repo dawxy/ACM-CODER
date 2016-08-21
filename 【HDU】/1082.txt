@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <string.h>
+#include <stack>
+using namespace std;
+struct p{
+	int i, j;
+}j[26];
+
+int main ()
+{
+	char c, txt[1000];
+	int n, ans;
+	scanf ("%d%*c", &n);
+	while(n--)
+	{
+		c = getchar();
+		scanf ("%*c%d %d%*c", &j[c-'A'].i, &j[c-'A'].j);
+	}
+	while(gets(txt))
+	{
+		stack<p> s;
+		ans = 0;
+		int len = strlen(txt), i;
+		p buf;
+		
+		for(i = 0; i < len; i++)
+		{
+			if ('(' == txt[i])continue;
+			if(txt[i] == ')')
+			{
+				buf = s.top(), s.pop();
+				if (s.top().j != buf.i)
+				{
+					printf ("error\n");
+					goto there;
+				}
+				ans += s.top().i*buf.i*buf.j;
+				buf.i = s.top().i;
+				s.pop();
+				s.push(buf);
+			}
+			else
+				s.push(j[txt[i]-'A']);
+		}
+		printf ("%d\n", ans);
+there:;
+		while(s.size())
+			s.pop();
+	}
+
+	return 0;
+}

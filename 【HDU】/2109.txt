@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+int a[105],b[105];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n;
+    while(~scanf ("%d%*c", &n) && n)
+	{
+        for (int i = 0; i < n; i++)
+		{
+            scanf ("%d%*c", &a[i]);
+		}
+		for (int i = 0; i < n; i++)
+		{
+            scanf ("%d%*c", &b[i]);
+		}
+        sort(a,a+n);
+        sort(b,b+n);
+        int h = 0, d = 0;
+        for (int i = 0; i < n; i++)
+		{
+			if (a[i] == b[i])
+				h++, d++;
+            else if (a[i] > b[i])
+                h += 2;
+			else
+				d += 2;
+		}
+		printf ("%d vs %d\n", h, d);
+	}
+    return 0;
+}

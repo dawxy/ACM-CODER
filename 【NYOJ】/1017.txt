@@ -1,0 +1,35 @@
+#include <cstdio>
+#include <cstring>
+typedef long long LL;
+#define MAXN 41
+#define MAXM 7
+#define max(a,b) (a>b?a:b)
+LL dp[MAXN][MAXN][MAXM], num[MAXN][MAXN];
+
+LL dfs(int x, int y, int m)
+{
+	LL& ans = dp[x][y][m];
+	if (-1 != ans) return ans;
+	if (!m) return ans = num[x][y];
+	ans = 0;
+	for (int i = x; i < y; i++)
+		ans = max(ans,dfs(x,i,m-1)*num[i+1][y]);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	char s[MAXN];
+	int n,m;
+	scanf("%d %d %s%*c", &n, &m, &s);
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = i; j < n; j++)
+			num[i][j] = num[i][j-1]*10+s[j]-'0';
+	}
+	memset(dp,-1,sizeof(dp));
+	printf("%d\n", dfs(0,n-1,m));
+	return 0;
+}

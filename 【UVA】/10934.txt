@@ -1,0 +1,28 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define LL unsigned long long
+#define MAXN 64
+LL dp[MAXN][MAXN], k;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	for (int i = 1; i <= 63; i++)
+	{
+		for (int j = 1; j <= 63; j++)
+			dp[i][j] = dp[i - 1][j - 1] + 1 + dp[i][j - 1];
+	}
+	while (~scanf("%d %llu", &n, &k) && n)
+	{
+		if (n > 63) n = 63;
+		int ans = lower_bound(dp[n],dp[n]+64,k)-dp[n];
+		if (ans <= 63) printf("%d\n", ans);
+		else puts("More than 63 trials needed.");
+	}
+	return 0;
+}

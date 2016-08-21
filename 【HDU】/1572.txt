@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <string.h>
+int d[30][30], ans, len, g[7];
+bool vis[30], used[30];
+
+void dfs(int p, int u, int sum)
+{
+	if (sum > ans)
+		return;
+	if (p == len)
+	{
+		if (ans > sum)
+			ans = sum;
+		return;
+	}
+	for (int i = 0; i < len; i++)
+	{
+		if (!vis[g[i]])
+		{
+			vis[g[i]] = true;
+			dfs(p+1, g[i], sum+d[u][g[i]]);
+			vis[g[i]] = false;
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(1)
+	{
+		int n ,t;
+		scanf ("%d%*c", &t);
+		if (!t)
+			break;
+		memset(vis,false, sizeof(vis));
+		memset(used,false, sizeof(used));
+		for (int i = 0; i < t; i++)
+		{
+			for (int j = 0; j < t; j++)
+			{
+				scanf ("%d%*c", &d[i][j]);
+			}
+		}
+		scanf ("%d%*c", &n);
+		len = 0;
+		int a;
+		for (int i = 0;  i < n; i++)
+		{
+			scanf ("%d%*c", &a);
+			if (!used[a])
+			{
+				g[len++] = a;
+				used[a] = true;
+			}
+		}
+		ans = 999999;
+		dfs(0, 0, 0);
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

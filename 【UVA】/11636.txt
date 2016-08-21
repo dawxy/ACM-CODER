@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+int n, ans;
+
+void dfs(int num, int sum)
+{
+	if(num > n || sum >= n) return;
+	if(num == n)
+	{
+		ans = min(ans,sum);
+		return;
+	}
+	repe(i,1,num)
+		dfs(num+i,sum+1);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int count = 0;
+	while(~scanf("%d%*c",&n) && n >= 0)
+	{
+		/*ans = INF;
+		dfs(1,0);
+		printf("ans = %d\n", ans);*/
+		int cnt = 0,a = 1;
+		while(a < n)
+		{
+			cnt++;
+			a <<= 1;
+		}
+		printf("Case %d: %d\n", ++count,cnt);
+	}
+	return 0;
+}

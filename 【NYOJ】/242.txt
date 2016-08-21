@@ -1,0 +1,15 @@
+#include <stdio.h>
+#define PI 3.1415926
+
+int main ()
+{
+	double r;
+	while (EOF != scanf ("%lf%*c", &r))
+	{
+		double ans;
+		ans = PI*(4*r*r*r)/3.0;
+		printf ("%d\n", (ans-(int)ans >= 0.50 ? (int)ans+1 : (int)ans));
+	}
+
+	return 0;
+}

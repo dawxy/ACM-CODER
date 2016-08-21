@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <string.h>
+#include <string>
+#include <map>
+using namespace std;
+map <string, int> vis;
+
+int main ()
+{
+	#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+	#endif
+	int n;
+        while(~scanf ("%d%*c", &n) && n)
+	{
+		vis.clear();
+		char a[20], ans[20];
+                for (int i = 0; i < n; i++)
+		{
+			scanf ("%s%*c", a);
+                        vis[a]++;
+		}
+		int maxn = -1;
+                for (map <string, int> :: iterator it = vis.begin(); it != vis.end(); it++)
+		{
+                        if (maxn < it->second)
+                                maxn = it->second, strcpy(ans,it->first.c_str());
+		}
+                printf ("%s\n", ans);
+	}
+        return 0;
+}

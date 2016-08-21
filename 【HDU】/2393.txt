@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t, count = 0;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		int a[3];
+        scanf ("%d %d %d%*c", &a[0], &a[1], &a[2]);
+        sort(a,a+3);
+        printf ("Scenario #%d:\n", ++count);
+        if (a[2]*a[2] == a[0]*a[0]+a[1]*a[1])
+            puts("yes");
+		else
+			puts("no");
+		printf ("\n");
+	}
+    return 0;
+}

@@ -1,0 +1,52 @@
+#include <stdio.h>
+#define MAX 20
+char map[MAX][MAX];
+int fi[4]={-1, 1, 0, 0}, fj[4]={0, 0, -1, 1}, w, h;
+
+void dfs (int *, int ,int);
+
+int main ()
+{
+	while (1)
+	{
+		int i, j, si, sj, sum = 0;
+		scanf ("%d %d%*c", &w, &h);
+		if (0 == w && 0 == h)
+			break;
+		for (i = 0; i < h; i++)
+		{
+			for (j = 0; j < w; j++)
+			{
+				map[i][j] = getchar();
+				if ('@' == map[i][j])
+				{
+					si = i;
+					sj = j;
+				}
+			}
+			getchar();
+		}
+
+		dfs (&sum, si, sj);
+		printf ("%d\n", sum+1);
+
+	}
+
+	return 0;
+}
+
+void dfs (int *sum, int si, int sj)
+{
+	int i, ni, nj;
+	map[si][sj] = '#';
+	for (i = 0; i < 4; i++)
+	{
+		ni = fi[i]+si;
+		nj = fj[i]+sj;
+			if (0 <= ni && h > ni && 0 <= nj && w > nj && '.' == map[ni][nj])
+			{
+				*sum += 1;
+				dfs(sum, ni, nj);
+			}
+	}
+}

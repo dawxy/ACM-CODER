@@ -1,0 +1,104 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1010, f[4][2]={{-1,0},{0,-1},{1,0},{0,1}};//ÉÏ×óÏÂÓÒ
+const int rot[4]={3,0,1,2};
+int h,w, si,sj,ei,ej;
+int ok[MAXN][MAXN];
+bool vis[MAXN][MAXN][4];
+
+inline bool can(int lx, int x, int y, int d)
+{
+	if(d&1)//×óÓÒ×ß
+		return !ok[x*2][1==d?y:y-1];
+	return !ok[x+lx][y];
+}
+bool next_p(int &x, int &y, int &d, bool s)
+{
+	rep(i,0,4)
+	{
+		int nd = (d+rot[i])%4, ni = x+f[nd][0], nj = y+f[nd][1];
+		if((0 <= ni && h > ni && 0 <= nj && w > nj && !vis[ni][nj][nd] && can(x,ni,nj,nd)) || 
+			(ni == -1 && nj == ej && s) || (ni == h && nj == ej && !s))
+		{
+			x = ni, y = nj, d = nd;
+			return true;
+		}
+	}
+	return false;
+}
+bool sloved()
+{
+	int d = 2;
+	int x = si, y = sj, s = 0;
+	clc(vis,0);
+	while(1)
+	{
+		if(x == h && y == ej)
+		{
+			x = ei;
+			y = ej;
+			ei = si;
+			ej = sj;
+			d = 0;
+			s = 1;
+		}
+		if(x == -1 && y == ej) return true;
+		vis[x][y][d] = true;
+		if(!next_p(x,y,d,s)) return false;
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int st,ed;
+		scanf("%d %d %d %d%*c", &h, &w, &st, &ed);
+		rep(i,0,2*h-1)
+		{
+			rep(j,0,w-1+(i&1))
+				scanf("%d%*c", &ok[i][j]);
+		}
+		si = 0, sj = st, ei = h-1, ej = ed;
+		sloved();
+		//sloved(h-1,ed,0,st,0);
+		int cnt = 0;
+		rep(i,0,h)
+		{
+			rep(j,0,w)
+			{
+				rep(k,0,4)
+				{
+					if(vis[i][j][k])
+					{
+						cnt++;
+						break;
+					}
+				}
+			}
+		}
+		if(cnt == h*w) puts("YES");
+		else puts("NO");
+	}
+	return 0;
+}

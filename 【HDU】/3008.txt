@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 105
+#define INF 0x3f3f3f3f
+#define min(a,b) (a<b?a:b)
+int dp[MAXN][MAXN], cost[MAXN], h[MAXN], n, t, q;
+//dp[i][j]表示BOSS剩余生命为i我的能量为j时消耗的最少时间
+
+int dfs(int b_lv, int e, int m_lv)
+{
+	if(e > 100) e = 100;
+	if(b_lv <= 0) return dp[0][e] = 0;
+	int& ans = dp[b_lv][e];
+	if(~ans) return ans;
+	if(m_lv <= 0) return ans = INF;
+	ans = INF;
+	ans = min(ans,dfs(b_lv-1, e+t, m_lv-q)+1);
+	for(int i = 0; i < n; i++)
+	{
+		if(e >= cost[i])
+			ans = min(ans, dfs(b_lv-h[i],e-cost[i]+t,m_lv-q)+1);
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d %d%*c", &n, &t, &q) && n+t+q)
+	{
+		for(int i = 0; i < n; i++)
+			scanf("%d %d%*c", &cost[i], &h[i]);
+		memset(dp,-1,sizeof(dp));
+		int ans = dfs(100,100,100);
+		if(INF == ans) puts("My god");
+		else printf("%d\n", ans);
+	}
+	return 0;
+}

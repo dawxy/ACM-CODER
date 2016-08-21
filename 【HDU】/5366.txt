@@ -1,0 +1,35 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10;
+LL dp[MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    dp[1] = 1, dp[2] = 2,dp[3] = 3;
+    repe(i,3,60) dp[i] = dp[i-1]+dp[i-3]+1;
+    int n;
+    while(~scanf("%d", &n))
+    {
+        printf("%I64d\n", dp[n]);
+    }
+    return 0;
+}

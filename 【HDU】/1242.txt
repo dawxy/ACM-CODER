@@ -1,0 +1,94 @@
+/*
+7 8
+#.#####.
+#.a#x.rx
+#..#x.xx
+..#....#
+#...##..
+.#......
+........
+这个应该输出12
+*/
+#include <stdio.h>
+#include <string.h>
+#include <queue>
+#define MAXN 211
+using namespace std;
+struct NODE{
+	int x, y, dis;
+	friend bool operator<(NODE n1,NODE n2)  
+	{  
+		return n2.dis<n1.dis;  
+	} 
+};
+int h, w, si, sj, ei, ej,lens, d[4][2] = {{1,0},{-1,0},{0,-1},{0,1}};
+char g[MAXN][MAXN];
+
+int bfs();
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(EOF != scanf ("%d %d%*c", &h, &w))
+	{
+		int i, j;
+		lens = 0;
+		for (i = 0; i < h; i++)
+		{
+			for (j = 0; j < w; j++)
+			{
+				g[i][j] = getchar();
+				if ('r' == g[i][j])
+				{
+					si = i;
+					sj = j;
+				}
+				if ('a' == g[i][j])
+					ei = i, ej = j;
+			}
+			getchar();
+		}
+		int ans = bfs();
+		if (-1 != ans)
+			printf ("%d\n", ans);
+		else
+			printf ("Poor ANGEL has to stay in the prison all his life.\n");
+	}
+	return 0;
+}
+
+int bfs()
+{
+	priority_queue<NODE>que;
+	int ni, nj;
+	NODE buf, val;
+	g[si][sj] = '#';
+	buf.x = si;
+	buf.y = sj;
+	buf.dis = 0;
+	que.push(buf);
+	while(!que.empty())
+	{
+		buf = que.top(), que.pop();
+		if (buf.x == ei && buf.y == ej)
+			return buf.dis;
+		for (int i = 0; i < 4; i++)
+		{
+			ni = buf.x+d[i][0];
+			nj = buf.y+d[i][1];
+			if (0 <= ni && h > ni && 0 <= nj && w > nj && '#' != g[ni][nj])
+			{
+				val.x = ni;
+				val.y = nj;
+				if ('x' == g[ni][nj])
+					val.dis = buf.dis+2;
+				else
+					val.dis = buf.dis+1;
+				g[ni][nj] = '#';
+				que.push(val);
+			}
+		}
+	}
+	return -1;
+}

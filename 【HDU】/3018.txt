@@ -1,0 +1,77 @@
+/*
+一个图能最少用几笔画成=有奇数点的连通块的度为奇数的点的数量/2+没有度数为奇数的点的连通块数量
+（还要看孤立点是不是算笔画，这里是不算的）
+*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXM = 400000+10;
+struct Edge{
+	int u,v;
+}edge[MAXM];
+int tol, head[MAXM], next[MAXM], to[MAXM], du[MAXN], sum[MAXN], f[MAXN];
+
+void add_edge(int u, int v)
+{
+	next[tol] = head[u];
+	to[tol] = v;
+	head[u] = tol++;
+}
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		tol = 0;
+		clc(head,-1);
+		clc(du,0);
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &edge[i].u, &edge[i].v);
+			du[edge[i].u]++, du[edge[i].v]++;
+		}
+		clc(sum,0);
+		repe(i,1,n)
+		{
+			f[i] = i;
+			if(du[i]&1) sum[i] = 1;
+		}
+		rep(i,0,m)
+		{
+			int x = find(edge[i].u), y = find(edge[i].v);
+			if(x != y)
+			{
+				f[y] = x;
+				sum[x] += sum[y];
+			}
+		}
+		int ans = 0;
+		repe(i,1,n)
+		{
+			if(find(i) == i && du[i])
+			{
+				if(sum[i]) ans += sum[i]/2;
+				else ans++;
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

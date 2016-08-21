@@ -1,0 +1,119 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, MAXM = 2000000+10;
+struct P{
+	int a,b,c;
+}p[MAXN];
+struct Edge{
+	int u,v,cost;
+	Edge(int a = 0, int b = 0, LL c = 0){
+		u = a, v = b, cost = c;
+	}
+}edge[MAXM];
+int m,x,y,z, pre[MAXN], vis[MAXN],id[MAXN],in[MAXN];
+
+void add_edge(int u, int v, int cost)
+{
+	edge[m++] = Edge(u,v,cost);
+}
+int yinru(int a, int b)
+{
+	int ans = (abs(p[a].a-p[b].a)+abs(p[a].b-p[b].b)+abs(p[a].c-p[b].c))*y;
+	if(p[a].c >= p[b].c) return ans;
+	return ans+z;
+}
+inline int creat(int a)
+{
+	return p[a].c*x;
+}
+int zl_mst(int rt, int n, int m)
+{
+	int ans = 0;
+	while(1)
+	{
+		clc(in,0x3f);
+		rep(i,0,m)
+		{
+			int u = edge[i].u, v = edge[i].v;
+			if(u != v && edge[i].cost < in[v])
+			{
+				in[v] = edge[i].cost;
+				pre[v] = u;
+			}
+		}
+		in[rt] = 0;
+		//rep(i,0,n) if(INF == in[i]) return -1;
+		clc(vis,-1);
+		clc(id,-1);
+		int cnt = 0;
+		rep(i,0,n)
+		{
+			ans += in[i];
+			int v = i;
+			while(vis[v] != i && -1 == id[v] && v != rt)
+			{
+				vis[v] = i;
+				v = pre[v];
+			}
+			if(v != rt && -1 == id[v])
+			{
+				for(int u = pre[v]; u != v; u = pre[u]) id[u] = cnt;
+				id[v] = cnt++;
+			}
+		}
+		if(!cnt) break;
+		rep(i,0,n) if(-1 == id[i]) id[i] = cnt++;
+		rep(i,0,m)
+		{
+			int v = edge[i].v;
+			edge[i].u = id[edge[i].u];
+			edge[i].v = id[edge[i].v];
+			if(edge[i].u != edge[i].v) edge[i].cost -= in[v];
+		}
+		n = cnt;
+		rt = id[rt];
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d %d %d %d%*c", &n, &x, &y, &z) && n+x+y+z)
+	{
+		m = 0;
+		repe(i,1,n) scanf("%d %d %d%*c", &p[i].a, &p[i].b, &p[i].c);
+		repe(i,1,n)
+		{
+			int len;
+			scanf("%d%*c", &len);
+			while(len--)
+			{
+				int v;
+				scanf("%d%*c", &v);
+				add_edge(i,v,yinru(i,v));
+			}
+		}
+		//0为超级源点
+		repe(i,1,n) add_edge(0,i,creat(i));
+		printf("%d\n", zl_mst(0,n+1,m));
+	}
+	return 0;
+}

@@ -1,0 +1,201 @@
+/*
+双向广搜+MAP
+*/
+#include <stdio.h>
+#include <string.h>
+#include <string>//sting类型的头文件
+#include <map>
+#define MAXN 2000000
+#define MAXS 24
+using namespace std;
+struct QUE{
+	int s[MAXS], dis, fa, data;
+}que[MAXN], st;
+const int ed[MAXS] = {0,3,4,3,0,5,6,5,0,1,2,1,0,7,8,7,0,9,10,9,0,1,2,1};
+map <string, int> vis;
+map <string, int> bvis;
+int front = 0, rear = 1;
+bool finded;
+
+int bfs();
+void back_bfs();
+void output(int);
+void boutput(int);
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+	freopen("e:\\out.txt","w",stdout);
+#endif
+	int t, sf, sr;
+	back_bfs();
+	sr = rear+2, sf = sr-1;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		for (int i = 0; i < MAXS; i++)
+			scanf ("%d%*c", &st.s[i]);
+		if (!memcmp(ed,st.s, sizeof(ed)))
+		{
+			printf ("PUZZLE ALREADY SOLVED\n");
+			continue;
+		}
+		front = sf, rear = sr, finded = false;
+		int ans;
+		ans = bfs();
+		if (finded)
+		{
+			output(ans);
+			boutput(ans);
+			printf ("\n");
+		}
+		else
+			printf ("NO SOLUTION WAS FOUND IN 16 STEPS\n");
+	}
+	return 0;
+}
+
+void turn(int *a, int v)
+{
+	int i, buf[MAXS];
+	memcpy(buf,a, sizeof(buf));
+	switch(v)
+	{
+	case 1: 
+		{
+			a[21] = buf[7], a[22] = buf[8], a[23] = buf[9];
+			memcpy(a+2,buf,sizeof(int)*10);
+			a[0] = buf[10], a[1] = buf[11];
+			break;
+		}
+	case 2:
+		{
+			a[9] = buf[23], a[10] = buf[12], a[11] = buf[13];
+			memcpy(a+12,buf+14, sizeof(int)*10);
+			a[22] = buf[12],a[23] = buf[13];
+			break;
+		}
+	case 3:
+		{
+			a[21] = buf[11], a[22] = buf[0], a[23] = buf[1];
+			memcpy(a,buf+2,sizeof(int)*10);
+			a[10] = buf[0],a[11] = buf[1];
+			break;
+		}
+	case 4:
+		{
+			a[9] = buf[19],a[10] = buf[20],a[11] = buf[21];
+			memcpy(a+14,buf+12,sizeof(int)*10);
+			a[12] = buf[22],a[13] = buf[23];
+			break;
+		}
+	}
+}
+string beto_str(int *a)
+{
+	string str;
+	for (int i = 0; i < MAXS;i++)
+		str += a[i]+'0';
+	return str;
+}
+bool try_insert(int *a)
+{
+	string str = beto_str(a);
+	if (vis[str])
+		return false;
+	vis[str] = rear;
+	return true;
+}
+bool back_try_insert(int *a)
+{
+	string str = beto_str(a);
+	if (bvis[str])
+		return false;
+	bvis[str] = rear;
+	return true;
+}
+int bfs()
+{
+	int val[MAXS];
+	vis.clear();
+	st.dis = 0;
+	st.fa = -1;
+	try_insert(st.s);
+	que[rear++] = st;
+	while(1 != rear-front)
+	{
+		if (que[++front].dis > 8)
+			return -1;
+		if (bvis[beto_str(que[front].s)])
+		{
+			finded = true;
+			return front;
+		}
+		for (int i = 1; i <= 4; i++)
+		{
+			memcpy(val,que[front].s, sizeof(val));
+			turn(val,i);
+			if (try_insert(val))
+			{
+				que[rear].data = i;
+				que[rear].dis = que[front].dis+1;
+				que[rear].fa = front;
+				memcpy(que[rear++].s,val,sizeof(val));
+			}
+		}
+	}
+	return -1;
+}
+
+void back_bfs()
+{
+	int val[MAXS];
+	bvis.clear();
+	st.dis = 0;
+	st.fa = -1;
+	memcpy(st.s,ed,sizeof(ed));
+	back_try_insert(st.s);
+	que[rear++] = st;
+	while(1 != rear-front)
+	{
+		if (que[++front].dis > 8)
+			return;
+		for (int i = 1; i <= 4; i++)
+		{
+			memcpy(val,que[front].s, sizeof(val));
+			turn(val,i);
+			if (back_try_insert(val))
+			{
+				if (1 == i)
+					que[rear].data = 3;
+				else if (2 == i)
+					que[rear].data = 4;
+				else if (3 == i)
+					que[rear].data = 1;
+				else
+					que[rear].data = 2;
+				que[rear].dis = que[front].dis+1;
+				que[rear].fa = front;
+				memcpy(que[rear++].s,val,sizeof(val));
+			}
+		}
+	}
+}
+
+void output(int a)
+{
+	if (-1 == que[a].fa)
+		return;
+	output(que[a].fa);
+	printf ("%d",que[a].data);
+}
+void boutput(int a)
+{
+	string str = beto_str(que[a].s);
+	int p = bvis[str];
+	while(-1 != que[p].fa)
+	{
+		printf ("%d",que[p].data);
+		p = que[p].fa;
+	}
+}

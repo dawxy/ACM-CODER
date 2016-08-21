@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+struct NODE{
+	int len, s, w[MAXN], v[MAXN];
+} p[MAXN];
+int dp[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, t;
+	while(~scanf("%d %d%*c", &n, &t))
+	{
+		for(int i = 1; i <= n; i++)
+		{
+			scanf("%d %d%*c", &p[i].len, &p[i].s);
+			for(int j = 0; j < p[i].len; j++)
+				scanf("%d %d%*c", &p[i].w[j], &p[i].v[j]);
+		}
+		memset(dp, -1, sizeof(dp));//初始化为-1保证0类型至少选择一个
+		memset(dp[0], 0, sizeof(dp[0]));
+		for(int i = 1; i <= n; i++)//物品组数
+		{
+			if(0 == p[i].s) //分组背包变形(至少选一个)
+			{
+				for(int j = 0; j < p[i].len; j++)//每组背包内的物品
+				{
+					for(int k = t; k >= p[i].w[j]; k--)//当前背包大小
+					{
+						if(-1 != dp[i][k - p[i].w[j]])
+							dp[i][k] = max(dp[i][k], dp[i][k - p[i].w[j]] + p[i].v[j]);
+							//如果dp[i][k - p[i].w[j]]存在，就相当于第i组已经取过了，在这基础上再选,就是至少一个
+						if(-1 != dp[i - 1][k - p[i].w[j]])
+							dp[i][k] = max(dp[i][k], dp[i - 1][k - p[i].w[j]] + p[i].v[j]);
+							//保证至少选择一个,不然的话这组就全是-1，以后不管怎样都是-1了，就说明达不到要求了,最后就输出-1
+					}
+				}
+			}
+			else if(1 == p[i].s) //分组背包(最多选一个)
+			{
+				memcpy(dp[i],dp[i-1], sizeof(dp[i]));//把上一个状态都复制下来,因为这组可以不选
+				//没有使用滚动数组，这两个循环不需要换顺序
+				for(int j = 0; j < p[i].len; j++)//每组背包内的物品
+				{
+					for(int k = t; k >= p[i].w[j]; k--)//当前背包大小
+					{
+						if(-1 != dp[i - 1][k - p[i].w[j]])
+							dp[i][k] = max(dp[i][k], dp[i - 1][k - p[i].w[j]] + p[i].v[j]);
+					}
+				}
+			}
+			else //01背包(任意选)
+			{
+				memcpy(dp[i],dp[i-1], sizeof(dp[i]));
+				for(int j = 0; j < p[i].len; j++)
+				{
+					for(int k = t; k >= p[i].w[j]; k--)
+					{
+						if(-1 != dp[i - 1][k - p[i].w[j]])
+							dp[i][k] = max(dp[i][k], dp[i][k - p[i].w[j]] + p[i].v[j]);
+							//没用滚动数组的0-1背包如果先把上一个状态都复制过来的话这里第二个是dp[i][k - p[i].w[j]] 是i不是i-1！因为这里的dp[i][]可能是这次循环的
+					}
+				}
+			}
+		}
+		printf("%d\n", dp[n][t]);
+	}
+	return 0;
+}

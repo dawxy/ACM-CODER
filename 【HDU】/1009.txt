@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 1005
+struct NODE{
+	double v, w;
+}p[MAXN];
+
+inline bool cmp(const NODE& a, const NODE& b){ return a.v/a.w > b.v/b.w;}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int m,n;
+	while(scanf("%d %d%*c", &m, &n) && (~m || ~n))
+	{
+		for(int i = 0; i < n; i++)
+			scanf("%lf %lf%*c", &p[i].v, &p[i].w);
+		sort(p,p+n,cmp);
+		double ans = 0;
+		for(int i = 0; i < n && m >= 0; i++)
+		{
+			if(m >= p[i].w)
+				ans += p[i].v, m -= p[i].w;
+			else
+				ans += p[i].v*(m/p[i].w), m = 0;
+		}
+		printf("%.3lf\n", ans);
+	}
+	return 0;
+}

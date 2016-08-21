@@ -1,0 +1,102 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10+5, MAXM = 10*100+10;
+vector<int> g[MAXN];
+int mx[MAXN], ans[MAXN], s, n, id[MAXN];
+int dp[MAXN][MAXN][MAXM];
+//dp[i][j][k]表示前i个物品中放了j个物品总价值为k是否可以存在
+
+bool ok(int p, int i)
+{
+	repe(j,1,s)
+		if(dp[g[p].size()][j][i]) return true;
+	return false;
+}
+int sloved(int p)
+{
+	int c = mx[p]*s;
+	clc(dp,0);
+	repe(j,0,s) dp[0][j][0] = 1;
+	repe(i,1,g[p].size())
+	{
+		memcpy(dp[i],dp[i-1],sizeof(dp[i]));
+		repe(j,1,s)
+		{
+			int w = j*g[p][i-1];
+			repe(m,1,s)
+			{
+				if(m-j < 0) continue;
+				repe(k,w,c)
+				{
+					if(dp[i-1][m-j][k-w])
+						dp[i][m][k] = 1;
+				}
+			}
+		}
+	}
+	int ans = 0;
+	repe(i,1,c)
+	{
+		if(ok(p,i)) ans = i;
+		else break;
+	}
+	return ans;
+}
+bool cmp(int a, int b)
+{
+	if(ans[a] != ans[b]) return ans[a] > ans[b];
+	if(g[a].size() != g[b].size()) return g[a].size() < g[b].size();
+	per(i,g[a].size()-1,0)
+	{
+		if(g[a][i] != g[b][i]) return g[a][i] < g[b][i];
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &s) && s)
+	{
+		scanf("%d%*c", &n);
+		rep(i,0,n)
+		{
+			id[i] = i;
+			g[i].clear();
+			int len = 0;
+			mx[i] = 0;
+			scanf("%d%*c", &len);
+			rep(j,0,len)
+			{
+				int a;
+				scanf("%d%*c", &a);
+				g[i].push_back(a);
+				mx[i] = max(mx[i],a);
+			}
+			sort(g[i].begin(), g[i].end());
+		}
+		rep(i,0,n)
+			ans[i] = sloved(i);
+		sort(id,id+n,cmp);
+		printf("max coverage =%4.d :", ans[id[0]]);
+		rep(i,0,g[id[0]].size()) printf("%3.d", g[id[0]][i]);
+		putchar('\n');
+	}
+	return 0;
+}

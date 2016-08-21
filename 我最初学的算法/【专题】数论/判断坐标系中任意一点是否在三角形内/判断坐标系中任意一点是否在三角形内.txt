@@ -1,0 +1,35 @@
+#include <stdio.h>
+#define scanf scanf_s
+
+int area2 (int, int, int, int, int, int);//计算两倍三角形面积来返回三角形面积的正负
+
+int main ()
+{
+	double x0, y0, x1, y1, x2, y2;
+	while (EOF != scanf ("%lf %lf %lf %lf %lf %lf%*c", &x0,&y0,&x1,&y1,&x2,&y2))
+	{
+		int a1, a2, a3, ans = 0, i, j;
+		for (i = 1; i <= 99; i++)
+		{
+			for (j = 1; j <= 99; j++)
+			{
+				a1 = area2(i*10, j*10, x0*10, y0*10, x1*10, y1*10);
+				a2 = area2(i*10, j*10, x1*10, y1*10, x2*10, y2*10);
+				a3 = area2(i*10, j*10, x2*10, y2*10, x0*10, y0*10);
+				if (a1*a2 == a1*a3 && a1*a2 == a2*a3)//判断点(i,j)是否在三角形内,只要这三个三角形面积正负（方向）则这个点在这个三角形内部或者边上
+					ans++;
+			}
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}
+
+int area2 (int x0, int y0, int x1, int y1, int x2, int y2)
+{
+	int a =  x0*y1+y0*x2+x1*y2-x2*y1-x1*y0-x0*y2;
+	if (a > 0)
+		return 1;
+	return -1;
+}

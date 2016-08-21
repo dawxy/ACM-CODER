@@ -1,0 +1,65 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <map>
+#include <string>
+using namespace std;
+#define MAXN 210
+map<string, int> name;
+struct NODE{
+	int len, s[MAXN];
+}p[MAXN];
+int dp[2][MAXN], one[2][MAXN];
+
+void dfs(int r)
+{
+	dp[1][r] = one[0][r] = one[1][r] = 1;
+	dp[0][r] = 0;
+	for (int i = 0; i < p[r].len; i++)
+	{
+		dfs(p[r].s[i]);
+		dp[1][r] += dp[0][p[r].s[i]];
+		dp[0][r] += max(dp[0][p[r].s[i]], dp[1][p[r].s[i]]);
+		if (!one[0][p[r].s[i]]) one[1][r] = 0;
+		if (dp[0][p[r].s[i]] == dp[1][p[r].s[i]]) one[0][r] = 0;
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while (~scanf("%d%*c", &n) && n)
+	{
+		char a[110], b[110];
+		int sum = 1;
+		name.clear();
+		for (int i = 0; i <= n; i++)
+			p[i].len = 0;
+		gets(a);
+		name[a] = 0;
+		for (int i = 1; i < n; i++)
+		{
+			int s, f;
+			scanf("%s %s%*c", a, b);
+			if (name.find(a) == name.end())
+				name[a] = sum, s = sum++;
+			else
+				s = name[a];
+			if (name.find(b) == name.end())
+				name[b] = sum, f = sum++;
+			else
+				f = name[b];
+			p[f].s[p[f].len++] = s;
+		}
+		dfs(0);
+		if (dp[1][0] > dp[0][0] && one[1][0])
+			printf("%d Yes\n", dp[1][0]);
+		else if (dp[1][0] < dp[0][0] && one[0][0])
+			printf("%d Yes\n", dp[0][0]);
+		else
+			printf("%d No\n", max(dp[0][0], dp[1][0]));
+	}
+	return 0;
+}

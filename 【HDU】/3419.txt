@@ -1,0 +1,145 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f,MAXN = 10000+10, MOD = 1000007;
+int ret[10][10][10];
+struct NODE{
+    LL a, b;
+    NODE(LL _a = 0, LL _b = 0){
+        a = _a, b = _b;
+    }
+    bool operator ==(const NODE &t) const{
+        return a == t.a && b == t.b;
+    }
+};
+int head[MOD], next[MAXN], sum[MAXN], cnt;
+NODE node[MAXN];
+void clear(){
+    cnt = 0;
+    clc(head,-1);
+    clc(sum,0);
+}
+LL hash(const NODE& s){
+    return (s.a+s.b)%MOD;
+}
+void insert(const NODE& s){
+    int id = hash(s);
+    int u = head[id];
+    while(~u){
+        if(s == node[u])
+        {
+            sum[u]++;
+            return;
+        }
+        u = next[u];
+    }
+    sum[cnt] = 1;
+    node[cnt] = s;
+    next[cnt] = head[id];
+    head[id] = cnt++;
+}
+bool query(const NODE& s){
+    int id = hash(s);
+    int u = head[id];
+    while(~u){
+        if(node[u] == s) return true;
+        u = next[u];
+    }
+    return 0;
+}
+int ans,a,b,c;
+char ca[15],cb[15], cc[20];
+bool used[10], cuse[10];
+LL tmp1, tmp2;
+
+void dfs(int na, int nb, int st)
+{
+    if(na > a || nb > b || na+nb > c+1) return;
+    sscanf(ca,"%I64d",&tmp1);
+    sscanf(cb,"%I64d",&tmp2);
+    LL buf = tmp1*tmp2;
+    sprintf(cc,"%I64d", buf);
+    int len = strlen(cc);
+    if(a == na && b == nb && c == len)
+    {
+        bool find = 0;
+        memcpy(cuse,used,sizeof(used));
+        rep(i,0,len)
+        {
+            if(used[cc[i]-'0'])
+            {
+                find = true;
+                break;
+            }
+            used[cc[i]-'0'] = true;
+        }
+        memcpy(used,cuse,sizeof(cuse));
+        if(!find && !query(NODE(tmp1,tmp2)))
+        {
+            ans++;
+            insert(NODE(tmp1,tmp2));
+        }
+    }
+    repe(i,1,9)
+    {
+        if(used[i]) continue;
+        used[i] = true;
+        ca[na] = i+'0';
+        ca[na+1] = 0;
+        dfs(na+1,nb,i+1);
+        used[i] = false;
+        ca[na] = 0;
+    }
+    repe(i,1,9)
+    {
+        if(used[i]) continue;
+        used[i] = true;
+        cb[nb] = i+'0';
+        cb[nb+1] = 0;
+        dfs(na,nb+1,st);
+        used[i] = false;
+        cb[nb] = 0;
+    }
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    clc(ret,-1);
+    clc(used,0);
+    used[0] = true;
+    while(~scanf("%d %d %d%*c", &a, &b, &c) && a+b+c)
+    {
+        ans = 0;
+        clear();
+        ca[0] = cb[0] = '0';
+        ca[1] = cb[1] = 0;
+        if(!a || !b || !c || c < b || c < a || a+b < c)
+        {
+            puts("0");
+            continue;
+        }
+        if(~ret[a][b][c]) ans = ret[a][b][c];
+        else
+        {
+            dfs(0,0,1);
+            ret[a][b][c];
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+int a,b,c,x,y;
+
+inline double f(double m)
+{
+	return sqrt((m-x)*(m-x)+(a*m*m+b*m+c-y)*(a*m*m+b*m+c-y));
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	scanf("%d %d %d %d %d%*c", &a, &b, &c, &x, &y);
+	double l = -5000, r = 5000;
+	rep(i,0,5000)
+	{
+		double m1 = l+(r-l)/3;
+		double m2 = r-(r-l)/3;
+		if(f(m1) < f(m2)) r = m2;
+		else l = m1;
+	}
+	printf("%.3f\n", f(l));
+	return 0;
+}

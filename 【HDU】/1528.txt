@@ -1,0 +1,121 @@
+/* ***********************************************
+Author :Darkangelwings
+Created Time :2014/10/25 ÐÇÆÚÁù 18:34:01
+File Name :use.cpp
+************************************************ */
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define eps 1e-8
+#define pi acos(-1.0)
+typedef long long LL;
+#define MAXN 30
+#define MAXM 900
+struct Edge{
+	int next, v;
+	Edge(int a = 0, int b = 0){
+		next = a, v = b;
+	}
+}edge[MAXM];
+struct Card{
+	int c, num;
+}card[2][MAXN];
+int lin[MAXN], n, head[MAXN], tol;
+bool vis[MAXN];
+
+void add_edge(int u, int v){
+	edge[tol] = Edge(head[u], v);
+	head[u] = tol++;
+}
+int get_num(char c){
+	if ('2' <= c && '9' >= c) return c - '0';
+	int ans = 10;
+	switch (c){
+	case 'A': ans++;
+	case 'K': ans++;
+	case 'Q': ans++;
+	case 'J': ans++;
+	}
+	return ans;
+}
+int get_c(char c){
+	int ans = 0;
+	switch (c){
+	case 'H':ans++;
+	case 'S':ans++;
+	case 'D':ans++;
+	}
+	return ans;
+}
+bool ok(int a, int b){
+	if (card[0][a].num != card[1][b].num) return card[0][a].num > card[1][b].num;
+	return card[0][a].c > card[1][b].c;
+}
+bool dfs(int u){
+	for (int i = head[u]; ~i; i = edge[i].next){
+		int v = edge[i].v;
+		if (!vis[v]){
+			vis[v] = true;
+			if (-1 == lin[v] || dfs(lin[v])){
+				lin[v] = u;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int hungary(){
+	int ans = 0;
+	clc(lin, -1);
+	rep(i, 0, n){
+		clc(vis, 0);
+		if (dfs(i)) ans++;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while (t--)
+	{
+		char color, p;
+		scanf("%d%*c", &n);
+		per(i,1,0)
+		{
+			rep(j, 0, n)
+			{
+				scanf("%c%c%*c", &p, &color);
+				card[i][j].c = get_c(color);
+				card[i][j].num = get_num(p);
+			}
+		}
+		clc(head, -1);
+		tol = 0;
+		rep(i, 0, n)
+		{
+			rep(j, 0, n)
+			{
+				if (ok(i, j))
+					add_edge(i, j);
+			}
+		}
+		printf("%d\n", hungary());
+	}
+	return 0;
+}

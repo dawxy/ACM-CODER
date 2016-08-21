@@ -1,0 +1,98 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, MAXM = 11000+10;
+struct Edge{
+	int u,v;
+	LL cost;
+}edge[MAXM];
+LL in[MAXN];
+int pre[MAXN], vis[MAXN], id[MAXN], st[MAXM];
+
+LL zl_mst(int &ft,int rt, int n, int m)
+{
+	LL ans = 0;
+	while(1)
+	{
+		clc(in,0x3f);
+		rep(i,0,m)
+		{
+			int u = edge[i].u, v = edge[i].v;
+			if(u != v && edge[i].cost < in[v])
+			{
+				if(rt == u) ft = st[i];
+				in[v] = edge[i].cost;
+				pre[v] = u;
+			}
+		}
+		in[rt] = 0;
+
+		clc(vis,-1);
+		clc(id,-1);
+		int cnt = 0;
+		rep(i,0,n)
+		{
+			ans += in[i];
+			int v = i;
+			while(v!=rt && vis[v] != i && -1 == id[v])
+			{
+				vis[v] = i;
+				v = pre[v];
+			}
+			if(v != rt && -1 == id[v])
+			{
+				for(int u = pre[v]; u != v; u = pre[u]) id[u] = cnt;
+				id[v] = cnt++;
+			}
+		}
+		if(ans >= INF*2) return -1;
+		if(!cnt) break;
+		rep(i,0,n) if(-1 == id[i]) id[i] = cnt++;
+		rep(i,0,m)
+		{
+			int v = edge[i].v;
+			edge[i].u = id[edge[i].u];
+			edge[i].v = id[edge[i].v];
+			if(edge[i].u != edge[i].v) edge[i].cost -= in[v];
+		}
+		n = cnt;
+		rt = id[rt];
+	}
+	return ans-INF;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		int rt = n, ft;
+		rep(i,0,m) scanf("%d %d %I64d%*c", &edge[i].u, &edge[i].v, &edge[i].cost);
+		rep(i,0,n)
+		{
+			edge[m].u = rt,edge[m].v = i,edge[m].cost = INF;
+			st[m++] = i;
+		}
+		LL ans = zl_mst(ft,rt,n+1,m);
+		if(-1 == ans) puts("impossible");
+		else printf("%I64d %d\n", ans,ft);
+		putchar('\n');
+	}
+	return 0;
+}

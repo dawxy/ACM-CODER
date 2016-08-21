@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000000+10;
+int p[MAXN<<1];//p[i]记录i为中心的回文串半径,添加#后p[i]-1就是原串的回文长度了
+char s[MAXN<<1];//中间加上'#'后的串,下标1开始的
+char str[MAXN];
+
+int manacher(char *a, int n)
+{
+	//给原串加'#'
+	int len = 0;
+	s[len++] = '$';
+	s[len++] = '#';
+	rep(i,0,n)
+	{
+		s[len++] = a[i];
+		s[len++] = '#';
+	}
+	s[len] = 0;
+	//开始计算最长回文串
+	int mx = 0, id = 0;
+	rep(i,0,len)
+	{
+		p[i] = mx>i?min(p[id*2-i],mx-i):1;
+		while(s[i+p[i]] == s[i-p[i]]) p[i]++;
+		if(i+p[i] > mx)
+		{
+			mx = i+p[i];
+			id = i;
+		}
+	}
+	//得出最长值
+	int ans = 0;
+	rep(i,1,len) ans = max(ans,p[i]-1);
+	return ans;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%s", str);
+		printf("%d\n",manacher(str,strlen(str)));
+	}
+	return 0;
+}

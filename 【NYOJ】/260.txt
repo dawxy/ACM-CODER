@@ -1,0 +1,20 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int n, i, last, ans;
+		scanf ("%d%*c", &n);
+		for (i = 1, last = 0; i <= n ;i++)
+		{
+			ans = last+(1+i)*i/2;
+			last = ans;
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

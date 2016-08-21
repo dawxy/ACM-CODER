@@ -1,0 +1,59 @@
+#include <stdio.h>
+#define MAX 20
+int n, ans[MAX], t;
+bool vis[MAX] = {0}, isprime[MAX*2] = {0}, no;
+
+bool is_prime(int s)
+{
+	for (int i = 2; i*i <= s; i++)
+	{
+		if (0 == s%i)
+			return false;
+	}
+	return true;
+}
+void dfs(int p)
+{
+	int i;
+	if (p == n && isprime[1+ans[n-1]])
+	{
+		printf ("1");
+		for (i = 1; i < n; i++)
+			printf (" %d", ans[i]);
+		printf ("\n");
+		no = false;
+		return;
+	}
+	for (i = 2; i <= n; i++)
+	{
+		if (!vis[i] && isprime[ans[p-1]+i])
+		{
+			ans[p] = i;
+			vis[i] = true;
+			dfs(p+1);
+			vis[i] = false;
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("E:\\1.txt","r",stdin);
+	freopen("E:\\out.txt","w",stdout);
+#endif
+	for (int i = 2, len = 0; i <= MAX*2; i++)
+	{
+		if (is_prime(i))
+			isprime[i] = true;
+	}
+	ans[0] = 1;
+	while(EOF != scanf ("%d%*c", &n)&&n)
+	{
+		no = true;
+		printf ("Case %d:\n", ++t);
+		if (!(n&1) || 1 == n)
+			dfs(1);
+		if (no)
+			printf ("No Answer\n");
+	}
+}

@@ -1,0 +1,88 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500+10, d[4][2] = {{-1,-1},{-1,1},{1,-1},{1,1}};
+struct NODE{
+    int x,y;
+    NODE(int a, int b)
+    {
+        x = a, y = b;
+    }
+};
+bool at[MAXN][MAXN];
+int n,m;
+
+int sloved()
+{
+    queue<NODE> q;
+    rep(i,0,n)
+    {
+        rep(j,0,m) if(at[i][j]) q.push(NODE(i,j));
+    }
+    while(!q.empty())
+    {
+        NODE now = q.front();q.pop();
+        rep(i,0,4)
+        {
+            int ni = now.x+d[i][0], nj = now.y+d[i][1];
+            if(0 <= ni && n > ni && 0 <= nj && m > nj && at[ni][nj])
+            {
+                int x = ni,y = now.y;
+                if(!at[x][y])
+                {
+                    at[x][y] = true;
+                    q.push(NODE(x,y));
+                }
+                x = now.x,y = nj;
+                if(!at[x][y])
+                {
+                    at[x][y] = true;
+                    q.push(NODE(x,y));
+                }
+            }
+        }
+    }
+    int ans = 0;
+    rep(i,0,n)
+    {
+        rep(j,0,m) if(at[i][j]) ans++;
+    }
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t,count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        scanf("%d %d%*c", &n, &m);
+        clc(at,0);
+        int g;
+        scanf("%d%*c", &g);
+        while(g--)
+        {
+            int x,y;
+            scanf("%d %d%*c", &x, &y);
+            at[x-1][y-1] = true;
+        }
+        printf("Case #%d:\n%d\n", ++count,sloved());
+    }
+    return 0;
+}

@@ -1,0 +1,39 @@
+//DFS生成1~10中选取n个数的排列
+#include <stdio.h>
+#include <string.h>
+#define scanf scanf_s
+int n, vis[10];
+char a[10];
+
+void dfs(int p)
+{
+	if (p == n)
+	{
+		a[n] = 0;
+		puts(a);
+		return;
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		if (!vis[i])
+		{
+			a[p] = i+'0';
+			vis[i] = 1;
+			dfs(p+1);
+			vis[i] = 0;
+		}
+	}
+}
+
+int main ()
+{
+	FILE *f;
+	//freopen_s(&f,"e:\\out.txt", "w",stdout);
+	while(EOF != scanf ("%d%*c", &n))
+	{
+		memset(vis,0,sizeof(vis));
+		dfs(0);
+	}
+
+	return 0;
+}

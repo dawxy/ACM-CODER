@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <malloc.h>
+#define scanf scnaf_s
+typedef struct node{
+	int data;
+	int freq;
+	struct node* next;
+	struct node* prior;
+}NODE, *PNODE;
+
+PNODE list_init ();
+void list_insert(PNODE, int, int);//在第s-1个元素之后插入val
+void list_traverse (PNODE);
+bool locate (PNODE, int);
+
+int main ()
+{
+	int i;
+	PNODE pb = list_init();
+	for (i = 1; i <= 3; i++)
+		list_insert (pb, i, i);
+	locate(pb, 3);
+	locate(pb, 2);
+	locate(pb, 2);
+	list_traverse(pb);
+	return 0;
+}
+
+PNODE list_init ()
+{
+	PNODE phead = (PNODE)malloc (sizeof(NODE));
+	phead->next = phead;
+	phead->prior = phead;
+	phead->data = phead->freq = 0;
+	return phead;
+}
+
+void list_insert(PNODE ph, int s, int val)
+{
+	int i;
+	if (0 >= s || ph->data+1 < s)
+	{
+		printf ("插入范围超标！\n");
+		return;
+	}
+	PNODE p = (PNODE)malloc(sizeof(NODE)), q;
+	p->data = val;
+	p->freq = 0;
+	for (i = 0, q = ph; i < s-1; i++)//q是要插入位置的前一个节点
+		q = q->next;
+	p->next = q->next;
+	p->prior = q;
+	q->next->prior = p;
+	q->next = p;
+	ph->data += 1;
+}
+
+void list_traverse (PNODE ph)
+{
+	PNODE p = ph->next;
+	while (ph != p)
+	{
+		printf ("%d\n", p->data);
+		p = p->next;
+	}
+}
+
+bool locate (PNODE ph, int x)
+{
+	int i;
+	PNODE q = ph->next, buf;
+	while (ph != q && x != q->data)//找到x的位置q
+	{
+		q = q->next;
+	}
+	if (q == ph)
+		return false;
+	q->freq++;
+	buf = q->prior;//buf是q的前一个节点
+	buf->next = q->next;//把q节点断开
+	q->next->prior = buf;
+	while (ph != buf && q->freq > buf->freq)//找到第一个比q的访问频率(freq)大或者相等的节点buf
+	{
+		buf = buf->prior;
+	}
+	q->prior = buf;//把q插入buf后面
+	q->next = buf->next;
+	buf->next->prior = q;
+	buf->next = q;
+	return true;
+}

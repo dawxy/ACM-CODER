@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 102
+const int d[4] = {0,1,2,3};//+-*/
+const char fx[5] = "+-*/";
+int a[MAXN], ans[MAXN], fans[MAXN],ed, n;
+bool vis[MAXN][32000*2+1];
+
+bool dfs(int, int);
+int main ()
+{
+	#ifdef SHY
+		freopen("e:\\1.txt","r",stdin);
+	#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		char c;
+		scanf ("%d%*c", &n);
+        for (int i = 0; i < n; i++)
+            scanf ("%d%*c", &a[i]);
+        scanf ("%d%*c", &ed);
+        memset(vis,false,sizeof(vis));
+        if (dfs(1,a[0]))
+		{
+			printf ("%d",a[0]);
+            for (int i = 1;  i < n; i++)
+                printf ("%c%d",fans[i], ans[i]);
+            printf ("=%d\n",ed);
+		}
+		else
+			printf ("NO EXPRESSION\n");
+	}
+    return 0;
+}
+
+int cal(int s, int a, int b)
+{
+	if (0 == s)
+		return a+b;
+	if (1 == s)
+		return a-b;
+	if (2 == s)
+		return a*b;
+	if (3 == s)
+		return a/b;
+}
+bool dfs(int p, int sum)
+{
+    if (p == n)
+	{
+        if (sum == ed)
+			return true;
+		return false;
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		int buf = cal(i,sum,a[p]);
+		if (buf > 32000 || buf < - 32000 || vis[p][buf+32000])
+			continue;
+        if (3 == i && sum%a[p])
+			continue;
+		vis[p][buf+32000] = true;
+        ans[p] = a[p];
+        fans[p] = fx[i];
+        if(dfs(p+1,buf))
+			return true;
+	}
+	return false;
+}

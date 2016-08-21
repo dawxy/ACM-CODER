@@ -1,0 +1,167 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+12+10, MAXM = 1000*3*2+10;
+int nxt[MAXM], from[MAXM], to[MAXM], cap[MAXM], tol, head[MAXN];
+
+void add_edge(int u, int v, int c)
+{
+	nxt[tol] = head[u],from[tol] = u,to[tol] = v,cap[tol] = c;
+	head[u] = tol++;
+	nxt[tol] = head[v],from[tol] = v,to[tol] = u,cap[tol] = 0;
+	head[v] = tol++;
+}
+int d[MAXN],st,ed;
+bool bfs()
+{
+	clc(d,-1);
+	queue<int> q;
+	q.push(st);
+	d[st] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(-1 == d[v] && cap[i])
+			{
+				d[v] = d[u]+1;
+				q.push(v);
+				if(~d[ed]) return true;
+			}
+		}
+	}
+	return false;
+}
+int stack[MAXN], top, cur[MAXN];
+int maxflow()
+{
+	int ans = 0;
+	while(bfs())
+	{
+		memcpy(cur,head,sizeof(head));
+		int u = st;
+		top = 0;
+		while(1)
+		{
+			if(u == ed)
+			{
+				int flow = INF, loc;
+				rep(i,0,top)
+				{
+					if(flow > cap[stack[i]])
+					{
+						flow = cap[stack[i]];
+						loc = i;
+					}
+				}
+				rep(i,0,top)
+				{
+					cap[stack[i]] -= flow;
+					cap[stack[i]^1] += flow;
+				}
+				ans += flow;
+				top = loc;
+				u = from[stack[top]];
+			}
+			for(int i = cur[u]; ~i; cur[u] = i = nxt[i])
+				if(cap[i] && d[u]+1 == d[to[i]]) break;
+			if(~cur[u])
+				u = to[stack[top++] = cur[u]];
+			else
+			{
+				if(!top) break;
+				d[u] = -1;
+				u = from[stack[--top]];
+			}
+		}
+	}
+	return ans;
+}
+int num[MAXN], buf[MAXM];
+struct IN{
+	int u,v,w;
+}in[15];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		repe(i,1,n) scanf("%d%*c", &num[i]);
+		int a,b,w,p;
+		clc(head,-1);
+		tol = 0;
+		ed = 0;
+		int cnt = n, sum = 0;
+		rep(i,0,m)
+		{
+			scanf("%d %d %d %d%*c", &a, &b, &w, &p);
+			if(p < 0)
+			{
+				++cnt;
+				add_edge(a,cnt,INF);
+				add_edge(cnt,b,INF);
+				add_edge(cnt,ed,w);
+			}
+			else if(0 == p)
+			{
+				add_edge(a,b,INF);
+			}
+			else
+			{
+				IN tmp = {a,b,w};
+				in[sum++] = tmp;
+			}
+		}
+		st = cnt+1;
+		repe(i,1,n)
+		{
+			if(num[i])
+				add_edge(st,i,num[i]);
+		}
+		int tmp = tol;
+		rep(i,0,sum)
+			add_edge(in[i].u, in[i].v,1);
+		cnt = (1<<sum)-1;
+		memcpy(buf,cap,sizeof(int)*tol);
+		int ans = 0, cost = INF;
+		repe(i,0,cnt)
+		{
+			memcpy(cap,buf,sizeof(int)*tol);
+			int cc = 0;
+			rep(j,0,sum)
+			{
+				if(i&(1<<j))
+					cap[tmp+j*2] = INF, cc += in[j].w;
+			}
+			int flow = maxflow();
+			if(ans < flow)
+			{
+				ans = flow;
+				cost = cc;
+			}
+			else if(ans == flow && cost > cc)
+				cost = cc;
+		}
+		if(0 == ans) puts("Poor Heaven Empire");
+		else printf("%d %d\n", ans,cost);
+	}
+	return 0;
+}

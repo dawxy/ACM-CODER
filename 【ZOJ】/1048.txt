@@ -1,0 +1,18 @@
+#include <stdio.h>
+
+int main (void)
+{
+	int i;
+	float a[12];
+	float b = 0;
+	int j = 12;
+
+	for (i = 0; i < j; i++)
+	{
+		scanf ("%f", &a[i]);
+		b = a[i] + b;
+	}
+		printf ("$%.2f", b *1.0/ 12.0);
+
+	return 0;
+}

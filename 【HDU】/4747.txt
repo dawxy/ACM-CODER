@@ -1,0 +1,174 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000+10;
+char buf[MAXN*2], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+	int ans = 0;
+    if(ps == pe) return -1;
+	do{
+		rnext();
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return -1;
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	return ans;
+}
+int a[MAXN],num[MAXN],sot[MAXN<<1],cnt;
+
+int mhash(int v){return lower_bound(sot,sot+cnt,v)-sot;}
+int inline id(int x, int y){return x+y|x!=y;}
+int sz[MAXN<<2];
+void add(int x, int y, int p)
+{
+	if(x == y)
+	{
+		sz[id(x,y)] = 1;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) add(x,m,p);
+	else add(m+1,y,p);
+	sz[id(x,y)] = sz[id(x,m)]+sz[id(m+1,y)];
+}
+int query(int x, int y)
+{
+	if(x == y) return sot[x];
+	int m = (x+y)>>1;
+	if(sz[id(x,m)] < m-x+1) return query(x,m);
+	return query(m+1,y);
+}
+int d[MAXN],mx[MAXN],n;
+LL sum[MAXN<<1],st[MAXN<<1];
+void push_down(int x, int y, int m)
+{
+	int u = id(x,y);
+	if(~st[u])
+	{
+		int l = id(x,m),r = id(m+1,y);
+		st[l] = st[r] = st[u];
+		sum[l] = (m-x+1)*st[u];sum[r] = (y-m)*st[u];
+		mx[l] = mx[r] = st[u];
+		st[u] = -1;
+	}
+}
+void push_up(int x, int y, int m)
+{
+	int u = id(x,y),l = id(x,m),r = id(m+1,y);
+	sum[u] = sum[l]+sum[r];
+	mx[u] = max(mx[l],mx[r]);
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		sum[id(x,y)] = mx[id(x,y)] = d[x];
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+void update(int x, int y, int ql, int qr, int v)
+{
+	if(ql <= x && y <= qr)
+	{
+		int u = id(x,y);
+		sum[u] = v*(y-x+1);
+		mx[u] = v,st[u] = v;
+		return;
+	}
+	int m = (x+y)>>1;
+	push_down(x,y,m);
+	if(ql <= m) update(x,m,ql,qr,v);
+	if(qr > m) update(m+1,y,ql,qr,v);
+	push_up(x,y,m);
+}
+int find_ft(int x, int y, int v)
+{
+	if(x == y) return x+(v>sum[id(x,y)]);
+	int m = (x+y)>>1,ans;
+	push_down(x,y,m);
+	if(v < mx[id(x,m)]) ans = find_ft(x,m,v);
+	else ans = find_ft(m+1,y,v); 
+	push_up(x,y,m);
+	return ans;
+}
+int nxt[MAXN],la[MAXN<<1];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	while(~(n = in()) && n)
+	{
+		rep(i,0,n) num[i] = a[i] = in();
+		num[n] = 0;
+		sort(num,num+n+1);
+		cnt = 1;
+		sot[0] = num[0];
+		rep(i,0,n+1)
+		{
+			if(num[i] != num[i-1])
+			{
+				sot[cnt++] = num[i];
+				if(num[i]-num[i-1] > 1)
+				{
+					sot[cnt++] = num[i-1]+1;
+					swap(sot[cnt-1],sot[cnt-2]);
+				}
+			}
+		}
+		sot[cnt] = sot[cnt-1]+1;
+		cnt++;
+		clc(sz,0);
+		clc(la,-1);
+		rep(i,0,n) nxt[i] = n-1;
+		rep(i,0,n)
+		{
+			int h = mhash(a[i]);
+			add(0,cnt-1,h);
+			d[i] = query(0,cnt-1);
+			if(~la[h]) nxt[la[h]] = i-1;
+			la[h] = i;
+		}
+		clc(st,-1);
+		bulid(0,n-1);
+		LL ans = 0;
+		rep(i,0,n)
+		{
+			ans += sum[id(0,n-1)];
+			int y = nxt[i];
+			int x = find_ft(0,n-1,a[i]);
+			update(0,n-1,0,i,0);
+			if(x > y) continue;
+			update(0,n-1,x,y,a[i]);
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

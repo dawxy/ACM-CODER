@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <math.h>
+#define PI 3.1415926
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t, count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+	{
+        double a,b, max;
+        scanf ("%lf %lf%*c", &a,&b);
+        max = a*a+b*b;
+        int ans = ceil(max/(100.0/PI));
+        printf ("Property %d: This property will begin eroding in year %d.\n", ++count,ans);
+        if (!t)
+			puts("END OF OUTPUT.");
+	}
+    return 0;
+}

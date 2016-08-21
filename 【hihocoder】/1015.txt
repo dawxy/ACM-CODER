@@ -1,0 +1,65 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000000+10;
+int nt[MAXN];//nt[i]为满足x[i-z…i-1]=x[0…z-1]的最大z值(就是相同的最大前缀后缀)
+void get_next(char *x, int m)//这个nt[i]表示nt’[i] = nt[nt[…nt[i]]]
+{							//直到nt'[i] < 0 或者x[nt’[i]] != x[i],这样要快一些
+   int i = 0,j;
+   j = nt[0] = -1;
+   while(i < m)
+   {
+      while(~j && x[i] != x[j]) j = nt[j];
+      if(x[++i] == x[++j]) nt[i] = nt[j];
+      else nt[i] = j;
+   }
+}
+//返回x在y中出现的次数,可以重叠
+int kmp(char *x, int m, char *y, int n)//x是模式串,y是主串
+{
+   int i = 0,j = 0,ans = 0;
+   get_next(x,m);
+   while(i < n)
+   {
+      while(~j && y[i] != x[j]) j = nt[j];
+      i++,j++;
+      if(j == m)
+      {
+         ans++;
+         j = nt[j];//改为j=0，则计算不重复数量
+      }
+   }
+   return ans;
+}
+char a[MAXN], b[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%s%s", a,b);
+		int lenb = strlen(b);
+		get_next(b,lenb);
+		printf("%d\n", kmp(a,strlen(a),b,lenb));
+	}
+	return 0;
+}

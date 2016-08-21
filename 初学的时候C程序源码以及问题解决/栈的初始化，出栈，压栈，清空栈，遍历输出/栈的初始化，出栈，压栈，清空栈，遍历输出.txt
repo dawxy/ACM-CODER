@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <malloc.h>
+#include <stdlib.h>
+
+typedef struct node{
+	int data;
+	struct node *PNEXT;
+}NODE, *PNODE;
+
+typedef struct Stack{
+	struct node *PTOP;
+	struct node *PBOTTOM;
+}STACK, *PSTACK;
+
+void init (PSTACK);//初始化栈
+void push (PSTACK, int);//压栈
+bool is_empty (PSTACK);//判断栈是否为空
+bool traverse (PSTACK);//遍历输出
+bool pop (PSTACK, int*);//出栈, val返回被删除的栈的值
+bool clear (PSTACK);//清空栈
+
+int main ()
+{
+	STACK S;
+	int val;
+	init(&S);
+	push(&S, 1);
+	push(&S, 2);
+	push(&S, 3);
+	push(&S, 4);
+	push(&S, 5);
+	traverse (&S);
+	//if (pop(&S, &val))
+		//printf ("出栈成功！出栈的值为%d\n", val);
+	clear(&S);
+	traverse (&S);
+
+	return 0;
+}
+
+void init (PSTACK PS)
+{
+	PS->PTOP = (PNODE)malloc(sizeof(NODE));
+	if (NULL == PS->PTOP)
+	{
+		printf ("动态分配内存失败！\n");
+		exit(-1);
+	}
+	PS->PBOTTOM     = PS->PTOP;
+	PS->PTOP->PNEXT = NULL;
+}
+
+void push (PSTACK PS, int val)
+{
+	PNODE pnew  = (PNODE)malloc(sizeof(NODE));
+	if (NULL == pnew)
+	{
+		printf ("动态内存分配失败\n");
+		exit(-1);
+	}
+	pnew->data  = val;
+	pnew->PNEXT = PS->PTOP;
+	PS->PTOP    = pnew;
+	return;
+}
+
+bool is_empty (PSTACK PS)
+{
+	if (PS->PTOP == PS->PBOTTOM)
+		return true;
+	return false;
+}
+
+bool traverse (PSTACK PS)
+{
+	PNODE p = PS->PTOP;
+	if (is_empty(PS))
+	{
+		printf ("输出失败！栈为空\n");
+		return false;
+	}
+	while (p != PS->PBOTTOM)
+	{
+		printf ("%d\n", p->data);
+		p = p->PNEXT;
+	}
+	return true;
+}
+
+bool pop (PSTACK PS, int *val)
+{
+	PNODE p = PS->PTOP;
+	if (is_empty(PS))
+	{
+		printf ("出栈失败！栈已经为空！\n");
+		return false;
+	}
+	*val = p->data;
+	PS->PTOP = p->PNEXT;
+	free(p);
+	return true;
+}
+
+bool clear (PSTACK PS)
+{
+	PNODE p = NULL;
+	if (is_empty(PS))
+	{
+		printf ("栈为空！不需要清空！\n");
+		return false;
+	}
+	while (PS->PTOP != PS->PBOTTOM)
+	{
+		p = PS->PTOP;
+		PS->PTOP = p->PNEXT;
+		free(p);
+	}
+	return true;
+}

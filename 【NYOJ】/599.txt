@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int h, ans = 1,c = 0;
+		scanf ("%d%*c", &h);
+		if(h > 10)
+		{
+			if (0 != (h-10)%5)
+				c = 1;
+			ans = 1+(h-10)/5+c;
+		}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

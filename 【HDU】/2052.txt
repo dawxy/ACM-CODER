@@ -1,0 +1,58 @@
+#include <stdio.h>
+
+void main ()
+{
+	int a, b;
+	while (EOF != scanf ("%d %d",&a, &b))
+	{
+		getchar ();
+		a += 2;
+		b += 2;
+
+		char n[78][78];
+		int i, j;
+		for (i = 0; i < 78; i++)//Çå0
+		{
+			for (j = 0; j < 78; j++)
+			{
+				n[i][j] = '\0';
+			}
+		}
+
+		n[0][0] = n[0][a-1] = n[b-1][0] = n[b-1][a-1] = '+';
+		for (i = 0, j = 1; j < a-1; j++)
+		{
+			n[i][j] = '-';
+		}
+		for (i = b-1, j = 1; j < a-1; j++)
+		{
+			n[i][j] = '-';
+		}
+		for (i = 1, j = 0; i < b-1; i++)
+		{
+			n[i][j] = '|';
+		}
+		for (i = 1, j = a-1; i < b-1; i++)
+		{
+			n[i][j] = '|';
+		}
+
+
+		for (i = 0; i < b; i++)
+		{
+			for (j = 0; j < a; j++)
+			{
+				if (0 != n[i][j])
+					printf ("%c", n[i][j]);
+				else
+					printf (" ");
+			}
+			printf ("\n");
+		}
+
+		printf ("\n");
+	}
+		
+		
+}
+

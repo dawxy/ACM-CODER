@@ -1,0 +1,74 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100010;
+int nxt[MAXN<<1];
+
+void get_next(char *x, int m)
+{
+	int i = 0, j = -1;
+	nxt[0] = -1;
+	while(i < m)
+	{
+		while(~j && x[i] != x[j]) j = nxt[j];
+		nxt[++i] = ++j;
+	}
+}
+char a[MAXN<<1], b[MAXN], c[MAXN<<1];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%s %s", a, b))
+	{
+		int lena = strlen(a), lenb = strlen(b);
+		int n = lena +lenb;
+		strcpy(c,b);
+		strcat(c,a);
+		strcat(a,b);
+		get_next(a,n);
+		a[lena] = 0;
+		int ans = min(min(nxt[n],lenb),lena);
+		get_next(c,n);
+		nxt[n] = min(min(lena,nxt[n]), lenb);
+		if(nxt[n] == ans)
+		{
+			strcpy(c,b);
+			strcat(c,a+nxt[n]);
+			strcat(a,b+ans);
+			if(strcmp(a,c) < 0) puts(a);
+			else puts(c);
+		}
+		else
+		{
+			if(nxt[n] > ans)
+			{
+				strcpy(c,a);
+				strcat(c,b+nxt[n]);
+				puts(c);
+			}
+			else
+			{
+				strcpy(c,b);
+				strcat(c,a+ans);
+				puts(c);
+			}
+		}
+	}
+	return 0;
+}

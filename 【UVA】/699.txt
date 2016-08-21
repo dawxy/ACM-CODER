@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 10000
+char c;
+int min, max;
+
+bool creat_tree(int, int*);
+
+int main ()
+{
+	int t = 0;
+	while (1)
+	{
+		int ans[MAX] = {0};
+		min = 9999999;
+		max = -1;
+		if (!creat_tree(MAX/2, ans))
+		{
+			if (' ' != c)
+				break;
+			while('\n' != (c = getchar()));
+			continue;
+		}
+		printf ("Case %d:\n%d", ++t,ans[min]);
+		for (int i = min+1; i <= max; i++)
+		{
+			printf (" %d", ans[i]);
+		}
+		printf ("\n\n");
+	}
+
+	return 0;
+}
+
+bool creat_tree(int v, int *ans)
+{
+	int a;
+	scanf ("%d%c", &a, &c);
+	if (-1 == a)
+		return false;
+	if (min > v)
+		min = v;
+	if (max < v)
+		max = v;
+	ans[v] += a;
+	creat_tree(v-1, ans);
+	creat_tree(v+1, ans);
+	return true;
+}

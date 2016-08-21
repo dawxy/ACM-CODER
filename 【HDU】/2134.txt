@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <math.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    double r;
+    while(scanf ("%lf%*c", &r) && r)
+	{
+        printf ("%.3lf ", sqrt(r*r/3.0));
+        printf ("%.3lf\n", sqrt(r*r*2.0/3.0));
+	}
+    return 0;
+}

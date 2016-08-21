@@ -1,0 +1,65 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 1010
+#define MAXM 1010000
+struct NODE{
+	int x,y,z,t;
+}p[MAXN];
+struct Edge{
+	int u,v, cost;
+	Edge(int a = 0, int b = 0, int c = 0){u = a, v = b, cost = c;}
+	bool operator<(const Edge& t) const{return cost < t.cost;}
+}edge[MAXM];
+int f[MAXN];
+
+int get_cost(int a, int b)
+{
+	return (int)sqrt((p[a].x-p[b].x)*(p[a].x-p[b].x)+(p[a].y-p[b].y)*(p[a].y-p[b].y)+(p[a].z-p[b].z)*(p[a].z-p[b].z)) + abs(p[a].t-p[b].t);
+}
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, m = 0;
+	scanf("%d%*c", &n);
+	rep(i,0,n) scanf("%d %d %d %d%*c", &p[i].x, &p[i].y, &p[i].z, &p[i].t);
+	rep(i,0,n)
+	{
+		rep(j,i+1,n)
+			edge[m++] = Edge(i,j,get_cost(i,j));
+	}
+	sort(edge,edge+m);
+	rep(i,0,n) f[i] = i;
+	int ans = 0, l, cnt = n;
+	rep(i,0,m)
+	{
+		int x = find(edge[i].u), y = find(edge[i].v);
+		if(x != y)
+		{
+			ans += edge[i].cost;
+			f[x] = y;
+			if(--cnt == 1) break;
+		}
+	}
+	scanf("%d%*s", &l);
+	if(ans <= l)
+		printf("%dTas\n", ans);
+	else puts("Death");
+	return 0;
+}

@@ -1,0 +1,32 @@
+#include <stdio.h>
+
+int main ()
+{
+	while (1)
+	{
+		int a, b, i, j, can[100] = {0};
+		scanf ("%d %d%*c", &a, &b);
+		if (0 == a && 0 == b)
+			break;
+		for (i = 0, j = 0, a *= 100; i <= 99; i++)
+		{
+			if (0 == (a+i)%b)
+			{
+				can[j] = i;
+				j++;
+			}
+		}
+		for (i = 0; i < j; i++)
+		{
+			if (10 > can[i])
+				printf ("0");
+			printf ("%d", can[i]);
+			if (j-1 != i)
+				printf (" ");
+			else
+				printf ("\n");
+		}
+	}
+
+	return 0;
+}

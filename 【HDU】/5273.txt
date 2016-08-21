@@ -1,0 +1,79 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10, SIZE = 30;
+int a[MAXN], ans[MAXN][MAXN], num[MAXN],sot[MAXN], cnt;
+
+int c[MAXN];
+inline int lowbit(int x){return x&-x;}
+inline int mhash(int v){return lower_bound(sot+1,sot+1+cnt,v)-sot;}
+void add(int x)
+{
+    while(x <= cnt)
+    {
+        c[x]++;
+        x += lowbit(x);
+    }
+}
+int sum(int x)
+{
+    int ans = 0;
+    while(x > 0)
+    {
+        ans += c[x];
+        x -= lowbit(x);
+    }
+    return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int n,q;
+    while(~scanf("%d %d%*c", &n, &q))
+    {
+        cnt = 0;
+        repe(i,1,n)
+        {
+            scanf("%d%*c", &a[i]);
+            num[i] = a[i];
+        }
+        sort(num+1,num+1+n);
+        sot[++cnt] = num[1];
+        repe(i,2,n) if(num[i] != num[i-1]) sot[++cnt] = num[i];
+        clc(ans,0);
+        repe(i,1,n)
+        {
+            clc(c,0);
+            add(mhash(a[i]));
+            repe(j,i+1,n)
+            {
+                ans[i][j] = ans[i][j-1]+sum(cnt)-sum(mhash(a[j]));
+                add(mhash(a[j]));
+            }
+        }
+        while(q--)
+        {
+            int x,y;
+            scanf("%d %d", &x, &y);
+            if(x > y) swap(x,y);
+            printf("%d\n", ans[x][y]);
+        }
+    }
+    return 0;
+}

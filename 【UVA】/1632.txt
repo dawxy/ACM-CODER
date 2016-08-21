@@ -1,0 +1,59 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10;
+int x[MAXN], d[MAXN], dp[MAXN][MAXN][2];
+
+int in()
+{
+	int ch;
+	while((ch = getchar()) < '0' || ch > '9');
+	int ans = ch-'0';
+	while((ch = getchar()) >= '0' && ch <= '9') ans = (ans<<1)+(ans<<3)+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n) x[i] = in(), d[i] = in();
+		rep(i,0,n) clc(dp[i],0x3f);
+		rep(i,0,n) dp[i][i][0] = dp[i][i][1] = 0;
+		per(i,n-1,0)
+		{
+			rep(j,i,n)
+			{
+				if(i > 0 && dp[i][j][0]+x[i]-x[i-1] < d[i-1])//人在i处往i-1走
+					dp[i-1][j][0] = min(dp[i-1][j][0], dp[i][j][0]+x[i]-x[i-1]);
+				if(j+1 < n && dp[i][j][0]+x[j+1]-x[i] < d[j+1])//人在i处往j+1走
+					dp[i][j+1][1] = min(dp[i][j+1][1], dp[i][j][0]+x[j+1]-x[i]);
+				if(i > 0 && dp[i][j][1]+x[j]-x[i-1] < d[i-1])//人在j往i-1走
+					dp[i-1][j][0] = min(dp[i-1][j][0], dp[i][j][1]+x[j]-x[i-1]);
+				if(j+1 < n && dp[i][j][1]+x[j+1]-x[j] < d[j+1])//j->j+1
+					dp[i][j+1][1] = min(dp[i][j+1][1], dp[i][j][1]+x[j+1]-x[j]);
+			}
+		}
+		int ans = min(dp[0][n-1][0], dp[0][n-1][1]);
+		if(INF == ans) puts("No solution");
+		else printf("%d\n", ans);
+	}
+	return 0;
+}

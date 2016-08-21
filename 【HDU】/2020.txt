@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <malloc.h>
+
+int juedui (int a)
+{
+	if (a < 0)
+		a *= (-1);
+	return a;
+}
+
+void paixu (int *p, int n)
+{
+	int i, j, t;
+	for (i = 0; i < n-1; i++)
+	{
+		for (j = 0; j < n-1-i; j++)
+		{
+			if (juedui(p[j]) < juedui(p[j+1]))
+			{
+				t = p[j];
+				p[j] = p[j+1];
+				p[j+1] = t;
+			}
+		}
+	}
+}
+
+void main ()
+{
+	int n, *p, i;
+
+	while (1)
+	{
+		scanf ("%d", &n);
+		getchar ();
+		if (0 == n)
+			return;
+		p = (int*) malloc ((sizeof(int)*n)+1);
+		for (i = 0; i < n; i++)
+		{
+			if (n-1 != i)
+				scanf ("%d ", &p[i]);
+			else
+			{
+				scanf ("%d", &p[i]);
+			}
+		}
+
+		paixu (p, n);
+		for (i = 0; i < n; i++)
+		{
+			if (n-1 != i)
+				printf ("%d ", p[i]);
+			else
+				printf ("%d\n", p[i]);
+		}
+		getchar ();
+		free (p);
+	}
+}

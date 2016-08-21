@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 38
+typedef long long LL;
+LL dp[MAXN][MAXN],a[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && ~n)
+	{
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = 0; j < n; j++)
+				a[i][j] = getchar()-'0';
+			getchar();
+		}
+		memset(dp,0,sizeof(dp));
+		dp[0][0] = 1;
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = 0; j < n; j++)
+			{
+				if(dp[i][j] && a[i][j])
+				{
+					if(j+a[i][j] < n)
+						dp[i][j+a[i][j]] += dp[i][j];
+					if(i+a[i][j] < n)
+					dp[i+a[i][j]][j] += dp[i][j];
+				}
+			}
+		}
+		printf("%I64d\n", dp[n-1][n-1]);
+	}
+	return 0;
+}

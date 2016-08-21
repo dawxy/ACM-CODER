@@ -1,0 +1,65 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXM = 210000+10;
+int dp[MAXM];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int num[6],count = 0;
+	while(1)
+	{
+		int sum = 0,m = 0;
+		rep(i,0,6)
+		{
+			scanf("%d%*c", &num[i]);
+			sum += num[i];
+			m += num[i]*(i+1);
+		}
+		if(!sum) break;
+		clc(dp,0);
+		printf("Collection #%d:\n",++count);
+		if(m&1)
+		{
+			puts("Can't be divided.");
+			putchar('\n');
+			continue;
+		}
+		m>>=1;
+		rep(i,0,6)
+		{
+			for(int j = 1; j <= num[i]; num[i] -= j,j<<=1)
+			{
+				int w = j*(i+1);
+				if(w > m) break;
+				per(k,m,w) dp[k] = max(dp[k],dp[k-w]+w);
+			}
+			if(num[i] > 0)
+			{
+				int w = num[i]*(i+1);
+				per(k,m,w) dp[k] = max(dp[k],dp[k-w]+w);
+			}
+		}
+		if(dp[m] == m) puts("Can be divided.");
+		else puts("Can't be divided.");
+		putchar('\n');
+	}
+	return 0;
+}

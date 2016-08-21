@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 60
+#define INF 0x3f3f3f3f
+int dp[MAXN][MAXN], tax[MAXN], p[MAXN][MAXN];
+
+void pt(int x, int y)
+{
+	if(x == y) return;
+	printf("-->%d",p[x][y]);
+	pt(p[x][y],y);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		for(int i = 1; i <= n; i++)
+		{
+			for(int j = 1; j <= n; j++)
+			{
+				scanf("%d%*c", &dp[i][j]);
+				p[i][j] = j;
+				if(-1 == dp[i][j])
+					dp[i][j] = INF;
+			}
+		}
+		for(int i = 1; i <= n; i++)
+			scanf("%d%*c", &tax[i]);
+		for(int k = 1; k <= n; k++)
+		{
+			for(int i = 1; i <= n; i++)
+			{
+				for(int j = 1; j <= n; j++)
+				{
+					if(dp[i][j] > dp[i][k]+dp[k][j]+tax[k])
+					{
+						dp[i][j] = dp[i][k]+dp[k][j]+tax[k];
+						p[i][j] = p[i][k];
+					}
+					else if(dp[i][j] == dp[i][k]+dp[k][j]+tax[k])
+					{
+						if(p[i][j] > p[i][k])
+							p[i][j] = p[i][k];
+					}
+				}
+			}
+		}
+		int a,b;
+		while(~scanf("%d %d%*c", &a, &b) && (~a || ~b))
+		{
+			printf("From %d to %d :\n", a,b);
+			printf("Path: %d",a);
+			pt(a,b);
+			putchar('\n');
+			printf("Total cost : %d\n\n", dp[a][b]);
+		}
+	}
+	return 0;
+}

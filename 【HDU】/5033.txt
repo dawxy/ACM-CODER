@@ -1,0 +1,86 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+#define toj(a) (a*180.0/PI)
+#define MAXN 100010
+struct NODE{
+	double x, h;
+	bool operator<(const NODE& a) const{
+		return x < a.x;
+	}
+}p[MAXN];
+struct A{
+	int x;
+	double val;
+}left[MAXN], right[MAXN];
+const double PI = 4.0 * atan(1.0);
+int n;
+
+inline double clc_k(const NODE& a, const NODE& b){
+	return (a.h-b.h)/fabs(a.x-b.x);
+}
+int find(double num)
+{
+	int l = 0, r = n-1, mid;
+	while(l <= r)
+	{
+		mid = (l+r)>>1;
+		if(p[mid].x < num) 
+			l = mid+1;
+		else 
+			r = mid-1;
+	}
+	return l;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d%*c", &n);
+		for(int i = 0; i < n; i++)
+			scanf("%lf %lf%*c", &p[i].x, &p[i].h);
+		sort(p,p+n);
+		left[0].x = -1, left[0].val = 0;
+		for(int i = 1; i < n; i++)
+		{
+			int a = i-1;
+			while(~left[a].x && left[a].val > clc_k(p[a], p[i]))
+				a = left[a].x;
+			left[i].x = a;
+			left[i].val = clc_k(p[a], p[i]);
+		}
+		right[n-1].x = -1, right[n-1].val = 0;
+		for(int i = n-2; i >= 0; i--)
+		{
+			int a = i+1;
+			while(~right[a].x && right[a].val > clc_k(p[a], p[i]))
+				a = right[a].x;
+			right[i].x = a;
+			right[i].val = clc_k(p[a], p[i]);
+		}
+		int q;
+		NODE a;
+		a.h = 0;
+		scanf("%d%*c", &q);
+		printf("Case #%d:\n", ++count);
+		while(q--)
+		{
+			scanf("%lf%*c", &a.x);
+			int rt = find(a.x);
+			int lt = rt-1;
+			while(~left[lt].x && left[lt].val > clc_k(p[lt], a))
+				lt = left[lt].x;
+			while(~right[rt].x && right[rt].val > clc_k(p[rt], a))
+				rt = right[rt].x;
+			printf("%.10lf\n", 180-toj(atan(clc_k(p[lt],a)))-toj(atan(clc_k(p[rt],a))));
+		}
+	}
+	return 0;
+}

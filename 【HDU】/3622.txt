@@ -1,0 +1,122 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <algorithm>
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define clc(a,b) memset(a,b,sizeof(a))
+using namespace std;
+const int MAXN = 100+10, MAXM = 200*200+10;
+struct Twosat{
+	//id&1 = 1表示真，否则假(就是奇数编号为真，偶数编号为假)
+	int n, to[MAXM], next[MAXM],head[MAXN<<1],tol;
+	void init(int n)
+	{
+		this->n = n;
+		clc(head,-1);
+		tol = 0;
+	}
+	void add_edge(int u, int v)
+	{
+		next[tol] = head[u],to[tol] = v;
+		head[u] = tol++;
+	}
+	void add_clause(int x, int xv, int y, int vv)//添加关系，x为xv(xv = 0假，1真),y为vv
+	{
+		x = (x<<1)+xv;y = (y<<1)+vv;
+		add_edge(x^1,y);
+		add_edge(y^1,x);
+	}
+	bool vis[MAXN<<1];
+	int s[MAXN<<1], c;
+	bool dfs(int x)
+	{
+		if(vis[x^1]) return false;
+		if(vis[x]) return true;
+		vis[x] = true;
+		s[c++] = x;
+		for(int i = head[x]; ~i; i = next[i])
+			if(!dfs(to[i])) return false;
+		return true;
+	}
+	bool sloved()
+	{
+		clc(vis,0);
+		for(int i = 0; i < n<<1; i += 2)
+		{
+			if(!vis[i] && !vis[i^1])
+			{
+				c = 0;
+				if(!dfs(i))
+				{
+					while(c > 0) vis[s[--c]] = false;
+					if(!dfs(i^1)) return false;//i和i^1都不能选说明不存在2-sat的解
+				}
+			}
+		}
+		return true;
+	}
+}twosat;
+struct P{
+	double x,y;
+}p[MAXN][2];
+double dis[MAXN][2][MAXN][2];
+int n;
+
+double get_dis(const P &a, const P &b){
+	return sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));
+}
+bool ok(double r)
+{
+	twosat.init(n);
+	r *= 2;
+	rep(i,0,n)
+	{
+		rep(a,0,2)
+		{
+			rep(j,i+1,n)
+			{
+					rep(b,0,2)
+					{
+						if(dis[i][a][j][b] > r || fabs(dis[i][a][j][b]-r) < 1e-6) continue;
+						twosat.add_clause(i,a^1,j,b^1);
+					}
+			}
+		}
+	}
+	return twosat.sloved();
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+    while(~scanf("%d%*c", &n))
+    {
+    	double x = 0, y = 0, ans = 0;
+    	rep(i,0,n)
+    		scanf("%lf %lf %lf %lf%*c", &p[i][0].x, &p[i][0].y, &p[i][1].x, &p[i][1].y);
+		rep(i,0,n)
+		{
+			rep(a,0,2)
+			{
+				rep(j,i+1,n)
+				{
+					rep(b,0,2)
+					{
+						dis[i][a][j][b] = dis[j][b][i][a] = get_dis(p[i][a],p[j][b]);
+						y = max(y,dis[i][a][j][b]);
+					}
+				}
+			}
+		}
+		//printf("%.f\n", y);
+		while(x <= y)
+		{
+			double m = (x+y)/2.0;
+			if(ok(m)) ans = m, x = m+0.00001;
+			else y = m-0.00001;
+		}
+		printf("%.2f\n", ans);
+    }
+    return 0;
+}

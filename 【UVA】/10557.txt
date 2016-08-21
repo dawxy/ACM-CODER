@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 101
+int ed, vis[MAX], en[MAX];
+bool find;
+struct G{
+	int en, n, out[MAX];
+}g[MAX];
+
+void dfs(int, int);
+void dfs2(int);
+
+int main ()
+{
+	while(1)
+	{
+		scanf ("%d%*c", &ed);
+		if (-1 == ed)
+			break;
+		memset(g,0,sizeof(g));
+		memset(vis,0,sizeof(vis));
+		memset(en,0,sizeof(en));
+		for (int i = 1; i <= ed; i++)
+		{
+			scanf ("%d%*c%d%*c", &g[i].en, &g[i].n);
+			for (int j = 0; j < g[i].n; j++)
+				scanf ("%d%*c", &g[i].out[j]);
+		}
+		find = false;
+		dfs(1,100);
+		if (find)
+			puts("winnable");
+		else
+			puts("hopeless");
+	}
+
+	return 0;
+}
+
+void dfs(int room, int eng)
+{
+	if (find)
+		return;
+	if (ed == room)
+	{
+		find = true;
+		return;
+	}
+	for (int i = 0; i < g[room].n; i++)
+	{
+		int m = g[room].out[i];
+		if(en[m] && en[m] < eng+g[m].en)
+		{
+			dfs2(room);
+			if (find)
+				return;
+		}
+		else if (!en[m] && 0 < eng+g[m].en)
+		{
+			en[m] = eng+g[m].en;
+			dfs(m, en[m]);
+		}
+
+	}
+}
+
+void dfs2(int room)
+{
+	if (ed == room)
+	{
+		find = true;
+		return;
+	}
+	for (int i = 0; i < g[room].n; i++)
+	{
+		int m = g[room].out[i];
+		if (!vis[m])
+		{
+			vis[m] = 1;
+			dfs2(m);
+			vis[m] = 0;
+		}
+	}
+}

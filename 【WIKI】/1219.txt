@@ -1,0 +1,29 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 52
+const int d[4][2] = {{2,-1},{1,-2},{-1,-2},{-2,-1}};
+unsigned long long dp[MAXN][MAXN];
+
+int main ()
+{
+    int w, h, si, sj, ei, ej;
+    scanf ("%d %d%*c" ,&w, &h);
+    scanf ("%d %d %d %d%*c", &sj, &si, &ej, &ei);
+    dp[si][sj] = 1;
+    for (int j = sj; j <= ej; j++)
+    {
+        for (int i = 1; i <= h; i++)
+        {
+            for (int k = 0; k < 4; k++)
+            {
+                int ni = i+d[k][0], nj = j+d[k][1];
+                if (1 <= ni && h >= ni && 1 <= nj && w >= nj)
+                    dp[i][j] += dp[ni][nj];
+            }
+        }
+    }
+    printf ("%lld\n", dp[ei][ej]);
+    return 0;
+}

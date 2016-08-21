@@ -1,0 +1,46 @@
+/*
+n>3
+方案一：
+ 　　1 号和 2 号先过河，然后 1 号回来，n 号和 n-1 号过河，然后 2 号再回来
+ 用时：2*a[2]+a[1]+a[n];
+方案二：
+ 　　1 号和 n 号先过河，然后 1 号再回来，1 号和 n-1 号再过河，之后 1 号再回来
+ 用时：a[n]+a[n-1]+2*a[1];
+每次取这两种方案的最小值
+
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+int a[MAXN];
+
+int sloved(int n)
+{
+	if (n <= 1)
+        return a[n];
+    if (2 == n)
+        return a[0]+a[1]+a[2];
+    return sloved(n-2)+min(a[0]*2+a[n]+a[n-1],a[0]+a[1]*2+a[n]);
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		int n;
+		scanf ("%d%*c", &n);
+		for (int i = 0; i < n; i++)
+		{
+			scanf ("%d%*c", &a[i]);
+		}
+		sort(a,a+n);
+		printf ("%d\n", sloved(n-1));
+	}
+    return 0;
+}

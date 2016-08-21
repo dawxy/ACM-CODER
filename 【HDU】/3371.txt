@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 510
+struct NODE{
+    int a, b, v;
+    bool operator < (const NODE& t) const {return v < t.v;}
+}p[25010];
+int ans,ch,f[MAXN];
+
+int in()//加了输入挂
+{
+    while((ch = getchar()) < '0' || '9' < ch);
+    ans = ch-'0';
+    while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+    return ans;
+}
+int find(int x){return f[x] == x ? x : f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n = in(),m = in(),k = in(), cnt = 1;
+        for(int i = 0; i <= n; i++) f[i] = i;
+        for(int i = 0; i < m; i++)
+            p[i].a = in(), p[i].b = in(), p[i].v = in();
+        sort(p,p+m);
+        for(int i = 0; i < k; i++)
+        {
+            int len = in();
+            int y = find(in()); //把第一个点所在集合设为下面连通的边合并的集合
+            for(int j = 1; j < len; j++)//把已经修建完的路(也就是边为0)的城市直接连通，并cnt计数
+            {
+                int x = find(in());
+                if(x != y) f[x] = y, cnt++;
+            }
+        }
+        ans = 0;
+        for(int i = 0; i < m && cnt < n; i++)
+        {
+            int x = find(p[i].a), y = find(p[i].b);
+            if(x != y) ans += p[i].v, f[x] = y, cnt++;
+        }
+        if(cnt < n) puts("-1");
+        else printf("%d\n", ans);
+    }
+    return 0;
+}

@@ -1,0 +1,99 @@
+/*±©Á¦*/
+#include <stdio.h>
+#define MAXN 1000001
+bool a[MAXN];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	for (int i = 1; i < MAXN-1; i++)
+	{
+		bool f = false;
+		int buf = i;
+		while(buf)
+		{
+			if (buf%10 == 4 || buf%100 == 62)
+			{
+				f = true;
+				break;
+			}
+			buf /= 10;
+		}
+		if (f)
+			a[i] = true;
+	}
+	while(1)
+	{
+		int l, r;
+		scanf ("%d %d%*c", &l, &r);
+		if (!l && !r)
+			break;
+		int ans = 0;
+		for (int i = l; i <= r; i++)
+		{
+			if (!a[i])
+				ans++;
+		}
+		printf ("%d\n", ans);
+	}
+	return 0;
+}
+==================================================================================
+/*ÊýÎ»DP*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10;
+int dp[MAXN][2],bit[MAXN];
+
+int dfs(int len, bool is6, bool ismax)
+{
+	if(!len) return 1;
+	if(!ismax && ~dp[len][is6]) return dp[len][is6];
+	int cnt = 0, mxnum = ismax?bit[len]:9;
+	repe(i,0,mxnum)
+	{
+		if(4 == i || is6 && 2 == i) continue;
+		cnt += dfs(len-1,6 == i,ismax && i == mxnum);
+	}
+	return ismax?cnt:dp[len][is6] = cnt;
+}
+int sloved(int n)
+{
+	int len = 0;
+	while(n)
+	{
+		bit[++len] = n%10;
+		n /= 10;
+	}
+	return dfs(len,false,true);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	clc(dp,-1);
+	int n,m;
+	while(~scanf("%d %d", &n, &m) && n+m)
+	{
+		printf("%d\n", sloved(m)-sloved(n-1));
+	}
+	return 0;
+}

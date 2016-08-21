@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <malloc.h>
+typedef struct Node{
+	char data;
+	Node *c1, *c2, *c3, *c4;
+}node, *pnode;
+int ans;
+
+void creat_tree(pnode*);
+void traverse(pnode, pnode, int);
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		ans = 0;
+		pnode ph1, ph2;
+		creat_tree(&ph1);
+		getchar();
+		creat_tree(&ph2);
+		getchar();
+		traverse(ph1, ph2, 1024);
+		printf ("There are %d black pixels.\n", ans);
+	}
+
+	return 0;
+}
+
+void creat_tree(pnode *p)
+{
+	*p = (pnode)malloc(sizeof(node));
+	(*p)->data = getchar();
+	if ('e' == (*p)->data || 'f' == (*p)->data)
+	{
+		(*p)->c1=(*p)->c2=(*p)->c3=(*p)->c4=NULL;
+		return;
+	}
+	creat_tree(&((*p)->c1));
+	creat_tree(&((*p)->c2));
+	creat_tree(&((*p)->c3));
+	creat_tree(&((*p)->c4));
+}
+
+void traverse(pnode p1, pnode p2, int v)
+{
+	if (NULL == p1 && NULL == p2)
+		return;
+	if (NULL != p1 && NULL != p2)
+	{
+		if ('f' == p1->data || 'f' == p2->data)
+		{
+			ans += v;
+			p1->c1=p1->c2=p1->c3=p1->c4=NULL;
+			p2->c1=p2->c2=p2->c3=p2->c4=NULL;
+			return;
+		}
+		traverse(p1->c1, p2->c1, v/4);
+		traverse(p1->c2, p2->c2, v/4);
+		traverse(p1->c3, p2->c3, v/4);
+		traverse(p1->c4, p2->c4, v/4);
+		return;
+	}
+	if (NULL != p1)
+	{
+		if ('f' == p1->data)
+		{
+			ans += v;
+			p1->c1=p1->c2=p1->c3=p1->c4=NULL;
+			return;
+		}
+		traverse(p1->c1, p2, v/4);
+		traverse(p1->c2, p2, v/4);
+		traverse(p1->c3, p2, v/4);
+		traverse(p1->c4, p2, v/4);
+		return;
+	}
+	if (NULL != p2)
+	{
+		if ('f' == p2->data)
+		{
+			ans += v;
+			p2->c1=p2->c2=p2->c3=p2->c4=NULL;
+			return;
+		}
+		traverse(p1, p2->c1, v/4);
+		traverse(p1, p2->c2, v/4);
+		traverse(p1, p2->c3, v/4);
+		traverse(p1, p2->c4, v/4);
+	}
+
+}

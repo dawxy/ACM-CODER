@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		char c;
+		while ('\n' != (c = getchar()) && EOF != c)
+		{
+			if ('a' <= c && 'z' >= c)
+				printf ("%c", c-32);
+			else
+				printf ("%c", c+32);
+		}
+		printf ("\n");
+	}
+
+	return 0;
+}

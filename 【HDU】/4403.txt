@@ -1,0 +1,70 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 15+10;
+char a[MAXN];
+vector<LL> p[2];
+map<LL,int> vis;
+
+LL get_int(int x, int y)
+{
+	LL ans = 0;
+	repe(i,x,y)
+	{
+		ans = ans*10+a[i]-'0';
+	}
+	return ans;
+}
+void find(int x, int y, int id)
+{
+	int len = y-x,all = (1<<len)-1, la = x;
+	repe(s,0,all)
+	{
+		LL sum = 0;
+		la = x;
+		rep(i,0,len)
+		{
+			if(s&(1<<i))
+			{
+				sum += get_int(la,x+i);
+				la = x+i+1;
+			}
+		}
+		sum += get_int(la,x+len);
+		p[id].push_back(sum);
+	}
+}
+int sloved()
+{
+	int n = strlen(a),ans = 0;
+	rep(i,0,n-1)
+	{
+		p[0].clear();
+		p[1].clear();
+		find(0,i,0);
+		find(i+1,n-1,1);
+		vis.clear();
+		rep(i,0,p[0].size()) vis[p[0][i]]++;
+		rep(i,0,p[1].size())
+		{
+			if(vis.find(p[1][i]) != vis.end())
+				ans += vis[p[1][i]];
+		}
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%s",a) && 'E' != a[0])
+	{
+		printf("%d\n", sloved());
+	}
+	return 0;
+}

@@ -1,0 +1,72 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 5010
+int a[MAXN], sum[MAXN];
+
+int ql,qr;
+int query(int u, int x, int y)
+{
+	if(ql <= x && qr >= y) return sum[u];
+	int m = (x+y)>>1, ans = 0;
+	if(ql <= m) ans += query(u<<1,x,m);
+	if(qr > m) ans += query((u<<1)+1,m+1,y);
+	return ans;
+}
+int p,v;
+void update(int u, int x, int y)
+{
+	if(x == y)
+	{
+		sum[u] += v;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(u<<1,x,m);
+	else update((u<<1)+1,m+1,y);
+	sum[u] = sum[u<<1]+sum[(u<<1)+1];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int cnt = 0;
+		clc(sum,0);
+		qr = n;
+		v = 1;
+		repe(i,1,n)
+		{
+			scanf("%d%*c", &a[i]);
+			a[i]++;
+			ql = a[i]+1;
+			cnt += query(1,1,n);
+			p = a[i];
+			update(1,1,n);
+		}
+		int ans = cnt;
+		repe(i,1,n)
+		{
+			cnt += n-2*a[i]+1;
+			ans = min(ans,cnt);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

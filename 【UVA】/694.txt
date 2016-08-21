@@ -1,0 +1,25 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t = 0;
+	while (1)
+	{
+		long long a, n, count = 0, buf;
+		scanf ("%lld %lld%*c", &a, &n);
+		if (-1 == a && -1 == n)
+			break;
+		buf = a;
+		while (1 != a && a <= n)
+		{
+			if (0 == a%2)
+				a /= 2;
+			else
+				a = 3*a+1;
+			count ++;
+		}
+		if (1 == a)
+			count++;
+		printf ("Case %d: A = %lld, limit = %lld, number of terms = %lld\n", ++t,buf,n,count);
+	}
+}

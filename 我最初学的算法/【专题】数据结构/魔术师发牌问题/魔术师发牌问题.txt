@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <malloc.h>
+
+typedef struct NODE{
+	int data;
+	NODE *next;
+}node, *pnode;
+
+pnode init_looplist ();
+void the_proved(pnode);
+void traverse (pnode);
+
+int main ()
+{
+	pnode ph = init_looplist();
+	the_proved (ph);
+	traverse (ph);
+	return 0;
+}
+
+pnode init_looplist ()
+{
+	pnode ph = (pnode)malloc(sizeof(node)), p, plast;
+	ph->next = plast = ph;
+	for (int i = 1; i <= 13; i++)
+	{
+		p = (pnode)malloc (sizeof(node));
+		p->data = 0;
+		plast->next = p;
+		plast = p;
+	}
+	plast->next = ph->next;
+	free(ph);
+	return plast->next;
+}
+
+void the_proved(pnode ph)
+{
+	int s = 2, i;
+	pnode p = ph;
+	ph->data = 1;
+	while (s < 14)
+	{
+		for (i = 0; i < s; )
+		{
+			p = p->next;
+			if (0 == p->data)
+				i++;
+		}
+		p->data = s;
+		s++;
+	}
+}
+
+void traverse (pnode ph)
+{
+	pnode p = ph->next;
+	printf ("%d\n", ph->data);
+	while (p != ph)
+	{
+		printf ("%d\n", p->data);
+		p = p->next;
+	}
+}

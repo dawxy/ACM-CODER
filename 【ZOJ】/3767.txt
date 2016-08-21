@@ -1,0 +1,27 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        long long  n, m;
+        scanf ("%lld %lld%*c", &n, &m);
+        long long sum = 0, a;
+        for (int i = 0; i < n; i++)
+		{
+            scanf ("%lld%*c", &a);
+            sum += a;
+		}
+        if (sum <= m)
+			puts("Safe");
+		else
+			puts("Warning");
+	}
+    return 0;
+}
+

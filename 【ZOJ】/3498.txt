@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+int main ()
+{
+	#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+	#endif
+    int t;
+    scanf ("%d%*c",&t);
+    while(t--)
+	{
+		int n;
+		scanf ("%d%*c", &n);
+		int ans = 0;
+		long long sum = 1;
+		while(sum <= n)
+		{
+            ans++;
+            sum <<= 1;
+		}
+        printf ("%d\n", ans);
+	}
+    return 0;
+}

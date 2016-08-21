@@ -1,0 +1,82 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+#define INF 0x3f3f3f3f
+struct E{
+	int from,to,cost;
+	E(int a = 0, int b = 0, int c = 0){from = a, to = b, cost = c;}
+};
+struct NODE{
+	int dis,u;
+	NODE(int a = 0, int b = 0) {dis = a, u = b;}
+	bool operator <(const NODE& a) const { return dis > a.dis;}
+};
+vector<E> edge;
+vector<int> g[MAXN];
+int st[MAXN], ed[MAXN], d, dp[MAXN];
+bool vis[MAXN];
+
+void add(int a, int b, int c)
+{
+	edge.push_back(E(a,b,c));
+	g[a].push_back(edge.size()-1);
+}
+int dijkstra(int si)
+{
+	memset(dp,0x3f,sizeof(dp));
+	memset(vis,0,sizeof(vis));
+	dp[si] = 0;
+	priority_queue<NODE> q;
+	q.push(NODE(0,si));
+	while(!q.empty())
+	{
+		NODE buf = q.top();q.pop();
+		if(vis[buf.u]) continue;
+		vis[buf.u] = true;
+		int len = g[buf.u].size();
+		for(int i = 0; i < len; i++)
+		{
+			E& e = edge[g[buf.u][i]];
+			if(dp[e.to] > dp[buf.u]+e.cost)
+			{
+				dp[e.to] = dp[buf.u]+e.cost;
+				q.push(NODE(dp[e.to],e.to));
+			}
+		}
+	}
+	int ans = INF;
+	for(int i = 0; i < d; i++)
+		ans = min(ans,dp[ed[i]]);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int m,s;
+	while(~scanf("%d %d %d%*c", &m, &s, &d))
+	{
+		int a,b,c;
+		for(int i = 0; i <= 1000; i++) g[i].clear();
+		edge.clear();
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b, &c);
+			add(a,b,c), add(b,a,c);
+		}
+		for(int i = 0; i < s; i++)
+			scanf("%d%*c", &st[i]);
+		for(int i = 0; i < d; i++)
+			scanf("%d%*c", &ed[i]);
+		int ans = INF;
+		for(int i = 0; i < s; i++)
+			ans = min(ans,dijkstra(st[i]));
+		printf("%d\n", ans);
+	}
+	return 0;
+}

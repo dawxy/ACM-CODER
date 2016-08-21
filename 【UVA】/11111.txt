@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <stack>
+using namespace std;
+const int maxn = 10000;
+
+int t[maxn];
+
+bool solve(int n) {
+	int c[30000] = {0}, buf,i;
+	stack<int> s;
+	for (i = 0; i < n; i++)
+	{
+		if (t[i] < 0)
+		{
+			s.push(t[i]);
+			c[s.size()] += (-1)*t[i];
+		}
+		else
+		{
+			if ( (-1)*s.top() != t[i])
+				return false;
+			buf = s.top(), s.pop();
+			if (!s.empty() && (-1)*s.top() <= c[s.size()+1])
+				return false;
+			s.push(buf);
+			c[s.size()+1] = 0;
+			s.pop();
+		}
+	}
+	return true;
+}
+
+
+int main() {
+	//freopen("e:\\1.txt", "r", stdin);
+	int n;
+	char c;
+	for (n = 0; scanf("%d%c", &t[n++], &c) != EOF; ) {
+		if (c == '\n') {
+			if (n % 2 == 1)
+				puts(":-( Try again.");
+			else{
+				if (solve(n))
+					puts(":-) Matrioshka!");
+				else
+					puts(":-( Try again.");
+			}
+			n = 0;
+		}
+	}
+	return 0;
+}

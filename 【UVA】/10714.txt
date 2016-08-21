@@ -1,0 +1,41 @@
+#include <stdio.h>
+#define MAXN 1000010
+int a[MAXN];
+
+int min (int a, int b)
+{
+	if (a < b)
+		return a;
+	return b;
+}
+int max(int a, int b)
+{
+	if (a < b)
+		return b;
+	return a;
+}
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+    while(t--)
+	{
+		int l, n;
+		scanf ("%d %d%*c",&l, &n);
+        for (int i = 0;  i < n; i++)
+		{
+            scanf ("%d%*c", &a[i]);
+		}
+		int ansmin = -1, ansmax = -1;
+		for (int i = 0;  i < n; i++)
+		{
+			ansmin = max(min(a[i],l-a[i]),ansmin);
+			ansmax = max(max(a[i],l-a[i]),ansmax);
+		}
+		printf ("%d %d\n", ansmin, ansmax);
+	}
+    return 0;
+}

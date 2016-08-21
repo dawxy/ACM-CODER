@@ -1,0 +1,43 @@
+#include <cstdio>
+#include <cmath>
+#define MAXN 50000
+int prime[MAXN+1];
+
+void get_prime()
+{
+	for(int i = 2; i <= MAXN; i++)
+	{
+		if(!prime[i]) prime[++prime[0]] = i;
+		for(int j = 1; j <= prime[0] && prime[j] <= MAXN/i; j++)
+		{
+			prime[prime[j]*i] = 1;
+			if(i%prime[j] == 0) break; 
+		}
+	}
+	prime[prime[0]+1] = 0x3f3f3f3f;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+	int m, a,b;
+	get_prime();
+	while(~scanf("%d %d %d%*c", &m, &a, &b) && m+a+b)
+	{
+		int maxn = 0, p, q;
+		for(int i = 1; prime[i] <= m/2; i++)
+		{
+			for(int j = 1; prime[j] <= prime[i] && (long long)prime[i]*prime[j] <= m; j++)
+			{
+				if(a*1.0/b < prime[j]*1.0/prime[i] || fabs(a*1.0/b - prime[j]*1.0/prime[i]) < 1e-6)
+				{
+					if(maxn < prime[i]*prime[j])
+						maxn = prime[i]*prime[j], p = prime[j], q = prime[i];
+				}
+			}
+		}
+		printf("%d %d\n", p, q);
+	}
+	return 0;
+}

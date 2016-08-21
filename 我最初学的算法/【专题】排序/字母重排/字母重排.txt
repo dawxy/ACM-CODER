@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+#define scanf scanf_s
+using namespace std;
+struct di{
+	char data[7];
+};
+
+int main ()
+{
+	int i, len;
+	di zd[1000], sz[1000];//zdÊäÈëµÄ×Öµä£¬szÅÅÍêĞòµÄ×Öµä
+	for (i = 0; strcmp(zd[i-1].data, "******"); i++)//ÊäÈë×Öµä
+	{
+		scanf ("%s%*c", &zd[i].data,7);
+		strcpy_s(sz[i].data, zd[i].data);
+	}
+	len = i-1;
+	for (i = 0;  i < len; i++)//×ÖµäÅÅĞò
+	{
+		int buf = strlen(sz[i].data);
+		sort(sz[i].data, sz[i].data+buf);
+	}
+
+	char a[7];
+	while (EOF != scanf ("%s%*c", a, 7))
+	{
+		int lenb;
+		char b[7];
+		bool into = false;
+		strcpy_s(b, a);
+		lenb = strlen(b);
+		sort(b, b+lenb);
+		for (i = len-1; i >= 0; i--)
+		{
+			if (!strcmp(b, sz[i].data))
+			{
+				printf ("%s ", zd[i].data);
+				into = true;
+			}
+		}
+		if (!into)
+			printf (":(");
+		printf ("\n");
+	}
+	return 0;
+}

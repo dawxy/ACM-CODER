@@ -1,0 +1,107 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 300
+int h;
+char map[MAX][MAX];
+
+bool is_node(char);
+void solved(int, int);
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int si, sj;
+		for (int i = 0; i < MAX; i++)
+			for (int j = 0; j < MAX; j++)
+				map[i][j] = 0;
+		for (h = 0; ;h++)
+		{
+			int j, c;
+			for (j = 0; '\n' != (c = getchar()) && EOF != c;j++)
+				map[h][j] = c;
+			map[h][j] = '\0';
+			if ('#' == map[h][0])
+				break;
+		}
+		bool in = false;
+		for (int j = 0; '\0' != map[0][j]; j++)
+		{
+			if (is_node(map[0][j]))
+			{
+				in = true;
+				si = 0;
+				sj = j;
+				break;
+			}
+		}
+
+		printf ("(");
+		if (in)
+			solved(si, sj);
+		printf (")\n");
+	}
+
+	return 0;
+}
+
+bool is_node(char a)
+{
+	if ('\0' == a || ' ' == a || '|' == a || '-' == a || '#' == a)
+		return false;
+	return true;
+}
+
+bool find_child(int hi, int hj, int *s, int *e, int *hxi)
+{
+	if ('|' != map[hi][hj])
+		return false;
+	if ('-' == map[hi+1][hj])
+	{
+		int j = hj, k = hj;
+		while(1)
+		{
+			if ('-' != map[hi+1][j])
+				break;
+			j--;
+			if (j < 0)
+				break;
+		}
+		while(1)
+		{
+			if ('-' != map[hi+1][k])
+				break;
+			if (0 == map[hi+1][k])
+				break;
+			k++;
+		}
+		*s = j+1;
+		*e = k-1;
+		*hxi  = hi+2;
+		if (hi+2 >= h)
+			return false;
+		return true;
+	}
+	return false;
+}
+
+void solved(int si, int sj)
+{
+	int st, ed, hxi;
+	printf ("%c(",	map[si][sj]);
+	if (!find_child(si+1, sj, &st, &ed, &hxi))
+	{
+		printf (")");
+		return;
+	}
+	for (int j = st; j <= ed; j++)
+	{
+		if ('\0' == map[hxi][j])
+			break;
+		if (is_node(map[hxi][j]))
+			solved(hxi, j);
+	}
+	printf (")");
+}

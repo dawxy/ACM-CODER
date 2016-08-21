@@ -1,0 +1,74 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1500+10, MAXM = MAXN;
+int head[MAXN], tol, nxt[MAXM],to[MAXM];
+int dp[MAXN][2], f[MAXN];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+void dfs(int u)
+{
+	dp[u][1] = 1, dp[u][0] = 0;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		dfs(v);
+		dp[u][1] += min(dp[v][1], dp[v][0]);
+		dp[u][0] += dp[v][1];
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d", &n))
+	{
+		clc(head,-1);
+		clc(f,-1);
+		tol = 0;
+		rep(i,0,n)
+		{
+			int u,len;
+			scanf("%d:(%d)", &u, &len);
+			rep(j,0,len)
+			{
+				int v;
+				scanf("%d", &v);
+				add_edge(u,v);
+				f[v] = u;
+			}
+		}
+		int rt = -1;
+		rep(i,0,n)
+		{
+			if(f[i] == -1)
+			{
+				rt = i;
+				break;
+			}
+		}
+		dfs(rt);
+		printf("%d\n", min(dp[rt][0],dp[rt][1]));
+	}
+	return 0;
+}

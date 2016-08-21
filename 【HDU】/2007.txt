@@ -1,0 +1,38 @@
+#include <stdio.h>
+
+void main (void)
+{
+	int a, b, x, y, i;
+	
+	while (EOF != scanf_s ("%d %d", &a, &b))
+	{
+		x = 0;
+		y = 0;
+		getchar ();
+		if (a < b)
+		{
+			for (i = a; i <= b; i++)
+			{
+				if (0 == i%2)
+				{
+					x += i*i;
+				}
+				else 
+					y += i*i*i;
+			}
+		}
+		else if (a > b)
+		{
+			for (i = b; i <= a; i++)
+			{
+				if (0 == i%2)
+				{
+					x += i*i;
+				}
+				else 
+					y += i*i*i;
+			}
+		}
+		printf ("%d %d\n", x, y);
+	}
+}

@@ -1,0 +1,75 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 510
+#define MAXM 100010
+struct Edge{
+	int next, v;
+	Edge(int a = 0, int b = 0){next = a, v = b;}
+}edge[MAXM];
+struct cmp{
+    const bool operator ()(int &a,int &b)const{
+        return a>b;
+    }
+};
+int head[MAXN],tol,in[MAXN], n, ans[MAXN];
+
+void add_edge(int u, int v)
+{
+	edge[tol] = Edge(head[u],v);
+	head[u] = tol++;
+}
+void topo()
+{
+	int c = 1, p = 1;
+	priority_queue<int,vector<int>,cmp> q;
+	repe(i,1,n) if(!in[i]) q.push(i);
+	while(!q.empty())
+	{
+		int u = q.top();q.pop();
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v;
+			if(!--in[v]) q.push(v);
+		}
+		ans[p++] = u;
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int m;
+	while(~scanf("%d %d%*c", &n, &m))
+	{
+		int a,b;
+		clc(head,-1);
+		clc(in,0);
+		tol = 0;
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a, &b);
+			add_edge(a,b);
+			in[b]++;
+		}
+		topo();
+		printf("%d", ans[1]);
+		repe(i,2,n) printf(" %d", ans[i]);
+		putchar('\n');
+	}
+	return 0;
+}

@@ -1,0 +1,72 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 40000*2+10, MAXM = 40000*2+10;
+const LL MOD = 1000000007;
+LL f[MAXN];
+int head[MAXN],tol,nxt[MAXM],to[MAXM],fa[MAXN];
+
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+int cnt[MAXN];
+void dfs(int u, int fa)
+{
+	cnt[u] = 1;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(v == fa) continue;
+		dfs(v,u);
+		cnt[u] += cnt[v];
+	}
+}
+int pow_mod(LL x, int n)
+{
+	LL ans = 1;
+	while(n)
+	{
+		if(n&1) ans = ans*x%MOD;
+		x = x*x%MOD;
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	f[0] = 1;
+	repe(i,1,40000) f[i] = f[i-1]*i%MOD;
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d%d",&n, &m);
+		tol = 0;
+		clc(head,-1);
+		clc(fa,0);
+		rep(i,0,m)
+		{
+			int u,v;
+			scanf("%d%d",&u,&v);
+			add_edge(v,u);
+			fa[u] = v;
+		}
+		repe(i,1,n) if(!fa[i]) add_edge(0,i);
+		clc(cnt,0);
+		dfs(0,-1);
+		LL p = 1;
+		repe(i,1,n) p = p*cnt[i]%MOD;
+		printf("%lld\n", f[n]*pow_mod(p,MOD-2)%MOD);
+	}
+	return 0;
+}

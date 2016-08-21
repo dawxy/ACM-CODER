@@ -1,0 +1,186 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500+10, MAXIN = 10000, MAXOUT = 10000;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+char bufout[MAXOUT], outtmp[50],*pout = bufout, *pend = bufout+MAXOUT;
+inline void write(){ fwrite(bufout,sizeof(char),pout-bufout,stdout);pout = bufout;}
+inline void out_char(char c){ *(pout++) = c;if(pout == pend) write();}
+inline void out_str(char *s)
+{
+	while(*s){ *(pout++) = *(s++); if(pout == pend) write(); }
+}
+template <class T>
+inline void out_int(T x) {
+	if(!x){ out_char('0');return;}
+	if(x < 0) x = -x,out_char('-');
+	int len = 0;
+	while(x){ outtmp[len++] = x%10+48; x /= 10;}
+	outtmp[len] = 0;
+	for(int i = 0, j = len-1; i < j; i++,j--) swap(outtmp[i],outtmp[j]);
+	out_str(outtmp);
+}
+int a[MAXN][MAXN],nn;
+int val[MAXN<<1][MAXN<<1];
+
+inline int id(int x, int y){return x+y|x!=y;}
+void push_up(int x, int y, int m, int u)
+{
+	val[u][id(x,y)] = val[u][id(x,m)]^val[u][id(m+1,y)];
+}
+void bulid2(int x, int y, int ux, int uy, bool yz)
+{
+	if(x == y)
+	{
+		int u = id(ux,uy);
+		/*只有当两层都是叶子时才是一个点，否则还需要分解*/
+		if(yz) val[u][id(x,y)] = a[ux][x];
+		else
+		{
+			int m = (ux+uy)>>1;
+			val[u][id(x,y)] = val[id(ux,m)][id(x,y)]^val[id(m+1,uy)][id(x,y)];
+		}
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid2(x,m,ux,uy,yz);
+	bulid2(m+1,y,ux,uy,yz);
+	push_up(x,y,m,id(ux,uy));
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		bulid2(1,nn,x,y,1);
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	bulid2(1,nn,x,y,0);
+}
+void update2(int x, int y, int p, int v,int ux, int uy, bool yz)
+{
+	if(x == y)
+	{
+		int u = id(ux,uy);
+		if(yz) val[u][id(x,y)] = v;
+		else
+		{
+			int m = (ux+uy)>>1;
+			val[u][id(x,y)] = val[id(ux,m)][id(x,y)]^val[id(m+1,uy)][id(x,y)];
+		}
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update2(x,m,p,v,ux,uy,yz);
+	else update2(m+1,y,p,v,ux,uy,yz);
+	push_up(x,y,m,id(ux,uy));
+}
+void update(int x, int y, int p, int p2, int v)
+{
+	if(x == y)
+	{
+		update2(1,nn,p2,v,x,y,1);
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) update(x,m,p,p2,v);
+	else update(m+1,y,p,p2,v);
+	update2(1,nn,p2,v,x,y,0);
+}
+int qv;
+void query2(int x, int y, int ql, int qr, int u)
+{
+	if(ql <= x && y <= qr)
+	{
+		qv ^= val[u][id(x,y)];
+		return;
+	}
+	int m = (x+y)>>1;
+	if(ql <= m) query2(x,m,ql,qr,u);
+	if(qr > m) query2(m+1,y,ql,qr,u);
+}
+void query(int x, int y, int ql, int qr, int sl, int sr)
+{
+	if(ql <= x && y <= qr)
+	{
+		query2(1,nn,sl,sr,id(x,y));
+		return;
+	}
+	int m = (x+y)>>1;
+	if(ql <= m) query(x,m,ql,qr,sl,sr);
+	if(qr > m) query(m+1,y,ql,qr,sl,sr);
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	in(t);
+	while(t--)
+	{
+		int n,m,q;
+		in(n),in(m),in(q);
+		nn = m;
+		repe(i,1,n)
+		{
+			repe(j,1,m) in(a[i][j]);
+		}
+		bulid(1,n);
+		while(q--)
+		{
+			int op;
+			in(op);
+			if(1 == op)
+			{
+				int x1,y1,x2,y2;
+				in(x1),in(y1),in(x2),in(y2);
+				qv = 0;
+				query(1,n,x1,x2,y1,y2);
+				if(qv) out_str("Yes\n");
+				else out_str("No\n");
+			}
+			else
+			{
+				int x,y,v;
+				in(x),in(y),in(v);
+				update(1,n,x,y,v);
+			}
+		}
+	}
+	write();
+	return 0;
+}

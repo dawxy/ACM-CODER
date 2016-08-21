@@ -1,0 +1,15 @@
+#include <stdio.h>
+
+int main ()
+{
+	int n, i;
+	__int64 a[21];
+	for (i = 3, a[1] = 0, a[2] = 1; i <= 20; i++)
+		a[i] = (i-1)*(a[i-1]+a[i-2]);
+	while (EOF != scanf ("%d%*c", &n))
+	{
+		printf ("%I64d\n", a[n]);
+	}
+
+	return 0;
+}

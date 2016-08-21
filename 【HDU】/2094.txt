@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <string.h>
+struct NAME{
+	char data[100];
+}name[500];
+int n;
+
+int find (char *a, int len)
+{
+	for (int i = 0; i < len; i++)
+	{
+		if (!strcmp(a, name[i].data))
+			return i;
+	}
+	return -1;
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	while(EOF != scanf ("%d%*c", &n) && n)
+	{
+		char name1[100], name2[100];
+		int s1, s2, len = 0, i;
+		bool lose[500] = {0};
+		while(n--)
+		{
+			scanf ("%s %s%*c", name1, name2);
+			s1 = find(name1, len);
+			if (-1 == s1)
+			{
+				strcpy(name[len++].data, name1);
+				s1 = len-1;
+			}
+			s2 = find(name2, len);
+			if (-1 == s2)
+			{
+				strcpy(name[len++].data, name2);
+				s2 = len-1;
+			}
+			lose[s2] = true;
+		}
+		int ans = 0;
+		for (i = 0; i < len; i++)
+		{
+			if (!lose[i])
+				ans++;
+		}
+		if (1 != ans)
+			printf ("No\n");
+		else
+			printf ("Yes\n");
+	}
+
+	return 0;
+}

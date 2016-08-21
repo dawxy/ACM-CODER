@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXH 8
+#define MAXW 8
+#define MAXQUE 1000
+int g[MAXH][MAXW], d[8][2] = {{-1,-2},{-2,-1},{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2}} ,si, sj, ei, ej;
+struct queue{
+	int i, j;
+}que[MAXQUE];
+int bfs();
+
+int main ()
+{
+	char a[3],b[3];
+	while(EOF != scanf("%s %s%*c", a, b))///////////
+	{
+		si = a[0]-'a';
+		sj = a[1]-'1';
+		ei = b[0]-'a';
+		ej = b[1]-'1';
+		memset(g, 0, sizeof(g));
+		int ans = bfs()-1;
+		printf ("To get from %s to %s takes %d knight moves.\n", a, b, ans);
+	}
+
+	return 0;
+}
+
+int bfs()
+{
+	int ni, nj, front = 0, rear = 1;
+	queue st, buf;
+	st.i = si;
+	st.j = sj;
+	g[si][sj] = 1;
+	que[rear++] = st;
+	while(1 != rear-front)
+	{
+		buf = que[++front];
+		if (buf.i == ei && buf.j == ej)
+			return g[ei][ej];
+		for (int i = 0; i < 8; i++)
+		{
+			ni = buf.i+d[i][0];
+			nj = buf.j+d[i][1];
+			if (0 <= ni && MAXH > ni && 0 <= nj && MAXW > nj && 0 == g[ni][nj])
+			{
+				g[ni][nj] = g[buf.i][buf.j]+1;
+				que[rear].i = ni;
+				que[rear++].j = nj;
+			}
+		}
+	}
+	return -1;
+}

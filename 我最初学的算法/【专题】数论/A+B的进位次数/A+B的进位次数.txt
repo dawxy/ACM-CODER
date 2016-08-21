@@ -1,0 +1,21 @@
+//A+B的进位次数
+#include <stdio.h>
+#define scanf scanf_s
+
+int main ()
+{
+	while (1)
+	{
+		int a, b, buf, ans = 0;
+		scanf ("%d %d%*c", &a, &b);
+		if (0 == a && 0 == b)
+			break;
+		while (a && b)
+		{
+			buf = (a%10+b%10) > 9 ? 1 : 0;
+			ans += buf;
+			a /= 10, b /= 10;
+		}
+		printf ("%d\n", ans);
+	}
+}

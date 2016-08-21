@@ -1,0 +1,122 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXM = 44790+10;
+
+int get_s(int *num)
+{
+	int ans = 0;
+	rep(i,0,6) ans = ans*6+num[i];
+	return ans;
+}
+void get_num(int s, int *num)
+{
+	int len = 0;
+	while(s)
+	{
+		num[len++] = s%6;
+		s /= 6;
+	}
+	if(len < 6) num[len++] = 0;
+	for(int i = 0, j = len-1; i < j; i++,j--) swap(num[i],num[j]);
+}
+int a[6],nxt[6],dis[MAXM];
+
+void to_left()
+{
+	nxt[0] = a[3];
+	nxt[1] = a[2];
+	nxt[2] = a[0];
+	nxt[3] = a[1];
+	nxt[4] = a[4];
+	nxt[5] = a[5];
+}
+void to_right()
+{
+	nxt[0] = a[2];
+	nxt[1] = a[3];
+	nxt[2] = a[1];
+	nxt[3] = a[0];
+	nxt[4] = a[4];
+	nxt[5] = a[5];
+}
+void to_front()
+{
+	nxt[0] = a[5];
+	nxt[1] = a[4];
+	nxt[2] = a[2];
+	nxt[3] = a[3];
+	nxt[4] = a[0];
+	nxt[5] = a[1];
+}
+void to_back()
+{
+	nxt[0] = a[4];
+	nxt[1] = a[5];
+	nxt[2] = a[2];
+	nxt[3] = a[3];
+	nxt[4] = a[1];
+	nxt[5] = a[0];
+}
+int bfs(int st, int ed)
+{
+	clc(dis,-1);
+	queue<int> q;
+	q.push(st);
+	dis[st] = 0;
+	while(!q.empty())
+	{
+		int now = q.front();q.pop();
+		if(now == ed) return dis[now];
+		get_num(now,a);
+		to_left();
+		int s = get_s(nxt);
+		if(-1 == dis[s])
+		{
+			dis[s] = dis[now]+1;
+			q.push(s);
+		}
+		to_right();
+		s = get_s(nxt);
+		if(-1 == dis[s])
+		{
+			dis[s] = dis[now]+1;
+			q.push(s);
+		}
+		to_front();
+		s = get_s(nxt);
+		if(-1 == dis[s])
+		{
+			dis[s] = dis[now]+1;
+			q.push(s);
+		}
+		to_back();
+		s = get_s(nxt);
+		if(-1 == dis[s])
+		{
+			dis[s] = dis[now]+1;
+			q.push(s);
+		}
+	}
+	return -1;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d",&a[0]))
+	{
+		a[0]--;
+		rep(i,1,6) scanf("%d", &a[i]),a[i]--;
+		int st = get_s(a);
+		rep(i,0,6) scanf("%d", &a[i]),a[i]--;
+		int ed = get_s(a);
+		printf("%d\n",bfs(st,ed));
+	}
+	return 0;
+}

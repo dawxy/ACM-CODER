@@ -1,0 +1,55 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = (1e6)+10;
+
+int nt[MAXN];//nt[i]为满足x[i-z…i-1]=x[0…z-1]的最大z值(就是相同的最大前缀后缀)
+void get_next(char *x, int m)//(预处理要查询的文本，即key)
+{
+	int i = 0,j;
+	j = nt[0] = -1;
+	while(i < m)
+	{
+		while(~j && x[i] != x[j]) j = nt[j];
+		nt[++i] = ++j;
+	}
+}
+bool kmp(char *x, int m, char *y, int n)//x是模式串,y是主串
+{
+	int i = 0,j = 0,ans = 0;
+	while(i < n)
+	{
+		while(~j && y[i] != x[j]) j = nt[j];
+		i++,j++;
+		if(j == m) return true;
+	}
+	return false;
+}
+
+char s[MAXN];
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%s", s);
+		int len = strlen(s),ans = 0;
+		get_next(s,len);
+		int tmp = nt[len];
+		while(tmp > 0)
+		{
+			if(tmp*3 <= len && kmp(s+len-tmp,tmp,s+tmp,len-2*tmp)) ans = max(ans,tmp);
+			tmp = nt[tmp];
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 205
+#define INF 0x3f3f3f3f
+int sum[MAXN], dp[MAXN][MAXN];
+//dp[i][j]表示区间i~j全部合并成一堆的最小费用
+
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n;
+    while(~scanf ("%d%*c", &n))
+    {
+        int a;
+        sum[0] = 0;
+        for (int i = 1; i <= n; i++)
+        {
+            scanf ("%d%*c", &a);
+            sum[i] = sum[i-1]+a;
+        }
+        memset(dp,0,sizeof(dp));
+        for (int len = 1; len < n; len++)
+        {
+            for (int i = n-len; i >= 1; i--)
+            {
+                int j = i+len;
+                dp[i][j] = INF;
+                for (int k = i; k < j; k++)
+                    dp[i][j] = min(dp[i][j], dp[i][k]+dp[k+1][j]+sum[j]-sum[i-1]);
+            }
+        }
+        printf ("%d\n", dp[1][n]);
+    }
+    return 0;
+}

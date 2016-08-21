@@ -1,0 +1,119 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20*20+10, MAXSIZE = 130;
+int L, clen;
+char ss[130];
+double pr[130];
+struct Trie{
+	int cnt, ch[MAXN][MAXSIZE], fail[MAXN];
+	bool end[MAXN], vis[MAXN][110];
+	double dp[MAXN][110];//dp[i][j]在i结点，已经还需要添加j个字符的概率
+	int newnode()
+	{
+		clc(ch[cnt],-1);
+		end[cnt++] = 0;
+		return cnt-1;
+	}
+	void init()
+	{
+		cnt = 0;
+		newnode();
+		clc(vis,0);
+	}
+	void insert(char *s)
+	{
+		int u = 0, len = strlen(s);
+		rep(i,0,len)
+		{
+			int &c = ch[u][s[i]];
+			if(-1 == c)
+				c = newnode();
+			u = c;
+		}
+		end[u] = true;
+	}
+	void get_fail()
+	{
+		queue<int> q;
+		fail[0] = 0;
+		rep(i,0,MAXSIZE)
+		{
+			int &c = ch[0][i];
+			if(~c)
+			{
+				fail[c] = 0;
+				q.push(c);
+			}
+			else c = 0;
+		}
+		while(!q.empty())
+		{
+			int u = q.front();q.pop();
+			rep(i,0,MAXSIZE)
+			{
+				int &c = ch[u][i];
+				int p = ch[fail[u]][i];
+				if(~c)
+				{
+					fail[c] = p;
+					end[c] |= end[p];
+					q.push(c);
+				}
+				else c = p;
+			}
+		}
+	}
+	double dfs(int u, int sum)
+	{
+		double &ans = dp[u][sum];
+		if(vis[u][sum]) return ans;
+		vis[u][sum] = true;
+		if(!sum) return ans = 1.0;
+		ans = 0;
+		rep(i,0,clen)
+			if(!end[ch[u][ss[i]]]) ans += pr[i]*dfs(ch[u][ss[i]], sum-1);
+		return ans;
+	}
+}ac;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+		char a[30];
+		ac.init();
+		rep(i,0,n)
+		{
+			scanf("%s", a);
+			ac.insert(a);
+		}
+		ac.get_fail();
+		scanf("%d%*c", &clen);
+		rep(i,0,clen) scanf("%c %lf%*c", &ss[i], &pr[i]);
+		scanf("%d%*c", &L);
+		printf("Case #%d: %.6lf\n", ++count,ac.dfs(0,L));
+	}
+	return 0;
+}

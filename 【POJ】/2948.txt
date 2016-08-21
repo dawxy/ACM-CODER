@@ -1,0 +1,64 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500+10;
+char buf[MAXN*MAXN], *ps = buf, *pe = buf+1;//ps当前读取到的开头指针，pe当前缓存结尾指针
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+	int ans = 0;
+	do{
+		rnext();
+	}while(!isdigit(*ps) && ps != pe);
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	return ans;
+}
+int a[MAXN][MAXN], b[MAXN][MAXN], dp[MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while((n = in())+(m = in()))
+	{
+		repe(i,1,n)
+		{
+			repe(j,1,m) a[i][j] = in()+a[i][j-1];
+		}
+		repe(i,1,n)
+		{
+			repe(j,1,m) b[i][j] = in()+b[i-1][j];
+		}
+		clc(dp,0);
+		repe(i,1,n)
+		{
+			repe(j,1,m)
+				dp[i][j] = max(dp[i-1][j]+a[i][j],dp[i][j-1]+b[i][j]);
+		}
+		printf("%d\n", dp[n][m]);
+	}
+	return 0;
+}

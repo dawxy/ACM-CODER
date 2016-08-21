@@ -1,0 +1,25 @@
+#include <cstdio>
+#include <cstring>
+
+int gcd(int a, int b)
+{
+	while(b)
+	{
+		a %= b;
+		if(a<b) a ^= b, b ^= a, a ^= b;
+	}
+	return a;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int a,b;
+	while(~scanf("%d %d%*c", &a, &b))
+	{
+		if(1 == gcd(a,b)) printf("%10d%10d    Good Choice\n\n",a,b);
+		else printf("%10d%10d    Bad Choice\n\n",a,b);
+	}
+	return 0;
+}

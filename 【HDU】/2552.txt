@@ -1,0 +1,16 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        scanf ("%*f%*c%*f%*c");
+        puts("1");
+	}
+    return 0;
+}

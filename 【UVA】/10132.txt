@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+struct NODE{
+	char a[300];
+	int len;
+}p[200];
+char buf[600], val[600];
+int n, len;
+
+bool is_ans();
+bool cmp(const NODE a, const NODE b)
+{
+	return a.len < b.len;
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t, count = 0;
+	scanf ("%d%*c%*c", &t);
+	while(1)
+	{
+		bool end = false;
+		n = 0;
+		while(1)
+		{
+			if (NULL == gets(p[n].a))
+			{
+				end = true;
+				break;
+			}
+			if (!strcmp(p[n].a,""))
+				break;
+			p[n].len = strlen(p[n].a);
+			n++;
+		}
+		sort(p,p+n,cmp);
+		if (count++)
+			printf ("\n");
+		bool ok = false;
+		len = p[0].len+p[n-1].len;
+		for (int i = n-1; i >= 0 && p[i].len == p[n-1].len; i--)
+		{
+			strcpy(buf, p[0].a), strcat(buf, p[i].a);
+			if (is_ans()) break;
+			strcpy(buf, p[i].a), strcat(buf, p[0].a);
+			if (is_ans()) break;
+		}
+		puts(buf);
+		if (end)
+			break;
+	}
+	return 0;
+}
+
+bool is_ans()
+{ 
+	for (int i = 1; i < n; i++)
+	{
+		if (p[i].len != len-p[1].len) continue;
+		strcpy(val,p[1].a), strcat(val,p[i].a);
+		if (!strcmp(val,buf)) return true;
+		strcpy(val,p[i].a), strcat(val,p[1].a);
+		if (!strcmp(val,buf)) return true;
+	}
+	return false;
+}

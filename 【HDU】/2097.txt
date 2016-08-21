@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int thesum (int, int);
+
+int main ()
+{
+	while (1)
+	{
+		int a, sum10, sum16, sum12;
+		scanf ("%d%*c", &a);
+		if (0 == a)
+			break;
+		sum10 = thesum(a, 10);
+		sum12 = thesum(a, 12);
+		sum16 = thesum(a, 16);
+		if (sum10 == sum12 && sum10 == sum16)
+			printf ("%d is a Sky Number.\n", a);
+		else
+			printf ("%d is not a Sky Number.\n", a);
+
+	}
+
+	return 0;
+}
+
+int thesum (int a, int w)
+{
+	int i, sum = 0;
+	char s[5];
+	itoa (a, s, w);
+	for (i = 0; '\0' != s[i]; i++)
+	{
+		if ('0' <= s[i] && '9' >= s[i])
+			sum += s[i]-'0';
+		else
+			sum += s[i]-'a'+10;
+	}
+	return sum;
+}

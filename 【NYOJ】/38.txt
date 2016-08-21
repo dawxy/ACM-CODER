@@ -1,0 +1,59 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(a));
+#define MAXN 510
+struct NODE{
+	int u,v,cost;
+	NODE(int a, int b, int c){u = a, v = b, cost = c;}
+	bool operator<(const NODE& t) const{return cost < t.cost;}
+};
+vector<NODE> edge;
+int f[MAXN],n,m;
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int kruskal()
+{
+	sort(edge.begin(),edge.end());
+	repe(i,0,n) f[i] = i;
+	int ans = 0;
+	rep(i,0,m)
+	{
+		NODE& e = edge[i];
+		int a = find(e.u), b = find(e.v);
+		if(a != b) ans += e.cost, f[a] = b;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int a,b,c;
+		edge.clear();
+		scanf("%d %d%*c", &n, &m);
+		rep(i,0,m)
+		{
+			scanf("%d %d %d%*c", &a, &b, &c);
+			edge.push_back(NODE(a,b,c));
+		}
+		int mi;
+		scanf("%d%*c", &mi);
+		rep(i,1,n)
+		{
+			scanf("%d%*c", &a);
+			mi = min(mi,a);
+		}
+		printf("%d\n", mi+kruskal());
+	}
+	return 0;
+}

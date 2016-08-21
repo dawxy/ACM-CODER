@@ -1,0 +1,154 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100*1001+10;
+struct DA{
+	int s[MAXN];//文本串(末尾加0,前面字符>0)
+	int sa[MAXN], t[MAXN], t2[MAXN], c[MAXN], n;
+	/*sa[]是后缀数组(sa[0]为n无效,sa[1~n]存放字典序从小到大的后缀串i,后缀串i表示s[i]~s[(strlen(s)-1)]的串); 
+	t[],t2[]是辅助空间,c[]是桶排序的数组桶
+	n是文本串长度(加完字符后)*/
+	void bulid_sa(int m) //m是出现字符的范围+1(也就是最大的那个字符大小+1) O(nlog(n))
+	{
+		int *x = t, *y = t2, p;//这样交换t1[],t2[]只需要更换指针
+		//第一轮基数排序,如果m很大可改为sort(快排)
+		memset(c,0,sizeof(int)*(m));//初始化c[0]~c[m-1]为0
+		rep(i,0,n) c[x[i] = s[i]]++;
+		rep(i,1,m) c[i] += c[i-1];
+		per(i,n-1,0) sa[--c[x[i]]] = i;
+		for(int k = 1; k <= n; k <<= 1, m = p)
+		{
+			p = 0;
+			//直接利用sa[]排序第二关键字
+			rep(i,n-k,n) y[p++] = i;
+			rep(i,0,n) if(sa[i] >= k) y[p++] = sa[i]-k;
+			//基数排序第一关键字
+			memset(c,0,sizeof(int)*m);
+			rep(i,0,n) c[x[y[i]]]++;
+			rep(i,1,m) c[i] += c[i-1];
+			per(i,n-1,0) sa[--c[x[y[i]]]] = y[i];
+			//根据sa和y数组计算新的x数组
+			swap(x,y);
+			p = 1;x[sa[0]] = 0;
+			rep(i,1,n) x[sa[i]] = y[sa[i-1]] == y[sa[i]] && y[sa[i-1]+k] == y[sa[i]+k]?p-1:p++;
+			if(p >= n) break;//p是rank(y)值不相同的数量,p>=n说明排序编号都不同了，不需要继续排下去
+		}
+	}
+	int rank[MAXN], height[MAXN];
+	//rank[i]表示后缀i在sa[]中的下标(就是后缀i排第几)，rank[0~n-1]存放后缀i排第几(1~n),rank[n]为0无效
+	//height[i]定义为sa[i-1]和sa[i]的最长公共前缀(LCP)长度,height[2~n]为有效值
+	void get_height() //O(n)
+	{
+		int k = 0;
+		rep(i,0,n) rank[sa[i]] = i;//获取rank值
+		rep(i,0,n)
+		{
+			if(k) k--;
+			int j = sa[rank[i]-1];
+			while(s[i+k] == s[j+k])
+				k++;
+			height[rank[i]] = k;
+		}
+	}
+}da;
+int n, id[MAXN];
+
+void add(int ch, int num)
+{
+	id[da.n] = num;
+	da.s[da.n++] = ch;
+}
+bool flag[110];
+bool can(int l, int r)//子串[l,r)是否在>n/2个原串中出现
+{
+	int cnt = 0;
+	clc(flag,0);
+	if(r-l <= (n>>1)) return false;
+	rep(i,l,r)
+	{
+		int x = id[da.sa[i]];
+		if(!flag[x] && n != x)
+		{
+			cnt++;
+			flag[x] = true;
+		}
+	}
+	return cnt > (n>>1);
+}
+void pt(int l, int r)
+{
+	rep(i,l,r)
+		putchar(da.s[i]+'a'-1);
+	putchar('\n');
+}
+bool ok(int len, bool prt = 0)//寻找长度为len并且在>n/2个原串中出现的子串
+{
+	int st = 1;
+	repe(i,2,da.n)
+	{
+		if(i == da.n || da.height[i] < len)//新建分组
+		{
+			if(can(st,i))
+			{
+				if(prt) pt(da.sa[st],da.sa[st]+len);
+				else return true;
+			}
+			st = i;
+		}
+	}
+	return false;
+}
+bool sloved(int mx)
+{
+	if(!ok(1)) return false;
+	int x = 1, y = mx;
+	while(x <= y)//二分查找长度
+	{
+		int m = (x+y)>>1;
+		if(ok(m)) x = m+1;
+		else y = m-1;
+	}
+	ok(y,1);
+	return true;
+}
+char a[1010];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int count = 0;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int mx = 0;
+		da.n = 0;
+		rep(i,0,n)
+		{
+			scanf("%s", a);
+			int len = strlen(a);
+			mx = max(mx,len);
+			rep(j,0,len) add(a[j]-'a'+1,i);
+			add(30+i,i);
+		}
+		add(0,n);
+		da.bulid_sa(30+n);
+		da.get_height();
+		if(count++) putchar('\n') ;
+		if(!sloved(mx))puts("?");
+	}
+	return 0;
+}

@@ -1,0 +1,46 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define MAXN 210
+vector<int> s[MAXN];
+int dp[MAXN][MAXN], v[MAXN];//dp[i][j]表示以i为根的时候选择j个点的最大的价值,i本身算一个点
+
+void dfs(int root, int sum)
+{
+    int len = s[root].size();
+    dp[root][1] = v[root];
+    for (int i = 0; i < len; i++)//每个儿子结点
+    {
+        if (sum > 1)
+            dfs(s[root][i], sum-1);
+        for (int j = sum; j >= 2; j--)//枚举以root为根，一共选择的点的数量
+        {
+            for (int k = 1; k < j; k++)//在第i个儿子节点选择
+                dp[root][j] = max(dp[root][j], dp[root][j-k]+dp[s[root][i]][k]);
+        }
+    }
+}
+int main ()
+{
+    #ifdef SHY
+        freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int n, m;
+    while(~scanf ("%d %d%*c", &n, &m) && n+m)
+    {
+        int f;
+        for (int i = 0; i <= n; i++)
+            s[i].clear();
+        memset(dp,0,sizeof(dp));
+        for (int i = 1; i <= n; i++)
+        {
+            scanf ("%d %d%*c", &f, &v[i]);
+            s[f].push_back(i);
+        }
+        dfs(0,m+1);
+        printf ("%d\n", dp[0][m+1]);
+    }
+    return 0;
+}

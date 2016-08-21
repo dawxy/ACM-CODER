@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10;
+const char tmp[30] = "anniversary";
+char s[MAXN];
+
+void get_s(char *ans, int st, int ed)
+{
+    int cnt = 0;
+    repe(i,st,ed) ans[cnt++] = tmp[i];
+    ans[cnt] = 0;
+}
+bool sloved()
+{
+    int len = strlen(s);
+    char a[MAXN],b[MAXN],c[MAXN];
+    int cnt = 0;
+    rep(i,0,11)
+    {
+        rep(j,i+1,11)
+        {
+            get_s(a,0,i);get_s(b,i+1,j);get_s(c,j+1,10);
+            char *p = strstr(s,a);
+            if(!p) continue;
+            p = strstr(p+strlen(a),b);
+            if(!p) continue;
+            p = strstr(p+strlen(b),c);
+            if(!p) continue;
+            return true;
+        }
+    }
+    return false;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        scanf("%s", s);
+        if(sloved()) puts("YES");
+        else puts("NO");
+    }
+    return 0;
+}

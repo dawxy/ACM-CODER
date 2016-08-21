@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define MAXM 10010
+#define MAXS 15
+struct NODE
+{
+	int len, w[MAXN], v[MAXN];
+} p[MAXS];
+int dp[MAXS][MAXM], n, m, s;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d %d %d%*c", &n, &m, &s))
+	{
+		int buf;
+		for(int i = 0; i <= s; i++)
+			p[i].len = 0;
+		for(int i = 0; i < n; i++)
+		{
+			scanf("%d%*c", &buf);
+			scanf("%d %d%*c", &p[buf].w[p[buf].len], &p[buf].v[p[buf].len]);
+			p[buf].len++;
+		}
+		memset(dp, -1, sizeof(dp));//求每组至少需要有一个，初始化为-1
+		memset(dp[0], 0, sizeof(dp[0]));
+		for(int i = 1; i <= s; i++)//第几个品牌
+		{
+			for(int j = 0; j < p[i].len; j++)//每个品牌的第几个物品，因为是求至少1中，这样的循环顺序就可以在同一组中选多个物品
+			{
+				for(int k = m; k >= p[i].w[j]; k--)//当前背包容量
+				{
+					//两个方程不能交换顺序，避免0费用物品选多次
+					if(-1 != dp[i][k - p[i].w[j]])
+						dp[i][k] = max(dp[i][k], dp[i][k - p[i].w[j]] + p[i].v[j]);//因为存在自己当前组可能还有被选过的物品，需要加这个转移方程
+					if(-1 != dp[i - 1][k - p[i].w[j]])
+						dp[i][k] = max(dp[i][k], dp[i - 1][k - p[i].w[j]] + p[i].v[j]);//正常的0-1背包转移方程
+				}
+			}
+		}
+		if(-1 == dp[s][m])
+			puts("Impossible");
+		else
+			printf("%d\n", dp[s][m]);
+	}
+	return 0;
+}
+

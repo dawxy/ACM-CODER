@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 10010
+int prime[MAXN+1];
+bool is_prime[MAXN+1];
+
+void getprime()
+{
+	for (int i = 2; i <= MAXN; i++)
+	{
+		if (!prime[i])prime[++prime[0]] = i;
+		for (int j = 1; j <= prime[0] && prime[j] <= MAXN / i; j++)
+		{
+			prime[prime[j] * i] = 1;
+			if (i%prime[j] == 0) break;
+		}
+	}
+}
+void getprime2()
+{
+	memset(is_prime,1,sizeof(is_prime));
+	int len = sqrt(MAXN+0.5);
+	for (int i = 2; i <= len; i++)
+	{
+		if(!is_prime[i]) continue;
+		for(int j = i*i; j <= MAXN; j += i) is_prime[j] = false;
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	getprime();
+	getprime2();
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int ans = 0;
+		for(int i = 1; i <= prime[0] && prime[i] <= n; i++)
+		{
+			for(int j = i; j <= prime[0] && prime[j] <= n; j++)
+			{
+				int c = n-prime[i]-prime[j];
+				if(!is_prime[c] || c < prime[j]) continue;
+				ans++;
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

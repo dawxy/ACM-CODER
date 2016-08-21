@@ -1,0 +1,49 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100+10;
+char a[MAXN],b[MAXN];
+int n;
+
+bool sloved()
+{
+	rep(i,0,n)
+	{
+		if('A' == a[i])
+		{
+			if('U' != b[i]) return false;
+		}
+		if('T' == a[i])
+		{
+			if('A' != b[i]) return false;
+		}
+		if('C' == a[i])
+		{
+			if('G' != b[i]) return false;
+		}
+		if('G' == a[i])
+		{
+			if('C' != b[i]) return false;
+		}
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d%s%s", &n,a,b);
+		if(sloved())puts("YES");
+		else puts("NO");
+	}
+	return 0;
+}

@@ -1,0 +1,105 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 80+5;
+struct MATRIX{
+	int num[MAXN][MAXN];
+};
+MATRIX a[MAXN];
+int cost[MAXN][MAXN];
+int m;
+
+MATRIX mul(const MATRIX &a, const MATRIX &b)
+{
+	MATRIX ans;
+	clc(ans.num,0);
+	rep(i,0,m)
+	{
+		rep(k,0,m)
+		{
+			if(!a.num[i][k]) continue;
+			rep(j,0,m)
+			{
+				ans.num[i][j] += a.num[i][k]*b.num[k][j];
+			}
+		}
+	}
+	return ans;
+}
+bool same(const MATRIX &a, const MATRIX &b)
+{
+	rep(i,0,m)
+	{
+		if(memcmp(a.num[i],b.num[i], sizeof(int)*m)) return false;
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		rep(i,0,n)
+		{
+			rep(j,0,m)
+			{
+				rep(k,0,m)
+				{
+					scanf("%d%*c", &a[i].num[j][k]);
+				}
+			}
+		}
+		clc(cost,0x3f);
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+			{
+				if(i == j) continue;
+				MATRIX ans = mul(a[i],a[j]);
+				rep(k,0,n)
+				{
+					if(i == k || j == k) continue;
+					if(same(ans,a[k]))
+						cost[i][k] = 1;
+				}
+			}
+		}
+		rep(i,0,n) cost[i][i] = 0;
+		rep(k,0,n)
+		{
+			rep(i,0,n)
+			{
+				rep(j,0,n)
+					cost[i][j] = min(cost[i][j], cost[i][k]+cost[k][j]);
+			}
+		}
+		int q;
+		scanf("%d%*c", &q);
+		while(q--)
+		{
+			int a,b;
+			scanf("%d %d%*c", &a, &b);
+			a--, b--;
+			if(INF == cost[a][b]) puts("Sorry");
+			else printf("%d\n", cost[a][b]);
+		}
+	}
+	return 0;
+}

@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <malloc.h>
+
+void main (void)
+{
+	int n, i;
+	long s;
+	while (EOF != scanf ("%d ", &n))
+	{
+		int *p = (int*)malloc (sizeof(int) * n);
+		for (i = 0; i < n; i++)
+		{
+			if ((n-1) == i)
+			{
+				scanf ("%d", &p[i]);
+				p[i] -= '\0';
+			}
+			else
+			{
+				scanf ("%d ", &p[i]);
+				p[i] -= '\0';
+			}
+			//gets (p);
+			//p[i] = getchar() - '\0';
+			//getchar();
+		}
+		s = 1;
+
+		for (i = 0; i < n; i++)
+		{
+			if (0 != p[i]%2)
+			{
+				s *= p[i];
+			}
+		}
+		printf ("%d\n", s);
+		getchar ();
+	}
+}

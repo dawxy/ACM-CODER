@@ -1,0 +1,47 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1000010
+#define INF 0x3f3f3f3f
+#define max(a,b) (a>b?a:b)
+int ch, ans, f, a[MAXN], dp[MAXN], last[MAXN];
+/*dp[i][j]表示前j项中i个子段和的最大值，且第i个子段包含a[j]
+(a[j]可能包含在第i子段;也可能第i子段只有a[j]一个元素,那么只有把a[j]加到每一个dp[i-1][k]后面找最大值)
+所以状态转移方程:dp[i][j] = max(dp[i][j-1], dp[i-1][k])(i-1 <= k <= j-1)。
+但是这样复杂度m*n^2肯定超时，于是要优化*/
+
+int in()
+{
+	if((ch = getchar()) == '-') f = -1;
+	else f = 1;
+	while(ch < '0' || '9' < ch) ch = getchar();
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans*f;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int m, n;
+	while(~scanf("%d %d%*c", &m, &n))
+	{
+		int maxn;
+		for (int i = 1; i <= n; i++)
+			a[i] = in();
+		memset(dp,-0x3f,sizeof(dp));
+		memset(last,0,sizeof(last));
+		for (int i = 1; i <= m; i++)
+		{
+			maxn = -INF;
+			for (int j = i; j <= n; j++)
+			{
+				dp[j] = max(dp[j-1], last[j-1])+a[j];
+				last[j-1] = maxn;
+				maxn = max(maxn,dp[j]);
+			}
+		}
+		printf("%d\n", maxn);
+	}
+	return 0;
+}

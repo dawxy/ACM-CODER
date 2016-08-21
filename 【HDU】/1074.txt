@@ -1,0 +1,55 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 15
+#define INF 0x3f3f3f3f
+char name[MAXN][110];
+int ed[MAXN], w[MAXN], dp[1<<MAXN], cost[1<<MAXN], last[1<<MAXN], p[1<<MAXN], n;
+
+void dfs(int s)
+{
+	if (-1 != dp[s])
+		return;
+	dp[s] = INF;
+	for (int i = 0; i < n; i++)
+	{
+		if (s&(1 << i))
+		{
+			dfs(s^(1<<i));
+			int wg = cost[s^(1 << i)] + w[i]>ed[i] ? cost[s^(1 << i)] + w[i]-ed[i] : 0;
+			if (dp[s] >= dp[s ^ (1 << i)] + wg)
+				dp[s] = dp[s ^ (1 << i)] + wg, p[s] = i;
+		}
+	}
+	last[s] = s^(1<<p[s]);
+	cost[s] = cost[last[s]]+w[p[s]];
+}
+void pt(int s)
+{
+	if (!s) return;
+	pt(last[s]);
+	puts(name[p[s]]);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while (t--)
+	{
+		scanf("%d%*c", &n);
+		for (int i = 0; i < n; i++)
+		{
+			scanf("%s %d %d%*c", name[i], &ed[i], &w[i]);
+		}
+		memset(dp,-1,sizeof(dp));
+		cost[0] = dp[0] = 0;
+		dfs((1 << n) - 1);
+		printf("%d\n", dp[(1<<n)-1]);
+		pt((1<<n)-1);
+	}
+	return 0;
+}

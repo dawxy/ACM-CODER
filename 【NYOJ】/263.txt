@@ -1,0 +1,38 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int l, r, m, maxl = -1, minr = 99999999, maxm = -1, n, i;
+		scanf ("%d%*c", &n);
+		for (i = 0; i < n; i++)
+		{
+			scanf ("%d %d %d%*c", &l, &r, &m);
+			if (maxl < l)
+			{
+				maxl = l;
+				minr = r;
+				maxm = m;
+			}
+			else if (maxl <= l && minr > r)
+			{
+				maxl = l;
+				minr = r;
+				maxm = m;
+			}
+			else if (maxl <= l && minr >= r && maxm < m)
+			{
+				maxl = l;
+				minr = r;
+				maxm = m;
+			}
+			
+		}
+		printf ("%d\n", maxm);
+	}
+
+	return 0;
+}

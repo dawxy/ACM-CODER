@@ -1,0 +1,83 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 4010, MAXL = 300010, MOD = 20071027;
+char str[MAXL];
+int dp[MAXL], tree[MAXN*100][30], cnt;
+bool val[MAXN*100];
+
+void init()
+{
+	clc(tree[0],-1);
+	cnt = 1;
+}
+void insert(const char *s)
+{
+	int u = 0, n = strlen(s);
+	rep(i,0,n)
+	{
+		int c = s[i]-'a';
+		if(-1 == tree[u][c])
+		{
+			clc(tree[cnt],-1);
+			val[cnt] = 0;
+			tree[u][c] = cnt++;
+		}
+		u = tree[u][c];
+	}
+	val[u] = 1;
+}
+void query(int si, int n)
+{
+	int u = 0;
+	rep(i,si,n)
+	{
+		if(!str[i])return;
+		int c = str[i]-'a';
+		if(-1 == tree[u][c]) return;
+		u = tree[u][c];
+		if(val[u])
+			dp[si] = (dp[i+1]+dp[si])%MOD;
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int count = 0;
+	while(~scanf("%s", str))
+	{
+		int n, len = strlen(str);
+		char s[110];
+		scanf("%d%*c", &n);
+		init();
+		rep(i,0,n)
+		{
+			scanf("%s", s);
+			insert(s);
+		}
+		clc(dp,0);
+		dp[len] = 1;
+		per(i,len-1,0)
+		{
+			query(i,len);
+		}
+		printf("Case %d: %d\n", ++count,dp[0]);
+	}
+	return 0;
+}

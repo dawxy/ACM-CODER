@@ -1,0 +1,93 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 24+10;
+int num[MAXN];
+char a[1000+10];
+unordered_map<int, int> vis;
+
+int get_one(int v)
+{
+	int sum = 0;
+	while(v)
+	{
+		if(v&1) sum++;
+		v >>= 1;
+	}
+	return sum;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n)
+		{
+			scanf("%s", a);
+			int len = strlen(a);
+			num[i] = 0;
+			rep(j,0,len) num[i] ^= (1<<(a[j]-'A'));
+		}
+		int ans = 0, cnt = 1<<((n>>1)), val = 0;
+		vis.clear();
+		rep(s,0,cnt)
+		{
+			int v = 0;
+			rep(i,0,n>>1)
+			{
+				if(s&(1<<i))
+					v ^= num[i];
+			}
+			vis[v] = s;
+		}
+		cnt = 1<<(n-(n>>1));
+		rep(s,0,cnt)
+		{
+			int v = 0;
+			rep(i,0,(n-(n>>1)))
+			{
+				if(s&(1<<i))
+					v ^= num[i+(n>>1)];
+			}
+			if(vis.find(v) != vis.end())
+			{
+				int tmp = get_one(s)+get_one(vis[v]);
+				if(tmp > ans)
+				{
+					ans = tmp;
+					val = vis[v]^(s<<(n>>1));
+				}
+			}
+		}
+		printf("%d\n", ans);
+		int out = 0;
+		rep(i,0,n)
+		{
+			if(val&(1<<i))
+			{
+				if(out) putchar(' ');
+				printf("%d", i+1);
+				out = true;
+			}
+		}
+		putchar('\n');
+	}
+	return 0;
+}

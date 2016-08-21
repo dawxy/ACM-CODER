@@ -1,0 +1,57 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 110
+struct Edge{
+	int u, v, cost;
+	Edge(int a = 0, int b = 0, int c = 0){u = a, v = b, cost = c;}
+	bool operator<(const Edge& t) const {return cost < t.cost;}
+}edge[MAXN*MAXN];
+int f[MAXN];
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, m = 0, c;
+	scanf("%d%*c", &n);
+	rep(i,0,n)
+	{
+		rep(j,0,n)
+		{
+			scanf("%d%*c", &c);
+			if(i == j) continue;
+			edge[m++] = Edge(i,j,c);
+		}
+	}
+	sort(edge,edge+m);
+	rep(i,0,n) f[i] = i;
+	int ans = 0, cnt = n;
+	rep(i,0,m)
+	{
+		int x = find(edge[i].u), y = find(edge[i].v);
+		if(x != y)
+		{
+			ans += edge[i].cost;
+			cnt--;
+			f[x] = y;
+		}
+	}
+	printf("%d\n", ans);
+	return 0;
+}

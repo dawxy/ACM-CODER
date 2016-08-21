@@ -1,0 +1,55 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 1010
+struct NODE{
+	int len, s[MAXN], v[MAXN];
+}g[MAXN];
+int dp[MAXN];
+
+int dfs(int root, int fa, int val)
+{
+	int sum = 0;
+	bool in = false;
+	for (int i = 0; i < g[root].len; i++)
+	{
+		if (fa == g[root].s[i]) continue;
+		sum += dfs(g[root].s[i],root,g[root].v[i]);
+		in = true;
+	}
+	if (!in)
+		dp[root] = val;
+	else
+		dp[root] = min(sum,val);
+	return dp[root];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, r;
+	while (~scanf("%d %d%*c", &n, &r) && n + r)
+	{
+		int a, b, val;
+		for (int i = 0; i <= n; i++)
+			g[i].len = 0;
+		for (int i = 1; i < n; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b, &val);
+			g[a].s[g[a].len] = b;
+			g[a].v[g[a].len++] = val;
+			g[b].s[g[b].len] = a;
+			g[b].v[g[b].len++] = val;
+		}
+		if (1 == n)
+			puts("0");
+		else
+		{
+			dfs(r, -1, 0x3f3f3f3f);
+			printf("%d\n", dp[r]);
+		}
+	}
+	return 0;
+}

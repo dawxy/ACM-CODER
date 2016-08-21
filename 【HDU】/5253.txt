@@ -1,0 +1,82 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10,d[2][2]={{1,0},{0,1}};
+struct Edge{
+    int u,v,cost;
+    bool operator<(const Edge& t)const{
+        return cost < t.cost;
+    }
+    Edge(int a = 0, int b = 0, int c = 0)
+    {
+        u = a, v = b, cost = c;
+    }
+}edge[MAXN*MAXN*2];
+int a[MAXN][MAXN],tol,m, f[MAXN*MAXN];
+
+inline int get_id(int x, int y){return x*m+y;}
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t,count = 0;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n;
+        scanf("%d %d%*c", &n, &m);
+        rep(i,0,n)
+        {
+            rep(j,0,m)
+            {
+                scanf("%d%*c", &a[i][j]);
+            }
+        }
+        tol = 0;
+        rep(i,0,n)
+        {
+            rep(j,0,m)
+            {
+                rep(k,0,2)
+                {
+                    int ni = i+d[k][0], nj = j+d[k][1];
+                    if(0 <= ni && ni < n && 0 <= nj && nj < m)
+                    {
+                        edge[tol++] = Edge(get_id(i,j),get_id(ni,nj),abs(a[i][j]-a[ni][nj]));
+                    }
+                }
+            }
+        }
+        int sum = n*m, ans = 0;
+        sort(edge,edge+tol);
+        rep(i,0,sum) f[i] = i;
+        rep(i,0,tol)
+        {
+            int x = find(edge[i].u), y = find(edge[i].v);
+            if(x != y)
+            {
+                f[x] = y;
+                ans += edge[i].cost;
+                if(1 == (--sum)) break;
+            }
+        }
+        printf("Case #%d:\n%d\n", ++count,ans);
+    }
+    return 0;
+}

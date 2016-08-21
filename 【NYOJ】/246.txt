@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define INF 0x3f3f3f3f
+#define MAX(a,b,c) max(max(a,b),c);
+const int v[5][5] = {{5,-1,-2,-1,-3},{-1,5,-3,-2,-4},{-2,-3,5,-2,-2},{-1,-2,-2,5,-1},{-3,-4,-2,-1,-INF}};
+int ch, dp[MAXN][MAXN];
+char a[MAXN], b[MAXN];
+
+void input(char *c, int *len, int s)
+{
+	scanf("%d%*c", len);
+	for (int i = 0; i < *len; i++)
+	{
+		ch = getchar();
+		switch(ch)
+		{
+		case 'A':c[i+1] = 0;break;
+		case 'C':c[i+1] = 1;break;
+		case 'G':c[i+1] = 2;break;
+		case 'T':c[i+1] = 3;break;
+		case '-':c[i+1] = 4;break;
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int lena, lenb;
+		input(a,&lena,0);
+		input(b,&lenb,1);
+		for (int i = 1; i <= lena; i++)
+			dp[i][0] = dp[i-1][0]+v[a[i]][4];
+		for (int i = 1; i <= lenb; i++)
+			dp[0][i] = dp[0][i-1]+v[4][b[i]];
+		for (int i = 1; i <= lena; i++)
+		{
+			for (int j = 1; j <= lenb; j++)
+				dp[i][j] = MAX(dp[i-1][j]+v[a[i]][4],dp[i][j-1]+v[4][b[j]],v[a[i]][b[j]]+dp[i-1][j-1]);
+		}
+		printf("%d\n", dp[lena][lenb]);
+	}
+	return 0;
+}

@@ -1,0 +1,94 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 200000*2+10;
+int set[MAXN<<1], tmp[MAXN], pos[MAXN];
+struct NODE{
+	int x,y;
+}q[MAXN>>1];
+
+inline int id(int x, int y){return x+y|x!=y;}
+inline void push_down(int x, int y, int m)
+{
+	int u = id(x,y);
+	if(~set[u])
+	{
+		int l = id(x,m), r = id(m+1,y);
+		set[l] = set[r] = set[u];
+		set[u] = -1;
+	}
+}
+void update(int x, int y, int ql, int qr, int num)
+{
+	if(ql <= x && y <= qr)
+	{
+		set[id(x,y)] = num;
+		return;
+	}
+	int m = (x+y)>>1;
+	push_down(x,y,m);
+	if(ql <= m) update(x,m,ql,qr,num);
+	if(qr > m) update(m+1,y,ql,qr,num);
+}
+bool vis[MAXN];
+void query(int x, int y)
+{
+	if(x == y)
+	{
+		if(~set[id(x,y)])
+			vis[set[id(x,y)]] = true;
+		return;
+	}
+	int m = (x+y)>>1;
+	push_down(x,y,m);
+	query(x,m);
+	query(m+1,y);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,L, tol = 0;
+	scanf("%d %d%*c", &n, &L);
+	rep(i,0,n)
+	{
+		scanf("%d %d%*c", &q[i].x, &q[i].y);
+		tmp[tol++] = q[i].x, tmp[tol++] = q[i].y;
+	}
+	tmp[tol++] = L;
+	sort(tmp,tmp+tol);
+	int cnt = 0;
+	pos[cnt++] = tmp[0];
+	rep(i,1,tol)
+	{
+		if(tmp[i] != tmp[i-1])
+			pos[cnt++] = tmp[i];
+	}
+	clc(set,-1);
+	rep(i,0,n)
+	{
+		int x = lower_bound(pos,pos+cnt,q[i].x)-pos, y = lower_bound(pos,pos+cnt,q[i].y)-pos;
+		update(0,cnt-1,x,y-1,i);
+	}
+	clc(vis,0);
+	query(0,cnt-1);
+	int ans = 0;
+	rep(i,0,n) if(vis[i]) ans++;
+	printf("%d\n", ans);
+	return 0;
+}

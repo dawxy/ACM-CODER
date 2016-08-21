@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int a;
+	while(EOF != scanf ("%d%*c", &a) && a)
+	{
+		int t = 0, ans;
+		while(!(1&(a>>t)))
+		{
+			t++;
+		}
+		ans = (1<<t);
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

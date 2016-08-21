@@ -1,0 +1,47 @@
+#include <stdio.h>
+const int MAXN = 110, d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+int w, h, g[MAXN][MAXN];
+
+void dfs(int, int);
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		scanf ("%d %d%*c", &h, &w);
+		for (int i = 0; i < h ;i++)
+			for (int j = 0;  j < w; j++)
+				scanf ("%d%*c", &g[i][j]);
+		int ans = 0;
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				if (g[i][j])
+				{
+					ans++;
+					dfs(i,j);
+				}
+			}
+		}
+		printf ("%d\n", ans);
+	}
+	return 0;
+}
+
+void dfs(int si, int sj)
+{
+	int ni, nj;
+	g[si][sj] = 0;
+	for (int i = 0; i < 4 ;i++)
+	{
+		ni = d[i][0]+si;
+		nj = d[i][1]+sj;
+		if (0 <= ni && h > ni && 0 <= nj && w > nj && g[ni][nj])
+			dfs(ni, nj);
+	}
+}

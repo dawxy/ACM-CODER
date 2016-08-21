@@ -1,0 +1,169 @@
+//目的:对256个ASSIC码字符的赫夫曼树压缩和解压原理
+//这里我用char数组保存了编码，没有正真起到压缩,反而增大了空间， 
+//需要压缩的话还要把编码用二进制保存
+#include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <string.h>
+#define scanf scanf_s
+#define STRINGLEN 256//输入的字符种类数
+#define TXTLEN 300//输入的文本最大长度
+#define BMLEN  7//编码最大长度
+typedef struct Node{//既作为队列节点又作为树的节点
+	char data;
+	unsigned int time;
+	Node *next, *rchild, *lchild;
+}node, *pnode;
+typedef struct Table{//编码表和存放压缩后的文本
+	char bm[BMLEN];
+}table, *ptable;
+
+pnode init_priority_queue ();//初始化优先队列
+void add_priority_queue (pnode, pnode);//从小到大插入队列
+bool pop_priority_queue (pnode, pnode *);//出队列,把弹出的元素用pnode*保存
+pnode get_hefuman (pnode);//得到并返回赫夫曼树pt
+pnode read_and_get_tree(char *);//读取文本并返回生成的赫夫曼树
+void get_table (pnode, char*, ptable);//得到编码表,这里用t保存,返回在ptable参数
+void encode(char *, ptable, char *);//压缩(把字符根据table转换为编码),返回在char*参数
+void decode(pnode, pnode, char *, int);//解压(把编码根据赫夫曼树转换为字符)并且输出
+
+int main ()
+{
+	pnode pt;
+	table code[STRINGLEN]/*编码表：下标1~256对应256个ASSIC码字符*/;
+	char temp[BMLEN] = {'\0'}, text[TXTLEN], ziptxt[BMLEN*TXTLEN] = {'\0'}/*压缩后文本*/;
+
+	gets_s (text);//读取文本
+	pt = read_and_get_tree(text);//根据文本生成赫夫曼编码树
+	get_table(pt, temp, code);//得到编码表
+	encode (ziptxt, code, text);//得到压缩后二进制文本
+	decode(pt, pt,ziptxt,0);
+	return 0;
+}
+
+pnode init_priority_queue ()
+{
+	pnode ph = (pnode)malloc(sizeof(node));
+	ph->next = ph->lchild = ph->rchild = NULL;
+	ph->time = 0;
+	return ph;
+}
+
+void add_priority_queue (pnode ph, pnode p)
+{
+	pnode buf = ph;
+	while (NULL != buf->next && buf->next->time < p->time)
+	{
+		buf = buf->next;
+	}
+	p->next = buf->next;
+	buf->next = p;
+	ph->time ++;
+}
+
+bool pop_priority_queue (pnode ph, pnode *f)
+{
+	if (NULL == ph->next)
+		return false;
+	*f = ph->next;
+	ph->next = (*f)->next;
+	ph->time--;
+	return true;
+}
+
+pnode get_hefuman (pnode ph)
+{
+	pnode p1, p2, p;
+	while (1 != ph->time)//每次从队列取出2个节点把time相加到新节点再把新节点放回队列
+	{                    //直到队列中只有一个元素，则这个节点为赫夫曼树的根节点
+		p = (pnode)malloc (sizeof(node));
+		p->data = -1;//这里的非叶子节点都把data设为-1，来区分叶子节点
+		pop_priority_queue(ph, &p1);
+		pop_priority_queue(ph, &p2);
+		p->time = p1->time+p2->time;
+		p->lchild = p1;
+		p->rchild = p2;
+		add_priority_queue(ph, p);
+	}
+	pop_priority_queue(ph, &p);
+	return p;
+}
+
+void get_table (pnode pt, char *temp, ptable code)
+{
+	if (-1 != pt->data)
+	{
+		strcpy_s (code[pt->data].bm, temp);
+		pt->lchild = pt->rchild = NULL;//把叶子节点左右儿子都赋成NULL
+	}
+	else
+	{
+		int i = 0;
+		while ('\0' != temp[i])
+		{
+			i++;
+		}
+		temp[i] = '0', temp[i+1] = '\0';
+		get_table (pt->lchild, temp, code);
+		temp[i] = '1';
+		get_table (pt->rchild, temp, code);
+		temp[i] = '\0';
+	}
+
+}
+
+pnode read_and_get_tree(char * text)
+{
+	pnode txt = (pnode)malloc(sizeof(node)*STRINGLEN), ph, pt;
+	ph = init_priority_queue ();
+	int i;
+	for (i = 0; i < STRINGLEN; i++)//初始化256个字符出现的次数
+		txt[i].time = 0;
+	i = 0;
+	while ('\0' != text[i])//统计相应字母出现次数
+	{
+		if (0 > text[i] || 256 < text[i])
+		{
+			printf ("请输入ASSIC码字符！\n");
+			exit(-1);
+		}
+		txt[text[i]].time++;
+		i++;
+	}
+	for (i = 0; i < STRINGLEN; i++)//把出现过的字符和出现的次数加入队列
+	{
+		if (txt[i].time)
+		{
+			txt[i].data = i;
+			add_priority_queue(ph, &txt[i]);
+		}
+	}
+	pt = get_hefuman(ph);
+	free(ph);
+	return pt;//返回赫夫曼树
+}
+
+void encode(char * ziptxt, ptable code,char * text)
+{
+	int i = 0;
+	while ('\0' != text[i])
+	{
+		strcat_s (ziptxt,BMLEN*TXTLEN, code[text[i]].bm);
+		i++;
+	}
+}
+
+void decode(pnode ptg, pnode pt, char *ziptxt, int n)
+{
+	if (NULL == pt->lchild)
+	{
+		printf ("%c", pt->data);
+		pt = ptg;
+	}
+	if ('\0' == ziptxt[n])
+		return;
+	if ('0' == ziptxt[n])
+		decode(ptg, pt->lchild, ziptxt, n+1);
+	else
+		decode(ptg, pt->rchild, ziptxt, n+1);
+}

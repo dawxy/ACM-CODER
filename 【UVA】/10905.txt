@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+struct NODE{
+	char c[100];
+	int len;
+}a[100];
+char bufa[100], bufb[100];
+
+bool cmp(const NODE c, const NODE d)
+{
+	strcpy(bufa,c.c);
+	strcpy(bufb,d.c);
+	if (strcmp(strcat(bufa,d.c),strcat(bufb,c.c)) > 0)
+		return true;
+	return false;
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(EOF != scanf ("%d%*c", &n) && n)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			scanf ("%s%*c", a[i].c);
+			a[i].len = strlen(a[i].c);
+		}
+		sort(a,a+n, cmp);
+		for (int i = 0; i < n; i++)
+			printf ("%s", a[i].c);
+		printf ("\n");
+	}
+	return 0;
+}

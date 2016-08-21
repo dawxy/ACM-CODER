@@ -1,0 +1,69 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+int A,B,C,a,b;
+int g[3][26];
+
+bool ok()
+{
+	int cnt[26]={0};
+	rep(i,0,26) cnt[i] += a*g[0][i]+b*g[1][i];
+	rep(i,0,26) if(cnt[i] != g[2][i]) return false;
+	return true;
+}
+bool sloved()
+{
+	for(a = 1; a <= 100; a++)
+	{
+		for(b = 1; b <= 100;b++)
+		{
+			if(ok()) return true;
+		}
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		clc(g,0);
+		scanf("%d%d%d%*c", &A,&B,&C);
+		rep(i,0,A)
+		{
+			char c;
+			int v;
+			scanf("%c %d%*c", &c, &v);
+			g[0][c-'A'] += v;
+		}
+		rep(i,0,B)
+		{
+			char c;
+			int v;
+			scanf("%c %d%*c", &c, &v);
+			g[1][c-'A'] += v;
+		}
+		rep(i,0,C)
+		{
+			char c;
+			int v;
+			scanf("%c %d%*c", &c, &v);
+			g[2][c-'A'] += v;
+		}
+		if(sloved())
+		{
+			printf("%d %d\n", a,b);
+		}
+		else puts("NO");
+	}
+	return 0;
+}

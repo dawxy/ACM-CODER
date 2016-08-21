@@ -1,0 +1,35 @@
+#include <stdio.h>
+
+double min(double a, double b)
+{
+    if (a > b)
+        return b;
+    else
+        return a;
+}
+
+double max (double a, double b)
+{
+    if (a > b)
+        return a;
+    else
+        return b;
+}
+
+void main ()
+{
+    double x[4], y[4],s1, s2;
+
+    while (EOF != scanf ("%lf %lf %lf %lf %lf %lf %lf %lf", &x[0],&y[0], &x[1],&y[1], &x[2], &y[2],&x[3], &y[3]))
+    {
+        getchar ();
+
+        s1 = min(max(x[0], x[1]), max(x[2], x[3]))-max(min(x[0], x[1]), min(x[2], x[3]));
+        s2 = min(max(y[0], y[1]), max(y[2], y[3]))-max(min(y[0], y[1]), min(y[2], y[3]));
+    
+        if (s1 < 0 || s2 < 0)
+            printf ("0.00\n");
+        else
+            printf ("%.2lf\n", s1*s2);
+    }
+}

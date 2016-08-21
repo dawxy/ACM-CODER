@@ -1,0 +1,34 @@
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+#define MAXN 100010
+typedef long long LL;
+struct NODE{
+	int e,k;
+}p[MAXN];
+
+inline bool cmp(const NODE& a, const NODE& b){return a.e*b.k < b.e*a.k;}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		for(int i = 0; i < n; i++)
+			scanf("%d%*c", &p[i].e);
+		for(int i = 0; i < n; i++)
+			scanf("%d%*c", &p[i].k);
+		sort(p,p+n,cmp);
+		LL sum = 0,ans = 0;
+		for(int i = 0; i < n; i++)
+		{
+			sum += p[i].e;
+			ans += sum*p[i].k;
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 11
+#define MAXM 100010
+int num[MAXN], sum;
+bool dp[MAXM];
+
+bool in()
+{
+	bool end = true;
+	sum = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		scanf("%d%*c", &num[i+1]);
+		sum += (i+1)*num[i+1];
+		if (num[i+1])
+			end = false;
+	}
+	return !end;
+}
+bool sloved()
+{
+	if (sum&1) return false;
+	memset(dp,0,sizeof(dp));
+	dp[0] = 1;
+	int c = sum>>1, w;
+	for (int i = 1; i <= 10; i++)
+	{
+		if (num[i]*i >= sum>>1)
+		{
+			for (int j = i; j <= c; j++)
+				if (dp[j-i]) dp[j] = true;
+		}
+		else
+		{
+			for(int j = 1; j <= num[i]; num[i] -= j, j <<= 1)
+			{
+				w = j*i;
+				for(int k = c; k >= w; k--)
+					if(dp[k-w]) dp[k] = true;
+			}
+			if(num > 0)
+			{
+				w = num[i]*i;
+				for(int k = c; k >= w; k--)
+					if(dp[k-w]) dp[k] = true;
+			}
+		}
+	}
+	return dp[c];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int count = 0;
+	while(in())
+	{
+		if (sloved())
+			printf("#%d:Can be divided.\n\n",++count);
+		else
+			printf("#%d:Can't be divided.\n\n", ++count);
+	}
+	return 0;
+}

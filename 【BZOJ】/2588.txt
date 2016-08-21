@@ -1,0 +1,154 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10, MAXM = MAXN*30;
+char buf[MAXN], *ps = buf, *pe = buf+1;//ps当前读取到的开头指针，pe当前缓存结尾指针
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+	int ans = 0;
+    if(ps == pe) return -1; //判断是否到文件结尾
+	do{
+		rnext();
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return -1;//判断是否到文件结尾
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	return ans;
+}
+int lc[MAXM],rc[MAXM],sum[MAXM],tol;
+int rt[MAXN], a[MAXN],num[MAXN],sot[MAXN],cnt;
+int head[MAXN], nxt[MAXN<<1], to[MAXN<<1],e;
+
+inline int mhash(int v){return lower_bound(sot+1,sot+1+cnt,v)-sot;}
+inline void add_edge(int u, int v)
+{
+	nxt[e] = head[u], to[e] = v;
+	head[u] = e++;
+}
+void insert(int &u, int x, int y, int p)
+{
+	lc[++tol] = lc[u], rc[tol] = rc[u], sum[tol] = sum[u]+1;
+	u = tol;
+	if(x == y) return;
+	int m = (x+y)>>1;
+	if(p <= m) insert(lc[u],x,m,p);
+	else insert(rc[u],m+1,y,p);
+}
+int all,ft[MAXN],d[MAXN<<1],id[MAXN<<1], fa[MAXN];
+void dfs(int u, int dep)
+{
+	rt[u] = rt[fa[u]];
+	insert(rt[u],1,cnt,mhash(a[u]));
+	ft[u] = all;
+	d[all] = dep, id[all++] = u;
+	for(int i = head[u]; ~i; i = nxt[i])
+	{
+		int v = to[i];
+		if(fa[u] == v) continue;
+		fa[v] = u;
+		dfs(v,dep+1);
+		d[all] = dep, id[all++] = u;
+	}
+}
+int dp[MAXN<<1][20], dp_num[MAXN<<1][20];
+void st_init()
+{
+	rep(i,0,all) dp[i][0] = d[i], dp_num[i][0] = id[i];
+	for(int j = 1; (1<<j) <= all; j++)
+	{
+		for(int i = 0; i+(1<<j)-1 < all; i++)
+		{
+			if(dp[i][j-1] < dp[i+(1<<(j-1))][j-1])
+			{
+				dp[i][j] = dp[i][j-1];
+				dp_num[i][j] = dp_num[i][j-1];
+			}
+			else
+			{
+				dp[i][j] = dp[i+(1<<(j-1))][j-1];
+				dp_num[i][j] = dp_num[i+(1<<(j-1))][j-1];
+			}
+		}
+	}
+}
+int st_query(int x, int y)//查询d[x~y]中最小值对应的点编号
+{
+	if(x > y) swap(x,y);
+	int k = 0;
+	while((1<<(k+1)) <= y-x+1) k++;
+	if(dp[x][k] <= dp[y-(1<<k)+1][k]) return dp_num[x][k];
+	return dp_num[y-(1<<k)+1][k];
+}
+/*LCA初始化和查询*/
+void lca_init(int rt)//初始化O(n*log(n))
+{
+	tol = all = 0;
+	fa[rt] = 0;
+	dfs(rt,1);
+	st_init();
+}
+int lca_query(int x, int y)//x,y的LCA, O(1)
+{
+	return st_query(ft[x],ft[y]);
+}
+int query(int a, int b, int lca, int lcaf, int x, int y, int k)
+{
+	if(x == y) return x;
+	int m = (x+y)>>1, ls = sum[lc[a]]+sum[lc[b]]-sum[lc[lca]]-sum[lc[lcaf]];
+	if(ls >= k) return query(lc[a],lc[b],lc[lca],lc[lcaf],x,m,k);
+	return query(rc[a],rc[b],rc[lca],rc[lcaf],m+1,y,k-ls);
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n = in(),q = in();
+	repe(i,1,n) num[i] = a[i] = in();
+	sort(num+1,num+1+n);
+	sot[cnt=1] = num[1];
+	repe(i,2,n) if(num[i] != num[i-1]) sot[++cnt] = num[i];
+	e = 0;
+	clc(head,-1);
+	rep(i,1,n)
+	{
+		int u = in(),v = in();
+		add_edge(u,v);
+		add_edge(v,u);
+	}
+	lca_init(1);
+	int last = 0;
+	while(q--)
+	{
+		int u = in(),v = in(),k = in();
+		u ^= last;
+		int lca = lca_query(u,v);
+		int ans = sot[query(rt[u],rt[v],rt[lca],rt[fa[lca]],1,cnt,k)];
+		printf("%d", ans);
+		last = ans;
+		if(q) putchar('\n');
+	}
+	return 0;
+}

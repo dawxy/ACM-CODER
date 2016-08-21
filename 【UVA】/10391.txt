@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <map>
+#include <string.h>
+#include <string>
+using namespace std;
+struct NODE{
+	char a[200];
+	int len;
+}node[120010];
+map <string,bool> vis;
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	vis.clear();
+	int n = 0;
+	while(EOF != scanf ("%s",node[n].a))
+	{
+		node[n].len = strlen(node[n].a);
+		vis[node[n++].a] = true;
+	}
+	char buf;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 1; j < node[i].len; j++)
+		{
+			buf = node[i].a[j];
+			node[i].a[j] = 0;
+			if (vis.end() != vis.find(string(node[i].a)))
+			{
+				node[i].a[j] = buf;
+				if (vis.end() != vis.find(string(node[i].a+j)))
+				{
+					printf ("%s\n",node[i].a);
+					break;
+				}
+			}
+			else
+				node[i].a[j] = buf;
+		}
+	}
+	return 0;
+}

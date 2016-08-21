@@ -1,0 +1,72 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10;
+struct NODE{
+	double x, y;
+	bool operator<(const NODE&t)const{
+		return x < t.x;
+	}
+}c[MAXN];
+double l;
+
+inline bool equal(const double a, const double b){
+	return fabs(a-b) < 1e-8;
+}
+int sloved(int n)
+{
+	sort(c,c+n);
+	if(c[0].x > 0 && !equal(c[0].x,0)) return -1;
+	int ans = 0, p = 0;
+	double now = 0;
+	while(p < n)
+	{
+		double mx = -1;
+		while((c[p].x < now || equal(c[p].x,now)) && p < n)
+		{
+			mx = max(c[p].y,mx);
+			p++;
+		}
+		if(-1 == mx) return -1;
+		now = mx;
+		ans++;
+		if(now > l || equal(now,l)) return ans;
+	}
+	return -1;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	double w;
+	while(~scanf("%d %lf %lf%*c", &n, &l, &w))
+	{
+		int cnt = 0;
+		rep(i,0,n)
+		{
+			double p,r;
+			scanf("%lf %lf%*c", &p, &r);
+			if(r*2 < w) continue;
+			double tmp = sqrt(r*r*1.0-w*w/4.0);
+			c[cnt++] = {p-tmp,p+tmp};
+		}
+		printf("%d\n",sloved(cnt));
+	}
+	return 0;
+}

@@ -1,0 +1,111 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10, MAXM = 1000000+100;
+struct Edge{
+	int u, v,cost;
+	Edge(int a = 0, int b = 0, int c = 0){
+		u = a, v = b, cost = c;
+	}
+}edge[MAXM];
+int a[MAXN],tol, sum[MAXN];
+
+inline int get_id(int a, int b){
+	return sum[a-1]+b;
+}
+inline void add_edge(int u, int v, int cost){
+	edge[tol++] = Edge(u,v,cost);
+}
+int in[MAXN], pre[MAXN], vis[MAXN], id[MAXN];
+int mst(int rt, int n, int m)
+{
+	int ans = 0;
+	while(1)
+	{
+		clc(in,0x3f);
+		rep(i,0,m)
+		{
+			int u = edge[i].u, v = edge[i].v;
+			if(u != v && edge[i].cost < in[v])
+			{
+				in[v] = edge[i].cost;
+				pre[v] = u;
+			}
+		}
+		in[rt] = 0;
+		rep(i,0,n) if(INF == in[i]) return -1;
+		clc(vis,-1);
+		clc(id,-1);
+		int cnt = 0;
+		rep(i,0,n)
+		{
+			ans += in[i];
+			int v = i;
+			while(v != rt && -1 == id[v] && vis[v] != i)
+			{
+				vis[v] = i;
+				v = pre[v];
+			}
+			if(v != rt && -1 == id[v])
+			{
+				for(int u = pre[v]; u != v; u = pre[u]) id[u] = cnt;
+				id[v] = cnt++;
+			}
+		}
+		if(!cnt) break;
+		rep(i,0,n) if(-1 == id[i]) id[i] = cnt++;
+		rep(i,0,m)
+		{
+			int v = edge[i].v;
+			edge[i].u = id[edge[i].u];
+			edge[i].v = id[edge[i].v];
+			if(edge[i].u != edge[i].v) edge[i].cost -= in[v];
+		}
+		n = cnt;
+		rt = id[rt];
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	sum[0] = 1;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		tol = 0;
+		repe(i,1,n) scanf("%d%*c", &a[i]), sum[i] = sum[i-1]+a[i]+1;
+		rep(i,0,m)
+		{
+			int c,l1,d,l2, cost;
+			scanf("%d %d %d %d %d%*c", &c, &l1, &d, &l2, &cost);
+			add_edge(get_id(c,l1),get_id(d,l2),cost);
+		}
+		repe(i,1,n) add_edge(0,get_id(i,0),0);
+		repe(i,1,n)
+		{
+			repe(j,1,a[i])
+			{
+				add_edge(get_id(i,j),get_id(i,j-1),0);
+			}
+		}
+		printf("%d\n", mst(0,sum[n],tol));
+	}
+	return 0;
+}

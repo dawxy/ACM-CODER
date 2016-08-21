@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 150
+int a[MAXN];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n;
+    while(~scanf ("%d%*c", &n) && n)
+	{
+        for (int i = 0; i < n; i++)
+            scanf ("%d%*c", &a[i]);
+        sort(a,a+n);
+        int sum = 0;
+        for (int i = 0; i < (n+2)/2; i++)
+            sum += (a[i]+2)/2;
+		printf ("%d\n", sum);
+	}
+    return 0;
+}

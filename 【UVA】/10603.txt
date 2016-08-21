@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 201
+struct QUE{
+	int a[3], dis;
+}que[MAX*MAX*MAX], st;
+bool vis[MAX][MAX][MAX];
+int ed, d[6][2] = {{0,1},{0,2},{1,0},{1,2},{2,0},{2,1}};
+
+int bfs();
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		scanf ("%d %d %d %d%*c", &st.a[0],&st.a[1],&st.a[2],&ed);
+		int ans;
+		while(1)
+		{
+			memset(vis,false, sizeof(vis));
+			ans = bfs();
+			if (-1 != ans)
+				break;
+			ed--;
+		}
+		printf ("%d %d\n", ans, ed);
+	}
+	return 0;
+}
+
+int daoshui(QUE *now, int s)
+{
+	int from = d[s][0], to = d[s][1], c;
+	if (0 == now->a[from] || st.a[to] == now->a[to])
+		return -1;
+	c = st.a[to]-now->a[to];
+	if (now->a[from] < c)
+		c = now->a[from];
+	now->a[from] -= c;
+	now->a[to] += c;
+	return c;
+}
+int bfs()
+{
+	int front = -1, rear = 0;
+	QUE buf, val;
+	val = st;
+	val.a[0] = val.a[1] = val.dis = 0;
+	que[rear++] = val;
+	vis[0][0][st.a[2]] = true;
+	while(1 != rear-front)
+	{
+		buf = que[++front];
+		if (ed == buf.a[0] || ed == buf.a[1] || ed == buf.a[2])
+			return buf.dis;
+		for (int i = 0; i < 6; i++)
+		{
+			val = buf;
+			int c = daoshui(&val,i);
+			if (-1 == c) continue;
+			if (!vis[val.a[0]][val.a[1]][val.a[2]])
+			{
+				vis[val.a[0]][val.a[1]][val.a[2]] = true;
+				val.dis = buf.dis+c;
+				que[rear++] = val;
+			}
+		}
+	}
+	return -1;
+}

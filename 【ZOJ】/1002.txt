@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 5
+const int d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+char g[MAXN][MAXN];
+int ans, n;
+bool vis[MAXN][MAXN];
+
+void dfs(int);
+int main ()
+{
+	#ifdef SHY
+		freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(EOF != scanf ("%d%*c", &n) && n)
+	{
+		for (int i = 0; i < n; i++)
+		{
+            for (int j = 0; j < n; j++)
+                g[i][j] = getchar();
+            getchar();
+		}
+        memset(vis,false, sizeof(vis));
+        ans = 0;
+        for (int i = 0; i < n; i++)
+		{
+            for (int j = 0;  j< n; j++)
+			{
+				if ('.' == g[i][j])
+				{
+                    vis[i][j] = true;
+                    dfs(1);
+                    vis[i][j] = false;
+				}
+			}
+		}
+        printf ("%d\n", ans);
+	}
+    return 0;
+}
+
+bool ok (int si, int sj)
+{
+	int ni, nj, j;
+    for (int i = 0; i < 4; i++)
+	{
+		j = 1;
+        while(1)
+		{
+            ni = si+d[i][0]*j;
+			nj = sj+d[i][1]*j;
+            if (0 > ni || n <= ni || 0 > nj || n <= nj || 'X' == g[ni][nj])
+                break;
+            if (vis[ni][nj])
+                return false;
+			j++;
+		}
+	}
+	return true;
+}
+void dfs(int p)
+{
+    if (p > ans)
+		ans = p;
+    for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+            if (!vis[i][j] && '.' == g[i][j] && ok(i, j))
+			{
+				vis[i][j] = true;
+                dfs(p+1);
+                vis[i][j] = false;
+			}
+		}
+	}
+}

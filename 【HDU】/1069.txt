@@ -1,0 +1,47 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 35
+struct NODE{
+    int a[3];
+}p[6*MAXN];
+int dp[6*MAXN];
+
+bool cmp(NODE a, NODE b){return a.a[0] > b.a[0];}
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n, count = 0;
+    while(~scanf ("%d%*c", &n) && n)
+    {
+        int len = 0, a[3], ans = 0;
+        for (int i = 0; i < n; i++)
+        {
+            scanf ("%d %d %d%*c", &a[0], &a[1], &a[2]);
+            sort(a,a+3);
+            do{
+                p[len].a[0] = a[0];
+                p[len].a[1] = a[1];
+                p[len++].a[2] = a[2];
+            }while(next_permutation(a,a+3));
+        }
+        memset(dp,0,sizeof(dp));
+        sort(p,p+len, cmp);
+        for (int i = 0; i < len; i++)
+        {
+            dp[i] = p[i].a[2];
+            for (int j = 0; j < i; j++)
+            {
+                if (p[j].a[1] > p[i].a[1] && p[j].a[0] != p[i].a[0])
+                    dp[i] = max(dp[i], dp[j]+p[i].a[2]);
+            }
+            if (ans < dp[i])
+                ans = dp[i];
+        }
+        printf ("Case %d: maximum height = %d\n", ++count, ans);
+    }
+    return 0;
+}

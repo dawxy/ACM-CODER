@@ -1,0 +1,120 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef unsigned long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 3000000+10, MAXIN = 300000,MAXNUM = 3000000;
+const LL MOD = 3221225473;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+int a[MAXN],cnt[MAXN],prime[MAXN];
+bool isprime[MAXN],vis[MAXN], used[MAXN];
+
+void get_prime()
+{
+	clc(isprime,1);
+	int len = sqrt(MAXNUM+0.5);
+	repe(i,2,len)
+	{
+		if(!isprime[i]) continue;
+		for(int j = i*i; j <= MAXNUM; j += i) isprime[j] = false;
+	}
+}
+void getprime()
+{
+	repe(i,2,MAXNUM)
+	{
+		if(!prime[i])prime[++prime[0]] = i;
+		for(int j = 1; j <= prime[0] && prime[j] <= MAXNUM/i; j++)
+		{
+			prime[prime[j]*i] = 1;
+			if(i%prime[j] == 0) break;
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	get_prime();
+	getprime();
+	int t;
+	in(t);
+	while(t--)
+	{
+		clc(vis,0);
+		clc(cnt,0);
+		clc(used,0);
+		int n;
+		in(n);
+		rep(i,0,n)
+		{
+			in(a[i]);
+			a[i]--;
+		}
+		LL ans=1,x;
+		rep(i,0,n)
+		{
+			if(!vis[i])
+			{
+				int j=i;
+				x=0;
+				while(!vis[j]){
+					x++;
+					vis[j]=1;
+					j=a[j];
+				}
+				if(used[x]) continue;
+				if(isprime[x])
+				{
+					cnt[x] = max(cnt[x],1);
+					continue;
+				}
+				repe(j,1,prime[0])
+				{
+					int tmp = 0, p = prime[j];
+					while(x && 0 == x%p)
+						x /= p, tmp++;
+					if(cnt[p] < tmp) cnt[p] = tmp;
+					if(isprime[x])
+					{
+						if(x > 1 && x != p)
+							cnt[x] = max(cnt[x],1);
+						break;
+					}
+				}
+			}
+		}
+		repe(i,2,n) while(cnt[i]--) ans = ans*i%MOD;
+		printf("%I64u\n",ans);
+	}
+	return 0;
+}

@@ -1,0 +1,97 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <vector>
+using namespace std;
+#define MAXN 1005
+#define INF 0x3f3f3f3f
+struct NODE{
+	int dis,s;
+	bool mark;
+	NODE(int a, int b, bool c){dis = a, s = b,mark = c;}
+	bool operator<(const NODE& a)const{
+		return a.dis<dis;
+	}
+};
+struct E{
+	int to, cost;
+	E(int a, int b){to = a, cost = b;}
+};
+vector<E> edge;
+vector<int> g[MAXN];
+priority_queue<NODE> q;
+int cnt[MAXN][2], dis[MAXN][2];
+bool vis[MAXN][2];
+
+void dijkstra(int st)
+{
+	memset(dis,0x3f,sizeof(dis));
+	memset(cnt,0,sizeof(cnt));
+	memset(vis,0,sizeof(vis));
+	dis[st][0] = 0;
+	cnt[st][0] = 1;
+	q.push(NODE(0,st,0));
+	while(!q.empty())
+	{
+		NODE now = q.top();q.pop();
+		int u = now.s;
+		if(vis[u][now.mark]) continue;
+		vis[u][now.mark] = true;
+		int len = g[u].size();
+		for(int i = 0; i < len; i++)
+		{
+			E& e = edge[g[u][i]];
+			int newc = now.dis+e.cost;
+			if(newc < dis[e.to][0])//当前路径比最小值小
+			{
+				if(INF > dis[e.to][0])
+				{
+					dis[e.to][1] = dis[e.to][0];
+					cnt[e.to][1] = cnt[e.to][0];
+					q.push(NODE(dis[e.to][1],e.to,1));
+				}
+				dis[e.to][0] = newc;
+				cnt[e.to][0] = cnt[u][now.mark];
+				q.push(NODE(dis[e.to][0],e.to,0));
+			}
+			else if(newc == dis[e.to][0])//等于最短路相同
+				cnt[e.to][0] += cnt[u][now.mark];
+			else if(newc < dis[e.to][1])
+			{
+				dis[e.to][1] = newc;
+				cnt[e.to][1] = cnt[u][now.mark];
+				q.push(NODE(dis[e.to][1],e.to,1));
+			}
+			else if(newc == dis[e.to][1])
+				cnt[e.to][1] += cnt[u][now.mark];
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m,st,ed,a,b,c;
+		edge.clear();
+		scanf("%d %d%*c", &n, &m);
+		for(int i = 1; i <= n; i++) g[i].clear();
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b, &c);
+			edge.push_back(E(b,c));
+			g[a].push_back(edge.size()-1);
+		}
+		scanf("%d %d%*c", &st, &ed);
+		dijkstra(st);
+		if(dis[ed][0]+1 == dis[ed][1])
+			printf("%d\n", cnt[ed][0]+cnt[ed][1]);
+		else
+			printf("%d\n", cnt[ed][0]);
+	}
+	return 0;
+}

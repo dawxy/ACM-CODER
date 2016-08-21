@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 200010
+int f[MAXN], n, sum[MAXN];
+map<string, int> vis;
+
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int add(char *c)
+{
+	if(vis.find(c) == vis.end())
+	{
+		sum[n] = 1;
+		f[n] = n;
+		return vis[c] = n++;
+	}
+	return vis[c];
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	while(~scanf("%d%*c", &t))
+	{
+		while(t--)
+		{
+			int m;
+			scanf("%d%*c", &m);
+			vis.clear();
+			n = 0;
+			char a[30], b[30];
+			rep(i,0,m)
+			{
+				scanf("%s %s%*c", a, b);
+				int x = find(add(a)), y = find(add(b));
+				if(x != y)
+				{
+					sum[y] += sum[x];
+					f[x] = y;
+				}
+				printf("%d\n", sum[y]);
+			}
+		}
+	}
+	return 0;
+}

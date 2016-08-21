@@ -1,0 +1,18 @@
+#include <stdio.h>
+#define PI 3.1415927
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    double r,n,t;
+    int  count = 0;
+    while(~scanf ("%lf %lf %lf%*c", &r,&n,&t) && n)
+	{
+        double d = r*PI*n/12/5280;
+        double v = d/(t/3600);
+        printf ("Trip #%d: %.2lf %.2lf\n", ++count,d,v);
+	}
+    return 0;
+}

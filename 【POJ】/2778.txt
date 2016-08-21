@@ -1,0 +1,144 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10*10+10;
+const LL MOD = 100000;
+int id[300];
+struct Trie{
+	int cnt;
+	int ch[MAXN][4], fail[MAXN];
+	bool end[MAXN];
+	int newnode()
+	{
+		clc(ch[cnt],-1);
+		end[cnt++] = 0;
+		return cnt-1;
+	}
+	void init()
+	{
+		cnt = 0;
+		newnode();
+		clc(end,0);
+	}
+	void insert(char *s)
+	{
+		int u = 0,len = strlen(s);
+		rep(i,0,len)
+		{
+			int& c = ch[u][id[s[i]]];
+			if(-1 == c)
+				c = newnode();
+			u = c;
+		}
+		end[u] = true;
+	}
+	void get_fail()
+	{
+		queue<int> q;
+		fail[0] = 0;
+		rep(i,0,4)
+		{
+			int& c = ch[0][i];
+			if(~c)
+			{
+				fail[c] = 0;
+				q.push(c);
+			}
+			else c = 0;
+		}
+		while(!q.empty())
+		{
+			int u = q.front();q.pop();
+			rep(i,0,4)
+			{
+				int& c = ch[u][i];
+				int p = ch[fail[u]][i];
+				if(end[p]) end[c] = true;
+				if(~c)
+				{	 
+					fail[c] = p;
+					q.push(c);
+				}
+				else c = p;
+			}
+		}
+	}
+}ac;
+struct MATRIX{
+	LL num[MAXN][MAXN];
+}x;
+int cnt;
+
+MATRIX mul_mod(const MATRIX& a, const MATRIX& b)
+{
+	MATRIX ans;
+	clc(ans.num,0);
+	rep(i,0,cnt)
+	{
+		rep(j,0,cnt)
+		{
+			rep(k,0,cnt)
+				ans.num[i][j] += a.num[i][k]*b.num[k][j];
+			ans.num[i][j] %= MOD;
+		}
+	}
+	return ans;
+}
+MATRIX pow_mod(MATRIX x, int n)
+{
+	MATRIX ans;
+	clc(ans.num,0);
+	rep(i,0,cnt) ans.num[i][i] = 1;
+	while(n)
+	{
+		if(n&1)  ans = mul_mod(ans,x);
+		x = mul_mod(x,x);
+		n >>= 1;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	id['A'] = 0,id['C'] = 1, id['T'] = 2, id['G'] = 3;
+	int m,n;
+	scanf("%d %d", &m, &n);
+	ac.init();
+	char str[20];
+	rep(i,0,m)
+	{
+		scanf("%s", str);
+		ac.insert(str);
+	}
+	ac.get_fail();
+	cnt = ac.cnt;
+	clc(x.num,0);
+	rep(i,0,cnt)
+	{
+		rep(j,0,4)
+			if(!ac.end[i] && !ac.end[ac.ch[i][j]])
+				x.num[i][ac.ch[i][j]]++;
+	}
+	x = pow_mod(x,n);
+	LL ans = 0;
+	rep(i,0,cnt) ans += x.num[0][i];
+	printf("%I64d\n", ans%MOD);
+	return 0;
+}

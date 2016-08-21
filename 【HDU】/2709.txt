@@ -1,0 +1,30 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1000000
+#define MOD 1000000000
+int dp[MAXN+10], a[20], sum;
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int p = 1;
+    for(int i = 0; p <= MAXN; i++)
+    {
+        a[sum++] = p;
+        p <<= 1;
+    }
+    dp[0] = 1;
+    for(int i = 0; i < sum; i++)
+    {
+        for(int j = a[i]; j <= MAXN; j++)
+            dp[j] = (dp[j]+dp[j-a[i]])%MOD;
+    }
+    int n;
+    while(~scanf("%d%*c", &n))
+    {
+        printf("%d\n", dp[n]);
+    }
+    return 0;
+}

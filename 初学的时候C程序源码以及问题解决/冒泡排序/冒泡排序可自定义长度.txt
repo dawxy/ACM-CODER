@@ -1,0 +1,114 @@
+/*
+　　2013年9月1日 14:15:09
+  　冒泡排序（升序）输入６个数字排序
+   */
+#include <stdio.h>
+#include <malloc.h>
+
+void sort (int * a, int len) //按升序排
+{
+	int i, j, t;
+
+	for (i = 0; i < len - 1; ++i)
+	{
+		for (j = 0; j < len - 1 - i; ++j)
+		{
+			if (a[j] > a[j + 1])// 这里>为升序，<为降序；
+			{
+				t = a[j];
+				a[j] = a[j + 1];
+				a[j + 1] = t;
+			}
+		}
+	}
+}
+
+void sort1 (int * a, int len) //按降序排
+{
+	int i, j, t;
+
+	for (i = 0; i < len - 1; ++i)
+	{
+		for (j = 0; j < len - 1 - i; ++j)
+		{
+			if (a[j] < a[j + 1])// 这里>为升序，<为降序；
+			{
+				t = a[j];
+				a[j] = a[j + 1];
+				a[j + 1] = t;
+			}
+		}
+	}
+}
+
+int main (void)
+{
+	int i, l, len;
+	char ch, s;
+	int * a;
+
+	printf ("请输入您要排序的个数：");
+	scanf_s ("%d",&len);
+	while ( (ch=getchar()) !='\n' )//清除上次scanf输入的垃圾数据
+		continue;
+
+	a = (int *)malloc(len * sizeof(int));
+
+	for (l = 0; l < len; ++l)
+	{
+		printf ("请输入第%d个数字（整数）",l + 1);
+		scanf_s ("%d",&a[l]);
+	}
+
+xy://后面排序类型输错后返回
+	while ( (ch=getchar()) !='\n' )//清除上次scanf输入的垃圾数据
+		continue;
+
+	printf ("请选择按照什么顺序排列（输入S升序，J降序）\n");
+	printf ("请选择：");
+	scanf_s (" %c",&s,1);
+
+	if ('s' == s||'S' == s)
+	{
+		sort (a, len);
+		printf ("顺序为：");
+		for (i = 0; i < len - 1; ++i)
+		{
+			printf ("%d≤", a[i]);
+		}
+		printf ("%d\n", a[len - 1]);
+	}
+
+	else if ('j' == s||'J' == s)
+	{
+		sort1 (a, len);
+		printf ("顺序为：");
+		for (i = 0; i < len - 1; ++i)
+		{
+			printf ("%d≥", a[i]);
+		}
+		printf ("%d\n", a[len - 1]);
+	}
+
+	else 
+	{
+		printf ("请检查是否正确输入！");
+		goto xy;
+	}
+
+
+
+	return 0;
+}
+
+/*
+   在vs2012中的输出结果：例子
+   ——————————————————
+   请输入您要排序的个数：2
+请输入第1个数字（整数）2
+请输入第2个数字（整数）3
+请选择按照什么顺序排列（输入S升序，J降序）
+请选择：s
+顺序为：2<3
+   ——————————————————
+*/

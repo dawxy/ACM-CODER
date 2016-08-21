@@ -1,0 +1,94 @@
+/*
+注意是输出区间路径，还有必须是(]区间
+*/
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 100010
+struct NODE
+{
+	int a, b;
+} p[MAXN];
+int n, m, out[MAXN];
+
+bool cmp(const NODE a, const NODE b)
+{
+	return a.a < b.a;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d%*c", &m);
+		n = 0;
+		while(1)
+		{
+			scanf("%d %d%*c", &p[n].a, &p[n].b);
+			if(!p[n].a && !p[n].b)
+				break;
+			if(p[n].a > p[n].b)
+			{
+				p[n].a ^= p[n].b;
+				p[n].b ^= p[n].a;
+				p[n].a ^= p[n].b;
+			}
+			if(p[n].b < 0 || p[n].a > m)
+				continue;
+
+			if(p[n].a < 0)
+				p[n].a = 0;
+
+			if(p[n].b > m)
+				p[n].b = m;
+			n++;
+		}
+		sort(p, p + n, cmp);
+		if(count++)
+			printf("\n");
+		if(p[0].a > 0)
+		{
+			printf("0\n");
+			continue;
+		}
+		int end = p[0].b, max = 0, ans = 1, i;
+		for(i = 1; i < n && !p[i].a; i++)
+		{
+			if(end < p[i].b)
+				end = p[i].b;
+		}
+		out[0] = end;
+		for(; i < n; i++)
+		{
+			max = end;
+			for(; i < n && p[i].a <= end; i++)
+			{
+				if(max < p[i].b)
+					max = p[i].b;
+				if(i < n && p[i + 1].a > end)
+					break;
+			}
+			if(end < max)
+				end = max,  out[ans++] = end;
+			if(end >= m)
+				break;
+		}
+		if(end >= m)
+		{
+			printf("%d\n0 ", ans);
+
+			for(i = 0; i < ans - 1; i++)
+				printf("%d\n%d ", out[i], out[i]);
+
+			printf("%d\n", out[ans - 1]);
+		}
+		else
+			printf("0\n");
+	}
+
+	return 0;
+}

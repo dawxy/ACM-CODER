@@ -1,0 +1,38 @@
+#include <stdio.h>
+#define MAXN 10010
+char a[MAXN];
+
+char to(char c)
+{
+    if ('b' == c)
+		return ' ';
+    if ('q' == c)
+		return ',';
+	if ('t' == c)
+		return '!';
+	if ('m' == c)
+		return 'l';
+	if ('i' == c)
+		return 'e';
+	if ('c' == c)
+		return 'a';
+	if ('a' == c)
+		return 'c';
+    if ('e' == c)
+		return 'i';
+    if ('l' == c)
+		return 'm';
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(gets(a))
+	{
+        for (int i = 0; a[i]; i++)
+            printf ("%c", to(a[i]));
+        printf ("\n");
+	}
+    return 0;
+}

@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 100000
+#define max(a,b) (a>b?a:b)
+int ans, ch, a[MAXN];
+
+int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		int cnt = 0, ans = -1, sum = 0;
+		for (int i = 0; i < n; i++)
+			a[i] = in()-in();
+		for (int i = 0; i < (n<<1); i++)
+		{
+			sum += a[i%n];
+			if(sum < 0)
+				sum = 0, cnt = 0;
+			else
+			{
+				cnt++;
+				ans = max(ans,cnt);
+				if (cnt == n) break;
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

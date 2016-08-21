@@ -1,0 +1,18 @@
+#include <stdio.h>
+#include <math.h>
+#define PI 3.1415926
+
+int main()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		double n, r;
+		scanf ("%lf%*c", &n);
+		r = n/((sqrt)(3.0));
+		printf ("%.2lf\n", PI*r*r);
+	}
+
+	return 0;
+}

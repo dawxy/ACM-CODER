@@ -1,0 +1,60 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 305
+#define INF 0x3f3f3f3f
+#define min(a,b) (a<b?a:b)
+int dp[MAXN][MAXN], n;
+bool vis[MAXN];
+
+void floyd(int k)
+{
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < n; j++)
+            dp[i][j] = min(dp[i][j], dp[i][k]+dp[k][j]);
+    }
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int m,q,count = 0;
+    while(~scanf("%d %d %d%*c", &n, &m, &q) && n+m+q)
+    {
+        int a,b,c;
+        memset(dp,0x3f,sizeof(dp));
+        memset(vis,0,sizeof(vis));
+        for(int i = 0; i < m; i++)
+        {
+            scanf("%d %d %d%*c", &a, &b, &c);
+            if(dp[a][b] > c)
+                dp[a][b] = c;
+        }
+        for(int i = 0; i < n; i++) dp[i][i] = 0;
+        if(count) putchar('\n');
+        printf("Case %d:\n",++count);
+        for(int i = 0; i < q; i++)
+        {
+            scanf("%d%*c", &c);
+            if(c)
+            {
+                scanf("%d %d%*c", &a, &b);
+                if(!vis[a] || !vis[b]) printf("ERROR! At path %d to %d\n",a,b);
+                else if(INF == dp[a][b]) puts("No such path");
+                else printf("%d\n",dp[a][b]);
+            }
+            else
+            {
+                scanf("%d%*c", &a);
+                if(vis[a]) printf("ERROR! At point %d\n",a);
+                else
+                {
+                    vis[a] = true;
+                    floyd(a);
+                }
+            }
+        }
+    }
+    return 0;
+}

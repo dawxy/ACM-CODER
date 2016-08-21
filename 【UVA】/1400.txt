@@ -1,0 +1,88 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f3f3f3f3f
+#define MAXN 500010
+#define lc u<<1
+#define rc u<<1|1
+typedef pair<int, int> P;//存放线段树当前节点区间[x,y]中最大区间和的范围
+struct NODE{//prex是区间[x,y]中的前缀最大和的位置,suf是后缀的
+	int x,y,prex,sufx;
+	P all;
+}node[MAXN<<1];
+LL a[MAXN], sum[MAXN];
+
+inline P biger(const P& a, const P& b){
+	LL suma = sum[a.second]-sum[a.first-1],sumb = sum[b.second]-sum[b.first-1];
+	return (suma > sumb || (suma == sumb && a<b)) ? a:b;
+}
+NODE pushup(const NODE& a, const NODE& b)
+{
+	NODE ans;
+	ans.x = a.x, ans.y = b.y;
+	//更新all
+	ans.all = biger(a.all, b.all);//MAX起点终点都在[x,m]或者[m+1,y]
+	ans.all = biger(ans.all, P(a.sufx,b.prex));//MAX起点终点跨越m
+	//更新prex
+	ans.prex = biger(P(a.x,a.prex), P(a.x,b.prex)).second;
+	//更新sufx
+	ans.sufx = biger(P(a.sufx,b.y), P(b.sufx, b.y)).first;
+	return ans;
+}
+void bulid(int u, int x, int y)
+{
+	if(x == y)
+	{
+		node[u].all=P(x,y);
+		node[u].x = node[u].y = node[u].prex = node[u].sufx = x;
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(lc,x,m);
+	bulid(rc,m+1,y);
+	node[u] = pushup(node[lc], node[rc]);
+}
+int ql,qr;
+NODE query(int u)
+{
+	if(ql <= node[u].x && node[u].y <= qr) return node[u];
+	int m = (node[u].x+node[u].y)>>1;
+	NODE ans;
+	if(ql <= m && qr > m)
+		ans = pushup(query(lc), query(rc));
+	else if(ql <= m) ans = query(lc);
+	else if(qr > m) ans = query(rc);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,q, count = 0;
+	while(~scanf("%d %d%*c", &n, &q))
+	{
+		repe(i,1,n) scanf("%lld%*c", &a[i]), sum[i] = sum[i-1]+a[i];
+		bulid(1,1,n);
+		printf("Case %d:\n", ++count);
+		rep(i,0,q)
+		{
+			scanf("%d %d%*c", &ql, &qr);
+			NODE ans = query(1);
+			printf("%d %d\n", ans.all.first, ans.all.second);
+		}
+	}
+	return 0;
+}

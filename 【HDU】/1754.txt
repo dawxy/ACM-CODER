@@ -1,0 +1,80 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 200010
+int mx[MAXN<<1], a[MAXN];
+
+void bulid(int u, int x, int y)
+{
+    if(x == y)//叶子节点直接赋值
+    {
+        mx[u] = a[x];
+        return;
+    }
+    int m = (x+y)>>1;
+    bulid(u<<1,x,m);//u的左儿子编号为u<<1,右儿子为(u<<1)+1;
+    bulid((u<<1)+1,m+1,y);
+    mx[u] = max(mx[u<<1], mx[(u<<1)+1]);
+}
+int ql, qr;//查询区间
+int query(int u, int x, int y)
+{
+    if(ql <= x && y <= qr) return mx[u];//当前节点包含查询区间
+    int m = (x+y)>>1, ans = -INF;
+    if(ql <= m) ans = max(ans, query(u<<1,x,m));//向左走
+    if(m < qr) ans = max(ans, query((u<<1)+1,m+1,y));//向右走
+    return ans;
+}
+int p,v;//修改a[p] = v
+void update(int u, int x, int y)
+{
+    if(x == y)//叶子结点直接更新
+    {
+        mx[u] = v;
+        return;
+    }
+    int m = (x+y)>>1;
+    if(p <= m) update(u<<1,x,m);
+    else update((u<<1)+1, m+1,y);
+    mx[u] = max(mx[u<<1], mx[(u<<1)+1]);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int n,q;
+    while(~scanf("%d %d%*c", &n, &q))
+    {
+        repe(i,1,n) scanf("%d%*c", &a[i]);
+        bulid(1,1,n);
+        rep(i,0,q)
+        {
+            if(getchar() == 'Q')
+            {
+                scanf("%d %d%*c", &ql, &qr);
+                printf("%d\n", query(1,1,n));
+            }
+            else
+            {
+                scanf("%d %d%*c", &p, &v);
+                update(1,1,n);
+            }
+        }
+    }
+    return 0;
+}
+

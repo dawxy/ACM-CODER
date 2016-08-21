@@ -1,0 +1,23 @@
+//辗转相除法求最小公倍数
+#include <stdio.h>
+
+int gcd (int , int);
+
+int main ()
+{
+	int a, b;
+	while (1)
+	{
+		scanf_s ("%d %d%*c", &a, &b);
+		printf ("%d\n", a*b/gcd(a, b));//两数之积除以这两个数的最大公约数就是这两个数的最小公倍数
+	}
+
+	return 0;
+}
+
+int gcd (int a, int b)//求最大公约数
+{
+	if (0 == b%a)
+		return a;
+	return gcd(b%a, a);
+}

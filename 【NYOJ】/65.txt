@@ -1,0 +1,24 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t, i, s[22], ans[21];
+	s[1] = s[2] = 1;
+	for (i = 3; i < 22; i += 2)
+	{
+		s[i] = s[i+1] = s[i-1]*i;
+	}
+	ans[1] = 1;
+	for (i = 2; i <= 20; i++)
+	{
+		ans[i] = ans[i-1]+s[i];
+	}
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf ("%d%*c", &n);
+		printf ("%d\n", ans[n]);
+	}
+	return 0;
+}

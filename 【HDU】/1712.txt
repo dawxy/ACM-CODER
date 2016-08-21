@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+int dp[MAXN], a[MAXN][MAXN];
+
+int main ()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n, m;
+        while(~scanf ("%d %d%*c", &n, &m) && n+m)
+	{
+                for (int i = 1; i <= n; i++)
+                        for (int j = 1; j <= m; j++)
+				scanf ("%d%*c", &a[i][j]);
+		memset(dp,0,sizeof(dp));
+                for (int i = 1; i <= n; i++)//每一组
+		{
+                        for (int j = m; j >= 1; j--)//这个循环放外面，和01 02背包相反，确保只选择每组中的一个
+                                for (int k = 1; k <= j; k++)//每组中每一个物品
+                                        dp[j] = max(dp[j], dp[j-k]+a[i][k]);
+		}
+		printf ("%d\n", dp[m]);
+	}
+        return 0;
+}

@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define INF 0x3f3f3f3f
+#define MAXC 20000 //最多给出的货币数目
+#define MAXV 10000 //相当于背包容量
+int w[MAXN],num[MAXN], dp[MAXC+1], dp2[MAXC+1];
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int count = 0, n, c;
+    while(~scanf ("%d %d%*c", &n, &c) && n+c)
+    {
+        for(int i = 0; i < n; i++)
+            scanf ("%d%*c", &w[i]);
+        for (int i = 0; i < n; i++)
+            scanf ("%d%*c", &num[i]);
+        memset(dp,0x3f,sizeof(dp));
+        dp[0] = 0;
+        for (int i = 0; i < n; i++)//对购买人多重背包
+        {
+            if (num[i]*w[i] >= c)
+            {
+                for (int j = w[i]; j <= MAXV; j++)
+                    dp[j] = min(dp[j],dp[j-w[i]]+1);
+                continue;
+            }
+            for (int j = 1; j <= num[i]; num[i] -= j, j <<= 1)
+            {
+                int wg = j*w[i];
+                for (int k = MAXV; k >= wg; k--)
+                    dp[k] = min(dp[k],dp[k-wg]+j);//把每次支付的货币数目看成价值
+            }
+            if (num[i] > 0)
+            {
+                int wg = num[i]*w[i];
+                for (int k = MAXV; k >= wg; k--)
+                    dp[k] = min(dp[k],dp[k-wg]+num[i]);
+            }
+        }
+        memset(dp2,0x3f,sizeof(dp2));
+        dp2[0] = 0;
+        for (int i = 0; i < n; i++)//对售货员进行完全背包
+            for (int j = w[i]; j <= MAXV; j++)
+                dp2[j] = min(dp2[j],dp2[j-w[i]]+1);
+        int ans = INF;
+        //找到最小的货币流通数目：min(购买人付的货币数目+售货员减去商品价格c的找零货币数目)
+        for(int i = c; i <= MAXC; i++)
+            ans = min(ans,dp[i]+dp2[i-c]);
+        printf ("Case %d: ", ++count);
+        if (INF == ans)
+            puts("-1");
+        else
+            printf ("%d\n", ans);
+    }
+    return 0;
+}

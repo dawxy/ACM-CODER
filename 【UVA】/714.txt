@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <string.h>
+#define MAXN 600
+int a[MAXN],n, m;
+long long max;
+bool ans[MAXN];
+
+void sloved();
+int main ()
+{
+	#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+	//freopen("e:\\out.txt","w",stdout);
+	#endif
+	int t;
+	scanf ("%d%*c", &t);
+    while(t--)
+	{
+        scanf ("%d %d%*c", &n, &m);
+        max = 0;
+		for (int i = 0; i < n; i++)
+		{
+			scanf ("%d%*c", &a[i]);
+			max += a[i];
+		}
+		memset(ans,false,sizeof(ans));
+		if (1 != m)
+			sloved();
+        printf ("%d", a[0]);
+        for (int i = 1; i < n; i++)
+		{
+            if (ans[i])
+				printf (" /");
+			printf (" %d",a[i]);
+		}
+		printf ("\n");
+	}
+    return 0;
+}
+
+bool can(int x)
+{
+	long long buf = 0;
+	int s = 0;
+    for (int i = n-1; i >= 0; i--)
+	{
+        for (; i >= 0 && buf+a[i] <= x; i--)
+            buf += a[i];
+		if(i >= 0)
+		{
+			buf = a[i];
+			s++;
+		}
+		if (s > m-1)
+			return false;
+	}
+    return true;
+}
+void sloved()
+{
+    long long  l = 0, r = max;
+    while(l < r)
+	{
+		long long mid = l+(r-l)/2;
+        if (!can(mid))
+			l = mid+1;
+        else
+			r = mid;
+	}
+	long long buf = 0;
+	int s = 0;
+	for (int i = 0; i < n; i++)
+        if (a[i] > r)
+			r = a[i];
+     for (int i = n-1; i >= 0; i--)
+	{
+        for (; i >= 0 && buf+a[i] <= r; i--)
+            buf += a[i];
+		if(i >= 0)
+		{
+			buf = a[i];
+			s++;
+			ans[i+1] = true;
+		}
+	}
+	if (s < m-1)
+	{
+        for (int i = 1; i < n && s < m-1; i++)
+		{
+			if (!ans[i])
+                ans[i] = true,s++;
+		}
+	}
+}

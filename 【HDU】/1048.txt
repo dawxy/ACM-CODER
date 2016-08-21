@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <string.h>
+char buf[300];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    char c;
+    while(1)
+	{
+        gets(buf);
+        if (!strcmp(buf,"ENDOFINPUT"))
+			break;
+        while(1)
+		{
+			c = getchar();
+            if ('A' <= c && 'Z' >= c)
+                printf ("%c", (c-'A'-5+26)%26+'A');
+            else
+				printf ("%c",c);
+            if ('\n' == c)
+				break;
+		}
+		gets(buf);
+	}
+    return 0;
+}

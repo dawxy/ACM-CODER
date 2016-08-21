@@ -1,0 +1,118 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20, d[4][2]={{-1,0},{1,0},{0,-1},{0,1}};
+typedef pair<int,int> P;
+char a[MAXN][MAXN];
+
+bool vis[MAXN][MAXN];
+vector<P> dd;
+void del(int x, int y, bool &ok)
+{
+	vis[x][y] = true;
+	dd.push_back(P(x,y));
+	rep(i,0,4)
+	{
+		int ni = x+d[i][0], nj = y+d[i][1];
+		if(0 <= ni && ni < 9 && 0 <= nj && nj < 9 && !vis[ni][nj] && 'x' != a[ni][nj])
+		{
+			if('.' == a[ni][nj])
+			{
+				ok = false;
+				continue;
+			}
+			del(ni,nj,ok);
+		}
+	}
+}
+void dfs(int x, int y, bool &ok)
+{
+	vis[x][y] = true;
+	rep(i,0,4)
+	{
+		int ni = x+d[i][0], nj = y+d[i][1];
+		if(0 <= ni && ni < 9 && 0 <= nj && nj < 9 && !vis[ni][nj] && 'x' != a[ni][nj])
+		{
+			if('.' == a[ni][nj])
+			{
+				ok = false;
+				continue;
+			}
+			dfs(ni,nj,ok);
+		}
+	}
+}
+bool find(int x, int y)
+{
+	clc(vis,0);
+	rep(i,0,9)
+	{
+		rep(j,0,9)
+		{
+			if('o' == a[i][j] && !vis[i][j])
+			{
+				bool ok = true;
+				dfs(i,j,ok);
+				if(ok)
+					return true;
+			}
+		}
+	}
+	return false;
+}
+bool sloved()
+{
+	rep(i,0,9)
+	{
+		rep(j,0,9)
+		{
+			if('.' == a[i][j])
+			{
+				a[i][j] = 'x';
+				if(find(i,j))
+					return true;
+				a[i][j] = '.';
+			}
+		}
+	}
+	return false;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		rep(i,0,9) scanf("%s", a[i]);
+		clc(vis,0);
+		rep(i,0,9)
+		{
+			rep(j,0,9)
+			{
+				if('o' == a[i][j] && !vis[i][j])
+				{
+					dd.clear();
+					bool ok = true;
+					del(i,j,ok);
+					if(ok)
+					{
+						int sz = dd.size();
+						rep(k,0,sz)
+							a[dd[k].first][dd[k].second] = '.';
+					}
+				}
+			}
+		}
+		printf("Case #%d: ",++count);
+		if(sloved()) puts("Can kill in one move!!!");
+		else puts("Can not kill in one move!!!");
+	}
+	return 0;
+}

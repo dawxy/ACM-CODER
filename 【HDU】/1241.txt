@@ -1,0 +1,53 @@
+#include <stdio.h>
+#define MAXN 100
+char a[MAXN][MAXN];
+int n, m;
+
+void dfs (int, int);
+
+int main ()
+{
+	while (1)
+	{
+		int i, j, ans = 0;
+		scanf ("%d %d%*c", &n, &m);
+		if (0 == n && 0 == m)
+			break;
+		for (i = 0; i < n; i++)
+		{
+			for (j = 0; j < m; j++)
+			{
+				a[i][j] = getchar();
+			}
+			getchar();
+		}
+
+		for (i = 0; i < n; i++)
+		{
+			for (j = 0; j < m; j++)
+			{
+				if ('@' == a[i][j])
+				{
+					ans++;
+					dfs(i, j);
+				}
+			}
+		}
+		printf ("%d\n", ans);
+
+	}
+	
+}
+
+void dfs (int si, int sj)
+{
+	int d[8][2] = {{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}}, i, ni, nj;
+	a[si][sj] = '*';
+	for (i = 0; i < 8; i++)
+	{
+		ni = d[i][0]+si;
+		nj = d[i][1]+sj;
+		if (0 <= ni && n > ni && 0 <= nj && m > nj && '@' == a[ni][nj])
+			dfs(ni, nj);
+	}
+}

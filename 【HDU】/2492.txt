@@ -1,0 +1,70 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 100010
+int cnt[MAXN], c[MAXN], d[MAXN], mx, a[MAXN];
+
+inline int lowbit(int x){return x&-x;}
+int sum(int x)
+{
+    int ans = 0;
+    while(x > 0)
+    {
+        ans += cnt[x];
+        x -= lowbit(x);
+    }
+    return ans;
+}
+void update(int x, int num)
+{
+    while(x <= mx)
+    {
+        cnt[x] += num;
+        x += lowbit(x);
+    }
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n;
+        scanf("%d%*c", &n);
+        mx = 0;
+        rep(i,0,n) scanf("%d%*c", &a[i]), mx = max(mx,a[i]);
+        clc(cnt,0);
+        rep(i,0,n)
+        {
+            update(a[i],1);
+            c[i] = sum(a[i]-1);
+        }
+        clc(cnt,0);
+        per(i,n-1,0)
+        {
+            update(a[i],1);
+            d[i] = sum(a[i]-1);
+        }
+        LL ans = 0;
+        rep(i,0,n)
+            ans += c[i]*(LL)(n-1-i-d[i])+(i-c[i])*(LL)d[i];
+        printf("%I64d\n", ans);
+    }
+    return 0;
+}

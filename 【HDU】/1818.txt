@@ -1,0 +1,93 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <algorithm>
+using namespace std;
+#define MAXN 25
+#define MAXM 110
+#define INF 0x3f3f3f3f
+struct NODE{
+	int dis,s;
+	NODE(int a = 0, int b = 0){dis = a, s = b;}
+	bool operator <(const NODE& a)const{return dis>a.dis;}
+};
+char bug[MAXM][MAXN], ch[MAXM][MAXN];
+int n,m, cost[MAXM], dp[1<<20];
+bool vis[1<<20];
+
+bool ok(int s, int b)
+{
+	for(int i = 0; i < n; i++)
+	{
+		if('-' == bug[b][i])
+		{
+			if((s>>i)&1)
+				return false;
+		}
+		else if('+' == bug[b][i])
+		{
+			if(!((s>>i)&1))
+				return false;
+		}
+	}
+	return true;
+}
+int change(int s,int b)
+{
+	for(int i = 0; i < n; i++)
+	{
+		if('-' == ch[b][i])
+		{
+			if((s>>i)&1)
+				s ^= (1<<i);
+		}
+		else if('+' == ch[b][i])
+			s |= (1<<i);
+	}
+	return s;
+}
+void dijkstra()
+{
+	int st = (1<<n)-1;
+	priority_queue<NODE> q;
+	memset(dp,0x3f,sizeof(int)*(1<<n));
+	memset(vis,0,sizeof(bool)*(1<<n));
+	dp[st] = 0;
+	q.push(NODE(0,st));
+	while(!q.empty())
+	{
+		NODE now = q.top();q.pop();
+		int u = now.s;
+		if(!u) return;
+		if(vis[u]) continue;
+		vis[u] = true;
+		for(int i = 0; i < m; i++)
+		{
+			if(!ok(u,i)) continue;
+			int to = change(u,i);
+			if(dp[to] > dp[u]+cost[i])
+			{
+				dp[to] = dp[u]+cost[i];
+				q.push(NODE(dp[to],to));
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int count = 0;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		for(int i = 0; i < m; i++)
+			scanf("%d %s %s%*c", &cost[i], bug[i],ch[i]);
+		dijkstra();
+		printf("Product %d\n",++count);
+		if(INF == dp[0]) puts("Bugs cannot be fixed.");
+		else printf("Fastest sequence takes %d seconds.\n", dp[0]);
+		putchar('\n');
+	}
+	return 0;
+}

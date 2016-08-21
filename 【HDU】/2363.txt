@@ -1,0 +1,87 @@
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <algorithm>
+using namespace std;
+#define max(a,b) (a>b?a:b)
+#define min(a,b) (a<b?a:b)
+#define MAXN 105
+#define INF 0x3f3f3f3f
+struct NODE{
+	int high,low;
+	bool operator<(const NODE& a)const{return high-low < a.high-a.low;}
+}p[MAXN*MAXN];
+int h[MAXN], dp[MAXN], cost[MAXN][MAXN], n, sum;
+bool vis[MAXN];
+
+bool dijkstra(int high, int low)
+{
+	memset(dp,0x3f,sizeof(dp));
+	memset(vis,0,sizeof(vis));
+	dp[1] = 0;
+	for(int i = 1; i <= n; i++)
+	{
+		int x, m = INF;
+		for(int j = 1; j <= n; j++) if(!vis[j] && dp[j] <= m && h[j] >= low && h[j] <= high) m = dp[x=j];
+		if(INF == m)
+			return INF != dp[n];
+		vis[x] = true;
+		for(int j = 1; j <= n; j++) if(h[j] >= low && h[j] <= high)dp[j] = min(dp[j],dp[x]+cost[x][j]);
+	}
+	return INF != dp[n];
+}
+void sloved()
+{
+	int len = 0, dis = 0, st = abs(h[1]-h[n]);
+	for(int i = 0; i < sum; i++)
+	{
+		if(st <= p[i].high-p[i].low && dijkstra(p[i].high, p[i].low))
+		{
+			dis = dp[n], len = p[i].high-p[i].low;
+			for(int j = i+1; j < sum; j++)
+			{
+				if(len == p[j].high-p[j].low)
+				{
+					if(dijkstra(p[j].high,p[j].low))
+						dis = min(dis,dp[n]);
+				}
+				else
+					break;
+			}
+			printf("%d %d\n", len, dis);
+			return;
+		}
+	}
+	printf("%d %d\n", len, dis);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int m,a,b,c;
+		scanf("%d %d%*c", &n, &m);
+		memset(cost,0x3f,sizeof(cost));
+		for(int i = 1; i <= n; i++)
+			scanf("%d%*c", &h[i]);
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d %d%*c", &a, &b, &c);
+			if(cost[a][b] > c)
+				cost[a][b] = cost[b][a] = c;
+		}
+		sum = 0;
+		for(int i = 1; i <= n; i++)
+		{
+			for(int j = i+1; j <= n; j++)
+				p[sum].high = max(h[i],h[j]), p[sum++].low = min(h[i],h[j]);
+		}
+		sort(p,p+sum);
+		sloved();
+	}
+	return 0;
+}

@@ -1,0 +1,30 @@
+#include <stdio.h>
+
+int niu (int n)
+{
+	int i, d, x[3] = {0,0,0}, sum, j;
+	if (1 == n)
+		return 1;
+	for (i = 2, d = 1; i <= n; i++)
+	{
+		d += x[2];//累加今年新成年的小牛 
+		x[2] = x[1];//x[0]~x[2]是1到3岁的小牛
+		x[1] = x[0];
+		x[0] = d;//生小牛
+		sum = d+x[0]+x[1]+x[2];
+	}
+	return sum;
+}
+
+void main (void)
+{
+	int n;
+	while (1)
+	{
+		scanf("%d", &n);
+		if (0 == n)
+			return;
+		getchar();
+		printf ("%d\n" ,niu (n));
+	}
+}

@@ -1,0 +1,105 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int MAXN = 100000+10, MAXM = 200000+10;
+const LL INF = 4557430888798830399;
+struct Edge{
+    int next,to,cost;
+    Edge(int a = 0, int b = 0, int c = 0){
+        next = a, to = b, cost = c;
+    }
+}edge[MAXM];
+struct NODE{
+    LL dis, la;//这里的dis不一定是dis[u]
+    int u;
+    NODE(LL a = 0, LL b = 0, int c = 0){ dis = a, la = b, u = c;}
+    bool operator <(const NODE& a) const {return dis > a.dis;}
+};
+int tol,head[MAXN], k;
+LL dis[MAXN], la[MAXN];
+bool vis[MAXN];
+
+void add_edge(int u, int v, int cost)
+{
+    edge[tol] = Edge(head[u],v,cost);
+    head[u] = tol++;
+}
+void dijkstra(int st)
+{
+	priority_queue<NODE> q;
+	clc(dis, 0x3f);
+	clc(vis, 0);
+	clc(la, 0x3f);
+	dis[st] = 0;
+	la[st] = -INF;
+	q.push(NODE(dis[st], la[st], st));
+	while (!q.empty())
+	{
+		NODE now = q.top(); q.pop();
+		int u = now.u;
+		if(dis[u] > now.dis) dis[u] = now.dis;
+		if(vis[u] && la[u] <= now.la) continue;
+		vis[u] = true;
+		la[u] = now.la;
+		for (int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].to;
+			LL cost = edge[i].cost;
+			/*下面不能用dis[u]替换now.dis 两者不一定相等*/
+			if (cost - la[u] >= k && (dis[v] > now.dis + cost || cost < la[v]))
+				q.push(NODE(now.dis + cost, cost, v));
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int n,m;
+        scanf("%d %d %d%*c", &n, &m, &k);
+        int a,b,c;
+        tol = 0;
+        clc(head,-1);
+        rep(i,0,m)
+        {
+            scanf("%d %d %d%*c", &a, &b, &c);
+            add_edge(a,b,c);
+        }
+        dijkstra(1);
+        if(INF == dis[n]) puts("-1");
+        else printf("%I64d\n", dis[n]);
+    }
+    return 0;
+}
+/*
+1
+6 7 2
+1 2 2
+2 3 4
+3 4 6
+1 5 3
+5 4 8
+4 6 8
+4 6 10
+=======
+20
+*/

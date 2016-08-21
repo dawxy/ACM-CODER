@@ -1,0 +1,96 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+#define MAXN 1000010
+int color[MAXN<<2],vis[MAXN<<2],col;
+
+inline void update_up(int rt)
+{
+	color[rt] = color[rt<<1]|color[rt<<1|1];
+}
+void update_down(int rt)
+{
+	if(vis[rt])
+	{
+		vis[rt<<1] = vis[rt<<1|1] = vis[rt];
+		color[rt<<1] = color[rt<<1|1] = vis[rt];
+		vis[rt] = 0;
+	}
+}
+void bulid(int l, int r, int rt)
+{
+	vis[rt] = 0;
+	color[rt] = 2;
+	if(l == r) return;
+	int mid = (l+r)>>1;
+	bulid(l,mid,rt<<1);
+	bulid(mid+1,r,rt<<1|1);
+}
+void update(int l, int r, int c, int ql, int qr,int rt)
+{
+	if(ql <= l && qr >= r)
+	{
+		color[rt] = vis[rt] = 1<<(c-1);
+		return;
+	}
+	update_down(rt);
+	int mid = (l+r)>>1;
+	if(ql <= mid)
+		update(l,mid,c,ql,qr,rt<<1);
+	if(qr > mid)
+		update(mid+1,r,c,ql,qr,rt<<1|1);
+	update_up(rt);
+}
+int query(int l, int r, int ql, int qr, int rt)
+{
+	if(ql <= l && qr >= r)
+		return color[rt];
+	update_down(rt);
+	int mid = (l+r)>>1, ans = 0;
+	if(ql <= mid) ans |= query(l,mid,ql,qr,rt<<1);
+	if(qr > mid) ans |= query(mid+1,r,ql,qr,rt<<1|1);
+	return ans;
+}
+void output()
+{
+	vector<int> ans;
+	for(int i = 0; i < 30; i++)
+	{
+		if(col&(1<<i))
+			ans.push_back(i+1);
+	}
+	printf("%d", ans[0]);
+	for(int i = 1; i < ans.size(); i++)
+		printf(" %d", ans[i]);
+	putchar('\n');
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		int a,b,c;
+		char ch;
+		bulid(1,n,1);
+		for(int i = 0; i < m; i++)
+		{
+			ch = getchar();
+			if('P' == ch)
+			{
+				scanf("%d %d %d%*c", &a, &b, &c);
+				update(1,n,c,a,b,1);
+			}
+			else
+			{
+				scanf("%d %d%*c", &a, &b);
+				col = query(1,n,a,b,1);
+				output();
+			}
+		}
+	}
+	return 0;
+}

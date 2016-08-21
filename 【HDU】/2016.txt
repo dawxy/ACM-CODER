@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <malloc.h>
+
+void main (void)
+{
+	int n, *p, i, min, min_a, t;
+	while (1)
+	{
+		scanf ("%d ", &n);
+		if (0 == n)
+			break;
+		p = (int*) malloc (sizeof(int)*n);
+		for (i = 0; i < n; i++)
+		{
+			if (n-1 != i)
+				scanf ("%d ", &p[i]);
+			else
+				scanf ("%d", &p[i]);
+		}
+		for (i = 0, min = 0, min_a = p[0]; i < (n-1); i++)
+		{
+			if (min_a > p[i+1])
+			{
+				min = i+1;
+				min_a = p[i+1];
+			}
+		}
+		t = p[min];
+		p[min] = p[0];
+		p[0] = t;
+		for (i = 0; i < n; i++)
+		{
+			if (n-1 != i)
+				printf ("%d ", p[i]);
+			else
+				printf ("%d\n", p[i]);
+		}
+		free (p);
+	}
+}

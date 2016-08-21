@@ -1,0 +1,116 @@
+ #pragma comment(linker, "/STACK:102400000,102400000") 
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <ctime>
+using namespace std;
+typedef unsigned int LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000000+10, MAXM = 1000000*2+10;
+char buf[MAXN], *ps = buf, *pe = ps+1;
+inline void rnext()
+{
+    if(++ps == pe)
+        pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+    int ans = 0;
+    do{
+        rnext();
+    }while(!isdigit(*ps) && ps != pe);
+    do{
+        ans = (ans<<1)+(ans<<3)+*ps-48;
+        rnext();
+    }while(isdigit(*ps) && ps != pe);
+    return ans;
+}
+int head[MAXN], tol, to[MAXM], nxt[MAXM];
+
+inline void add_edge(int u, int v)
+{
+    nxt[tol] = head[u], to[tol] = v;
+    head[u] = tol++;
+}
+int f[MAXN];
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int ind[MAXN], num[MAXN], cnt;
+bool topo()
+{
+    int p  = 0;
+    queue<int> q;
+    rep(i,0,cnt) if(!ind[num[i]]) q.push(num[i]);
+    while(!q.empty())
+    {
+        int u = q.front();q.pop();
+        for(int i = head[u]; ~i; i = nxt[i])
+        {
+            int v = to[i];
+            if(!--ind[v]) q.push(v);
+        }
+        p++;
+    }
+    return p == cnt;
+}
+bool vis[MAXN];
+int main()
+{
+#ifdef SHY
+    freopen("in", "r", stdin);
+#endif
+    int t = in();
+    while(t--)
+    {
+        int n = in(),m1 = in(),m2 = in();
+        clc(head,-1);
+        tol = 0;
+        repe(i,1,n) f[i] = i;
+        int ok = false;
+        rep(i,0,m1)
+        {
+            int u = in(),v = in();
+            int x = find(u), y = find(v);
+            if(x != y)
+                f[x] = y;
+            else ok = true;
+        }
+        clc(ind,0);
+        rep(i,0,m2)
+        {
+            int u = in(),v = in();
+            if(ok) continue;
+            int x = find(u), y = find(v);
+            add_edge(x,y);
+            ind[y]++;
+        }
+        if(ok)
+        {
+            puts("YES");
+            continue;
+        }
+        cnt = 0;
+        clc(vis,0);
+        repe(i,1,n)
+        {
+            int x = find(i);
+            if(vis[x]) continue;
+            num[cnt++] = x;
+            vis[x] = true;
+        }
+        if(!topo()) puts("YES");
+        else puts("NO");
+    }
+    return 0;
+}
+

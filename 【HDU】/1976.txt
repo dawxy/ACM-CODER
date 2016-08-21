@@ -1,0 +1,33 @@
+#include <stdio.h>
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+        int a[3], b[3];
+        scanf ("%d %d %d%*c", &a[0], &a[1], &a[2]);
+        scanf ("%d %d %d%*c", &b[0], &b[1], &b[2]);
+        bool same = true;
+        for (int i = 0; i < 3; i++)
+		{
+            if (a[i] > b[i])
+			{
+				puts("First"), same = false;
+				break;
+			}
+			else if (a[i] < b[i])
+			{
+				puts("Second"),same = false;
+                break;
+			}
+		}
+        if (same)
+			puts ("Same");
+	}
+    return 0;
+}

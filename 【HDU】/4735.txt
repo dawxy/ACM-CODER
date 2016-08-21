@@ -1,0 +1,154 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define FOR(i,a,b) for(int i = b[a];i != a; i = b[i])
+const int INF = 0x3f3f3f3f, MAXN = 50+10,M = MAXN*MAXN;
+int head[MAXN],all,nxt[MAXN<<1],to[MAXN<<1],cost[MAXN<<1];
+int k,d,a[MAXN];
+
+void add_edge(int u, int v, int w)
+{
+	nxt[all] = head[u],to[all] = v;cost[all] = w;
+	head[u] = all++;
+}
+int vis[MAXN],dis[MAXN];
+void bfs(int st)
+{
+	queue<int> q;
+	clc(vis,0);
+	q.push(st);
+	dis[st] = 0;
+	vis[st] = 1;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(vis[v]) continue;
+			if(dis[u]+cost[i] <= d)
+			{
+				vis[v] = true;
+				dis[v] = dis[u]+cost[i];
+				q.push(v);
+			}
+		}
+	}
+}
+int lt[M],rt[M],up[M],down[M],row[M],col[M],tol,cnt[MAXN];
+void init(int maxc)
+{
+	repe(i,0,maxc) lt[i] = i-1,rt[i] = i+1,up[i] = down[i] = col[i] = i;
+	lt[0] = maxc,rt[maxc] = 0;
+	tol = maxc+1;
+	clc(cnt,0);
+}
+void remove(int c)
+{
+	FOR(i,c,down) lt[rt[i]] = lt[i],rt[lt[i]] = rt[i],--cnt[col[i]];
+}
+void reset(int c)
+{
+	FOR(i,c,up) lt[rt[i]] = rt[lt[i]] = i,++cnt[col[i]];
+}
+int f()
+{
+	int ans = 0;
+	FOR(c,0,rt) vis[c] = true;
+	FOR(c,0,rt)
+	{
+		if(vis[c])
+		{
+			ans++;
+			vis[c] = false;
+			FOR(i,c,down)
+			{
+				FOR(j,i,rt)
+					vis[col[j]] = false;
+			}
+		}
+	}
+	return ans;
+}
+int mi;
+void dfs(int d, int sum)
+{
+	if(d+f() > k || sum >= mi) return;
+	if(!rt[0])
+	{
+		mi = sum;
+		return;
+	}
+	int c = rt[0];
+	FOR(i,0,rt) if(cnt[i] < cnt[c]) c = i;
+	FOR(i,c,down)
+	{
+		remove(i);
+		FOR(j,i,rt) remove(j);
+		dfs(d+1,sum+(!a[row[i]]));
+		FOR(j,i,lt) reset(j);
+		reset(i);
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d %d",&n, &d);
+		k = 0;
+		repe(i,1,n) scanf("%d", &a[i]), k += a[i];
+		clc(head,-1);
+		all = 0;
+		rep(i,1,n)
+		{
+			int u,v,w;
+			scanf("%d %d %d", &u, &v, &w);
+			add_edge(u,v,w);
+			add_edge(v,u,w);
+		}
+		init(n);
+		repe(i,1,n)
+		{
+			int ft = tol;
+			bfs(i);
+			repe(j,1,n)
+			{
+				if(vis[j])
+				{
+					row[tol] = i,col[tol] = j;
+					lt[tol] = tol-1,rt[tol] = tol+1,up[tol] = up[j],down[tol] = j;
+					down[up[j]] = tol, up[j] = tol;
+					cnt[j]++,tol++;
+				}
+			}
+			lt[ft] = tol-1,rt[tol-1] = ft;
+		}
+		mi = INF;
+		clc(vis,0);
+		dfs(0,0);
+		printf("Case #%d: ", ++count);
+		if(INF == mi) puts("-1");
+		else printf("%d\n",mi);
+	}
+	return 0;
+}

@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <malloc.h>
+
+struct person
+{
+        int *p;
+};
+
+void main ()
+{
+    int n, m, i, j, sum = 0;
+    while (EOF !=  scanf("%d %d", &n, &m))
+    {
+        getchar();
+        struct person *peo; 
+        peo = (struct person*) malloc (sizeof(struct person)*(n+1));
+
+        for (i = 0; i < n; i++)//读取输入
+        {
+            peo[i].p = (int*) malloc (sizeof(int)*(m+1));
+            for (j = 0; j < m;j++)
+            {
+                if (m-1 != j)
+                {
+                    scanf ("%d ", &peo[i].p[j]);
+                }
+                else
+                {
+                    scanf ("%d", &peo[i].p[j]);
+                    getchar();
+                }
+            }
+        }
+
+        for (i = 0; i < n; i++)//每个学生平均分（第一行）
+        {
+            for (j = 0, sum = 0; j < m; j++)
+            {
+                sum += peo[i].p[j];
+            }
+            if (n-1 != i)
+                printf ("%.2lf ", (double)(1.0*sum/m));
+            else
+                printf ("%.2lf\n", (double)(1.0*sum/m));
+        }
+
+        double *avg = (double*) malloc (sizeof(double)*(m+1));
+        for (i = 0; i < m; i++)
+        {
+            avg[i] = 0;
+        }
+
+        for (j = 0; j < m; j++)//每门课平均值（第二行）
+        {
+            for (i = 0, sum = 0; i < n; i++)
+            {
+                sum += peo[i].p[j];
+            }
+            avg[j] = (1.0*sum)/n;
+            if (m-1 != j)
+                printf ("%.2lf ", avg[j]);
+            else
+                printf ("%.2lf\n", avg[j]);
+        }
+
+        for (i = 0,sum = 0; i < n; i++)//该班级中各科成绩均大于等于平均成绩的学生数量
+        {
+            for (j = 0; j < m; j++)
+            {
+                if (avg[j] > peo[i].p[j])
+                    break;
+            }
+            if (j == m)
+                sum += 1;
+        }
+        printf ("%d\n\n", sum);
+        free (peo);
+
+        
+    }
+}

@@ -1,0 +1,91 @@
+/*
+有正环的话会出现无线循环
+这里的正环其实是最短路，因为能量数值越高越好
+*/
+#include <stdio.h>
+#include <string.h>
+#define scanf scanf_s
+#define MAX 101
+int ed, vis[MAX], en[MAX];
+bool find;
+struct G{
+	int en, n, out[MAX];
+}g[MAX];
+
+void dfs(int, int);
+void dfs2(int);//判断环内是否存在终点
+
+int main ()
+{
+	FILE *f;
+	freopen_s(&f,"e:\\1.txt","r",stdin);
+	while(1)
+	{
+		scanf ("%d%*c", &ed);
+		if (-1 == ed)
+			break;
+		memset(g,0,sizeof(g));
+		memset(vis,0,sizeof(vis));
+		memset(en,0,sizeof(en));
+		for (int i = 1; i <= ed; i++)
+		{
+			scanf ("%d%*c%d%*c", &g[i].en, &g[i].n);
+			for (int j = 0; j < g[i].n; j++)
+				scanf ("%d%*c", &g[i].out[j]);
+		}
+		find = false;
+		dfs(1,100);
+		if (find)
+			puts("winnable");
+		else
+			puts("hopeless");
+	}
+
+	return 0;
+}
+
+void dfs(int room, int eng)
+{
+	if (find)
+		return;
+	if (ed == room)
+	{
+		find = true;
+		return;
+	}
+	for (int i = 0; i < g[room].n; i++)
+	{
+		int m = g[room].out[i];
+		if(en[m] && en[m] < eng+g[m].en)//en[m]！= 0说明存在环,en[m] < eng+g[m].en说明是正环,负环的话就会一直减到0以下
+		{
+			dfs2(room);
+			if (find)
+				return;
+		}
+		else if (!en[m] && 0 < eng+g[m].en)//不存在环的话就直接继续dfs
+		{
+			en[m] = eng+g[m].en;
+			dfs(m, en[m]);
+		}
+
+	}
+}
+
+void dfs2(int room)
+{
+	if (ed == room)
+	{
+		find = true;
+		return;
+	}
+	for (int i = 0; i < g[room].n; i++)
+	{
+		int m = g[room].out[i];
+		if (!vis[m])
+		{
+			vis[m] = 1;
+			dfs2(m);
+			vis[m] = 0;
+		}
+	}
+}

@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+int n;
+
+int get_sum(bool mid,char *a)//获得8个点最小变化次数
+{
+	int vis[300]={0}, mx = 0;
+	rep(i,0,8) vis[a[i]]++;
+	int ans;
+	repe(i,'a','z') mx = max(mx,vis[i]);
+	mx = max(vis['.'],mx);
+	mx = max(vis['#'],mx);
+	if(mid) ans = 4-mx/2;
+	else ans = 8-mx;
+	return ans;
+}
+char a[110][110];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d%*c", &n);
+		rep(i,0,n)
+			scanf("%s", a[i]);
+		int ans = 0;
+		int vis[110][110]={0};
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+			{
+				if(!vis[i][j])
+				{
+					char buf[9]={a[i][j],a[n-i-1][j],a[i][n-j-1],a[n-i-1][n-j-1],
+					a[j][i],a[n-j-1][i],a[j][n-i-1],a[n-j-1][n-i-1]};
+					buf[8] = 0;
+					ans += get_sum((i == n/2 || j == n/2 || i == j || n-1 == i+j),buf);
+					vis[i][j] = vis[n-i-1][j] = vis[i][n-j-1] = vis[n-i-1][n-j-1] = 1;
+					vis[j][i] = vis[n-j-1][i] = vis[j][n-i-1] = vis[n-j-1][n-i-1] = 1;
+				}
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,70 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXBUF = 100000, MAXN = 100000+10;
+char buf[MAXBUF], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{
+		rnext();
+		if('-' == *ps) f = -1;
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+LL st[35],ed[35];
+LL sum[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	st[0] = 0, ed[0] = 2;
+	repe(i,1,33) st[i] = ed[i-1],ed[i] = ed[i-1]<<1;
+	repe(i,0,33) ed[i]--;
+	int t;
+	in(t);
+	while(t--)
+	{
+		int n,a;
+		in(n);
+		repe(i,1,n) in(a), sum[i] = sum[i-1]+a;
+		LL ans = 0;
+		repe(lg,0,33)
+		{
+			LL x = st[lg],y = ed[lg];
+			int l = 1,r = 0;
+			repe(i,1,n)
+			{
+				l = max(i,l);
+				while(l <= n && sum[l]-sum[i-1] < x) l++;
+				r = max(l,r);
+				while(r <= n && sum[r]-sum[i-1] >= x && sum[r]-sum[i-1] <= y) r++;
+				LL len = r-l;
+				if(len < 1) continue;
+				ans += (lg+1)*(i*len+((l+r-1)*len>>1));
+			}
+		}
+		printf("%I64d\n", ans);
+	}
+	return 0;
+}

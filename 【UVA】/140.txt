@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <string.h>
+struct Node{
+	char d[8];
+	int len;
+}node[26];
+bool used[26], vis[8];
+char ans[8], b[8], s[8];
+int n, minw;
+
+int finddis(char a)
+{
+	for (int i = 0; i < n; i++)
+	{
+		if (a == b[i])
+			return i;
+	}
+	return -1;
+}
+int whide()
+{
+	int max = -1, buf, v;
+	for (int i = 0; i < n; i++)
+	{
+		v = finddis(b[i]);
+		for (int j = 0; j < node[b[i]-'A'].len; j++)
+		{
+			buf = v-finddis(node[b[i]-'A'].d[j]);
+			if (buf < 0)
+				buf *= -1;
+			if (buf > max)
+				max = buf;
+		}
+	}
+	return max;
+}
+void dfs(int p)
+{
+	if (p == n)
+	{
+		int val = whide();
+		if (minw > val)
+		{
+			minw = val;
+			for (int i = 0; i < n; i++)
+				ans[i] = b[i];
+		}
+		return;
+	}
+	for (int i = 0; i < n; i++)
+	{
+		if (!vis[i])
+		{
+			vis[i] = true;
+			b[p] = s[i];
+			dfs(p+1);
+			vis[i] = false;
+		}
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("E:\\1.txt","r",stdin);
+#endif
+	while(1)
+	{
+		char ch[100], c;
+		gets(ch);
+		if ('#' == ch[0])
+			break;
+		memset(used,false,sizeof(used));
+		memset(vis,false,sizeof(vis));
+		memset(node,0,sizeof(node));
+		int len = strlen(ch);
+		bool isnode = false;
+		for (int i = 0; i < len; )
+		{
+			if (!isnode)
+			{
+				c = ch[i]-'A';
+				used[ch[i]-'A'] = true;
+				i += 2;
+			}
+			else
+			{
+				while(';' != ch[i] && '\0' != ch[i])
+				{
+					node[c].d[node[c].len++] = ch[i++];
+					used[ch[i-1]-'A'] = true;
+				}
+				i++;
+			}
+			isnode = !isnode;
+		}
+		n = 0;
+		for (int i = 0; i < 26; i++)
+		{
+			if(used[i])
+				s[n++] = i+'A';
+		}
+		minw = 99999999;
+		dfs(0);
+		for (int i = 0; i < n; i++)
+		{
+			printf ("%c ", ans[i]);
+		}
+		printf ("-> %d\n",minw);
+	}
+
+	return 0;
+}

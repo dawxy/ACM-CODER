@@ -1,0 +1,19 @@
+#include <stdio.h>
+
+int main ()
+{
+	int i;
+	__int64 a[51];
+	a[0] = 0,a[1] = 1;
+	for (i = 2; i < 51; i++)
+		a[i] = a[i-1]+a[i-2];
+	while (1)
+	{
+		int n;
+		scanf ("%d%*c", &n);
+		if (-1 == n)
+			break;
+		printf ("%I64d\n", a[n]);
+	}
+	return 0;
+}

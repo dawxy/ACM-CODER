@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXM 5000
+#define MAXN 105
+#define INF 0x3f3f3f3f
+struct NODE{
+	int a,b,v;
+	bool operator < (const NODE& t) const {return v < t.v;}
+}p[MAXM];
+int f[MAXN], ans = 0, n, m;
+
+int find(int x) {return ~f[x]?f[x] = find(f[x]):x;}
+void kruskal(int si)
+{
+	int cnt = 1, min = INF, max = -1;
+	memset(f,-1,sizeof(f));
+	for(int i = si; i < m; i++)
+	{
+		int x = find(p[i].a), y = find(p[i].b);
+		if(x != y)
+		{
+			if(min > p[i].v) min = p[i].v;
+			if(max < p[i].v) max = p[i].v;
+			f[x] = y;
+			cnt++;
+		}
+	}
+	if(cnt == n && ans > max-min)
+		ans = max-min;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		for(int i = 0; i < m; i++)
+			scanf("%d %d %d%*c", &p[i].a, &p[i].b, &p[i].v);
+		sort(p,p+m);
+		ans = INF;
+		for(int i = 0; i < m; i++)
+			kruskal(i);
+		if(INF == ans) puts("-1");
+		else printf("%d\n", ans);
+	}
+	return 0;
+}

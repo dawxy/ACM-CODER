@@ -1,0 +1,270 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500000+10;
+struct NODE{
+    NODE *ch[2], *fa;
+    int sz,v,sum, lmx, rmx, mx;//sz-节点总数,v-当前节点值，lmx-包括左端点的最大连续和，rmx-包括右端点的最大连续和，mx-当前区间的最大连续和,sum-当前区间和
+    bool f;//lazy是否翻转
+    int setv;//lazy
+    int chd(){
+        return this == fa->ch[1];
+    }
+};
+NODE *null = new NODE;
+void free_all(NODE *u)
+{
+    if(null == u) return;
+    free_all(u->ch[0]);
+    free_all(u->ch[1]);
+    delete u;
+}
+void push_up(NODE *u){
+    u->sz = u->ch[0]->sz+u->ch[1]->sz+1;
+    u->sum = u->ch[0]->sum+u->ch[1]->sum+u->v;
+    /*if(1 == u->sz){
+        u->mx = u->lmx = u->rmx = u->v;
+        return;
+    }*/
+    u->lmx = max(u->ch[0]->lmx, u->ch[0]->sum + u->v + max(u->ch[1]->lmx,0));
+    u->rmx = max(u->ch[1]->rmx, u->ch[1]->sum + u->v + max(u->ch[0]->rmx,0));
+    u->mx = max(u->ch[0]->rmx,0) + max(u->ch[1]->lmx,0) + u->v;
+    u->mx = max(max(u->ch[0]->mx,u->ch[1]->mx), u->mx);
+}
+inline void pd(NODE *u, int v)
+{
+    if(null == u)return;
+    u->v = v;
+    u->sum = u->sz*v;
+    u->lmx = u->rmx = u->mx = max(u->sum,v);
+    u->setv = v;
+}
+inline void pd_rev(NODE *u)
+{
+    if(null == u)return;
+    swap(u->ch[0],u->ch[1]);
+    swap(u->lmx,u->rmx);
+    u->f ^= 1;
+}
+void push_down(NODE *u){
+    //if(1 == u->sz) return;
+    if(-INF != u->setv){
+        pd(u->ch[0],u->setv);
+        pd(u->ch[1],u->setv);
+        u->setv = -INF;
+    }
+    if(u->f)
+    {
+        pd_rev(u->ch[0]);
+        pd_rev(u->ch[1]);
+        u->f = false;
+    }
+}
+inline void setch(NODE *fa, NODE *u, int p){
+    fa->ch[p] = u;u->fa = fa;
+}
+void rot(NODE *u)
+{
+    NODE *y = u->fa;
+    int d = u->chd();
+    setch(y->fa,u,y->chd());
+    setch(y,u->ch[d^1],d);
+    setch(u,y,d^1);
+    push_up(y);push_up(u);
+}
+NODE *find_kth(NODE *u, int k)
+{
+    push_down(u);
+    int d = k-u->ch[0]->sz;
+    if(1 == d) return u;
+    if(d <= 0) return find_kth(u->ch[0], k);
+    return find_kth(u->ch[1],k-u->ch[0]->sz-1);
+}
+void splay(NODE *&rt, int k, NODE *p)
+{
+    NODE *x = find_kth(rt,k);
+    if(x == p) return;
+    while(x->fa != p)
+    {
+        NODE *y = x->fa;
+        if(x->fa->fa != p && x->chd() != y->chd())
+            rot(y);
+        rot(x);
+    }
+    if(p == null) rt = x;
+}
+NODE *merge(NODE *left, NODE *right)
+{
+    //if(left == null || left == NULL) return right;
+    splay(left,left->sz,null);
+    setch(left,right,1);
+    push_up(left);
+    return left;
+}
+void split(NODE *&rt, int k, NODE *&left, NODE *&right)
+{
+    splay(rt,k,null);
+    right = rt->ch[1];
+    right->fa = null;
+    left = rt;
+    rt->ch[1] = null;
+    push_up(left);
+}
+void bulid(NODE *&u, int x, int y, int *a,NODE *fa)
+{
+    if(x > y)
+    {
+        u = null;
+        return;
+    }
+    int m = (x+y)>>1;
+    u = new NODE();
+    u->v = a[m];
+    u->f = 0;
+    u->fa = fa;
+    u->rmx = u->lmx = u->mx = u->setv = -INF;
+    bulid(u->ch[0],x,m-1,a,u);
+    bulid(u->ch[1],m+1,y,a,u);
+    push_up(u);
+}
+void insert(NODE *&rt, int pos, int *a, int len)//往rt树的pos位置后插入序列a
+{
+    int x = pos;
+    splay(rt,x+1,null);
+    splay(rt,x+2,rt);
+    NODE *&u = rt->ch[1]->ch[0];
+    bulid(u,0,len-1,a,rt->ch[1]);
+    push_up(rt->ch[1]);
+    push_up(rt);
+    //u = now;
+}
+void del(NODE *&rt, int pos, int len)
+{
+    int x = pos, y = pos+len-1;
+    splay(rt,x,null);
+    splay(rt,y+2,rt);
+    NODE *&u = rt->ch[1]->ch[0];
+    free_all(u);
+    u = null;
+    push_up(rt->ch[1]);
+    push_up(rt);
+}
+void make_same(NODE *&rt, int pos, int len, int v)//把rt::pos~pos+len全部改为v
+{
+    int x = pos, y = pos+len-1;
+    splay(rt,x,null);
+    splay(rt,y+2,rt);
+    NODE *&u = rt->ch[1]->ch[0];
+    pd(u,v);
+    /*push_up(rt->ch[1]);
+    push_up(rt);*/
+}
+void rev(NODE *&rt, int pos, int len)//翻转
+{
+    int x = pos, y = pos+len-1;
+    splay(rt,x,null);
+    splay(rt,y+2,rt);
+    NODE *&u = rt->ch[1]->ch[0];
+    pd_rev(u);
+    /*push_up(rt->ch[1]);
+    push_up(rt);*/
+}
+int get_sum(NODE *&rt, int pos, int len)
+{
+    int x = pos, y = pos+len-1;
+    splay(rt,x,null);
+    splay(rt,y+2,rt);
+    return rt->ch[1]->ch[0]->sum;
+}
+int max_sum(NODE *&rt)
+{
+    splay(rt,1,null);
+    splay(rt,rt->sz,rt);
+    return rt->ch[1]->ch[0]->mx;
+}
+int a[MAXN], buf[MAXN];
+void pt(NODE *u)
+{
+    if(u == null) return;
+    push_down(u);
+    pt(u->ch[0]);
+    printf("%d ", u->v);
+    pt(u->ch[1]);
+    push_up(u);
+    if(u->fa == null) putchar('\n');
+}
+ 
+ 
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+    freopen("d:\\out.txt", "w", stdout);
+#endif
+    null->sz = null->sum = 0;
+    null->lmx = null->rmx = null->mx = -INF;
+    null->fa = NULL;
+    null->v = -1;
+    int n,m;
+    scanf("%d %d%*c", &n, &m);
+    NODE *rt;
+    repe(i,1,n) scanf("%d%*c", &a[i]);
+    a[0] = a[n+1] = 0;
+    bulid(rt,0,n+1,a,null);
+    char op[10];
+    while(m--)
+    {
+        scanf("%s%*c", op);
+        if('I' == op[0])
+        {
+            int pos,len;
+            scanf("%d %d%*c", &pos,&len);
+            rep(i,0,len) scanf("%d%*c", &buf[i]);
+            insert(rt,pos,buf,len);
+        }
+        else if('D' == op[0])
+        {
+            int pos,len;
+            scanf("%d %d%*c", &pos,&len);
+            del(rt,pos,len);
+        }
+        else if(!strcmp("MAKE-SAME",op))
+        {
+            int pos,len,v;
+            scanf("%d %d %d%*c", &pos,&len,&v);
+            make_same(rt,pos,len,v);
+        }
+        else if('R' == op[0])
+        {
+            int pos,len;
+            scanf("%d %d%*c", &pos,&len);
+            rev(rt,pos,len);
+        }
+        else if('G' == op[0])
+        {
+            int pos,len;
+            scanf("%d %d%*c", &pos,&len);
+            printf("%d\n", get_sum(rt,pos,len));
+        }
+        else
+        {
+            printf("%d\n", max_sum(rt));
+        }
+        //pt(rt);
+    }
+    return 0;
+}

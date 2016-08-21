@@ -1,0 +1,71 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10;
+char buf[MAXN], *ps = buf, *pe = buf+1;//ps当前读取到的开头指针，pe当前缓存结尾指针
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+	int ans = 0;
+    if(ps == pe) return -1; //判断是否到文件结尾
+	do{
+		rnext();
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return -1;//判断是否到文件结尾
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	return ans;
+}
+int a[MAXN], up[MAXN],down[MAXN];
+int q[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~(n = in()))
+	{
+		repe(i,1,n) a[i] = in();
+		clc(q,0x3f);
+		repe(i,1,n)
+		{
+			int k = lower_bound(q,q+n,a[i])-q;
+			q[k] = a[i];
+			up[i] = k+1;
+		}
+		clc(q,0x3f);
+		per(i,n,1)
+		{
+			int k = lower_bound(q,q+n,a[i])-q;
+			q[k] = a[i];
+			down[i] = k+1;
+		}
+		int ans = 0;
+		repe(i,1,n)
+			ans = max(ans,(min(up[i],down[i])<<1)-1);
+		printf("%d\n", ans);
+	}
+	return 0;
+}

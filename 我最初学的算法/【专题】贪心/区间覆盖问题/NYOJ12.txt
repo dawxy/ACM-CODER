@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <math.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 10010
+struct NODE
+{
+	double a, b;
+} p[MAXN];
+int n, m;
+double  l, w;
+
+bool cmp(const NODE a, const NODE b)
+{
+	return a.a < b.a;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+
+	while(t--)
+	{
+		int a, b;
+		scanf("%d %lf %lf%*c", &n, &l, &w);
+		w /= 2;
+		m = 0;
+
+		for(int i = 0; i < n; i++)
+		{
+			scanf("%d %d%*c", &a, &b);
+
+			if(b >= w)
+			{
+				double c = (sqrt)((double)b * b - w * w);
+				p[m].a = a - c;
+				p[m].b = a + c;
+				m++;
+			}
+		}
+
+		sort(p, p + m, cmp);
+		double end = 0, max;
+		int ans = 0, i, last = 0;
+
+		while(end < l)
+		{
+			max = -1;
+
+			for(i = last; i < m && (p[i].a < end || fabs(p[i].a - end) < 1e-6); i++)
+			{
+				if(max < p[i].b)
+					max = p[i].b;
+			}
+
+			if(max == -1)
+			{
+				ans = 0;
+				break;
+			}
+
+			if(end < max)
+			{
+				end = max;
+				ans++;
+			}
+
+			last = i;
+		}
+
+		printf("%d\n", ans);
+	}
+
+	return 0;
+}
+

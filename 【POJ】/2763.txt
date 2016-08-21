@@ -1,0 +1,188 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 100001+10, MAXM = 100001+10;
+char buf[MAXN*2], *ps = buf, *pe = buf+1;//ps当前读取到的开头指针，pe当前缓存结尾指针
+inline void rnext(){
+	if(++ps == pe)
+		pe = (ps = buf)+fread(buf,1,sizeof(buf),stdin);
+}
+inline int in()
+{
+	int ans = 0;
+    if(ps == pe) return -1; //判断是否到文件结尾
+	do{
+		rnext();
+	}while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return -1;//判断是否到文件结尾
+	do
+	{
+		ans = (ans<<1)+(ans<<3)+*ps-48;
+		rnext();
+	}while(isdigit(*ps) && ps != pe);
+	return ans;
+}
+int head[MAXN], tol, nxt[MAXM<<1],to[MAXM<<1];//树中边-邻接表
+int cost[MAXM], e[MAXM][2];//按照输入顺序的边(边的编号1~n-1)
+inline void add_edge(int u, int v)
+{
+	nxt[tol] = head[u], to[tol] = v;
+	head[u] = tol++;
+}
+struct TCP{
+private:
+	int fa[MAXN];//fa[u]表示u的父亲
+	int dep[MAXN];//dep[u]表示u的深度
+	int sz[MAXN];//sz[u]表示以u为根的子树有几个结点
+	int son[MAXN];//son[u]表示u的所有儿子结点中sz[]最大的那个点(重儿子)
+	int top[MAXN];//top[u]表示u所在的链的顶端节点
+	int tree[MAXN];//tree[u]表示节点u和他父亲的连边在线段树中的编号
+	int pre[MAXN];//pre[x]和tree相反
+	int bnum[MAXN];//每个边转化为深度较深的点之后对应的边号
+	int cnt;//线段树中点的数量(其实就是n)
+	void dfs1(int u)//预处理fa[],dep[],sz[],son[]
+	{
+		int num = 0;
+		sz[u] = 1;
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(v == fa[u]) continue;
+			fa[v] = u;dep[v] = dep[u]+1;
+			dfs1(v);
+			if(sz[v] > num) num = sz[v], son[u] = v;
+			sz[u] += sz[v];
+		}
+	}
+	void dfs2(int u, int num)//预处理top[],tree[],pre[]
+	{
+		tree[u] = cnt, pre[cnt++] = u,top[u] = num;
+		if(-1 == son[u]) return;
+		dfs2(son[u],num);//必须点递归重儿子，否则重链在线段树的编号会不连续
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(v != fa[u] && son[u] != v) dfs2(v,v);
+		}
+	}
+	/*--线段树--s*/
+	int sum[MAXN<<1];
+	inline int id(int x, int y){return x+y|x!=y;}
+	inline void push_up(int x, int y, int m){
+		sum[id(x,y)] = sum[id(x,m)]+sum[id(m+1,y)];
+	}
+	void bulid(int x, int y)
+	{
+		if(x == y)
+		{
+			sum[id(x,y)] = cost[bnum[pre[x]]];
+			return;
+		}
+		int m = (x+y)>>1;
+		bulid(x,m);
+		bulid(m+1,y);
+		push_up(x,y,m);
+	}
+	void update(int x, int y, int p, int v)
+	{
+		if(x == y)
+		{
+			sum[id(x,y)] = v;
+			return;
+		}
+		int m = (x+y)>>1;
+		if(p <= m) update(x,m,p,v);
+		else update(m+1,y,p,v);
+		push_up(x,y,m);
+	}
+	int query(int x, int y, int ql, int qr)
+	{
+		if(ql <= x && y <= qr) return sum[id(x,y)];
+		int m = (x+y)>>1, ans = 0;
+		if(ql <= m) ans += query(x,m,ql,qr);
+		if(qr > m) ans += query(m+1,y,ql,qr);
+		return ans;
+	}
+	/*--线段树--e*/
+public:
+	void init(int rt)
+	{
+		clc(son,-1);
+		dep[rt] = 0, fa[rt] = -1;
+		dfs1(rt);
+		cnt = 0;
+		dfs2(rt,rt);
+		clc(sum,0);
+		rep(i,1,cnt)//所有边
+		{
+			if(dep[e[i][0]] > dep[e[i][1]]) swap(e[i][0],e[i][1]);//每条边在树中下面的点作为标识(边转点)
+			bnum[e[i][1]] = i;
+		}
+		bulid(0,cnt-1);
+	}
+	void tcp_update(int c, int v)
+	{
+		update(0,cnt-1,tree[e[c][1]],v);//直接用e[c][1](每条边深度较深的点)作为该边的标识
+	}
+	int tcp_sum(int x, int y)
+	{
+		int f1 = top[x], f2 = top[y], ans = 0;
+		while(f1 != f2)
+		{
+			if(dep[f1] < dep[f2]) swap(f1,f2), swap(x,y);
+			ans += query(0,cnt-1,tree[f1], tree[x]);
+			x = fa[f1], f1 = top[x];
+		}
+		if(x == y) return ans;
+		if(dep[x] > dep[y]) swap(x,y);
+		ans += query(0,cnt-1,tree[son[x]],tree[y]);
+		return ans;
+	}
+}tcp;
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int n,q,s;
+	while(~(n = in()))
+	{
+		q = in(),s = in();
+		clc(head,-1);
+		tol = 0;
+		rep(i,1,n)
+		{
+			e[i][0] = in(),e[i][1] = in();
+			cost[i] = in();
+			add_edge(e[i][0],e[i][1]);
+			add_edge(e[i][1],e[i][0]);
+		}
+		tcp.init(s);
+		while(q--)
+		{
+			int op = in(),x = in();
+			if(op)
+			{
+				int v = in();
+				tcp.tcp_update(x,v);
+			}
+			else printf("%d\n", tcp.tcp_sum(s,x)), s = x;
+		}
+	}
+	return 0;
+}

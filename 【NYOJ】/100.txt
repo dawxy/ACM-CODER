@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main()
+{
+	int t;
+	scanf ("%d%*c", &t);
+	while (t--)
+	{
+		int m, ans = 0;
+		scanf ("%d%*c", &m);
+		while (0 != m)
+		{
+			if (1 == m%2)
+				ans++;
+			m /= 2;
+		}
+		printf ("%d\n",ans);
+	}
+
+	return 0;
+}

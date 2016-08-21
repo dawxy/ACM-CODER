@@ -1,0 +1,49 @@
+#include <stdio.h>
+#define MAX_N 100
+char map[MAX_N][MAX_N];
+int h, w, sum, d[4][2]={{-1, 0},{1,0},{0,-1},{0,1}};
+
+void dfs (char s, int, int);
+
+int main ()
+{
+	while (1)
+	{
+		int i, j;
+		scanf ("%d %d%*c", &h, &w);
+		if (0 == h && 0 == w)
+			break;
+		for (i = 0; i < h; i++)
+		{
+			for (j = 0; j < w; j++)
+				map[i][j] = getchar ();
+			getchar ();
+		}
+
+		for (i = sum = 0; i < h; i++)
+			for (j = 0; j < w; j++)
+			{
+				if (0 != map[i][j])
+				{
+					dfs(map[i][j], i, j);
+					sum++;
+				}
+			}
+		printf ("%d\n", sum);
+
+	}
+	return 0;
+}
+
+void dfs (char s, int si, int sj)
+{
+	int i, ni, nj;
+	map[si][sj] = 0;
+	for (i = 0; i < 4; i++)
+	{
+		ni = si+d[i][0];
+		nj = sj+d[i][1];
+		if (0 <= ni && h > ni && 0 <= nj && w > nj && s == map[ni][nj])
+			dfs(s, ni, nj);
+	}
+}

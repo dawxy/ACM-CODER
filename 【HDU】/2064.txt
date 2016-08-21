@@ -1,0 +1,27 @@
+#include <stdio.h>
+
+__int64 hannuota (int n, __int64 sum);
+
+int main ()
+{
+	int n;
+	while (EOF != scanf ("%d", &n))
+	{
+		__int64 sum = 0;
+		getchar ();
+		sum = hannuota(n, sum);
+		printf ("%I64d\n",sum);
+	}
+	return 0;
+}
+
+__int64 hannuota (int n, __int64 sum)
+{
+	if (1 == n)
+		sum += 2;
+	else
+	{
+		sum += 3*hannuota(n-1, sum) + 2;
+	}
+	return sum;
+}

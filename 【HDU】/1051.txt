@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 5010
+struct NODE
+{
+	int l, w;
+} p[MAXN];
+bool vis[MAXN];
+
+bool cmp(const NODE a, const NODE b)
+{
+	if(a.l == b.l)
+		return a.w <= b.w;
+
+	return a.l <= b.l;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif // SHY
+	int t;
+	scanf("%d%*c", &t);
+
+	while(t--)
+	{
+		int n;
+		scanf("%d%*c", &n);
+
+		for(int i = 0; i < n; i++)
+		{
+			scanf("%d %d%*c", &p[i].l, &p[i].w);
+		}
+
+		sort(p, p + n, cmp);
+		memset(vis, 0, sizeof(vis));
+		int ans = 0, sum = 0, st;
+
+		while(sum < n)
+		{
+			for(int i = 0;  i < n; i++)
+			{
+				if(!vis[i])
+				{
+					st = i;
+					ans++;
+					break;
+				}
+			}
+
+			for(int j = 0; j < n; j++)
+			{
+				if(!vis[j] && p[j].l >= p[st].l && p[j].w >= p[st].w)
+				{
+					vis[j] = true;
+					sum++;
+					st = j;
+				}
+			}
+		}
+
+		printf("%d\n", ans);
+	}
+
+	return 0;
+}

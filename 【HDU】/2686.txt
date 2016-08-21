@@ -1,0 +1,127 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 2000+10, MAXM = 1000*5+10;
+const int d[4][2] = {{0,1},{1,0},{-1,0},{0,-1}};
+struct MCMF{
+    struct Edge{
+        int next, to, cap, cost;
+        Edge(int a = 0, int b = 0, int c = 0, int d = 0){
+            next = a, to = b, cap = c, cost = d;
+        }
+    }edge[MAXM<<1];//记得多开一倍边数(有反向边)
+    int tol,head[MAXN];
+    bool inq[MAXN];
+    int d[MAXN]/*spfa*/, p[MAXN]/*上一条弧*/, a[MAXN]/*可改进量*/;
+    void init(){
+        tol = 0;
+        clc(head,-1);
+    }
+    void add_edge(int from, int to, int cap, int cost)
+    {
+        edge[tol] = Edge(head[from],to,cap,cost);
+        head[from] = tol++;
+        edge[tol] = Edge(head[to],from,0,-cost);
+        head[to] = tol++;
+    }
+    bool spfa(int s, int t, int& flow, LL& cost)
+    {
+        memset(d,0x3f,sizeof(d));
+        memset(inq,0,sizeof(inq));
+        d[s] = 0, inq[s] = true, p[s] = 0, a[s] = INF;
+		clc(a,0x3f);
+        queue<int> q;
+        q.push(s);
+        while(!q.empty())
+        {
+            int u = q.front();q.pop();
+            inq[u] = false;
+            for(int i = head[u]; ~i; i = edge[i].next)
+            {
+                Edge& e = edge[i];
+                if(e.cap > 0 && d[e.to] > d[u]+e.cost)
+                {
+                    d[e.to] = d[u]+e.cost;
+                    p[e.to] = i;
+                    a[e.to] = min(a[u], e.cap);
+                    if(!inq[e.to]) q.push(e.to), inq[e.to] = true;
+                }
+            }
+        }
+        if(INF == d[t]) return false;
+        flow += a[t];
+        cost += (LL)d[t]*(LL)a[t];
+		int u = t;
+        while(u != s)
+		{
+			edge[p[u]].cap -= a[t];
+			edge[p[u]^1].cap += a[t];
+			u = edge[p[u]^1].to;
+		}
+        return true;
+    }
+    //需要保证初始网络没有负圈，返回最大流量，cost才是最小花费
+    int mincostmaxflow(int s, int t, LL & cost)
+    {
+        int flow = 0;
+        cost = 0;
+        while(spfa(s,t,flow,cost));
+        return flow;
+    }
+}mcmf;
+int a[35][35], n;
+
+inline int id(int x, int y){
+	return x*n+y;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n)
+		{
+			rep(j,0,n) scanf("%d%*c", &a[i][j]);
+		}
+		mcmf.init();
+		int st = n*n*2,ed = st+1;
+		int tmp = n*n;
+		mcmf.add_edge(st,id(0,0),2,0);
+		mcmf.add_edge(id(n-1,n-1)+tmp,ed,2,0);
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+			{
+				rep(k,0,2)
+				{
+					int ni = i+d[k][0], nj = j+d[k][1];
+					if(0 <= ni && n > ni && 0 <= nj && n > nj)
+						mcmf.add_edge(tmp+id(i,j),id(ni,nj),2,0);
+				}
+				if(0 == i+j || (i == n-1 && j == n-1))
+					mcmf.add_edge(id(i,j),id(i,j)+tmp,2,-a[i][j]);
+				mcmf.add_edge(id(i,j),id(i,j)+tmp,1,-a[i][j]);
+			}
+		}
+		LL ans;
+		mcmf.mincostmaxflow(st,ed,ans);
+		printf("%I64d\n", -ans-(a[0][0]+a[n-1][n-1]));
+	}
+	return 0;
+}

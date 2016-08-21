@@ -1,0 +1,79 @@
+/*
+h[i] = h[i+1]*X+s[i]; h[n] = 0;
+定义长度为L的字符串s[i]~s[i+L-1],他的哈希值Hash(i,L)=h[i]-h[i+L]*(x^L) x^L用xl[L]预处理
+*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+//using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 40000+10, X = 123;
+unsigned long long h[MAXN], xl[MAXN], hash[MAXN];
+char s[MAXN];
+int n,m,p, rank[MAXN];
+
+inline bool cmp(const int a, const int b)
+{
+	if(hash[a] != hash[b]) return hash[a]<hash[b];
+	return a<b;
+}
+bool ok(int len)
+{
+	int sum = 0;
+	p = -1;
+	rep(i,0,n-len+1)
+	{
+		rank[i] = i;
+		hash[i] = h[i]-h[i+len]*xl[len];
+	}
+	std::sort(rank,rank+n-len+1,cmp);
+	rep(i,0,n-len+1)
+	{
+		if(!i || hash[rank[i]] != hash[rank[i-1]]) sum = 0;
+		if(++sum >= m) p = std::max(p,rank[i]);
+	}
+	return p >= 0;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d", &m) && m)
+	{
+		scanf("%s", s);
+		n = strlen(s);
+		//预处理h[]和xl[]
+		h[n] = 0;
+		per(i,n-1,0) h[i] = h[i+1]*X+s[i]-'a';
+		xl[0] = 1;
+		repe(i,1,n) xl[i] = xl[i-1]*X;
+		if(!ok(1))
+		{
+			puts("none");
+			continue;
+		}
+		int x = 1, y = n;
+		while(x <= y)
+		{
+			int m = (x+y)>>1;
+			if(ok(m)) x = m+1;
+			else y = m-1;
+		}
+		ok(y);
+		printf("%d %d\n", y, p);
+	}
+	return 0;
+}

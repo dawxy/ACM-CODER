@@ -1,0 +1,170 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 900+10, MAXM = 250*250*4+10;
+int nxt[MAXM],from[MAXM],to[MAXM],cap[MAXM],tol,head[MAXN];
+
+void add_edge(int a, int b, int c)
+{
+	nxt[tol] = head[a],from[tol] = a,to[tol] = b,cap[tol] = c;
+	head[a] = tol++;
+	nxt[tol] = head[b],from[tol] = b,to[tol] = a,cap[tol] = 0;
+	head[b] = tol++;
+}
+int d[MAXN],st,ed;
+bool bfs()
+{
+	queue<int> q;
+	clc(d,-1);
+	q.push(st);
+	d[st] = 0;
+	while(!q.empty())
+	{
+		int u = q.front();q.pop();
+		for(int i = head[u]; ~i; i = nxt[i])
+		{
+			int v = to[i];
+			if(-1 == d[v] && cap[i])
+			{
+				d[v] = d[u]+1;
+				q.push(v);
+				if(~d[ed]) return true;
+			}
+		}
+	}
+	return false;
+}
+int stack[MAXN], top,cur[MAXN];
+int maxflow()
+{
+	int ans = 0;
+	while(bfs())
+	{
+		memcpy(cur,head,sizeof(head));
+		int u = st;
+		top = 0;
+		while(1)
+		{
+			if(u == ed)
+			{
+				int flow = INF, loc;
+				rep(i,0,top)
+				{
+					if(flow > cap[stack[i]])
+					{
+						flow = cap[stack[i]];
+						loc = i;
+					}
+				}
+				rep(i,0,top)
+				{
+					cap[stack[i]] -= flow;
+					cap[stack[i]^1] += flow;
+				}
+				ans += flow;
+				top = loc;
+				u = from[stack[top]];
+			}
+			for(int i = cur[u]; ~i; cur[u] = i = nxt[i])
+				if(cap[i] && d[u]+1 == d[to[i]]) break;
+			if(~cur[u])
+				u = to[stack[top++]=cur[u]];
+			else
+			{
+				if(!top) break;
+				d[u] = -1;
+				u = from[stack[--top]];
+			}
+		}
+	}
+	return ans;
+}
+int f[MAXN];
+int find(int x){return f[x] == x?x:f[x] = find(f[x]);}
+int vis[MAXN][MAXN], buf[MAXM];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m,k,fn;
+		scanf("%d %d %d %d%*c", &n, &m, &k, &fn);
+		clc(head,-1);
+		tol = 0;
+		repe(i,1,n) f[i] = i;
+		clc(vis,0);
+		rep(i,0,m)
+		{
+			int a,b;
+			scanf("%d %d%*c", &a, &b);
+			vis[a][b] = true;;
+		}
+		rep(i,0,fn)
+		{
+			int a,b;
+			scanf("%d %d%*c", &a, &b);
+			int x = find(a), y = find(b);
+			if(x != y) f[x] = y;
+		}
+		repe(i,1,n)
+		{
+			int x = find(i);
+			repe(j,1,n)
+			{
+				if(x == find(j) && i != j)
+				{
+					repe(k,1,n)
+					{
+						if(vis[i][k])
+							vis[j][k] = true;
+					}
+				}
+			}
+		}
+		repe(i,1,n)
+		{
+			repe(j,1,n)
+			{
+				if(vis[i][j]) add_edge(i,j+n,1);
+				else add_edge(i+2*n,j+n,1);
+			}
+		}
+		repe(i,1,n) add_edge(i,i+n*2,k);
+		st = 0, ed = n*3;
+		int tmp = tol;
+		repe(i,1,n) add_edge(st,i,INF), add_edge(i+n,ed,INF);
+		memcpy(buf,cap,sizeof(int)*tol);
+		int x = 0, y = n, ans;
+		while(x <= y)
+		{
+			int m = (x+y)>>1;
+			memcpy(cap,buf,sizeof(int)*tol);
+			for(int i = tmp; i < tol; i += 2) cap[i] = m;
+			if(maxflow() == m*n)
+			{
+				ans = m;
+				x = m+1;
+			}
+			else y = m-1;
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

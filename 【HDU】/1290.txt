@@ -1,0 +1,23 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1010
+int dp[MAXN], w[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	dp[0] = w[0] = 1;
+	for(int i = 1; i <= 1000; i++)
+	{
+		w[i] = w[i-1]+i;
+		dp[i] = dp[i-1]+w[i-1];
+	}
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		printf("%d\n", dp[n]);
+	}
+	return 0;
+}

@@ -1,0 +1,161 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <string>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 210
+struct ISAP{
+    struct Edge{
+        int from, to, cap, flow;
+        Edge(int a, int b, int c, int d){
+            from = a, to = b, cap = c, flow = d;
+        }
+    };
+    int p[MAXN]/*可增广的上一条弧*/, num[MAXN]/*距离标号计数*/, d[MAXN]/*起点到i距离*/,cur[MAXN]/*当前弧下标*/;
+    int n, s, t;//节点数，边数，起点，终点
+    vector<int> g[MAXN];//邻接表
+    vector<Edge> edge;
+    bool vis[MAXN];
+    void init(int n)
+    {
+		this->n = n;
+        edge.clear();
+        rep(i,0,n) g[i].clear();
+        clc(num,0);
+        clc(cur,0);
+    }
+    void add_edge(int from, int to, int cap)
+    {
+        edge.push_back(Edge(from,to,cap,0));
+        edge.push_back(Edge(to,from,0,0));
+        int m = edge.size();
+        g[from].push_back(m-2);
+        g[to].push_back(m-1);
+    }
+    int augment()
+    {
+        int x = t, a = INF;
+        while(x != s)
+        {
+            Edge& e = edge[p[x]];
+            a = min(a, e.cap-e.flow);
+            x = edge[p[x]].from;
+        }
+        x = t;
+        while(x != s)
+        {
+            edge[p[x]].flow += a;
+            edge[p[x]^1].flow -= a;
+            x = edge[p[x]].from;
+        }
+        return a;
+    }
+    bool bfs()
+    {
+        memset(vis,0,sizeof(vis));
+        queue<int> q;
+        q.push(t);
+        d[t] = 0;
+        vis[t] = 1;
+        while(!q.empty())
+        {
+            int x = q.front(); q.pop();
+			int sz = g[x].size();
+            rep(i,0,sz)
+            {
+                Edge& e = edge[g[x][i]];
+                if(!vis[e.to])
+                {
+                    vis[e.to] = 1;
+                    d[e.to] = d[x]+1;
+                    q.push(e.to);
+                }
+            }
+        }
+        return vis[s];
+    }
+    int maxflow(int s, int t)
+    {
+        this->s = s, this->t = t;
+        int flow = 0;
+        bfs();//bfs可以不加;需要clc(d,0),并且下面一行换成num[0] = n;
+        rep(i,0,n) num[d[i]]++;
+        int x = s;
+        while(d[s] < n)
+        {
+            if(x == t)
+            {
+                flow += augment();
+                x = s;
+				continue;
+            }
+            int ok = 0,sz = g[x].size();
+            rep(i,cur[x],sz)
+            {
+                Edge& e = edge[g[x][i]];
+                if(e.cap > e.flow && d[x] == d[e.to]+1)
+                {
+                    ok = 1;
+                    p[e.to] = g[x][i];
+                    cur[x] = i;
+                    x = e.to;
+                    break;
+                }
+            }
+            if(!ok)
+            {
+                int sum = n-1;
+                rep(i,0,sz)
+                {
+                    Edge& e = edge[g[x][i]];
+                    if(e.cap > e.flow) sum = min(sum,d[e.to]);
+                }
+                if(--num[d[x]] == 0) return flow;//gap优化
+                num[d[x] = sum+1]++;
+                cur[x] = 0;
+                if(x != s) x = edge[p[x]].from;
+            }
+        }
+        return flow;
+    }
+}isap;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t, count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n,m,p,a,b;
+		scanf("%d %d %d%*c", &n, &m, &p);
+		int st = 0, ed = n;
+		isap.init(ed+1);
+		rep(i,0,p)
+		{
+			scanf("%d%*c", &a);
+			isap.add_edge(st,a,INF);
+		}
+		rep(i,0,m)
+		{
+			scanf("%d %d%*c", &a, &b);
+			isap.add_edge(a,b,1);
+			isap.add_edge(b,a,1);
+		}
+		printf("Case #%d: %d\n",++count, isap.maxflow(st,ed));
+	}
+	return 0;
+}

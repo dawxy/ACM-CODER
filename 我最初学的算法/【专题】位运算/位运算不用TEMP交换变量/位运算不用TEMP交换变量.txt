@@ -1,0 +1,11 @@
+#include <stdio.h>
+
+int main ()
+{
+	int a = 100, b = 54;
+	a ^= b;
+	b ^= a;
+	a ^= b;
+	printf ("a = %d\nb = %d\n", a, b);
+	return 0;
+} 

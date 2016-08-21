@@ -1,0 +1,17 @@
+#include <stdio.h>
+
+int main()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int a, b;
+    while(~scanf ("%d %d%*c", &a, &b))
+    {
+        if ((a+b)%86)
+            puts("no");
+        else
+            puts("yes");
+    }
+    return 0;
+}

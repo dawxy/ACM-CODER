@@ -1,0 +1,123 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 500+10, MAXM = 1000*1000*4*2+10;
+struct Twosat{
+	int head[MAXN<<1], tol, next[MAXM],to[MAXM];
+	void init()
+	{
+		clc(head,-1);
+		tol = 0;
+	}
+	void add_edge(int u, int v)
+	{
+		next[tol] = head[u], to[tol] = v;
+		head[u] = tol++;
+	}
+	void add_clause(int x, int vx, int y, int vy)
+	{
+		x = (x<<1)+vx, y = (y<<1)+vy;
+		add_edge(x^1,y);
+		add_edge(y^1,x);
+	}
+	bool vis[MAXN<<1];
+	int s[MAXN<<1],c;
+	bool dfs(int u)
+	{
+		if(vis[u^1]) return false;
+		if(vis[u]) return true;
+		vis[u] = true;
+		s[c++] = u;
+		for(int i = head[u]; ~i; i = next[i])
+			if(!dfs(to[i])) return false;
+		return true;
+	}
+	bool sloved(int n)
+	{
+		clc(vis,0);
+		for(int i = 0; i < n<<1; i+=2)
+		{
+			if(!vis[i] && !vis[i^1])
+			{
+				c = 0;
+				if(!dfs(i))
+				{
+					while(c) vis[s[--c]] = false;
+					if(!dfs(i^1)) return false;
+				}
+			}
+		}
+		return true;
+	}
+}ts;
+int b[MAXN][MAXN],n;
+
+bool ok()
+{
+	rep(i,0,n) if(b[i][i]) return false;
+	rep(k,0,31)
+	{
+		ts.init();
+		rep(i,0,n)
+		{
+			rep(j,i+1,n)
+			{
+				bool c = b[i][j]&(1<<k);
+				if((i&1) && (j&1))
+				{
+					rep(u,0,2)
+					{
+						rep(v,0,2)
+							if((u|v) != c)ts.add_clause(i,u^1,j,v^1);
+					}
+				}
+				else if(0 == (i&1) && 0 == (j&1))
+				{
+					rep(u,0,2)
+					{
+						rep(v,0,2)
+							if((u&v) != c)ts.add_clause(i,u^1,j,v^1);
+					}
+				}
+				else
+				{
+					rep(u,0,2)
+					{
+						rep(v,0,2)
+							if((u^v) != c)ts.add_clause(i,u^1,j,v^1);
+					}
+				}
+			}
+		}
+		if(!ts.sloved(n)) return false;
+	}
+	return true;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n)
+			rep(j,0,n) scanf("%d%*c", &b[i][j]);
+		if(ok()) puts("YES");
+		else puts("NO");
+	}
+	return 0;
+}

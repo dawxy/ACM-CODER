@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <string.h>
+#define INF 99999999
+#define MAXN 105
+char buf[MAXN];
+int A, B, C, D;
+
+int num()
+{
+    int len = strlen(buf), sum = 0;
+    for (int i = 0; i < len; i++)
+	{
+        if ('A' == buf[i])
+            sum += A;
+		else if ('B' == buf[i])
+			sum += B;
+		else if ('C' == buf[i])
+			sum += C;
+	}
+    return sum;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n, h,d,f,F;
+    while(EOF != scanf ("%d %d %d %d %d%*c", &n, &h, &d, &f, &F))
+	{
+        A = h+d+f;
+        B = 2*h+2*d+F;
+        C = 3*h+3*d+2*F;
+        int ans = INF, sum;
+        for (int i = 0; i < n; i++)
+		{
+            gets(buf);
+            sum = num();
+            if (sum < ans)
+				ans = sum;
+		}
+        printf ("%d\n", ans);
+	}
+    return 0;
+}

@@ -1,0 +1,31 @@
+#include <stdio.h>
+
+int main ()
+{
+	int t;
+	scanf ("%d%*c%*c", &t);
+	while (t--)
+	{
+		int a, n, i, j = 1, k;
+		scanf ("%d%*c%d%*c", &a, &n);
+		for (k = 0; k < n; k++)
+		{
+			for (j = 1; j <= a; j++)
+			{
+				for (i = 0; i < j; i++)
+					printf ("%d", j);
+				printf ("\n");
+			}
+			for (j = a-1; j >= 1; j--)
+			{
+				for (i = 0; i < j; i++)
+					printf ("%d", j);
+				printf ("\n");
+			}
+			if (n-1 != k)
+				printf ("\n");
+		}
+		if (0 != t)
+			printf ("\n");
+	}
+}

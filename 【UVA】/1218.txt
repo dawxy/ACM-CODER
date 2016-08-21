@@ -1,0 +1,57 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <vector>
+using namespace std;
+#define MAXN 10010
+#define INF 10010
+vector<int> g[MAXN];
+int dp[3][MAXN];
+/*dp[1][i]表示不选择i点但选择父亲节点，dp[0][i]表示选择i点，dp[2][i]表示不选择i点也不选择父亲*/
+
+void dfs(int r, int fa)
+{
+	int len = g[r].size();
+	dp[2][r] = INF;
+	dp[0][r] = 1;
+	for (int i = 0; i < len; i++)
+	{
+		int s = g[r][i];
+		if (s == fa) continue;
+		dfs(s,r);
+		dp[0][r] += min(dp[1][s], dp[0][s]);
+		dp[1][r] += dp[2][s];
+	}
+	for (int i = 0; i < len; i++)
+	{
+		int s = g[r][i];
+		if (s == fa) continue;
+		dp[2][r] = min(dp[2][r], dp[1][r] - dp[2][s] + dp[0][s]);
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while (~scanf("%d%*c", &n))
+	{
+		int a, b;
+		for (int i = 0; i <= n; i++)
+			g[i].clear();
+		memset(dp,0,sizeof(dp));
+		for (int i = 1; i < n; i++)
+		{
+			scanf("%d %d%*c", &a, &b);
+			g[a].push_back(b);
+			g[b].push_back(a);
+		}
+		dfs(1,-1);
+		printf("%d\n", min(dp[2][1], dp[0][1]));
+		scanf("%d%*c", &n);
+		if (-1 == n)
+			break;
+	}
+	return 0;
+}

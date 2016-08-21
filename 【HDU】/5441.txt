@@ -1,0 +1,70 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 20000+10, MAXM = 100000*2+10;
+struct EDGE{
+    int u,v,cost;
+    bool operator<(const EDGE&t)const{
+        return cost < t.cost;
+    }
+}edge[MAXM];
+struct QUERY{
+    int x,id;
+    bool operator<(const QUERY&t) const{
+        return x < t.x;
+    }
+}in[MAXN];
+int ans[MAXN],f[MAXN],cnt[MAXN],add[MAXN];
+
+int find(int x){return f[x] == x?x:f[x]=find(f[x]);}
+inline int get_all(int x)
+{
+    return x*x-x;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    repe(i,1,20000) add[i] = i*i-i-add[i-1];
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        int n,m,q;
+        scanf("%d %d %d", &n,&m,&q);
+        rep(i,0,m)
+        {
+            scanf("%d %d %d", &edge[i].u,&edge[i].v,&edge[i].cost);
+        }
+        sort(edge,edge+m);
+        rep(i,0,q) scanf("%d", &in[i].x),in[i].id = i;
+        sort(in,in+q);
+        repe(i,1,n) f[i] = i,cnt[i] = 1;
+        int p1 = 0,p2 = 0,sum = 0;
+        while(p1 < m && p2 < q)
+        {
+            while(p1 < m && edge[p1].cost <= in[p2].x)
+            {
+                int x = find(edge[p1].u), y = find(edge[p1].v);
+                if(x != y)
+                {
+                    f[x] = y;
+                    sum -= (get_all(cnt[x])+get_all(cnt[y]));
+                    cnt[y] += cnt[x];
+                    sum += get_all(cnt[y]);
+                }
+                p1++;
+            }
+            ans[in[p2].id] = sum;
+            p2++;
+        }
+        while(p2 < q) ans[in[p2++].id] = sum;
+        rep(i,0,q) printf("%d\n", ans[i]);
+    }
+    return 0;
+}

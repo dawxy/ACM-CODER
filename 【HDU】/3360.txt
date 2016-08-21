@@ -1,0 +1,149 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 2550
+struct Edge{
+	int next, v;
+	Edge(int a = 0, int b = 0){next = a, v = b;}
+}edge[MAXN*12];
+const int d[12][2]={{-1,-2},{-2,-1},{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2},{-1,0},{0,1},{1,0},{0,-1}};
+int a[MAXN][MAXN], tol, head[MAXN], dx[MAXN], dy[MAXN], mx[MAXN], my[MAXN], num[60][60],dis, n,h,w;
+bool used[MAXN];
+
+void add_edge(int u, int v)
+{
+	edge[tol] = Edge(head[u], v);
+	head[u] = tol++;
+}
+bool SearchP()
+{
+	queue<int>q;
+	dis = INF;
+	memset(dx, -1, sizeof(dx));
+	memset(dy, -1, sizeof(dy));
+	rep(i, 0, n)//*==
+	{
+		if(mx[i] == -1)
+		{
+			q.push(i);
+			dx[i] = 0;
+		}
+	}
+	while (!q.empty())
+	{
+		int u = q.front();
+		q.pop();
+		if (dx[u] > dis)break;
+		for(int i = head[u]; ~i; i = edge[i].next)
+		{
+			int v = edge[i].v;
+			if (dy[v] == -1)
+			{
+				dy[v] = dx[u] + 1;
+				if (my[v] == -1)dis = dy[v];
+				else
+				{
+					dx[my[v]] = dy[v] + 1;
+					q.push(my[v]);
+				}
+			}
+		}
+	}
+	return dis != INF;
+}
+bool DFS(int u)
+{
+	for(int i = head[u]; ~i; i = edge[i].next)
+	{
+		int v = edge[i].v;
+		if (!used[v] && dy[v] == dx[u] + 1)
+		{
+			used[v] = true;
+			if (my[v] != -1 && dy[v] == dis)continue;
+			if (my[v] == -1 || DFS(my[v]))
+			{
+				my[v] = u;
+				mx[u] = v;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int MaxMatch()
+{
+	int res = 0;
+	clc(mx, -1);
+	clc(my, -1);
+	while (SearchP())
+	{
+		clc(used, 0);
+		rep	(i, 0, n)//*==
+		{
+			if (mx[i] == -1 && DFS(i))
+				res++;
+		}
+	}
+	return res;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int count = 0;
+	while(~scanf("%d %d%*c", &h, &w) && h+w)
+	{
+		rep(i,0,h)
+			rep(j,0,w) scanf("%d%*c", &a[i][j]);
+		clc(head,-1);
+		n = tol = 0;
+		int m = 0;
+		rep(i,0,h)
+		{
+			rep(j,0,w)
+			{
+				if(~a[i][j])
+				{
+					if((i+j)&1) num[i][j] = n++;
+					else num[i][j] = m++;
+				}
+			}
+		}
+		rep(i,0,h)
+		{
+			rep(j,0,w)
+			{
+				if(-1 == a[i][j]) continue;
+				rep(k,0,12)
+				{
+					if(a[i][j]&(1<<k))
+					{
+						int ni = i+d[k][0], nj = j+d[k][1];
+						if(0 <= ni && h > ni && 0 <= nj && w > nj && ~a[ni][nj])
+						{
+							if((i+j)&1)
+								add_edge(num[i][j],num[ni][nj]);
+							else add_edge(num[ni][nj], num[i][j]);
+						}
+					}
+				}
+			}
+		}
+		printf("%d. %d\n",++count, MaxMatch());
+	}
+	return 0;
+}

@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+#define MAXN 110
+vector<int> s[MAXN];
+int v[MAXN],p[MAXN],dp[MAXN],n;
+
+int dfs(int si)
+{
+	if(~dp[si]) return dp[si];
+	dp[si] = -0x3f3f3f3f;
+	int len = s[si].size();
+	for(int i = 0; i < len; i++)
+	{
+		int buf = dfs(s[si][i]);
+		if(buf > dp[si])
+			dp[si] = buf,p[si] = s[si][i];
+	}
+	return dp[si]+=v[si];
+}
+void pt()
+{
+	int x = 0;
+	while(n != x)
+	{
+		printf("%d->", x+1);
+		x = p[x];
+	}
+	puts("1");
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int t,count = 0;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int m, a, b;
+		scanf("%d%*c", &n);
+		for(int i = 0; i <= n; i++)
+			s[i].clear();
+		memset(dp,-1,sizeof(dp));
+		v[n] = dp[n] = 0;
+		for(int i = 0; i < n; i++)
+			scanf("%d%*c", &v[i]);
+		scanf("%d%*c", &m);
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%d %d%*c", &a, &b);
+			s[a-1].push_back(b-1);
+		}
+		printf("CASE %d#\npoints : %d\ncircuit : ",++count, dfs(0));
+		pt();
+		if(t)
+			puts("");
+	}
+	return 0;
+}

@@ -1,0 +1,58 @@
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1e6+10;
+char a[MAXN];
+int cnt[27],k,sum;
+
+bool ok(char c)
+{
+    if(cnt[c-'a'] == 0) return false;
+    if(cnt[c-'a'] == 1) return sum-1 >= k;
+    return sum >= k;
+}
+void get_sum(char c){
+    if(cnt[c-'a'] == 1) sum--;
+    cnt[c-'a']--;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int t;
+    scanf("%d", &t);
+    while(t--)
+    {
+        scanf("%s", a);
+        int len = strlen(a);
+        scanf("%d", &k);
+        clc(cnt,0);
+        int l = 0;
+        sum = 0;
+        LL ans = 0;
+        rep(i,0,len)
+        {
+            if(cnt[a[i]-'a'] == 0) sum++;
+            cnt[a[i]-'a']++;
+            while(ok(a[l])) get_sum(a[l++]);
+            if(sum >= k)
+                ans += l+1;
+        }
+        printf("%I64d\n", ans);
+    }
+}

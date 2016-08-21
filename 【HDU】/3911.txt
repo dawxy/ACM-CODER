@@ -1,0 +1,129 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 100010
+#define lc u<<1
+#define rc u<<1|1
+struct NODE{
+	int x,y;
+	int lmx_1, lmx_0, rmx_1, rmx_0, mx1,mx0;
+	bool vis;
+}node[MAXN<<2];
+int a[MAXN];
+
+void push_up(NODE &fa, const NODE &ll, const NODE &rr)
+{
+	//update mx
+	fa.mx1 = max(ll.mx1, rr.mx1);
+	fa.mx1 = max(fa.mx1, ll.rmx_1+rr.lmx_1);
+	fa.mx0 = max(ll.mx0, rr.mx0);
+	fa.mx0 = max(fa.mx0, ll.rmx_0+rr.lmx_0);
+	//update lmx_
+	fa.lmx_1 = ll.lmx_1;
+	if(ll.lmx_1 == ll.y-ll.x+1) fa.lmx_1 += rr.lmx_1;
+	fa.lmx_0 = ll.lmx_0;
+	if(ll.lmx_0 == ll.y-ll.x+1) fa.lmx_0 += rr.lmx_0;
+	//update rmx_
+	fa.rmx_1 = rr.rmx_1;
+	if(rr.rmx_1 == rr.y-rr.x+1) fa.rmx_1 += ll.rmx_1;
+	fa.rmx_0 = rr.rmx_0;
+	if(rr.rmx_0 == rr.y-rr.x+1) fa.rmx_0 += ll.rmx_0;
+}
+void bulid(int u, int x, int y)
+{
+	node[u].vis = 0;
+	node[u].x = x, node[u].y = y;
+	if(x == y)
+	{
+		node[u].lmx_0 = node[u].mx0 = node[u].rmx_0 = !a[x];
+		node[u].lmx_1 = node[u].mx1 = node[u].rmx_1 = a[x];
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(lc,x,m);
+	bulid(rc,m+1,y);
+	push_up(node[u], node[lc],node[rc]);
+}
+inline void all_swap(NODE &a){
+	swap(a.lmx_0, a.lmx_1);
+	swap(a.mx0, a.mx1);
+	swap(a.rmx_0, a.rmx_1);
+}
+void push_down(int u)
+{
+	if(!node[u].vis) return;
+	node[lc].vis = !node[lc].vis;
+	all_swap(node[lc]);
+	node[rc].vis = !node[rc].vis;
+	all_swap(node[rc]);
+	node[u].vis = 0;
+}
+int ql,qr;
+void update(int u)
+{
+	int x = node[u].x, y = node[u].y;
+	if(ql <= x && y <= qr)
+	{
+		node[u].vis = !node[u].vis;
+		all_swap(node[u]);
+		return;
+	}
+	push_down(u);
+	int m = (x+y)>>1;
+	if(ql <= m) update(lc);
+	if(qr > m) update(rc);
+	push_up(node[u], node[lc],node[rc]);
+}
+NODE query(int u)
+{
+	int x = node[u].x, y = node[u].y;
+	if(ql <= x && y <= qr) return node[u];
+	push_down(u);
+	int m = (x+y)>>1;
+	NODE ans;
+	if(ql <= m && qr > m){
+		push_up(ans,query(lc), query(rc));
+	}
+	else if(ql <= m) ans = query(lc);
+	else if(qr > m) ans = query(rc);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n))
+	{
+		repe(i,1,n) scanf("%d%*c", &a[i]);
+		bulid(1,1,n);
+		int q, c;
+		scanf("%d%*c", &q);
+		rep(i,0,q)
+		{
+			scanf("%d %d %d%*c", &c, &ql, &qr);
+			if(c) update(1);
+			else
+			{
+				NODE ans = query(1);
+				printf("%d\n", ans.mx1);
+			}
+		}
+	}
+	return 0;
+}

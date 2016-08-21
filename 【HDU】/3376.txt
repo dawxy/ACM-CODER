@@ -1,0 +1,133 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define id(x,y) ((x)*n+(y))
+const int INF = 0x3f3f3f3f, MAXN = 360000*3+10, MAXM = 360000*5*2+10;
+const int f[2][2] = {{0,1},{1,0}};
+struct MCMF{
+	int s,t;
+    struct Edge{
+        int next, to, cap, cost;
+    }edge[MAXM<<1];//记得多开一倍边数(有反向边)
+	int tol,head[MAXN];
+	bool inq[MAXN];
+	int d[MAXN]/*spfa*/, p[MAXN]/*上一条边*/,pre[MAXN]/*上一个点*/;
+	void init(){
+		clc(head,-1);
+		tol = 0;
+	}
+	void add_edge(int from, int to, int cap, int cost)
+    {
+		Edge e = {head[from],to,cap,cost};
+        edge[tol] = e;
+        head[from] = tol++;
+		Edge e2 = {head[to],from,0,-cost};
+        edge[tol] = e2;
+        head[to] = tol++;
+    }
+	bool spfa()
+	{
+		queue<int> q;
+		clc(d,0x3f);
+		clc(inq,0);
+		d[s] = 0, inq[s] = true,p[s] = 0;
+		q.push(s);
+		while(!q.empty())
+		{
+			int u = q.front();q.pop();
+			inq[u] = false;
+			for(int i = head[u]; ~i; i = edge[i].next)
+			{
+				int v = edge[i].to, c = edge[i].cost;
+				if(edge[i].cap > 0 && d[v] > d[u]+c)
+				{
+					d[v] = d[u]+c;
+					p[v] = i;
+					pre[v] = u;
+					if(!inq[v]) q.push(v), inq[v] = true;
+				}
+			}
+		}
+		return INF != d[t];
+	}
+	//需要保证初始网络没有负圈，返回最大流量，cost才是最小花费
+	//如需要求最大费用最大流，则只要把边权改为负的，最后答案为-ans即可
+	int mincostmaxflow(int st, int ed,int &flow)
+	{
+		s = st, t = ed;
+		flow = 0;
+		int cost = 0;
+		while(spfa())
+		{
+			int tmp = INF;
+			for(int i = t; i != s; i = pre[i]) tmp = min(tmp,edge[p[i]].cap);
+			flow += tmp;
+			cost += d[t]*tmp;
+			for (int i = t ; i != s; i = pre[i])
+			{
+				edge[p[i]].cap -= tmp;
+				edge[p[i]^1].cap += tmp;
+			}
+		}
+		return cost;
+	}
+}mcmf;
+int mp[666][666], n;
+
+int in()
+{
+	int ch,ans;
+	ch = getchar();
+	while(ch < '0' || '9' < ch) ch = getchar();
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = (ans<<3)+(ans<<1)+ch-'0';
+	return ans;
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while(~scanf("%d%*c", &n))
+	{
+		rep(i,0,n)
+		{
+			rep(j,0,n) mp[i][j] = in();
+		}
+		mcmf.init();
+		int s = 0,t = n*n*2-1;
+		int tmp = n*n;
+		rep(i,0,n)
+		{
+			rep(j,0,n)
+			{
+				rep(k,0,2)
+				{
+					int ni = i+f[k][0], nj = j+f[k][1];
+					if(0 <= ni && n > ni && 0 <= nj && n > nj)
+						mcmf.add_edge(tmp+id(i,j),id(ni,nj),2,0);
+				}
+				if(0 == id(i,j) || (i == n-1 && j == n-1)) mcmf.add_edge(id(i,j),id(i,j)+tmp,2,-mp[i][j]);
+				else mcmf.add_edge(id(i,j),id(i,j)+tmp,1,-mp[i][j]);
+			}
+		}
+		int cc;
+		printf("%d\n", -mcmf.mincostmaxflow(s,t,cc)-(mp[0][0]+mp[n-1][n-1]));
+	}
+	return 0;
+}

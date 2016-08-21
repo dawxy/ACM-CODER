@@ -1,0 +1,79 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const LL INF = 0x3f3f3f3f3f3f3f3f;
+LL h[2],a[2],x[2],y[2], MOD;
+
+inline LL nxt(int id)
+{
+    return (x[id]*h[id]+y[id])%MOD;
+}
+bool vis[1000000+10];
+int find_p(int id)
+{
+    int p = -1,cnt = 0;
+    clc(vis,0);
+    while(1)
+    {
+        if(h[id] == a[id]) return cnt;
+        h[id] = nxt(id);
+        if(vis[h[id]]) return -1;
+        vis[h[id]] = true;
+        cnt++;
+    }
+    return p;
+}
+LL sloved()
+{
+    int p1 = find_p(0);
+    int p2 = find_p(1);
+    if(-1 == p1 || -1 == p2) return -1;
+    h[0] = nxt(0);
+    int q1 = find_p(0)+1;
+    h[1] = nxt(1);
+    int q2 = find_p(1)+1;
+    LL mi = INF, tmp = p1;
+    int i;
+    for(i = 0; i < q2; i++)
+    {
+        if(tmp >= p2 && tmp%q2 == p2%q2) break;
+        tmp += q1;
+    }
+    if(i < q2) mi = min(mi,tmp);
+    tmp = p2;
+    for(i = 0; i < q1; i++)
+    {
+        if(tmp >= p1 && tmp%q1 == p1%q1) break;
+        tmp += q2;
+    }
+    if(i < q1) mi = min(mi,tmp);
+    if(INF == mi) return -1;
+    return mi;
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    while(~scanf("%I64d%*c", &MOD))
+    {
+        rep(i,0,2)
+            scanf("%I64d %I64d %I64d %I64d", &h[i], &a[i], &x[i], &y[i]);
+        printf("%I64d\n",sloved());
+    }
+    return 0;
+}

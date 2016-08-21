@@ -1,0 +1,86 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define clc(a,b) memset(a,b,sizeof(b))
+#define MAXN 510
+struct Edge{
+	int from, to, cost;
+	Edge(int a, int b, int c) {from = a, to = b, cost = c;}
+	bool operator<(const Edge& t) const {return cost < t.cost;}
+};
+vector<Edge> edge;
+int f[MAXN],p[MAXN],n,m;
+
+int find(int x){return f[x] == x?x:f[x]=find(f[x]);}
+int kruskal()
+{
+	repe(i,1,n) f[i] = i;
+	int ans = 0, cnt = 1;
+	rep(i,0,m)
+	{
+		Edge& e = edge[i];
+		int a = find(e.from), b = find(e.to);
+		if(a != b)
+		{
+			ans += e.cost;
+			f[a] = b;
+			p[cnt++] = i;
+		}
+		if(cnt == n) break;
+	}
+	if(cnt < n) return -1;
+	return ans;
+}
+int kruskal(int del)
+{
+	repe(i,1,n) f[i] = i;
+	int ans = 0, cnt = 1;
+	rep(i,0,m)
+	{
+		if(del == i) continue;
+		Edge& e = edge[i];
+		int a = find(e.from), b = find(e.to);
+		if(a != b)
+		{
+			ans += e.cost;
+			f[a] = b;
+			cnt++;
+		}
+		if(cnt == n) break;
+	}
+	if(cnt < n) return -1;
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int a,b,c;
+		scanf("%d %d%*c", &n ,&m);
+		edge.clear();
+		rep(i,0,m)
+		{
+			scanf("%d %d %d%*c", &a, &b, &c);
+			edge.push_back(Edge(a,b,c));
+		}
+		sort(edge.begin(),edge.end());
+		int ans = kruskal(),mi = 0x3f3f3f3f;
+		rep(i,1,n)
+		{
+			mi = min(kruskal(p[i]),mi);
+			if(mi == ans) break;
+		}
+		if(mi == ans) puts("Yes");
+		else puts("No");
+	}
+	return 0;
+}

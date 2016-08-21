@@ -1,0 +1,27 @@
+#include <stdio.h>
+int a[105];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int n;
+    while(~scanf ("%d%*c", &n) &&n)
+	{
+        int ans = 0;
+        for (int i = 1; i <= n; i++)
+		{
+            scanf ("%d%*c", &a[i]);
+		}
+        for (int i = 1; i <= n; i++)
+		{
+            if (a[i] > a[i-1])
+                ans += (a[i]-a[i-1])*6;
+			else
+				ans += (a[i-1]-a[i])*4;
+		}
+		printf ("%d\n", ans+5*n);
+	}
+    return 0;
+}

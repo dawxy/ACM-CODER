@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+int ans, ch, maxn;
+
+inline int in()
+{
+	while((ch = getchar()) < '0' || '9' < ch);
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = ans*10+ch-'0';
+	maxn = max(maxn,ans);
+	return ans;
+}
+void out(int s)
+{
+	if (!s) return;
+	out(s/10);
+	putchar(s%10+'0');
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n, m, sum = 0;
+		maxn = -1;
+		scanf("%d %d%*c", &n, &m);
+		for (int i = 0; i < n; i++)
+			sum += in();
+		if (sum%m)
+			ans = sum/m+1;
+		else
+			ans = sum/m;
+		out(max(ans,maxn));
+		putchar('\n');
+	}
+	return 0;
+}

@@ -1,0 +1,57 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 1000+10;
+const LL MOD = 2147483647;
+LL v[MAXN];
+map<LL,int> cnt;
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int n,count = 0;
+    while(~scanf("%d%*c", &n))
+    {
+        int tol = 0;
+        cnt.clear();
+        rep(i,0,n)
+        {
+            scanf("%I64d%*c", &v[tol]);
+            LL tmp = v[tol];
+            if(cnt.find(tmp) == cnt.end())
+                tol++;
+            cnt[tmp]++;
+        }
+        printf("Case #%d: ",++count);
+        if(tol == 1)
+        {
+            puts("-1");
+            continue;
+        }
+        sort(v,v+tol);
+        int ans = 0;
+        rep(i,0,tol)
+        {
+            if((v[i]+v[(i-1+tol)%tol])%MOD == v[(i+1)%tol])
+                ans += cnt[v[i]];
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

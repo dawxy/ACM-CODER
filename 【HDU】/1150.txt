@@ -1,0 +1,60 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define clc(a,b) memset(a,b,sizeof(a));
+#define pb push_back
+#define MAXN 110
+vector<int> g[MAXN];
+bool vis[MAXN];
+int lin[MAXN],n;
+
+bool dfs(int u)
+{
+	int sz = g[u].size();
+	rep(i,0,sz)
+	{
+		int v = g[u][i];
+		if(!vis[v])
+		{
+			vis[v] = true;
+			if(-1 == lin[v] || dfs(lin[v]))
+			{
+				lin[v] = u;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+int sloved()
+{
+	clc(lin,-1);
+	int ans = 0;
+	rep(i,1,n+1)
+	{
+		clc(vis,0);
+		if(dfs(i)) ans++;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int m,k, a,b;
+		scanf("%d %d%*c", &m, &k);
+		rep(i,1,n+1) g[i].clear();
+		rep(i,0,k)
+		{
+			scanf("%*d %d %d%*c", &a, &b);
+			if(a&&b) g[a].pb(b);
+		}
+		printf("%d\n", sloved());
+	}
+	return 0;
+}

@@ -1,0 +1,89 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <map>
+#include <vector>
+using namespace std;
+#define MAXN 30
+map<string,int> vis;
+vector<int> g[MAXN];
+vector<int> ans;
+char name[MAXN][MAXN];
+bool ok[MAXN][MAXN], in[MAXN];
+int sum;
+
+int find(char *c)
+{
+	if(vis.find(c) == vis.end())
+	{
+		vis[c] = ++sum;
+		strcpy(name[sum],c);
+		return sum;
+	}
+	return vis[c];
+}
+void dfs(int u)
+{
+	if(in[u]) return;
+	ans.push_back(u);
+	in[u] = true;
+	int len = g[u].size();
+	for(int i = 0; i < len; i++)
+		dfs(g[u][i]);
+}
+void pt()
+{
+	printf("%s",name[ans[0]]);
+	int len = ans.size();
+	for(int i = 1; i < len; i++)
+		printf(", %s",name[ans[i]]);
+	putchar('\n');
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m,count = 0;
+	while(~scanf("%d %d%*c", &n ,&m) && n+m)
+	{
+		if(count) putchar('\n');
+		char c1[MAXN], c2[MAXN];
+		memset(ok,0,sizeof(ok));
+		memset(in,0,sizeof(in));
+		sum = -1;
+		vis.clear();
+		for(int i = 0; i < n; i++) g[i].clear();
+		for(int i = 0; i < m; i++)
+		{
+			scanf("%s %s%*c", c1,c2);
+			int a = find(c1), b = find(c2);
+			ok[a][b] = true;
+		}
+		for(int k = 0; k < n; k++)
+		{
+			for(int i = 0; i < n; i++)
+			{
+				for(int j = 0; j < n; j++)
+					ok[i][j] = ok[i][j] || (ok[i][k]&&ok[k][j]);
+			}
+		}
+		for(int i = 0; i < n; i++)
+		{
+			for(int j = i+1; j < n; j++)
+			{
+				if(ok[i][j] && ok[j][i])
+				{
+					g[i].push_back(j);
+					g[j].push_back(i);
+				}
+			}
+		}
+		printf("Calling circles for data set %d:\n", ++count);
+		for(int i = 0; i < n; i++)
+		{
+			if(!in[i]) ans.clear(),dfs(i),pt();
+		}
+	}
+	return 0;
+}

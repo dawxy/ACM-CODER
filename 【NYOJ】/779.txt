@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main ()
+{
+	int n, k;
+	while (EOF != scanf("%d %d%*c", &n, &k))
+	{
+		int ans;
+		if (n > k)
+		{
+			ans = n*2/k;
+			if (0 != (n*2)%k)
+				ans++;
+		}
+		else
+			ans = 2;
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}

@@ -1,0 +1,65 @@
+#include <stdio.h>
+
+int to_num(char *a)
+{
+    if ('z' == a[0])
+        return 0;
+    if ('o' == a[0])
+		return 1;
+	if ('t' == a[0])
+	{
+        if ('w' == a[1])
+			return 2;
+		if ('h' == a[1])
+			return 3;
+	}
+    if ('f' == a[0])
+	{
+		if ('o' == a[1])
+			return 4;
+		if ('i' == a[1])
+			return 5;
+	}
+    if ('s' == a[0])
+	{
+        if ('i' == a[1])
+			return 6;
+		if ('e' == a[1])
+			return 7;
+	}
+	if ('e' == a[0])
+		return 8;
+    if ('n' == a[0])
+		return 9;
+}
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    char buf[10];
+    while(1)
+	{
+        int a = 0, b = 0;
+        bool is_a = true;
+        while(1)
+		{
+            scanf ("%s%*c", buf);
+            if ('+' == buf[0])
+			{
+                is_a = false;
+                continue;
+			}
+			else if ('=' == buf[0])
+                break;
+            if (is_a)
+                a = a*10+to_num(buf);
+			else
+				b = b*10+to_num(buf);
+		}
+		if (!a && !b)
+			break;
+        printf ("%d\n", a+b);
+	}
+    return 0;
+}

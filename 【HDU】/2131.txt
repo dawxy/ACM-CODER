@@ -1,0 +1,21 @@
+#include <stdio.h>
+#include <string.h>
+char a[300];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    while(NULL != gets(a))
+	{
+        int len = strlen(a)-2, ans = 0;
+        for (int i = 2; i < len+2; i++)
+		{
+            if (a[0] == a[i] || a[0]-32 == a[i] || a[0]+32 == a[i])
+                ans++;
+		}
+        printf ("%.5lf\n", ans*1.0/len*1.0);
+	}
+    return 0;
+}

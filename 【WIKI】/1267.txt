@@ -1,0 +1,32 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 30
+int dp[MAXN][MAXN];
+bool vis[MAXN][MAXN];
+
+int main ()
+{
+    int h,w;
+    while(~scanf ("%d %d%*c", &h, &w))
+    {
+        int n;
+        scanf ("%d%*c",&n);
+        memset(vis,0,sizeof(vis));
+        memset(dp,0,sizeof(dp));
+        dp[0][1] = 1;
+        for (int i = 0; i < n; i++)
+        {
+            int a, b;
+            scanf ("%d %d%*c", &a, &b);
+            vis[a][b] = true;
+        }
+        for (int i = 1; i <= h; i++)
+        {
+            for (int j = 1; j <= w; j++)
+                if (!vis[i][j])
+                    dp[i][j] = dp[i-1][j]+dp[i][j-1];
+        }
+        printf("%d\n", dp[h][w]);
+    }
+    return 0;
+}

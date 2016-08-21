@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 20
+#define INF 0x3f3f3f3f
+int dp[MAXN][MAXN][MAXN][MAXN], a[MAXN], p[MAXN][MAXN][MAXN][MAXN], h, w;
+//dp[si][ei][si][ej]表示在高为si~ei宽为sj~ej的矩形中最少需要切多少距离
+
+int psum(int si, int ei, int sj, int ej)
+{
+	int& ans = p[si][ei][sj][ej];
+	if (-1 != ans) return ans;
+	ans = 0;
+	for (int i = si; i <= ei; i++)
+	{
+		for (int j = sj; j <= ej; j++)
+			if (a[i]&(1<<j)) ans++;
+	}
+	return ans;
+}
+int dfs(int si, int ei, int sj, int ej, int sum)
+{
+	int& ans = dp[si][ei][sj][ej];
+	if (-1 != ans) return ans;
+	if (1 == sum) return ans = 0;
+	ans = INF;
+	for (int k = si; k < ei; k++)//横切
+	{
+		int p1 = psum(si,k,sj,ej), p2 = psum(k+1,ei,sj,ej);
+		if (p1&&p2)
+			ans = min(ans,dfs(si,k,sj,ej,p1)+dfs(k+1,ei,sj,ej,p2)+ej-sj+1);
+	}
+	for (int k = sj; k < ej; k++)//竖切
+	{
+		int p1 = psum(si,ei,sj,k), p2 = psum(si,ei,k+1,ej);
+		if (p1&&p2)
+			ans = min(ans,dfs(si,ei,sj,k,p1)+dfs(si,ei,k+1,ej,p2)+ei-si+1);
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int k, count = 0;
+	while(~scanf("%d %d %d%*c", &h, &w, &k))
+	{
+		memset(a,0,sizeof(a));
+		memset(p,-1,sizeof(p));
+		int x,y, sum = 0;
+		for (int i = 0; i < k; i++)
+		{
+			scanf("%d %d%*c", &x, &y);
+			a[x-1] |= 1<<(y-1);
+		}
+		memset(dp,-1,sizeof(dp));
+		printf("Case %d: %d\n", ++count, dfs(0,h-1,0,w-1,k));
+	}
+	return 0;
+}

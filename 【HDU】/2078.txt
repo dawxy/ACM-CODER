@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+int a[42];
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int n, m;
+		scanf ("%d %d%*c", &n, &m);
+		for (int i = 0; i < n; i++)
+			scanf ("%d%*c", &a[i]);
+		sort(a,a+n);
+		printf ("%d\n", (100-a[0])*(100-a[0]));
+	}
+	return 0;
+}

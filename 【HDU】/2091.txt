@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <string.h>
+char ans[100][100];
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    freopen("e:\\out.txt","w",stdout);
+    #endif
+    char c;
+    int count = 0;
+    while(1)
+	{
+		scanf ("%c%*c", &c);
+		if ('@' == c)
+			break;
+        if (count++)
+            printf ("\n");
+        int h, len, l, r;
+        scanf ("%d%*c", &h);
+        memset(ans,' ', sizeof(ans));
+        len = 2*h-1;
+        l = r = len/2;
+        for (int i = 0; i < h-1; i++)
+		{
+            ans[i][l] = ans[i][r] = c;
+            l--, r++;
+            ans[i][r] = 0;
+		}
+        for (int i = 0; i < len; i++)
+            ans[h-1][i] = c;
+        ans[h-1][len] = 0;
+        for (int i = 0; i < h; i++)
+			puts(ans[i]);
+		count++;
+	}
+    return 0;
+}

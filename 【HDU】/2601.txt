@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <math.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    #endif
+    int t;
+    scanf ("%d%*c", &t);
+    while(t--)
+    {
+        __int64 n;
+        int ans = 0;
+        scanf ("%I64d%*c", &n);
+        int len = sqrt(1.0*(n+1));
+        for(int i = 2; i <= len; i++)
+        {
+            if (0 == (n+1)%i)
+                ans++;
+        }
+        printf ("%d\n", ans);
+    }
+    return 0;
+}

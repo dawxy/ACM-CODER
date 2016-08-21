@@ -1,0 +1,52 @@
+/*
+	枚举a求b，模方程:x[3]≡a^2 * x[1]+ab+b (mod 10001)
+	由"a≡b(mod n)使得a-b是n的倍数"，令倍数为y，则 (a+1)b+10001y = x[3]-a^2 * x[1];
+	此时可以直接用扩展GCD求出b和y;因为题意说输出任意一个满足的即可，所以只要求出0~10000中一个b
+*/
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#define MAXN 105
+#define MOD 10001
+int in[MAXN],ans[MAXN],n;
+
+void e_gcd(int a, int b, int& d, int& x, int& y)
+{
+	if(!b) d = a, x = 1, y = 0;
+	else e_gcd(b,a%b,d,y,x), y -= a/b*x;
+}
+void sloved()
+{
+	for (int a = 0; a <= 10000; a++)
+	{
+		int c = (in[1]-(a*a%MOD)*in[0]%MOD+MOD)%MOD,d,b,y;
+		e_gcd(a+1,-MOD,d,b,y);
+		if(c%d) continue;//无解
+		b *= c/d;//任意一个b
+		//求出0~10000中最小的b
+		int gb = abs(-MOD/d);
+		b = (b%gb+gb)%gb;
+		for (int j = 0; j < n; j++)
+		{
+			ans[j] = (a*in[j]%MOD+b)%MOD;
+			if(j == n-1) 
+			{
+				for(int i = 0; i < n; i++)
+					printf("%d\n", ans[i]);
+				return;
+			}
+			if((a*ans[j]%MOD+b)%MOD != in[j+1]) break;
+		}
+	}
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	scanf("%d%*c", &n);
+	for(int i = 0; i < n; i++)
+		scanf("%d%*c", &in[i]);
+	sloved();
+	return 0;
+}

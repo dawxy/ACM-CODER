@@ -1,0 +1,128 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define id(x,y) (x+y|x!=y)
+const int INF = 0x3f3f3f3f, MAXN = 500000+10;
+int sum[MAXN<<1];
+
+inline void push_up(int x, int y, int m){
+	sum[id(x,y)] = sum[id(x,m)]+sum[id(m+1,y)];
+}
+void bulid(int x, int y)
+{
+	if(x == y)
+	{
+		sum[id(x,y)] = 1;
+		return;
+	}
+	int m = (x+y)>>1;
+	bulid(x,m);
+	bulid(m+1,y);
+	push_up(x,y,m);
+}
+int p;
+void del(int x, int y)
+{
+	if(x == y)
+	{
+		sum[id(x,y)]--;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) del(x,m);
+	else del(m+1,y);
+	push_up(x,y,m);
+}
+int query(int x, int y, int k)//寻找左边起第k个空位
+{
+	if(x == y) return x;
+	int m = (x+y)>>1;
+	if(sum[id(x,m)] >= k) return query(x,m,k);
+	return query(m+1,y,k-sum[id(x,m)]);
+}
+int ql,qr;
+int find(int x, int y)//[ql,qr]有几个空位
+{
+	if(ql <= x && y <= qr) return sum[id(x,y)];
+	int m = (x+y)>>1, ans = 0;
+	if(ql <= m) ans += find(x,m);
+	if(qr > m) ans += find(m+1,y);
+	return ans;
+}
+char name[MAXN][20];
+int to[MAXN], f[MAXN], n;
+
+void get_f(int num){
+	int sq = sqrt(num+0.5);
+	repe(i,1,sq)
+	{
+		f[i*i]++;
+		for(int j = i+1; i*j <= num; j++) f[i*j] += 2;
+	}
+}
+inline int next_p(int id, int len){
+	if(to[id] > 0)//右移
+	{
+		ql = id,qr = n-1;
+		int r = find(0,n-1), l = len-r;//右边,左边分别有几个位置
+		int tmp = to[id]%len;
+		if(!tmp) tmp = len;//tmp-->id往右移几个位置
+		if(tmp <= r)//右边位置足够
+			return tmp+l;
+		else 
+			return tmp-r;//右边位置不够变成左边的位置
+	}
+	else//左移
+	{
+		ql = 0, qr = id;
+		int l = find(0,n-1), r = len-l;
+		int tmp = (-to[id])%len;
+		if(!tmp) tmp = len;
+		if(tmp <= l)
+			return l-tmp+1;//左边位置足够
+		else 
+			return r-(tmp-l)+1+l;
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int k;
+	get_f(500000);
+	while(~scanf("%d %d%*c", &n, &k))
+	{
+		rep(i,0,n) scanf("%s %d%*c", name[i],&to[i]);
+		bulid(0,n-1);
+		int mx = f[1], id = k-1;
+		int pos = id;
+		rep(i,1,n)
+		{
+			p = pos;
+			del(0,n-1);
+			pos = query(0,n-1,next_p(pos,n-i));
+			if(mx < f[i+1])
+			{
+				mx = f[i+1];
+				id = pos;
+			}
+		}
+		printf("%s %d\n", name[id],mx);
+	}
+	return 0;
+}

@@ -1,0 +1,24 @@
+include <stdio.h>
+
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int t;+
+    scanf ("%d%*c", &t);
+    while(t--)
+	{
+		double a, b, c, d, e, f;
+        scanf ("%lf %lf %lf %lf %lf %lf%*c", &a, &b, &c, &d, &e, &f);
+        if (a == c)
+            puts("circle");
+        else if (a*c > 0)
+            puts("ellipse");
+		else if (a*c < 0)
+			puts("hyperbola");
+        else
+			puts("parabola");
+	}
+    return 0;
+}

@@ -1,0 +1,187 @@
+/*g++编译链接需要加 -pthread 
+需要安装 wget
+*/
+#include <cstdio>
+#include <string>
+#include <cstring>
+#include <unordered_map>
+#include<unistd.h>
+//#include <afxinet.h> //httpClient
+#include <thread>//c++11标准thread库
+#include <vector>
+using namespace std;
+struct NODE{
+	int from, to;
+	NODE(int a, int b){from = a, to = b;}
+};
+vector<int> in;//问题标号
+vector<int> unfind;
+vector<int> repeat;//输入文件重复出现的题目编号
+unordered_map<int,int> num;
+int TOLThread, cnt, sum, cntth;
+//线程总数,cnt是当前需要查询的题目数量,sum是输入数据的题目数量,cntth是当前正在运行的线程数
+
+bool isnum(char ch)
+{
+	if('0' <= ch && '9' >= ch)
+		return true;
+	return false;
+}
+bool isfind(int p_id)
+{
+	char problem[10];
+	sprintf(problem,"%d",p_id);
+	if(~access(("problem\\"+(string)problem+".htm").c_str(),0))
+		return true;
+	return false;
+}
+bool is_ok(char *c)//判断输入线程数是否为数字
+{
+	for(int i = 0; c[i]; i++)
+		if(!isnum(c[i])) return false;
+	return true;
+}
+void input()
+{
+	char buf[100];
+	printf("是否要删除原有数据(Y删除，其他任意键不删除):");
+	gets(buf);
+	if(1 == strlen(buf) && (buf[0] == 'Y' || buf[0] == 'y'))
+	{
+		if(~access("problem", 0))
+			system("rm -rf problem");//删除非空文件夹包括系统文件夹
+	}
+	FILE *f = fopen("in.txt","r");
+	if(!f)
+	{
+		puts("请把in.txt放在此程序同一目录下");
+		system("pause");
+		exit(-1);
+	}
+	int sum_repeat = 0;//记录输入数据中已经抓取到的总数(输入数据可能同一题目出现2次以上,则要加2)
+	while(~fscanf(f,"%s%*c", buf,100))
+	{
+		if(isnum(buf[0]))
+		{
+			int a;
+			sscanf(buf,"%d",&a);
+			if(!num.count(a))//没出现过的
+			{
+				if(!isfind(a))
+					in.push_back(a);
+				else
+					sum_repeat++;
+			}
+			else
+			{
+				if(num[a] == 1)
+					repeat.push_back(a);
+				sum_repeat++;
+			}
+			sum++;
+			num[a]++;
+		}
+	}
+	fclose(f);
+	cnt = in.size();
+	printf("导入数据总数为%d个,其中已经有%d个抓取到，只需要抓取的题号有%d个\n", sum,sum_repeat,cnt);
+	if(repeat.size())//如果输入有重复数据
+	{
+		f = fopen("repeat.txt","w");
+		for(int i = 0; i < repeat.size(); i++) fprintf(f,"%d\n", repeat[i]);
+		fclose(f);
+		printf("导入题号中有%d个为重复题号,已经输出到repeat.txt\n",repeat.size());
+		printf("(可以忽略继续抓取%d个不重复的网页,如果继续,请更新完后在从excel删除数据)\n", cnt);
+	}
+	printf("确认后，输入需要创建的线程数:");
+	gets(buf);
+	sscanf(buf,"%u", &TOLThread);
+	while(!is_ok(buf) || !TOLThread)
+	{
+		printf("请输入合法的线程数(正整数):");
+		gets(buf);
+		sscanf(buf,"%u", &TOLThread);
+	}
+	printf("你输入的线程数为%d\n", TOLThread);
+	if(-1 == access("problem",0))//判断文件夹是否存在
+	{
+		system("mkdir problem");//创建文件夹
+		//system("attrib problem +h +s");
+		//R 只读文件属性。A 存档文件属性。S 系统文件属性。H 隐藏文件属性
+	}
+}
+bool get_web(int id)
+{
+	char problem[10];
+	sprintf(problem,"%d",in[id]);
+	string url = "http://acm.hdu.edu.cn/showproblem.php?pid="+(string)problem;
+	string save = "problem/"+(string)problem;
+	string tmp = "wget "+url+" -q -O "+save+".htm";
+	if(-1 == system(tmp.c_str()))
+	{
+		printf("problem: %d查询失败，还有%d个需要获取,%d个线程在运行\n",in[id],cnt,cntth);
+		return false;
+	}
+	printf("获取到%d,还有%d个需要获取,%d个线程在运行\n",in[id],cnt,cntth);
+	return true;
+}
+void ThreadFunc (NODE *p)//单线程
+{
+	for(int i = p->from; i <= p->to; i++)
+	{
+		if(!get_web(i))
+			unfind.push_back(i);
+		--cnt;
+	}
+	free(p);
+	cntth--;
+}
+void sloved()
+{
+	int len = cnt/TOLThread, st = 0;
+	cntth = 0;
+	for(int i = 0; i < TOLThread-1; i++)
+	{
+		NODE *a = new NODE(st,st+len-1);
+		cntth++;
+		st += len;
+		thread now = thread(ThreadFunc, a);
+		now.detach();//线程分离,独立运行
+	}
+	int sz = in.size();
+	while(sz-st > len)
+	{
+		NODE *a = new NODE(st,st+len-1);
+		st += len;
+		cntth++;
+	}
+	NODE *a = new NODE(st,sz-1);
+	cntth++;
+	thread now = thread(ThreadFunc, a);
+	now.detach();
+
+	while(cntth > 0) usleep(500);
+	puts("======\n获取完成");
+	if(unfind.size())
+	{
+		printf("由于网络原因,还有%d个problem没有获取到,已经输出到not_get.txt\n",unfind.size());
+		FILE *f = fopen("not_get.txt","w");
+		for(int i = 0; i < unfind.size(); i++)
+			fprintf(f,"%d\n", in[unfind[i]]);
+		fclose(f);
+	}
+}
+int main()
+{
+	if(!access("repeat.txt",0))
+		system("rm -rf repeat.txt");
+	input();
+	long long st = time(0),cost;
+	puts("正在开启线程,请稍候...");
+	sloved();
+	cost = time(0)-st;
+	printf("Cost Time: %lld分%lld秒\n", cost/60,cost%60);
+	system("pause");
+	return 0;
+}
+

@@ -1,0 +1,58 @@
+//马踏棋盘递归加回溯,比较慢
+#include <stdio.h>
+#include <time.h>
+#define scanf scanf_s
+#define M 5
+#define N 5
+int a[M][N] = {0}, count = 0;
+bool in = false;
+
+void dfs (int ,int, int);
+
+int main ()
+{
+	int x, y;
+	clock_t s, e;//记录下运行时间
+	scanf ("%d %d%*c", &x, &y);
+	if (0 > x || M <= x || 0 > y || N <= y)
+	{
+		printf ("输入超出范围!\n");
+		return -1;
+	}
+	s = clock();
+	dfs(x, y, 1);
+	if (!in)
+		printf ("没有可行的办法!\n");
+	e = clock();
+	printf("共耗时:%f\n",(double)(e-s)/CLOCKS_PER_SEC);
+}
+
+void dfs (int x,int y, int time)
+{
+	a[x][y] = time;//下面有回溯复原代码
+	int i, j, d[8][2] = {{-2,-1},{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2},{-1,-2}}, ni, nj;
+	if (M*N == time)//输出可行走法
+	{
+		printf ("方法%d\n", ++count);
+		for (i = 0; i < M; i++)
+		{
+			for (j = 0;  j < N; j++)
+				printf ("%2.d\t", a[i][j]);
+			printf ("\n");
+		}
+		printf ("\n");
+		in = true;
+		return;
+	}
+	for (i = 0; i < 8; i++)
+	{
+		ni = d[i][0]+x;
+		nj = d[i][1]+y;
+		if (0 <= ni && M > ni && 0 <= nj && N > nj && 0 == a[ni][nj])
+		{
+			dfs (ni, nj, time+1);
+			a[ni][nj] = 0;//这里用回溯复原棋盘
+		}
+	}
+	return;
+}

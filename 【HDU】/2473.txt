@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <cstring>
+#define MAXN 1100100
+int f[MAXN], p[MAXN];
+bool vis[MAXN];
+
+int find(int x){return f[x] == x ? x : f[x] = find(f[x]);}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int n,m, count = 0;
+    while(~scanf("%d %d%*c", &n, &m) && n+m)
+    {
+        int k = n, ch, a, b;
+        for(int i = 0; i < n; i++) f[i] = p[i] = i;
+        for(int i = 0; i < m; i++)
+        {
+            ch = getchar();
+            if('M' == ch)
+            {
+                scanf("%d %d%*c", &a, &b);
+                int x = find(p[a]), y = find(p[b]);
+                if(x != y) f[x] = y;
+            }
+            else
+            {
+                scanf("%d%*c", &a);
+                f[k] = k;
+                p[a] = k++;
+            }
+        }
+        int ans = 0;
+        memset(vis,0,sizeof(vis));
+        for(int i = 0; i < n; i++)
+        {
+            int x = find(p[i]);
+            if(!vis[x]) ans++, vis[x] = true;
+        }
+        printf("Case #%d: %d\n", ++count,ans);
+    }
+    return 0;
+}

@@ -1,0 +1,43 @@
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define MAXN 5010
+typedef long long LL;
+int a[MAXN],b[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n,m;
+	while(~scanf("%d %d%*c", &n, &m) && n+m)
+	{
+		rep(i,0,n) scanf("%d%*c", &a[i]);
+		rep(i,0,m) scanf("%d%*c", &b[i]);
+		sort(a,a+n);
+		sort(b,b+m);
+		int cur = 0, cost = 0;
+		rep(i,0,m)
+		{
+			if(b[i] >= a[cur])
+			{
+				cost += b[i];
+				if(++cur == n) break;
+			}
+		}
+		if(cur < n) puts("Loowater is doomed!");
+		else printf("%d\n", cost);
+	}
+	return 0;
+} 

@@ -1,0 +1,20 @@
+#include <stdio.h>
+
+int main ()
+{
+	__int64 cp[20];
+	int c;
+	scanf ("%d%*c", &c);
+	while (c--)
+	{
+		int n, i;
+		__int64 all = 1;
+		scanf ("%d%*c", &n);
+		for (i = 2, cp[0] = 0, cp[1] = 1; i < n; i++)
+			cp[i] = i*(cp[i-1]+cp[i-2]);
+		for (i = 0; i < n; i++)
+			all *= i+1;
+		printf ("%.2lf%%\n", cp[n-1]*1.0/all*100.0);
+	}
+	return 0;
+}

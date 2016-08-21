@@ -1,0 +1,47 @@
+//高精度阶乘计算
+#include <stdio.h>
+#define MAXW 8916
+int a[MAXW];
+
+int size(int a)
+{
+	if (a >= 1000)
+		return 4;
+	if (a >= 100)
+		return 3;
+	if (a >= 10)
+		return 2;
+	return 1;
+}
+
+int main ()
+{
+	int n;
+	while (EOF != scanf ("%d", &n))
+	{
+		int i, j, c, buf, w;
+		a[0] = w = 1;
+		for (i = 1; i <= n; i++)
+		{
+			c = j = 0;
+			for (j = 0;  j < w; j++)
+			{
+				buf = a[j]*i+c;
+				a[j] = buf%10000;
+				c = buf/10000;
+			}
+			if (c)
+				a[w++] = c;
+		}
+		printf ("%d", a[w-1]);
+		for (i = w-2; i >= 0; i--)
+		{
+			for (j = 4; j > size(a[i]); j--)
+				printf ("0");
+			printf ("%d", a[i]);
+		}	
+		printf ("\n");
+	}
+
+	return 0;
+}

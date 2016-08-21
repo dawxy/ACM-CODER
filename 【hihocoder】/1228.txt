@@ -1,0 +1,178 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10;
+char a[MAXN],txt[MAXN],buf[MAXN];
+int m,p,len,isi,kc,st,buflen;
+
+inline void insert(char c)
+{
+	if(isi)
+	{
+		if(len == m) return;
+		per(i,len,p+1) txt[i] = txt[i-1];
+		len++;
+		txt[p++] = c;
+	}
+	else
+	{
+		//if(p == len) return;
+		txt[p++] = c;
+		if(p > len) len = p;
+	}
+}
+void del(int pos)
+{
+	if(pos < 0 || pos >= len) return;
+	rep(i,pos,len-1) txt[i] = txt[i+1];
+	len--;
+	if(pos < p) p--;
+}
+void into_buf(int x, int y)
+{
+	buflen = 0;
+	if(x == y) return;
+	if(x > y) swap(x,y);
+	rep(i,x,y) buf[buflen++] = txt[i];
+}
+void del_str(int x, int y)
+{
+	if(x == y) return;
+	if(x > y) swap(x,y);
+	int n = y-x;
+	rep(i,x,len-n)
+		txt[i] = txt[i+n];
+	len -= n;
+	if(y < p) p -= n;
+	if(p > len) p = len;
+}
+char tmp[MAXN];
+void insert_buf()
+{
+	if(isi)
+	{
+		if(len + buflen > m) return;
+		txt[len] = 0;
+		strcpy(tmp,txt+p);
+		txt[p] = 0;
+		buf[buflen] = 0;
+		strcat(txt,buf);
+		strcat(txt,tmp);
+		len += buflen;
+		p += buflen;
+	}
+	else
+	{
+		if(buflen+p > m) return;
+		rep(i,0,buflen)
+		{
+			txt[p+i] = buf[i];
+		}
+		if(buflen+p > len)
+		{
+			len = buflen+p;
+			p = len;
+		}
+		else p += buflen;
+	}
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d %s", &m, a);
+		if(0 == m)
+		{
+			puts("NOTHING");
+			continue;
+		}
+		isi = true;
+		kc = false;
+		txt[0] = len = buflen = buf[0] = p = 0;
+		st = -1;
+		int n = strlen(a);
+		rep(i,0,n)
+		{
+			if(islower(a[i]))
+			{
+				kc  = 0;
+				insert(a[i]);
+			}
+			else
+			{
+				if('L' == a[i])
+				{
+					if(p > 0) p--;
+				}
+				else if('R' == a[i])
+				{
+					if(p < len && p < m) p++;
+				}
+				else if('S' == a[i])
+				{
+					kc  = 0;
+					isi ^= 1;
+				}
+				else if('D' == a[i])
+				{
+					if(kc)
+					{
+						del_str(st,p);
+						kc = 0;
+					}
+					else del(p);
+				}
+				else if('B' == a[i])
+				{
+					kc  = 0;
+					del(p-1);
+				}
+				else if('C' == a[i])
+				{
+					kc ^= 1;
+					if(kc)
+					{
+						st = p;
+					}
+					else
+					{
+						into_buf(st,p);
+					}
+				}
+				else if('V' == a[i])
+				{
+					kc  = 0;
+					insert_buf();
+				}
+			}
+		}
+		if(len)
+		{
+			txt[len] = 0;
+			puts(txt);
+		}
+		else puts("NOTHING");
+	}
+	return 0;
+}
+/*
+9
+50 abLSLLDabc
+25 abcdefgLLLSxyzSLLku
+50 abcdeLSCLLDLLRRabc
+15 abcBBdeLLDDxzDDDDRRRR
+10 abcdLLBB
+100 abcdeLCLLD
+5 abcLkjff
+30 abcdeCLLCRRVCLRCabVkz
+10 abcBBBLB
+*/

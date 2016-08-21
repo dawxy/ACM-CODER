@@ -1,0 +1,30 @@
+#include <cstdio>
+#include <cstring>
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int a = 0, b = 0, n,m, buf;
+        scanf("%d %d%*c", &n, &m);
+        for(int i = 0; i < n; i++)
+        {
+            scanf("%d%*c", &buf);
+            a += buf;
+        }
+        for(int i = 0; i < m; i++)
+        {
+            scanf("%d%*c", &buf);
+            b += buf;
+        }
+        if(a > b) puts("Calem");
+        else if(a < b) puts("Serena");
+        else puts("Draw");
+    }
+    return 0;
+}

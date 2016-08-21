@@ -1,0 +1,94 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define id(x,y) ((x)+(y)|(x)!=(y))
+const int INF = 0x3f3f3f3f, MAXN = 100000+10;
+int num[MAXN],x[MAXN],y[MAXN];
+int ans[MAXN], sum[MAXN<<1];//Ïß¶ÎÊ÷Î¬»¤y×ø±ê
+
+inline void push_up(int x, int y, int m){
+	sum[id(x,y)] = sum[id(x,m)]+sum[id(m+1,y)];
+}
+int p;
+void add(int x, int y)
+{
+	if(x == y)
+	{
+		sum[id(x,y)]++;
+		return;
+	}
+	int m = (x+y)>>1;
+	if(p <= m) add(x,m);
+	else add(m+1,y);
+	push_up(x,y,m);
+}
+int ql,qr;
+int query(int x, int y)
+{
+	if(ql <= x && y <= qr) return sum[id(x,y)];
+	int m = (x+y)>>1, ret = 0;
+	if(ql <= m) ret += query(x,m);
+	if(qr > m) ret += query(m+1,y);
+	return ret;
+}
+inline bool cmp(int a, int b){
+	if(x[a] != x[b]) return x[a] < x[b];
+	return y[a] > y[b];
+}
+int sin()
+{
+	int ch,ans;
+	ch = getchar();
+	while(ch < '0' || '9' < ch) ch = getchar();
+	ans = ch-'0';
+	while((ch = getchar()) >= '0' && '9' >= ch) ans = (ans<<3)+(ans<<1)+ch-'0';
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int n;
+	while(~scanf("%d%*c", &n) && n)
+	{
+		int mxy = 0;
+		rep(i,0,n)
+		{
+			x[i] = sin(), y[i] = sin();
+			if(mxy < y[i]) mxy = y[i];
+			num[i] = i;
+		}
+		sort(num,num+n,cmp);
+		clc(sum,0);
+		qr = mxy;
+		rep(i,0,n)
+		{
+			int nx = x[num[i]], ny = y[num[i]];
+			ql = ny;
+			if(i && x[num[i]] == x[num[i-1]] && y[num[i]] == y[num[i-1]])
+				ans[num[i]] = ans[num[i-1]];
+			else ans[num[i]] = query(0,mxy);
+			p = ny;
+			add(0,mxy);
+		}
+		printf("%d",ans[0]);
+		rep(i,1,n) printf(" %d", ans[i]);
+		putchar('\n');
+	}
+	return 0;
+}

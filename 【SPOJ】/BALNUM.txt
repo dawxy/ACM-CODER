@@ -1,0 +1,187 @@
+/*二维二进制压缩*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef unsigned long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 21;
+LL dp[MAXN][1<<10][1<<10];
+bool vis[MAXN][1<<10][1<<10];
+int bit[MAXN];
+
+bool ok(int s, int odd)
+{
+	rep(i,0,10)
+	{
+		if((1<<i)&s)
+		{
+			if((odd&(1<<i)) && (i&1)) return false;
+			if(!(odd&(1<<i)) && !(i&1)) return false;
+		}
+	}
+	return true;
+}
+LL dfs(int len, int s, int odd, bool ismax, bool z)
+{
+	if(!len) return ok(s,odd);
+	LL &ans = dp[len][s][odd];
+	if(!ismax && vis[len][s][odd]) return ans;
+	LL sum = 0;
+	int mx = ismax?bit[len]:9;
+	repe(i,0,mx)
+	{
+		int nxs = s, nxodd = odd;
+		if(!z || i) nxs = s|(1<<i), nxodd = odd^(1<<i);
+		sum += dfs(len-1,nxs,nxodd,ismax&&i==mx,z&&0==i);
+	}
+	if(!ismax)
+	{
+		ans = sum;
+		vis[len][s][odd] = true;
+	}
+	return sum;
+}
+LL sloved(LL n)
+{
+	int len = 0;
+	while(n)
+	{
+		bit[++len] = n%10;
+		n /= 10;
+	}
+	return dfs(len,0,0,1,1);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	clc(vis,0);
+	while(t--)
+	{
+		LL x,y;
+		scanf("%llu %llu", &x, &y);
+		printf("%llu\n", sloved(y)-sloved(x-1));
+	}
+	return 0;
+}
+===============================================================
+/*一维三进制压缩*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef unsigned long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 21;
+LL dp[MAXN][59049+10];
+bool vis[MAXN][59049+10];
+int bit[MAXN],buf[MAXN];
+
+int to3(int s)
+{
+	clc(buf,0);
+	int len = 0;
+	while(s)
+	{
+		buf[len++] = s%3;
+		s /= 3;
+	}
+	return len;
+}
+int to10(int *c, int len)
+{
+	int ans = 0;
+	per(i,len-1,0)
+		ans = ans*3+c[i];
+	return ans;
+}
+bool ok(int s)
+{
+	int n = to3(s);
+	rep(i,0,n)
+	{
+		if(!buf[i]) continue;
+		if((i&1) && buf[i] == 1) return false;
+		if(!(i&1) && buf[i] == 2) return false;
+	}
+	return true;
+}
+LL dfs(int len, int s, bool ismax, bool z)
+{
+	if(!len) return ok(s);
+	LL &ans = dp[len][s];
+	if(!ismax && vis[len][s]) return ans;
+	int mx = ismax?bit[len]:9;
+	LL sum = 0;
+	repe(i,0,mx)
+	{
+		int nxs = s;
+		if(!(z&&0==i))
+		{
+			int n = to3(s);
+			if(0 == buf[i] || 2 == buf[i]) buf[i] = 1;
+			else buf[i] = 2;
+			n = max(n,i+1);
+			nxs = to10(buf,n);
+		}
+		sum += dfs(len-1,nxs,ismax&&i==mx,z&&0==i);
+	}
+	if(!ismax)
+	{
+		ans = sum;
+		vis[len][s] = true;
+	}
+	return sum;
+}
+LL sloved(LL n)
+{
+	int len = 0;
+	while(n)
+	{
+		bit[++len] = n%10;
+		n /= 10;
+	}
+	return dfs(len,0,1,1);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d",&t);
+	clc(vis,0);
+	while(t--)
+	{
+		LL x,y;
+		scanf("%llu %llu", &x, &y);
+		printf("%llu\n", sloved(y)-sloved(x-1));
+	}
+	return 0;
+}

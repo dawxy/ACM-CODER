@@ -1,0 +1,58 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#define MAXN 10010
+int prime[MAXN], e[1300];
+
+void get_prime()
+{
+	for(int i = 2; i <= 10000; i++)
+	{
+		if(!prime[i]) prime[++prime[0]] = i;
+		for(int j = 1; j <= prime[0] && prime[j] <= 10000/i; j++)
+		{
+			prime[prime[j]*i] = 1;
+			if(i%prime[j] == 0) break;
+		}
+	}
+}
+void mul(int a, int d)
+{
+	for(int i = 1; i <= prime[0]; i++)
+	{
+		while(0 == a%prime[i])
+		{
+			a /= prime[i];
+			e[i] += d;
+		}
+		if(1 == a) return;
+	}
+}
+void cal(int a, int d)//计算乘以或者除以a!
+{
+	for(int i = 1; i <= a; i++)
+		mul(i,d);
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+	int p,q,r,s;
+	get_prime();
+	while(~scanf("%d %d %d %d%*c", &p, &q, &r, &s))
+	{
+		memset(e,0,sizeof(e));
+		cal(p,1);
+		cal(q,-1);
+		cal(p-q,-1);
+		cal(r,-1);
+		cal(s,1);
+		cal(r-s,1);
+		double ans = 1;
+		for(int i = 1; i <= prime[0]; i++)
+			ans *= pow(prime[i],e[i]);
+		printf("%0.5lf\n", ans);
+	}
+	return 0;
+}

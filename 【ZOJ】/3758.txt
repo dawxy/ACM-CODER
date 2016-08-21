@@ -1,0 +1,31 @@
+#include <stdio.h>
+
+bool is_prime(long long a)
+{
+	if (1 == a)
+		return false;
+	for (long long i = 2; i*i <= a; i++)
+	{
+		if (0 == a%i)
+			return false;
+	}
+	return true;
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int b, n;
+	while(EOF != scanf ("%d %d%*c", &b, &n))
+	{
+		long long m = 0;
+		for (int i = 0; i < n; i++)
+			m = m*b+1;
+		if (is_prime(m))
+			printf ("YES\n");
+		else
+			printf ("NO\n");
+	}
+	return 0;
+}

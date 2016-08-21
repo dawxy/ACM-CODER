@@ -1,0 +1,226 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 1044266559, MAXN = 100000+10;
+int par[MAXN],ch[MAXN][2],fa[MAXN],fz[MAXN],val[MAXN],st[MAXN],add[MAXN],mx[MAXN],mx2[MAXN],cnt[MAXN],cnt2[MAXN],sz[MAXN];
+
+void init()//下标1~n
+{
+	clc(par,0);clc(ch,0);clc(fa,0);
+	clc(fz,0);clc(add,0);clc(mx,-0x3f);clc(mx2,-0x3f);
+	clc(st,-0x3f);clc(cnt2,0);
+}
+inline int chd(int u){return ch[fa[u]][1] == u;}
+inline void setch(int f, int u, int d){ch[f][d] = u,fa[u] = f;}
+inline void up(int u, int v, int c)
+{
+	if(v > mx[u]) mx2[u] = mx[u],mx[u] = v,cnt2[u] = cnt[u],cnt[u] = c;
+	else if(v == mx[u]) cnt[u] += c;
+	else if(v > mx2[u]) mx2[u] = v, cnt2[u] = c;
+	else if(v == mx2[u]) cnt2[u] += c;
+}
+inline void push_up(int u)
+{
+	sz[u] = sz[ch[u][0]]+sz[ch[u][1]]+1;
+	mx[u] = mx2[u] = -INF,cnt[u] = cnt2[u] = 0;
+	up(u,val[u],1);
+	up(u,mx[ch[u][0]],cnt[ch[u][0]]);
+	up(u,mx[ch[u][1]],cnt[ch[u][1]]);
+	up(u,mx2[ch[u][0]],cnt2[ch[u][0]]);
+	up(u,mx2[ch[u][1]],cnt2[ch[u][1]]);
+}
+inline void rot(int u)
+{
+	int d = chd(u),y = fa[u];
+	setch(fa[y],u,chd(y));
+	setch(y,ch[u][d^1],d);
+	setch(u,y,d^1);
+	push_up(y);push_up(u);
+}
+inline void rev(int u)
+{
+	swap(ch[u][0],ch[u][1]);
+	fz[u] ^= 1;
+}
+inline void one_add(int u, int v)
+{
+	if(!u) return;
+	add[u] += v;
+	val[u] += v;
+	mx[u] += v;
+	if(mx2[u] != -INF) mx2[u] += v;
+}
+inline void one_change(int u, int v)
+{
+	if(!u) return;
+	add[u] = 0;
+	val[u] = v;
+	mx[u] = v;cnt[u] = sz[u];
+	mx2[u] = -INF,cnt2[u] = 0;
+	st[u] = v;
+}
+inline void push_down(int u)
+{
+	if(st[u] != -INF)
+	{
+		one_change(ch[u][0],st[u]);one_change(ch[u][1],st[u]);
+		st[u] = -INF;
+	}
+	if(add[u])
+	{
+		one_add(ch[u][0],add[u]);one_add(ch[u][1],add[u]);
+		add[u] = 0;
+	}
+	if(fz[u])
+	{
+		rev(ch[u][0]),rev(ch[u][1]);
+		fz[u] = 0;
+	}
+}
+void dfs_down(int u)
+{
+	if(fa[u]) dfs_down(fa[u]);
+	push_down(u);
+}
+void splay(int u)
+{
+	dfs_down(u);
+	int rt = u;
+	while(fa[rt]) rt = fa[rt];
+	if(rt == u) return;
+	par[u] = par[rt],par[rt] = 0;
+	while(fa[u])
+	{
+		if(fa[fa[u]] && chd(u) == chd(fa[u])) rot(fa[u]);
+		rot(u);
+	}
+}
+void expose(int u)
+{
+	for(int now = u,la = 0;now;la = now,now = par[now])
+	{
+		splay(now);
+		par[ch[now][1]] = now;fa[ch[now][1]] = par[la] = 0;
+		setch(now,la,1);
+		push_up(now);
+	}
+	splay(u);
+}
+int find_root(int u)//找到splay最左边点，即当前连通树的根
+{
+	expose(u);
+	while(ch[u][0]) u = ch[u][0];
+	return u;
+}
+/*====================无根树============================*/
+void make_root(int u)//把u点变成当前splay的根(有根树不能使用)
+{
+	expose(u);
+	rev(u);
+}
+void link(int u, int v)//如果x(以下x都是当前节点),y不在同一颗子树中，则通过在x,y之间连边的方式，连接这两颗子树
+{
+	//if(find_root(u) == find_root(v)) return false;
+	make_root(u);
+	par[u] = v;
+	//return true;
+}
+void cut(int u)//有根树单个cut和这个一样
+{
+	expose(u);
+	par[u] = fa[ch[u][0]] = 0;
+	ch[u][0] = 0;
+	push_up(u);
+}
+void cut(int u, int v)//如果x,y在同一颗子树中，且x!=y,则将x视为这颗子树的根以后，切断y与其父亲结点的连接
+{
+	//if(u == v || find_root(u) != find_root(v)) return false;
+	make_root(u);
+	cut(v);
+	//return true;
+}
+void up_add(int x, int y, int v)
+{
+	make_root(x);
+	expose(y);
+	one_add(y,v);
+}
+void update(int x, int y, int v)//如果x,y在同一颗子树中，则将x,y之间路径上所有点的点权变成v
+{
+	//if(find_root(x) != find_root(y)) return false;
+	make_root(x);
+	expose(y);
+	one_change(y,v);
+}
+int query(int x, int y, int&num)//如果x,y在同一颗子树中，返回x,y之间路径上点权的最二大值
+{
+	//if(find_root(x) != find_root(y)) return -1;
+	make_root(x);
+	expose(y);
+	num = cnt2[y];
+	return mx2[y];
+}
+int v[MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		int n,m;
+		scanf("%d%d", &n, &m);
+		repe(i,1,n) scanf("%d", &v[i]);
+		init();
+		repe(i,1,n) cnt[i] = sz[i] = 1,val[i] = v[i];
+		rep(i,1,n)
+		{
+			int x,y;
+			scanf("%d%d", &x, &y);
+			link(x,y);
+		}
+		printf("Case #%d:\n",++count);
+		while(m--)
+		{
+			int op;
+			scanf("%d", &op);
+			if(1 == op)
+			{
+				int x,y;
+				scanf("%d%d", &x, &y);
+				cut(x,y);
+				scanf("%d%d", &x, &y);
+				link(x,y);
+			}
+			else if(2 == op)
+			{
+				int x,y,v;
+				scanf("%d%d%d", &x, &y, &v);
+				update(x,y,v);
+			}
+			else if(3 == op)
+			{
+				int x,y,v;
+				scanf("%d%d%d", &x, &y, &v);
+				up_add(x,y,v);
+			}
+			else if(4 == op)
+			{
+				int x,y;
+				scanf("%d%d",&x, &y);
+				int ans,sum;
+				ans = query(x,y,sum);
+				if(-INF == ans) puts("ALL SAME");
+				else printf("%d %d\n", ans,sum);
+			}
+		}
+	}
+	return 0;
+}

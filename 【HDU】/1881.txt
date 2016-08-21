@@ -1,0 +1,40 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 40
+struct NODE{
+    int h, l, t;
+}p[MAXN];
+
+bool cmp(NODE a, NODE b)
+{
+    return a.t<b.t;
+}
+int main ()
+{
+    #ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+    #endif
+    int n;
+    while(~scanf ("%d%*c", &n) && n > 0)
+    {
+        int dp[300] = {0};
+        for (int i = 0; i < n; i++)
+            scanf ("%d %d %d%*c", &p[i].h, &p[i].l, &p[i].t);
+        sort(p,p+n,cmp);
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = p[i].t; j >= p[i].l; j--)
+                dp[j] = max(dp[j], dp[j-p[i].l]+p[i].h);
+        }
+        int ans = dp[0];
+        for (int i = 1; i <= p[n-1].t; i++)
+        {
+            if (ans < dp[i])
+                ans = dp[i];
+        }
+        printf ("%d\n", ans);
+    }
+    return 0;
+}

@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 110
+#define INF 0x3f3f3f3f
+int sum[MAXN][MAXN], dp[MAXN][MAXN][MAXN];
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int h, w, ans = -INF;
+		scanf("%d %d%*c", &h, &w);
+		for (int i = 1; i <= h; i++)
+		{
+			for (int j = 1; j <= w; j++)
+			{
+				scanf("%d%*c", &sum[i][j]);
+				sum[i][j] += sum[i][j-1];
+			}
+		}
+		for (int i = 1; i <= h; i++)
+		{
+			for(int j = 1; j <= w; j++)//列起点
+			{
+				for (int k = j; k <= w; k++)//列终点
+				{
+					dp[i][j][k] = max(dp[i-1][j][k]+sum[i][k]-sum[i][j-1], sum[i][k]-sum[i][j-1]);
+					ans = max(ans,dp[i][j][k]);
+				}
+			}
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,45 @@
+#include <stdio.h>
+#define MAX_NM 100
+char a[MAX_NM][MAX_NM];
+
+void dfs (int, int, int, int);
+
+int main ()
+{
+	int n, m;
+	while (EOF != scanf ("%d %d%*c", &n, &m))
+	{
+		int i, j, ans;
+		for (i = 0; i < n; i++)
+		{
+			for (j = 0;j < m; j++)
+				scanf ("%c", &a[i][j]);
+			getchar ();
+		}
+
+		for (i = 0, ans = 0; i < n; i++)
+			for (j = 0; j < m;j++)
+				if ('W' == a[i][j])
+				{
+					dfs (i, j, n, m);
+					ans++;
+				}
+		printf ("%d\n", ans);
+	}
+
+	return 0;
+}
+
+void dfs (int x, int y,  int n, int m)
+{
+	int i, j, ni, nj;
+	a[x][y] = '.';
+	for (i = -1; i <= 1; i++)
+		for (j = -1; j <= 1; j++)
+		{
+			ni = x+i;
+			nj = y+j;
+			if (0 <= ni && n > ni && 0 <= nj && m > nj && 'W' == a[ni][nj])
+				dfs(ni, nj, n, m);
+		}
+}

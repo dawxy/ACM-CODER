@@ -1,0 +1,88 @@
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <string>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <algorithm>
+using namespace std;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+typedef long long LL;
+#define MAXN 510
+struct Edge{
+	int to;
+	double cost;
+	Edge(int a, double b){to = a, cost = b;}
+};
+vector<Edge> edge;
+vector<int> g[MAXN];
+bool inq[MAXN];
+int cnt[MAXN], n;
+double dis[MAXN];
+
+bool spfa(int s)
+{
+	queue<int>q;
+	repe(i,0,n) dis[i] = -1;
+	clc(inq,0);
+	clc(cnt,0);
+	dis[s] = 1;
+	inq[s] = true;
+	q.push(s);
+	while(!q.empty())
+	{
+		int u = q.front(); q.pop();
+		inq[u] = false;
+		int sz = g[u].size();
+		rep(i,0,sz)
+		{
+			Edge &e = edge[g[u][i]];
+			if(dis[u] >= 0 && dis[e.to] < dis[u]*e.cost)
+			{
+				dis[e.to] = dis[u]*e.cost;
+				if(!inq[e.to])
+				{
+					q.push(e.to);
+					inq[e.to] = true;
+					if(++cnt[e.to] > n) return false;
+				}
+			}
+		}
+	}
+	return true;
+}
+void add_edge(int from, int to, double cost)
+{
+	edge.push_back(Edge(to, cost));
+	g[from].push_back(edge.size()-1);
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int m,a,b;
+		double c;
+		scanf("%d %d%*c", &n, &m);
+		repe(i,1,n) g[i].clear();
+		edge.clear();
+		rep(i,0,m)
+		{
+			scanf("%d %lf %d%*c", &a, &c, &b);
+			add_edge(a,b,c);
+		}
+		if(spfa(1)) puts("No");
+		else puts("Yes");
+	}
+	return 0;
+}

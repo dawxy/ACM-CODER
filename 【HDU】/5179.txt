@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+map<LL, bool> vis;
+int now[11];
+
+bool ok(int n, int v)
+{
+	rep(i,0,n) if(v > now[i] || now[i]%v) return false;
+	return true;
+}
+void dfs(LL num, int w)
+{
+	if(w > 9 || num > 1000000000) return;
+	if(vis.find(num) == vis.end())
+		vis[num] = true;
+	rep(i,1,10)
+	{
+		if(ok(w,i))
+		{
+			now[w] = i;
+			dfs(num*10+i,w+1);
+		}
+	}
+}
+int ans[1310];
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	vis.clear();
+	dfs(0,0);
+	int n = 0;
+	map<LL, bool>::iterator it = vis.begin();
+	for(it++; it != vis.end(); it++)
+		ans[n++] = (*it).first;
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int x,y;
+		scanf("%d %d%*c", &x, &y);
+		printf("%d\n", upper_bound(ans,ans+n,y)-lower_bound(ans,ans+n,x));
+	}
+	return 0;
+}

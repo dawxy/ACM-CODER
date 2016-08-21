@@ -1,0 +1,117 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <bitset>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10*10+5, MAXM = 10*10+5;
+double b[MAXN][MAXN];
+const double eps = 1e-8;
+int n,m;//n-方程个数,m-未知数个数
+double a[MAXN][MAXM],x[MAXM];//a[][]方程左边的矩阵,x[]-方程右边的值以及最后的未知数答案
+
+inline bool zero(double num){return fabs(num) < eps;}
+int gauss()//返回-1无解,0有一个解并存在x[],否则返回自由变元个数
+{
+	int row,col;
+	for(row = 0,col = 0; row < n && col < m; row++,col++)
+	{
+		int mx = row;//找出绝对值最大的作为当前行
+		rep(i,row+1,n) if(fabs(a[i][col]) > fabs(a[mx][col])) mx = i;
+		if(mx != row)
+		{
+			rep(j,col,m) swap(a[mx][j],a[row][j]);
+			swap(x[mx],x[row]);
+		}
+		if(zero(a[row][col]))
+		{
+			row--;
+			continue;//有多个解
+		}
+		rep(i,row+1,n)
+		{
+			if(zero(a[i][col])) continue;
+			double tmp = a[i][col]/a[row][col];
+			a[i][col] = 0;
+			rep(j,col+1,m) a[i][j] -= tmp*a[row][j];
+			x[i] -= tmp*x[row];
+		}
+	}
+	rep(i,0,n)
+	{
+		bool end = true;
+		rep(j,0,m)
+		{
+			if(!zero(a[i][j]))
+			{
+				end = false;
+				break;
+			}
+		}
+		if(end && !zero(x[i])) return -1;//i行所有a为0，而右边值x不为0，无解
+	}
+	if(row < m) return m-row;//迭代次数小于未知数个数则有1<<(m-row)个解
+	per(now,m-1,0)//从下往上推,利用已知求未知
+	{
+		rep(j,now+1,m) x[now] -= a[now][j]*x[j];
+		x[now] /= a[now][now];//输出整数解可能需要(int)(x[i]+0.5)
+	}
+	return 0;
+}
+
+int dis(int x1, int y1, int x2, int y2)
+{
+    return abs(x1-x2)+abs(y1-y2);
+}
+int main()
+{
+#ifdef SHY
+    freopen("d:\\1.txt", "r", stdin);
+#endif
+    int w,h,d,count = 0;
+    while(~scanf("%d %d %d", &w, &h, &d) && (w+h+d))
+    {
+        rep(i,0,h)
+            rep(j,0,w) scanf("%lf", &b[i][j]);
+        clc(a,0);clc(x,0);
+        n = m = h*w;
+        rep(i,0,h)
+        {
+            rep(j,0,w)
+            {
+                rep(k,0,h)
+                {
+                    rep(l,0,w)
+                    {
+                        if(dis(i,j,k,l) <= d)
+                        {
+                            a[i*w+j][k*w+l] = 1;
+                            x[i*w+j] += b[i][j];
+                        }
+                    }
+                }
+            }
+        }
+        int f = gauss();
+		if(f) puts("error");
+        if(count++) putchar('\n');
+        rep(i,0,h)
+        {
+            rep(j,0,w) printf("%8.2f", x[i*w+j]);
+            putchar('\n');
+        }
+    }
+    return 0;
+}

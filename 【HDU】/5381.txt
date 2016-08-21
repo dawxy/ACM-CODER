@@ -1,0 +1,210 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 10000+10, MAXIN = 10000,MAXOUT = 10000;
+char buf[MAXIN], *ps = buf, *pe = buf+1;
+inline void rnext(){
+	if(++ps == pe) pe = (ps = buf)+fread(buf,sizeof(char),sizeof(buf)/sizeof(char),stdin);
+}
+template <class T>
+inline bool in_int(T &ans)
+{
+	ans = 0;
+	T f = 1;
+	if(ps == pe) return false;
+	do{ rnext(); if('-' == *ps) f = -1;} while(!isdigit(*ps) && ps != pe);
+	if(ps == pe) return false;
+	do{ ans = (ans<<1)+(ans<<3)+*ps-48;rnext();}while(isdigit(*ps) && ps != pe);
+	ans *= f;
+	return true;
+}
+char bufout[MAXOUT], outtmp[50],*pout = bufout, *pend = bufout+MAXOUT;
+inline void write(){ fwrite(bufout,sizeof(char),pout-bufout,stdout);pout = bufout;}/*必须在程序结束时加 write()*/
+inline void out_char(char c){ *(pout++) = c;if(pout == pend) write();}
+inline void out_str(char *s)
+{
+	while(*s){ *(pout++) = *(s++); if(pout == pend) write(); }
+}
+template <class T>
+inline void out_int(T x) {
+	if(!x){ out_char('0');return;}
+	if(x < 0) x = -x,out_char('-');
+	int len = 0;
+	while(x){ outtmp[len++] = x%10+48; x /= 10;}
+	outtmp[len] = 0;
+	for(int i = 0, j = len-1; i < j; i++,j--) swap(outtmp[i],outtmp[j]);
+	out_str(outtmp);
+}
+int a[MAXN],n;
+
+int gcd(int a, int b)
+{
+	while(b)
+	{
+		a %= b;
+		if(a < b) swap(a,b);
+	}
+	return a;
+}
+int dp[MAXN][20];
+void st_init(int n)
+{
+	repe(i,1,n) dp[i][0] = a[i-1];//下标从1开始的
+	for(int j = 1; (1<<j) <= n; j++)
+	{
+		for(int i = 1; i+(1<<j)-1 <= n; i++)//下标从1开始的
+			dp[i][j] = gcd(dp[i][j-1], dp[i+(1<<(j-1))][j-1]);
+	}
+}
+int st(int x, int y)
+{
+	x++,y++;
+	int k = 0;
+	while((1<<(k+1)) <= y-x+1) k++;
+	return gcd(dp[x][k], dp[y-(1<<k)+1][k]);
+}
+
+struct NODE{
+	int x,y,id,block;
+	bool operator<(const NODE&t)const{
+		if(block != t.block) return block < t.block;
+		return y < t.y;
+	}
+}in[MAXN];
+struct P{
+	int len;
+	LL v[31],cnt[31];
+}p[2][MAXN];
+
+int find_r(int v, int l)
+{
+	int x = l, y = n-1;
+	while(x <= y)
+	{
+		int m = (x+y)>>1;
+		if(st(l,m) >= v) x = m+1;
+		else y = m-1;
+	}
+	return x;
+}
+int find_l(int v, int r)
+{
+	int x = 0,y = r;
+	while(x <= y)
+	{
+		int m = (x+y)>>1;
+		if(st(m,r) >= v) y = m-1;
+		else x = m+1;
+	}
+	return y;
+}
+LL ans[MAXN],sum;
+
+void update(int tag, bool add, int st, int ed)
+{
+	int cnt = ed-st+1,tol = 0;
+	P *now = &p[tag][st];
+	if(tag) now = &p[tag][ed];
+	while(cnt)
+	{
+		if(cnt >= now->cnt[tol])
+		{
+			if(add) sum += now->cnt[tol]*now->v[tol];
+			else sum -= now->cnt[tol]*now->v[tol];
+			cnt -= now->cnt[tol++];
+		}
+		else
+		{
+			if(add) sum += now->v[tol]*cnt;
+			else sum -= now->v[tol]*cnt;
+			cnt = 0;
+		}
+	}
+}
+
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+	freopen("d:\\out.txt", "w", stdout);
+#endif
+	int t;
+	in_int(t);
+	while(t--)
+	{
+		in_int(n);
+		rep(i,0,n) in_int(a[i]);
+		st_init(n);
+		rep(i,0,n)
+		{
+			int pos = i,la = i,v = a[i];
+			p[0][i].len = 0;
+			while(1)
+			{
+				pos = find_r(v,i);
+				p[0][i].v[p[0][i].len] = v;
+				p[0][i].cnt[p[0][i].len++] = pos-la;
+				if(pos > n-1) break;
+				v = st(i,pos);
+				la = pos;
+			}
+		}
+		rep(i,0,n)
+		{
+			int pos = i,la = i,v = a[i];
+			p[1][i].len = 0;
+			while(1)
+			{
+				pos = find_l(v,i);
+				p[1][i].v[p[1][i].len] = v;
+				p[1][i].cnt[p[1][i].len++] = la-pos;
+				if(pos < 0) break;
+				v = st(pos,i);
+				la = pos;
+			}
+		}
+		int q, SIZE = sqrt(n+0.5);
+		in_int(q);
+		rep(i,0,q)
+		{
+			in_int(in[i].x), in_int(in[i].y);
+			in[i].x--;in[i].y--;
+			in[i].id = i;
+			in[i].block = in[i].x/SIZE;
+		}
+		sort(in,in+q);
+		sum = a[0];
+		int x = 0,y = 0;
+		rep(i,0,q)
+		{
+			while(x > in[i].x)
+			{
+				update(0,1,--x,y);
+				//sum += add[0][--x];
+			}
+			while(y < in[i].y)
+			{
+				update(1,1,x,++y);
+				//sum += add[1][++y];
+			}
+			while(x < in[i].x)
+			{
+				update(0,0,x++,y);
+				//sum -= add[0][x++];
+			}
+			while(y > in[i].y)
+			{
+				update(1,0,x,y--);
+				//sum -= add[1][y--];
+			}
+			ans[in[i].id] = sum;
+		}
+		rep(i,0,q) out_int(ans[i]),out_char('\n');
+	}
+	write();
+	return 0;
+}

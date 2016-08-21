@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 200
+int h, k, max[MAX],kind[MAX], ans[MAX], maxnum;
+bool lxn[MAX];
+
+void dfs(int p, int n, int sum)
+{
+	lxn[sum] = true;
+	if (p == h)
+		return;
+	for (int i = 0; i <= n; i++)
+	{
+		dfs(p+1, n, sum+kind[i]);
+	}
+}
+void find(int pk)
+{
+	if (pk == k)
+	{
+		if (maxnum < max[pk-1])
+		{
+			maxnum = max[pk-1];
+			for (int i = 0; i < k; i++)
+				ans[i] = kind[i];
+		}
+		return;
+	}
+	for (int i = kind[pk-1]+1; i <= max[pk-1]+1; i++)
+	{
+		kind[pk] = i;
+		memset(lxn,false,sizeof(lxn));
+		dfs(0, pk, 0);
+		int j = 1;
+		while(lxn[j++]);
+		max[pk] = j-2;
+		find(pk+1);
+	}
+}
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	kind[0] = 1;
+	while(1)
+	{
+		scanf ("%d %d%*c", &h, &k);
+		if (0 == h && 0 == k)
+			break;
+		max[0] = h;
+		maxnum = -1;
+		find(1);
+		for (int i = 0; i < k; i++)
+		{
+			printf ("%3.d", ans[i]);
+		}
+		printf (" ->%3.d\n", maxnum);
+	}
+
+	return 0;
+}

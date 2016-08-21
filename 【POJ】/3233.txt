@@ -1,0 +1,91 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 31;
+int n,MOD;
+struct MATRIX {
+	int num[MAXN][MAXN];
+	void init(bool e){
+		clc(num,0);
+		if(e) rep(i,0,n) num[i][i] = 1;
+	}
+}a;
+
+MATRIX mul(const MATRIX& a, const MATRIX& b)
+{
+	MATRIX ans;
+	ans.init(0);
+	rep(i,0,n)
+	{
+		rep(j,0,n)
+		{
+			rep(k,0,n) ans.num[i][j] = (ans.num[i][j]+a.num[i][k]*b.num[k][j])%MOD;
+		}
+	}
+	return ans;
+}
+MATRIX pow_mod(MATRIX x, int c)
+{
+	MATRIX ans;
+	ans.init(1);
+	while(c)
+	{
+		if(c&1) ans = mul(ans,x);
+		x = mul(x,x);
+		c >>= 1;
+	}
+	return ans;
+}
+MATRIX add(const MATRIX &a, const MATRIX &b)
+{
+	MATRIX ans;
+	rep(i,0,n)
+	{
+		rep(j,0,n) ans.num[i][j] = (a.num[i][j]+b.num[i][j])%MOD;
+	}
+	return ans;
+}
+MATRIX sum(int k)
+{
+	if(1 == k) return a;
+	MATRIX ans;
+	ans.init(1);
+	ans = add(ans,pow_mod(a,k>>1));//1+A^(k/2)
+	ans = mul(ans,sum(k>>1));//(1+A^(k/2))*S(k/2)
+	if(k&1) ans = add(ans,pow_mod(a,k));
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int k;
+	scanf("%d %d %d%*c", &n, &k, &MOD);
+	rep(i,0,n)
+	{
+		rep(j,0,n) scanf("%d%*c", &a.num[i][j]);
+	}
+	MATRIX ans = sum(k);
+	rep(i,0,n)
+	{
+		printf("%d",ans.num[i][0]);
+		rep(j,1,n) printf(" %d", ans.num[i][j]);
+		putchar('\n');
+	}
+	return 0;
+}

@@ -1,0 +1,83 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <queue>
+using namespace std;
+#define MAXN 110
+#define MAXM 10010
+#define INF 0x3f3f3f3f
+#define min(a,b) (a<b?a:b)
+vector<int> g[MAXN];
+int cost[MAXN][MAXN],dis[MAXN],n, e[MAXN], dp[MAXM], sum;
+bool inq[MAXN];
+
+void bellman_ford()
+{
+    queue<int> q;
+    memset(inq,0,sizeof(inq));
+    memset(dis,0x3f,sizeof(dis));
+    dis[0] = 0;
+    inq[0] = true;
+    q.push(0);
+    while(!q.empty())
+    {
+        int u = q.front();q.pop();
+        inq[u] = false;
+        int len = g[u].size();
+        for(int i = 0; i < len; i++)
+        {
+            int to = g[u][i];
+            if(dis[u] < INF && dis[to] > dis[u]+cost[u][to])
+            {
+                dis[to] = dis[u]+cost[u][to];
+                if(!inq[to])
+                {
+                    q.push(to);
+                    inq[to] = true;
+                }
+            }
+        }
+    }
+}
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+#endif
+    int t;
+    scanf("%d%*c", &t);
+    while(t--)
+    {
+        int m, a, b, c;
+        sum = 0;
+        scanf("%d %d%*c", &n, &m);
+        memset(cost,0x3f,sizeof(cost));
+        for(int i = 0; i <= n; i++)g[i].clear();
+        for(int i = 0; i < m; i++)
+        {
+            scanf("%d %d %d%*c", &a, &b, &c);
+            if(INF == cost[a][b]) g[a].push_back(b),g[b].push_back(a);
+            if(cost[a][b] > c)
+                cost[a][b] = cost[b][a] = c;
+        }
+        for(int i = 1; i <= n; i++)
+        {
+            scanf("%d%*c",  &e[i]);
+            sum += e[i];
+        }
+        bellman_ford();
+        memset(dp,0x3f,sizeof(dp));
+        dp[0] = 0;
+        for(int i = 1; i <= n; i++)
+        {
+            for(int j = sum; j >= e[i]; j--)
+                dp[j] = min(dp[j], dp[j-e[i]]+dis[i]);
+        }
+        int ans = INF;
+        for (int i = sum / 2 + 1; i <= sum; i++)
+            ans = min(ans,dp[i]);
+        if(INF == ans) puts("impossible");
+        else printf("%d\n",ans);
+    }
+    return 0;
+}

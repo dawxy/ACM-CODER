@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <string.h>
+#include <string>
+#include <map>
+using namespace std;
+struct NODE{
+	char a[20];
+}q1[1510], q2[1510];
+map <string,bool> vis;
+
+int main ()
+{
+#ifdef DSHY
+	freopen("e:\\1.txt","r",stdin);
+#endif
+	int t, count = 0;
+	scanf ("%d%*c", &t);
+	while(t--)
+	{
+		int m, n;
+		scanf ("%d %d%*c", &m, &n);
+		for (int i = 0; i < m; i++)
+			gets(q1[i].a);
+		for (int i = 0; i < n; i++)
+			gets(q2[i].a);
+		int ans = 0;
+		char buf[40];
+		vis.clear();
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				buf[0] = 0;
+				strcat(buf,q1[i].a);
+				strcat(buf,q2[j].a);
+				if (vis.end() == vis.find(string(buf)))
+				{
+					vis[string(buf)] = true;
+					ans++;
+				}
+			}
+		}
+		printf ("Case %d: %d\n", ++count, ans);
+	}
+	return 0;
+}

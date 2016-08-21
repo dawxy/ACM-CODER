@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <malloc.h>
+#define scanf scanf_s
+#define INF 99999999
+#define MAX_P 10000
+typedef struct q{
+	int i;
+	int j;
+}Q, *PQ;
+Q p[MAX_P];
+int n, m, si, sj, ei, ej, len_que, fp, lp, sum[100][100], d[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+char map[100][100];
+
+void que_init();
+void que_push(int, int);
+Q que_out();
+void bfs ();
+
+int dijkstra ();
+
+
+int main()
+{
+	while (	EOF != scanf ("%d %d%*c", &n, &m))
+	{
+		int i, j;
+		for (i = 0; i < m; i++)
+		{
+			for (j = 0; j < n; j++)
+			{
+				map[i][j] = getchar ();
+				if ('S' == map[i][j])
+				{
+					si = i;
+					sj = j;
+				}
+				if ('G' == map[i][j])
+				{
+					ei = i;
+					ej = j;
+				}
+			}
+			getchar ();
+		}
+
+		bfs();
+		printf ("%d\n", sum[ei][ej]);
+
+	}
+
+
+	return 0;
+}
+
+void que_init ()
+{
+	len_que = 0;
+	fp = 0;
+	lp = 0;
+}
+
+void que_push (int i, int j)
+{
+	p[lp].i = i;
+	p[lp].j = j;
+	lp++;
+	len_que++;
+}
+
+Q que_out()
+{
+	Q buf = p[fp];
+	fp++;
+	len_que--;
+	return buf;
+}
+
+void bfs ()
+{
+	int i, j, ni, nj;
+	Q buf;
+	for (i = 0; i < m; i++)
+		for (j = 0; j < n; j++)
+			sum[i][j] = INF;
+	que_init();
+	que_push(si,sj);
+	sum[si][sj] = 0;
+	while (len_que)
+	{
+		buf = que_out();
+		if (buf.i == ei && buf.j == ej)
+			break;
+		for (i = 0; i < 4; i++)
+		{
+			ni = buf.i+d[i][0];
+			nj = buf.j+d[i][1];
+			if (0 <= ni && m > ni && 0 <= nj && n > nj && '#' != map[ni][nj] && INF == sum[ni][nj])\
+			{
+				que_push(ni, nj);
+				sum[ni][nj] = sum[buf.i][buf.j]+1;
+			}
+		}
+	}
+}
+

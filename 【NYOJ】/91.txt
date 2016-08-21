@@ -1,0 +1,28 @@
+#include <stdio.h>
+#define MAXN 1000000
+int a[10] = {1,2,6,24,120,720,5040,40320,362880};
+
+int main ()
+{
+	#ifdef SHY
+    freopen("e:\\1.txt","r",stdin);
+    //freopen("e:\\out.txt","w",stdout);
+    #endif
+	int t;
+	scanf ("%d%*c", &t);
+    while(t--)
+	{
+		int n;
+		scanf ("%d%*c", &n);
+        for (int i = 8; i >= 0 && n; i--)
+		{
+            if (n >= a[i])
+				n -= a[i];
+		}
+        if (0 == n)
+			puts("Yes");
+		else
+			puts("No");
+	}
+    return 0;
+}

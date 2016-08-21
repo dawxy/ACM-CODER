@@ -1,0 +1,127 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define eps (1e-8)
+const int INF = 0x3f3f3f3f, MAXN = 50+10, M = MAXN*MAXN;
+struct NODE{
+	double x,y;
+}city[MAXN],rd[MAXN];
+int lt[M],rt[M],up[M],down[M],col[M],tol,cnt[MAXN];
+int n,m,k;
+
+void init(int maxc)
+{
+	repe(i,0,maxc)
+		lt[i] = i-1,rt[i] = i+1,up[i]=down[i] = i;
+	lt[0] = maxc,rt[maxc] = 0;
+	tol = maxc+1;
+	clc(cnt,0);
+}
+bool ok(int a, int b, double r)
+{
+	double dis = sqrt((rd[a].x-city[b].x)*(rd[a].x-city[b].x)+(rd[a].y-city[b].y)*(rd[a].y-city[b].y));
+	return r > dis || fabs(dis-r)<eps;
+}
+void remove(int c)
+{
+	for(int i = down[c];i != c; i = down[i])
+		lt[rt[i]] = lt[i], rt[lt[i]] = rt[i],--cnt[col[i]];
+}
+void reset(int c)
+{
+	for(int i = up[c]; i != c; i = up[i])
+		lt[rt[i]] = rt[lt[i]] = i,++cnt[col[i]];
+}
+bool vis[MAXN];
+int f()
+{
+	int ans = 0;
+	for(int c = rt[0];c;c = rt[c]) vis[c] = true;
+	for(int c = rt[0];c;c = rt[c])
+	{
+		if(vis[c])
+		{
+			ans++;
+			vis[c] = false;
+			for(int i = down[c]; i != c; i = down[i])
+				for(int j = rt[i]; j != i; j = rt[j])
+					vis[col[j]] = false;
+		}
+	}
+	return ans;
+}
+bool dfs(int d)
+{
+	if(d+f() > k) return false;
+	if(0 == rt[0]) return d <= k;
+	int c = rt[0];
+	for(int i = rt[0]; i; i = rt[i]) if(cnt[c] > cnt[i]) c = i;
+	for(int i = down[c]; i != c; i = down[i])
+	{
+		remove(i);
+		for(int j = rt[i]; j != i; j = rt[j]) remove(j);
+		if(dfs(d+1)) return true;
+		for(int j = lt[i]; j != i; j = lt[j]) reset(j);
+		reset(i);
+	}
+	return false;
+}
+bool sloved(double r)
+{
+	init(n);
+	rep(i,0,m)
+	{
+		int ft = tol;
+		repe(j,1,n)
+		{
+			if(ok(i,j,r))
+			{
+				col[tol] = j;
+				lt[tol] = tol-1,rt[tol] = tol+1,up[tol] = up[j],down[tol] = j;
+				down[up[j]] = tol, up[j] = tol;
+				cnt[j]++,tol++;
+			}
+		}
+		if(ft != tol)
+			lt[ft] = tol-1,rt[tol-1] = ft;
+	}
+	return dfs(0);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d %d %d", &n, &m, &k);
+		repe(i,1,n) scanf("%lf %lf", &city[i].x, &city[i].y);
+		rep(i,0,m) scanf("%lf %lf", &rd[i].x, &rd[i].y);
+		double x = 0, y = 2000, ans;
+		while(x < y || fabs(x-y)<eps)
+		{
+			double m = (x+y)/2;
+			if(sloved(m))
+				ans = m, y = m-eps;
+			else x = m+eps;
+		}
+		printf("%.6f\n", ans);
+	}
+	return 0;
+}

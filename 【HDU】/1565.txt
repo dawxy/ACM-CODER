@@ -1,0 +1,73 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define MAXN 21
+#define MAXC 2584
+struct NODE{
+	int x, y;//x是上一行的状态下标，y是当前状态下标
+}p[MAXC*MAXC];
+int n, a[MAXN][MAXN], dp[MAXN][MAXC], s[MAXC], v[MAXN][MAXC], len, sum;
+
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	while (~scanf("%d%*c", &n))
+	{
+		if (!n)
+		{
+			puts("0");
+			continue;
+		}
+		memset(dp,0,sizeof(dp));
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 1; j <= n; j++)
+				scanf("%d%*c", &a[i][j]);
+		}
+		len = sum = 0;
+		//去掉有左右相邻的状态，因为都是n个所以每一行都一样的，只要算一次
+		for (int j = 0; j < (1 << n); j++)
+		{
+			if (j&(j << 1)) continue;
+			s[len++] = j;
+		}
+		//算出每一行每个合法状态分别对应的总价值
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 0; j < len; j++)
+			{
+				int x = s[j], d = 0;
+				v[i][j] = 0;
+				while (x)
+				{
+					if (x & 1)
+						v[i][j] += a[i][d + 1];
+					x >>= 1;
+					d++;
+				}
+			}
+		}
+		//去掉有上下相邻的状态
+		for (int i = 0; i < len; i++)
+		{
+			for (int j = 0; j < len; j++)
+			{
+				if (s[i] & s[j]) continue;
+				p[sum].x = i, p[sum++].y = j;
+			}
+		}
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 0; j < sum; j++)
+				dp[i][p[j].y] = max(dp[i][p[j].y], dp[i - 1][p[j].x] + v[i][p[j].y]);
+		}
+		int ans = 0;
+		for (int i = 0; i < len; i++)
+			ans = max(ans, dp[n][i]);
+		printf("%d\n", ans);
+	}
+	return 0;
+}

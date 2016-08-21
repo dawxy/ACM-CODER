@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <map>
+//#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f;
+
+int main()
+{
+#ifdef SHY
+    freopen("e:\\1.txt", "r", stdin);
+#endif
+    int n,m;
+    while(~scanf("%d %d%*c", &n, &m))
+    {
+        int ans = INF;
+        rep(i,0,m)
+        {
+            int a,b;
+            scanf("%d %d%*c", &a, &b);
+            int tmp = (n/a+(bool)(n%a))*b;
+            ans = min(ans,tmp);
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

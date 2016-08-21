@@ -1,0 +1,118 @@
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+//#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define FOR(i,a,b) for(int i = b[a]; i != a; i = b[i])
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 60+10, M = MAXN*MAXN;
+struct NODE{
+	LL x,y;
+}p[MAXN];
+int lt[M],rt[M],up[M],down[M],col[M],tol,cnt[MAXN];
+int n,k;
+
+void init()
+{
+	repe(i,0,n) lt[i] = i-1, rt[i] = i+1,up[i] = down[i] = i;
+	lt[0] = n, rt[n] = 0;
+	tol = n+1;
+	clc(cnt,0);
+}
+LL dis(LL a, LL b){return abs(p[a].x-p[b].x)+abs(p[a].y-p[b].y);}
+bool vis[MAXN];
+int f()
+{
+	int ans = 0;
+	FOR(c,0,rt) vis[c] = true;
+	FOR(c,0,rt)
+	{
+		if(vis[c])
+		{
+			ans++;
+			vis[c] = false;
+			FOR(i,c,down)
+				FOR(j,i,rt)
+					vis[col[j]] = false;
+		}
+	}
+	return ans;
+}
+void remove(int c)
+{
+	FOR(i,c,down) lt[rt[i]] = lt[i], rt[lt[i]] = rt[i],--cnt[col[i]];
+}
+void reset(int c)
+{
+	FOR(i,c,up) lt[rt[i]] = rt[lt[i]] = i,++cnt[col[i]];
+}
+bool dfs(int d)
+{
+	if(d > k || d+f() > k) return false;
+	if(!rt[0]) return d <= k;
+	int c = rt[0];
+	FOR(i,0,rt) if(cnt[i] < cnt[c]) c = i;
+	FOR(i,c,down)
+	{
+		remove(i);
+		FOR(j,i,rt) remove(j);
+		if(dfs(d+1)) return true;
+		FOR(j,i,lt) reset(j);
+		reset(i);
+	}
+	return false;
+}
+bool sloved(LL m)
+{
+	init();
+	repe(i,1,n)
+	{
+		int ft = tol;
+		repe(j,1,n)
+		{
+			if(dis(i,j) <= m)
+			{
+				col[tol] = j;
+				lt[tol] = tol-1,rt[tol] = tol+1,up[tol] = up[j],down[tol] = j;
+				down[up[j]] = tol,up[j] = tol;
+				cnt[j]++,tol++;
+			}
+		}
+		if(ft != tol) lt[ft] = tol-1,rt[tol-1] = ft;
+	}
+	return dfs(0);
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t,count = 0;
+	scanf("%d", &t);
+	while(t--)
+	{
+		scanf("%d %d", &n, &k);
+		repe(i,1,n) scanf("%I64d %I64d", &p[i].x, &p[i].y);
+		LL x = 0, y = 4000000010, ans;
+		while(x <= y)
+		{
+			LL m = (x+y)>>1;
+			if(sloved(m))
+				ans = m, y = m-1;
+			else x = m+1;
+		}
+		printf("Case #%d: %I64d\n", ++count,ans);
+	}
+	return 0;
+}

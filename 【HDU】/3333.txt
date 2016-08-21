@@ -1,0 +1,170 @@
+/*离线树状数组*/
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+#define INF 0x3f3f3f3f
+#define MAXN 30010
+struct QUERY{
+	int x,y, num;
+	bool operator<(const QUERY& t)const{return y < t.y;}
+}query[100010];
+LL cnt[MAXN], a[MAXN], n, ans[100010];
+map<LL,int> vis;
+
+inline int lowbit(int x){return x&-x;}
+void update(int x, LL d)
+{
+	while(x <= n)
+	{
+		cnt[x] += d;
+		x += lowbit(x);
+	}
+}
+LL sum(int x)
+{
+	LL ans = 0;
+	while(x > 0)
+	{
+		ans += cnt[x];
+		x -= lowbit(x);
+	}
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("e:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		scanf("%d%*c", &n);
+		repe(i,1,n) scanf("%I64d%*c", &a[i]);
+		int q;
+		scanf("%d%*c", &q);
+		rep(i,0,q)
+		{
+			scanf("%d %d%*c", &query[i].x, &query[i].y);
+			query[i].num = i;
+		}
+		sort(query,query+q);
+		vis.clear();
+		clc(cnt,0);
+		int p = 1;
+		rep(i,0,q)
+		{
+			int st = query[i].x, ed = query[i].y;
+			for(;p <= ed; p++)
+			{
+				if(!vis.count(a[p])) update(p,a[p]);
+				else
+				{
+					update(vis[a[p]],-a[p]);
+					update(p,a[p]);
+				}
+				vis[a[p]] = p;
+			}
+			ans[query[i].num] = sum(ed)-sum(st-1);
+		}
+		rep(i,0,q) printf("%I64d\n", ans[i]);
+	}
+	return 0;
+}
+==========================================================================================
+/*在线主席树*/
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <set>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+#define rep(i,a,n) for(int i = a; i < n; i++)
+#define repe(i,a,n) for(int i = a; i <= n; i++)
+#define per(i,n,a) for(int i = n; i >= a; i--)
+#define clc(a,b) memset(a,b,sizeof(a))
+const int INF = 0x3f3f3f3f, MAXN = 30000+10, MAXM = MAXN*50;
+int lc[MAXM],rc[MAXM],tol;
+LL sum[MAXM];
+int a[MAXN], rt[MAXN];
+unordered_map<int,int> vis;
+
+void update(int &u, int x, int y, int p, LL v)
+{
+	sum[tol] = sum[u]+v,lc[tol] = lc[u],rc[tol] = rc[u];
+	u = tol++;
+	if(x == y) return;
+	int m = (x+y)>>1;
+	if(p <= m) update(lc[u],x,m,p,v);
+	else update(rc[u],m+1,y,p,v);
+}
+LL query(int u, int x, int y, int ql, int qr)
+{
+	if(ql <= x && y <= qr) return sum[u];
+	int m = (x+y)>>1;
+	LL ans = 0;
+	if(ql <= m) ans += query(lc[u],x,m,ql,qr);
+	if(qr > m) ans += query(rc[u],m+1,y,ql,qr);
+	return ans;
+}
+int main()
+{
+#ifdef SHY
+	freopen("d:\\1.txt", "r", stdin);
+#endif
+	int t;
+	scanf("%d%*c", &t);
+	while(t--)
+	{
+		int n;
+		scanf("%d", &n);
+		repe(i,1,n) scanf("%d", &a[i]);
+		tol = 1;
+		vis.clear();
+		repe(i,1,n)
+		{
+			rt[i] = rt[i-1];
+			if(vis.find(a[i]) != vis.end())
+			{
+				int tmp = rt[i-1];
+				update(tmp,1,n,vis[a[i]],-a[i]);
+				rt[i] = tmp;
+				update(rt[i],1,n,i,a[i]);
+			}
+			else
+			{
+				rt[i] = rt[i-1];
+				update(rt[i],1,n,i,a[i]);
+			}
+			vis[a[i]] = i;
+		}
+		int q;
+		scanf("%d", &q);
+		rep(i,0,q)
+		{
+			int x,y;
+			scanf("%d %d", &x, &y);
+			printf("%I64d\n", query(rt[y],1,n,x,y));
+		}
+	}
+	return 0;
+}
